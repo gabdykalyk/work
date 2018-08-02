@@ -7,7 +7,7 @@ function initNavbar() {
 		var panel_collapse = $('#navbar-collapse-block');
 		var btn = $(this);
 		var is_show_panel = $(this).attr('class').indexOf('collapsed');
-		
+
 		if (window_w < 992) {
 			if (is_show_panel == -1) {
 				panel_collapse.removeClass('in');
@@ -40,7 +40,7 @@ function initNavbar() {
 function switchPayments(lnk) {
 	$('.nav-pay li').removeClass('active');
 	lnk.parent().addClass('active');
-	
+
 	var pay = lnk.attr('data-payment');var pay = lnk.attr('data-payment');
 	$('.row-pay').hide();
 	$('.row-pay-' + pay).css('display', 'block');
@@ -113,7 +113,7 @@ function showDoc(lnk, evnt) {
 	} else {
 		body.append('<div class="block-tooltip block-tooltip-fix"><img src="' + img_src + '" alt=""><button type="button" class="btn btn-default btn-close-tooltip" title="Закрыть"><i class="fa fa-times" aria-hidden="true"></i></button></div>');
 		tooltip = $('.block-tooltip');
-		
+
 		console.log(tooltip.width());
 
 		if (win_width < 768) {
@@ -143,4 +143,35 @@ function hideDoc() {
 	$('body').removeClass('modal-open');
 	$('.block-tooltip').remove();
 	$('.modal-backdrop-tooltip').remove();
+}
+
+function initSurcharge(number = 0) {
+		var count = $('.js-surcharge').length;
+		if (number != 0 ) {
+				$('.form-surcharge').attr('surcharge-number', number);
+		} else {
+				$('.form-surcharge').attr('surcharge-number', count);
+		}
+}
+
+function changeSurchargePeriodType() {
+		var select = $(document).find('.js-emplsurcharge-period'),
+				now = $(document).find('.js-emplsurcharge-period').val(),
+				block = select.closest('.js-surcharge'),
+				types = block.find('.js-types');
+
+		types.find('.form-group').hide();
+		types.find('.form-group[data-type="' + now + '"]').show();
+}
+
+function changeSurchargeType() {
+		var checked = $(document).find('.js-surcharge-type:checked'),
+				type = checked.data('type'),
+				to = checked.closest('.js-surcharge-price').find('.js-surcharge-type-label');
+
+		if (type == 'percent') {
+				to.html('%');
+		} else {
+				to.html('<i class="fa fa-rouble"></i>');
+		}
 }
