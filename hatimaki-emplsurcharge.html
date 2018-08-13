@@ -139,7 +139,7 @@
                                         <option value="30">30</option>
                                         <option value="31">31</option>
                                     </optgroup>
-                                </select>                                
+                                </select>
                             </div>
                             <div class="form-group form-group-date col-md-4 col-sm-7 col-xs-12 col-w-calc" data-type="week">
                                 <label class="hidden-xs">Дни недели</label>
@@ -277,7 +277,7 @@
             initSurcharge();
             changeSurchargePeriodType();
             changeSurchargeType();
-	
+
 			// Календарь и селект для Произольные дни и Каждый год
             $('.js-btn-datepicker').datepicker({
             	format: 'dd M',
@@ -285,45 +285,46 @@
                 multidate: true,
                 multidateSeparator: ', '
             }).on('changeDate', function(e) {
-            	var show = e.format('', 'dd M'),
-            		input = $(this).closest('.datepicker-surcharge').find('.js-surcharge-period');
-            	input.empty().trigger('change');
-            	$.each(e.dates, function( index, value ) {
-	            	if (input.find("option[value='" + e.format(index, 'dd M') + "']").length == 0) {			    		
-						var newOption = new Option(e.format(index, 'dd M'), value, true, true);
-				    	input.append(newOption).trigger('change');								    
-					}
-            	});	
-            });
-            
-            $('.js-surcharge-period').select2({
-            	width: '100%',
-            	dropdownCssClass: 'datepicker-surcharge-block'
-        	});
-        	
-        	$('.js-surcharge-period').on('select2:unselect', function (e) {
-				var data = e.params.data.id,
-					picker = $(this).closest('.datepicker-surcharge').find('.js-btn-datepicker'),
-					dates = picker.datepicker('getDates');
+                var show = e.format('', 'dd M'),
+                    input = $(this).closest('.datepicker-surcharge').find('.js-surcharge-period');
 
-				dates = jQuery.grep(dates, function(value) {
-				  return value != data;
-				});
-				
-				picker.datepicker('setDates', dates);
-			});        	
-			
-			// Изменение периода надбавки
+                input.empty().trigger('change');
+                $.each(e.dates, function( index, value ) {
+                    if (input.find("option[value='" + e.format(index, 'dd M') + "']").length == 0) {
+                        var newOption = new Option(e.format(index, 'dd M'), value, true, true);
+                        input.append(newOption).trigger('change');
+                    }
+                });
+            });
+
+            $('.js-surcharge-period').select2({
+                width: '100%',
+                dropdownCssClass: 'datepicker-surcharge-block'
+            });
+
+            $('.js-surcharge-period').on('select2:unselect', function (e) {
+                var data = e.params.data.id,
+                    picker = $(this).closest('.datepicker-surcharge').find('.js-btn-datepicker'),
+                    dates = picker.datepicker('getDates');
+
+                dates = jQuery.grep(dates, function(value) {
+                    return value != data;
+                });
+
+                picker.datepicker('setDates', dates);
+            });
+
+	          // Изменение периода надбавки
             $(document).on('change', '.js-emplsurcharge-period', function () {
                 changeSurchargePeriodType();
             });
-	
-			// Изменение типа надбавки (процент, фикса)
+
+			      // Изменение типа надбавки (процент, фикса)
             $(document).on('change', '.js-surcharge-type', function () {
                 changeSurchargeType();
             });
-	
-			// Удаление надбавки
+
+	          // Удаление надбавки
             $(document).on('click', '.js-surcharge-remove', function () {
                 if ($('.js-surcharge').length > 1) {
                     $(this).closest('.js-surcharge').remove();
@@ -331,28 +332,28 @@
                     alert('Нельзя удалить последний элемент!');
                 }
             });
-            
+
             // Select2 для филиала и должности
             $('.js-select-filial').select2({
-            	placeholder: "Для филиала",
-	            width: '100%'
-	        });	
-	        
-	        $('.js-select-vac').select2({
-            	placeholder: "Для должности",
-	            width: '100%'
-	        });	
-	        
-	        // Выбор дней месяца
-	        var surcharge_period_month = $('.js-surcharge-period-month-input').select2({
-	            width: '100%'
-	        });
-			surcharge_period_month.data('select2').$dropdown.addClass('surcharge-period-month-block');
-			surcharge_period_month.data('select2').$container.addClass('surcharge-period-month-input');
-			surcharge_period_month.data('select2').$dropdown.find('.select2-dropdown').append('<i class="fa fa-times"></i>');
-			$(document).on('click', '.surcharge-period-month-block .fa-times', function() {
-				surcharge_period_month.select2('close');
-			});
+              	placeholder: "Для филиала",
+  	            width: '100%'
+	          });
+
+            $('.js-select-vac').select2({
+              	placeholder: "Для должности",
+                width: '100%'
+            });
+
+  	        // Выбор дней месяца
+  	        var surcharge_period_month = $('.js-surcharge-period-month-input').select2({
+                width: '100%'
+  	        });
+		       surcharge_period_month.data('select2').$dropdown.addClass('surcharge-period-month-block');
+			     surcharge_period_month.data('select2').$container.addClass('surcharge-period-month-input');
+	         surcharge_period_month.data('select2').$dropdown.find('.select2-dropdown').append('<i class="fa fa-times"></i>');
+			     $(document).on('click', '.surcharge-period-month-block .fa-times', function() {
+				      surcharge_period_month.select2('close');
+			     });
         });
     </script>
 </body>
