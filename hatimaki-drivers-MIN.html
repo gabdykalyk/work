@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Водители, не добравшие до минимального размера зарплаты</title>
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="fonts/fontawesome-pro-5.1.0-web/css/all.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
+
+    <link href="css/styles.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <nav class="navbar navbar-fixed-top navbar-lk">
+        <div class="container-fluid">
+            <div class="navbar-collapse collapse" id="navbar-collapse-block">
+                <ul class="nav navbar-nav navbar-nav-main">
+                    <li class="item-menu-manper"><a href="#">Расчёты<span class="count">1</span></a></li>
+                    <li class="item-menu-messages"><a href="#">Новый расчёт<span class="count">5</span></a></li>
+                    <li class="item-menu-alerts active"><a href="#">Штрафы/Премии/Надбавки<span class="count">2</span></a></li>
+                    <li class="item-menu-schedule"><a href="#">Приказы/Инструкции</a></li>
+                    <li class="item-menu-index"><a href="#">Кадры<span class="count">3</span></a></li>
+                    <li class="item-menu-docs"><a href="#">Отчёты<span class="count">1</span></a></li>
+                    <li class="item-menu-discus"><a href="#">Обсуждения<span class="count">4</span></a></li>
+                    <li class="item-menu-complaints"><a href="#">Жалобы и предложения<span class="count">1</span></a></li>
+                    <li class="item-menu-friends"><a href="#">Друзья</a></li>
+                    <li class="item-menu-groups"><a href="#">Группы</a></li>
+                    <li class="item-menu-settings"><a href="#">Настройки</a></li>
+                    <li class="item-menu-help"><a href="#">Помощь</a></li>
+                </ul>
+            </div>
+            <button type="button" class="navbar-toggle collapsed" id="navbar-toggle">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <i class="fa fa-chevron-left" aria-hidden="true"></i>
+            </button>
+            <div class="navbar-right navbar-login">
+                <a href="#" class="btn"><span>Александр Константиновский</span> <i class="fa fa-sign-out hidden-sm hidden-xs" aria-hidden="true"></i></a>
+            </div>
+            <ul class="nav navbar-nav navbar-right navbar-nav-social">
+                <li><a href="#" title="Вконтакте"><i class="fab fa-vk" aria-hidden="true"></i></a></li>
+                <li><a href="#" title="Есть непросмотренные сообщения"><i class="fa fa-envelope" aria-hidden="true"></i><span class="badge"></span></a></li>
+                <li class="item-bell" title="Есть непросмотренные уведомления"><a href="#"><i class="fa fa-bell" aria-hidden="true"></i><span class="badge"></span></a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid content">
+        <h1>Водители, не добравшие до минимального размера зарплаты</h1>
+        <hr class="visible-lg visible-md">
+
+        <form action="" method="post" class="form-respons">
+            <div class="row">
+                <div class="form-group col-md-3 col-sm-5 col-xs-12 col-w-calc">
+                    <label for="filial" class="hidden-xs">Филиал</label>
+                    <select class="form-control js-select-multiple" name="filial" id="filial" multiple="multiple">
+                        <option value="1">Бутово1</option>
+                        <option value="2">Бутово2</option>
+                        <option value="3">Коммунарка</option>
+                        <option value="4">Коммунарка2</option>
+                    </select>
+                </div>
+                <div class="form-group finestat-form-period col-md-2 col-sm-3 col-xs-12 col-w-calc">
+                    <label for="surcharge[1]" class="hidden-xs">Период</label>
+                    <select class="form-control js-emplsurcharge-period" name="surcharge[1][period]">
+                        <option value="days">Сегодня</option>
+                        <option value="week">Произвольный</option>
+                    </select>
+                </div>
+                <div class="finestat-btn-block">
+                    <div class="form-group">
+                        <label class="hidden-xs">&nbsp;</label>
+                        <div class="">
+                            <button type="button" class="btn btn-primary">Показать</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8 col-sm-12">
+                    <div class="drivers-table drivers-table--min table--desktop">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">ФИО</th>
+                                    <th class="text-center">Кол-во<br>смен</th>
+                                    <th class="text-center">Кол-во<br>смен &lt;min </th>
+                                    <th class="text-center">Сумма<br>на руки</th>
+                                    <th class="text-center">Сумма<br>по формулам</th>
+                                    <th class="text-center">Потери<br>компании</th>
+                                    <th class="text-center">% расчетной<br>от полученной</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table--parent-tr" data-id="1">
+                                    <td>
+                                        <a href="#" class="js-drop-tr drop-tr-link"><i class="fa fa-chevron-circle-down"></i></a>
+                                    </td>
+                                    <td>Бутово</td>
+                                    <td class="text-center">10</td>
+                                    <td class="text-center">4</td>
+                                    <td class="text-center">19200</td>
+                                    <td class="text-center">15800</td>
+                                    <td class="text-center">3400</td>
+                                    <td class="text-center">82.3</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td></td>
+                                    <td>Антюхова Марина</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-red--l">200</td>
+                                    <td class="text-center td-red--l">3.9</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td></td>
+                                    <td>Карипаин Иван</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-red--l">6.85</td>
+                                    <td class="text-center td-green--l">4.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td></td>
+                                    <td>Федеев Юрий</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-red--l">6.85</td>
+                                    <td class="text-center td-red">4.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td></td>
+                                    <td>Мельничук Юрий</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-green">6.85</td>
+                                    <td class="text-center td-green">4.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td></td>
+                                    <td>Казаз Александр</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">1</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-red--xl">6.85</td>
+                                    <td class="text-center td-green">4.6</td>
+                                </tr>
+                                <tr class="table--parent-tr" data-id="2">
+                                    <td>
+                                        <a href="#" class="js-drop-tr drop-tr-link"><i class="fa fa-chevron-circle-down"></i></a>
+                                    </td>
+                                    <td>Коммунарка</td>
+                                    <td class="text-center">10</td>
+                                    <td class="text-center">4</td>
+                                    <td class="text-center">19200</td>
+                                    <td class="text-center">15800</td>
+                                    <td class="text-center">3400</td>
+                                    <td class="text-center">82.3</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td></td>
+                                    <td>Антюхова Марина</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-red--l">6.61</td>
+                                    <td class="text-center td-red--l">3.9</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td></td>
+                                    <td>Карипаин Иван</td>
+                                    <td class="text-center">2</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-red--l">6.85</td>
+                                    <td class="text-center td-green--l">4.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td></td>
+                                    <td>Федеев Юрий</td>
+                                    <td class="text-center">2</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-red--l">6.85</td>
+                                    <td class="text-center td-red">4.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td></td>
+                                    <td>Мельничук Юрий</td>
+                                    <td class="text-center">2</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-green">6.85</td>
+                                    <td class="text-center td-green">4.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td></td>
+                                    <td>Казаз Александр</td>
+                                    <td class="text-center">2</td>
+                                    <td class="text-center">3</td>
+                                    <td class="text-center">5200</td>
+                                    <td class="text-center">5000</td>
+                                    <td class="text-center td-red--xl">6.85</td>
+                                    <td class="text-center td-green">4.6</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="td-grey"></th>
+                                    <th class="td-grey">ИТОГО</th>
+                                    <th class="text-center td-grey">20</th>
+                                    <th class="text-center td-grey">10</th>
+                                    <th class="text-center td-grey">1500</th>
+                                    <th class="text-center td-grey">3</th>
+                                    <th class="text-center td-grey">5200</th>
+                                    <th class="text-center td-grey">5000</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="drivers-table drivers-table--min table--mobile">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Кол-во<br>смен/смен<br>&lt;min</th>
+                                    <th class="text-center">Сумма<br>на руки/<br>по формуле</th>
+                                    <th class="text-center" colspan="2">Потери компании/<br>% расчетной<br>от полученной</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table--parent-tr" data-id="1">
+                                    <td colspan="4">
+                                        <a href="#" class="js-drop-tr drop-tr-link"><i class="fa fa-chevron-circle-down"></i></a> Бутово
+                                    </td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center">200</td>
+                                    <td class="text-center">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td colspan="4">Антюхова Марина</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td colspan="4">Карипаин Иван</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td colspan="4">Федеев Юрий</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td colspan="4">Мельничук Юрий</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td colspan="4">Казаз Александр</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="1">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--parent-tr" data-id="2">
+                                    <td colspan="4">
+                                        <a href="#" class="js-drop-tr drop-tr-link"><i class="fa fa-chevron-circle-down"></i></a> Коммунарка
+                                    </td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center">200</td>
+                                    <td class="text-center">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td colspan="4">Антюхова Марина</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td colspan="4">Карипаин Иван</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td colspan="4">Федеев Юрий</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td colspan="4">Мельничук Юрий</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td colspan="4">Казаз Александр</td>
+                                </tr>
+                                <tr class="table--child-tr" data-parent="2">
+                                    <td class="text-center">10/4</td>
+                                    <td class="text-center">19 200/15 800</td>
+                                    <td class="text-center td-green">200</td>
+                                    <td class="text-center td-red">96.6</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th class="text-center td-grey">20</th>
+                                    <th class="text-center td-grey">10</th>
+                                    <th class="text-center td-grey">1500</th>
+                                    <th class="text-center td-grey">86.6</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap DateTimepicker, https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+    <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+
+    <!-- Select2, https://select2.org/getting-started/basic-usage -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.full.min.js"></script>
+
+    <!-- https://github.com/LucasLazaro/bootstrap-nav-tab-scrollable -->
+    <script type="text/javascript" src="js/scrolling-tabs/jquery.scrolling-tabs.js"></script>
+
+    <!-- Phone Mask, https://github.com/RobinHerbots/Inputmask -->
+    <script type="text/javascript" src="js/jquery.inputmask.bundle.js"></script>
+    <script type="text/javascript" src="js/inputmask.date.extensions.js"></script>
+
+    <script type="text/javascript" src="js/js-gl.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            initNavbar();
+
+            $('.js-select-multiple').select2({
+                width: '100%',
+            });
+
+            $(document).on('click', '.js-drop-tr', function (e) {
+                e.preventDefault();
+                var parent = $(this).closest('tr'),
+                    id = parent.data('id');
+
+                parent.toggleClass('open');
+                if (parent.hasClass('open')) {
+                    $(this).html('<i class="fa fa-chevron-circle-up"></i>');
+                    $(this).closest('table').find('tr[data-parent="' + id + '"]').show();
+                } else {
+                    $(this).html('<i class="fa fa-chevron-circle-down"></i>');
+                    $(this).closest('table').find('tr[data-parent="' + id + '"]').hide();
+                }
+            })
+        });
+    </script>
+</body>
+</html>
