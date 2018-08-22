@@ -68,28 +68,52 @@
         <hr class="visible-lg visible-md">
 
         <form action="" method="post" class="form-respons">
-            <div class="row">
-                <div class="form-group col-md-3 col-sm-5 col-xs-12 col-w-calc">
-                    <label for="filial" class="hidden-xs">Филиал</label>
-                    <select class="form-control js-select-multiple" name="filial" id="filial" multiple="multiple">
-                        <option value="1">Бутово1</option>
-                        <option value="2">Бутово2</option>
-                        <option value="3">Коммунарка</option>
-                        <option value="4">Коммунарка2</option>
-                    </select>
-                </div>
-                <div class="form-group finestat-form-period col-md-2 col-sm-3 col-xs-12 col-w-calc">
-                    <label for="surcharge[1]" class="hidden-xs">Период</label>
-                    <select class="form-control js-emplsurcharge-period" name="surcharge[1][period]">
-                        <option value="days">Сегодня</option>
-                        <option value="week">Произвольный</option>
-                    </select>
-                </div>
-                <div class="finestat-btn-block">
-                    <div class="form-group">
-                        <label class="hidden-xs">&nbsp;</label>
-                        <div class="">
-                            <button type="button" class="btn btn-primary">Показать</button>
+            <div class="js-surcharge">
+                <div class="row">
+                    <div class="form-group col-md-3 col-sm-5 col-xs-12 col-w-calc">
+                        <label for="filial" class="hidden-xs">Филиал</label>
+                        <select class="form-control js-select-multiple" name="filial" id="filial" multiple="multiple">
+                            <option value="1">Бутово1</option>
+                            <option value="2">Бутово2</option>
+                            <option value="3">Коммунарка</option>
+                            <option value="4">Коммунарка2</option>
+                        </select>
+                    </div>
+                    <div class="form-group finestat-form-period col-md-2 col-sm-3 col-xs-12 col-w-calc">
+                        <label for="surcharge[1]" class="hidden-xs">Период</label>
+                        <select class="form-control js-emplsurcharge-period" name="surcharge[1][period]">
+                            <option value="days">Сегодня</option>
+                            <option value="week">Произвольный</option>
+                        </select>
+                    </div>
+                    <div class="js-types finestat-types">
+                        <div class="form-group drivers-form-date" data-type="week">
+                            <label class="hidden-xs">&nbsp;</label>
+                            <div class="input-group datepicker form-control-sm">
+                                <input type="text" class="form-control" value="" name="from" maxlength="10">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group drivers-form-date-del" data-type="week">
+                          -
+                        </div>
+                        <div class="form-group drivers-form-date" data-type="week">
+                            <label class="hidden-xs">&nbsp;</label>
+                            <div class="input-group datepicker form-control-sm">
+                                <input type="text" class="form-control" value="" name="to" maxlength="10">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="finestat-btn-block">
+                        <div class="form-group form-btns">
+                            <div class="">
+                                <button type="button" class="btn btn-primary">Показать</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -374,9 +398,9 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th class="text-center td-grey">20</th>
-                                    <th class="text-center td-grey">10</th>
-                                    <th class="text-center td-grey">1500</th>
+                                    <th class="text-center td-grey">20/8</th>
+                                    <th class="text-center td-grey">38 400/31 600</th>
+                                    <th class="text-center td-grey">6800</th>
                                     <th class="text-center td-grey">86.6</th>
                                 </tr>
                             </tfoot>
@@ -413,7 +437,20 @@
     <script type="text/javascript">
         $(function () {
             initNavbar();
+            initSurcharge();
+            changeSurchargePeriodType();
 
+            // Календарь и селект для Произвольные дни и Каждый год
+            $('.datepicker').datetimepicker({
+                format: 'DD.MM.YYYY',
+                language: 'ru'
+            });
+
+            // Изменение периода надбавки
+            $(document).on('change', '.js-emplsurcharge-period', function () {
+                changeSurchargePeriodType();
+            });
+            
             $('.js-select-multiple').select2({
                 width: '100%',
             });
