@@ -175,3 +175,30 @@ function changeSurchargeType() {
 				to.html('<i class="fa fa-rouble"></i>');
 		}
 }
+
+// инициализация информационного окна для кол-ва заказов
+function initTooltipProviders() {
+	var win_width = $(window).width();
+
+	if (win_width > 991) {
+		$('.table-providers .cell-sum.td-red').tooltip({
+			html: true,
+			title: $(this).attr('data-title'),
+			container: '.table-responsive-wrapper-provider',
+			template: '<div class="tooltip-provider tooltip top" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div>'
+		});
+
+	} else {
+		$('.table-providers .cell-sum.td-red').tooltip({
+			html: true,
+			title: $(this).attr('data-title'),
+			trigger: 'click',
+			container: '.table-responsive-wrapper-provider',
+			template: '<div class="tooltip-provider tooltip top" role="tooltip"><button type="button" class="btn btn-close" onclick="hideTooltipProviders();"><i class="fas fa-times"></i></button><div class="tooltip-inner"></div></div>'
+		});
+	}
+}
+
+function hideTooltipProviders() {
+	$('.table-providers .cell-sum.td-red').tooltip('hide');
+}
