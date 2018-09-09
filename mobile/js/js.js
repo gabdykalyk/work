@@ -96,7 +96,7 @@ function initSwipe() {
 
     function onSwipeStart(e) {
         //itemis = $(e.target).closest("li").find(".move")
-		itemis = $(e.target).closest(".js-order-list").find(".order-item")
+		itemis = $(e.target).closest(".order-item").find(".order-item--body")
         swipeOrigin = e.touches[0].clientX;
     }
 
