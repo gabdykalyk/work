@@ -90,7 +90,7 @@ function initSwipe() {
             transform: "translatex(" + x + "px)"
         })
 		$(menuis).css({
-            transform: "translatex(" + x + "px)"
+            //transform: "translatex(" + x + "px)"
         })
     }
 
@@ -98,7 +98,7 @@ function initSwipe() {
 
     function onSwipeStart(e) {
 		itemis = $(e.target).closest(".order-item").find(".order-item--body");
-		menuis = $(e.target).closest(".order-item").find(".menu-action");
+		//menuis = $(e.target).closest(".order-item").find(".menu-action");
         swipeOrigin = e.touches[0].clientX;
     }
 
