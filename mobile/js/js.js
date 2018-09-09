@@ -43,3 +43,75 @@ function initModalOrder() {
 		}); 
 	});
 }
+
+// инициализация swipe
+function initSwipe() {
+	var startPos;
+	var handlingTouch = false;
+	var itemis;
+
+    document.addEventListener('touchstart', function (e) {
+        // Is this the first finger going down? 
+
+        if (e.touches.length == e.changedTouches.length) {
+            startPos = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+        }
+    });
+	
+    document.addEventListener('touchmove', function (e) {
+        // If this is the first movement event in a sequence:
+        if (startPos) {
+            // Is the axis of movement horizontal?
+            if (Math.abs(e.changedTouches[0].clientX - startPos.x) > Math.abs(e.changedTouches[0].clientY - startPos.y)) {
+                handlingTouch = true;
+                e.preventDefault();
+                onSwipeStart(e);
+            }
+            startPos = undefined;
+        } else if (handlingTouch) {
+            e.preventDefault();
+            onSwipeMove(e);
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchend', function (e) {
+        if (handlingTouch && e.touches.length == 0) {
+            e.preventDefault();
+            onSwipeEnd(e);
+            handlingTouch = false;
+        }
+    }, { passive: false });
+	
+    function slide(x) {
+
+        $(itemis).css({
+            transform: "translatex(" + x + "px)"
+        })
+    }
+
+    var swipeOrigin, x, itempos;
+
+    function onSwipeStart(e) {
+        //itemis = $(e.target).closest("li").find(".move")
+		itemis = $(e.target).closest(".js-order-list").find(".order-item")
+        swipeOrigin = e.touches[0].clientX;
+    }
+
+    function onSwipeMove(e) {
+        x = e.touches[0].clientX - swipeOrigin;
+        slide(x);
+    }
+
+    function onSwipeEnd(e) {
+
+        if (x > 35) {
+            slide(100);
+        } else {
+            slide(0);
+
+        }
+    }	
+}
