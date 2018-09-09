@@ -89,22 +89,32 @@ function initSwipe() {
         $(itemis).css({
             transform: "translatex(" + x + "px)"
         })
-		$(menuis).css({
-            //transform: "translatex(" + x + "px)"
-        })
+		if (x < 0) {
+			$(menuis).css({
+				width: Math.abs(x) + "px"
+				//transform: "translatex(" + x + "px)"
+			})
+		} else {
+			$(menuis).css({
+				width: "0px"
+				//transform: "translatex(" + x + "px)"
+			})			
+		}
+
     }
 
     var swipeOrigin, x, itempos;
 
     function onSwipeStart(e) {
 		itemis = $(e.target).closest(".order-item").find(".order-item--body");
-		//menuis = $(e.target).closest(".order-item").find(".menu-action");
+		menuis = $(e.target).closest(".order-item").find(".menu-action");
         swipeOrigin = e.touches[0].clientX;
     }
 
     function onSwipeMove(e) {
         x = e.touches[0].clientX - swipeOrigin;
         slide(x);
+		console.log('move ' + x);
     }
 
     function onSwipeEnd(e) {
