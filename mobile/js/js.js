@@ -84,9 +84,8 @@ function initSwipe() {
             handlingTouch = false;
         }
     }, { passive: false });
-	
-    function slide(x) {
 
+    function slide(x) {
         $(itemis).css({
             transform: "translatex(" + x + "px)"
         })
@@ -95,7 +94,6 @@ function initSwipe() {
     var swipeOrigin, x, itempos;
 
     function onSwipeStart(e) {
-        //itemis = $(e.target).closest("li").find(".move")
 		itemis = $(e.target).closest(".order-item").find(".order-item--body")
         swipeOrigin = e.touches[0].clientX;
     }
@@ -106,12 +104,10 @@ function initSwipe() {
     }
 
     function onSwipeEnd(e) {
-
-        if (x > 35) {
-            slide(100);
+        if (x < -100) {
+            slide(-240);
         } else {
             slide(0);
-
         }
-    }	
+    }
 }
