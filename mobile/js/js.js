@@ -48,7 +48,7 @@ function initModalOrder() {
 function initSwipe() {
 	var startPos;
 	var handlingTouch = false;
-	var itemis;
+	var itemis, menuis;
 
     document.addEventListener('touchstart', function (e) {
         // Is this the first finger going down? 
@@ -89,12 +89,16 @@ function initSwipe() {
         $(itemis).css({
             transform: "translatex(" + x + "px)"
         })
+		$(menuis).css({
+            transform: "translatex(" + x + "px)"
+        })
     }
 
     var swipeOrigin, x, itempos;
 
     function onSwipeStart(e) {
-		itemis = $(e.target).closest(".order-item").find(".order-item--body")
+		itemis = $(e.target).closest(".order-item").find(".order-item--body");
+		menuis = $(e.target).closest(".order-item").find(".menu-action");
         swipeOrigin = e.touches[0].clientX;
     }
 
