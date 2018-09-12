@@ -68,6 +68,7 @@ function bindEventTouch(element) {
 	var swipeOrigin;
 	var handlingTouch = false;
 	var x;
+	var isLeft = false;
 
     element.bind('tap taphold swipe swiperight swipeleft vmousemove', function(event, ui) {
         console.log('Event: '+event.type); 
@@ -79,7 +80,12 @@ function bindEventTouch(element) {
 		}
 		
 		if (event.type == 'swipeleft') {
-			swipeOrigin = event.swipestart.coords[0];
+			if (isLeft) {
+				swipeOrirgin = -200;
+			} else {
+				swipeOrigin = event.swipestart.coords[0];
+			}
+			
 			handlingTouch = true;
 		}
 		
@@ -102,8 +108,10 @@ function bindEventTouch(element) {
 		handlingTouch = false;
 		if (x < 0) {
 			slide($(this), -200);
+			isLeft = true;
 		} else {
 			slide($(this), 0);
+			isLeft = false;
 		}
 		
     });
