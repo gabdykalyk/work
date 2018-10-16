@@ -338,7 +338,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="modalStatus" tabindex="-1" role="dialog" aria-labelledby="modalStatusLabel">
+<div class="modal fade" id="modalStatus" role="dialog" aria-labelledby="modalStatusLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -387,7 +387,7 @@
                                     <div class="form-group col-md-8 col-sm-8 col-xs-12">
                                         <label class="hidden-xs" for="whoGives">Кто выдает</label>
                                         <select class="form-control  js-select-whoGives" name="whoGives" id="whoGives">
-                                            <option></option>
+                                            <option value="-1"></option>
                                             <option value="1">Петров</option>
                                             <option value="2">Сидоров</option>
                                             <option value="3">Васильев</option>
@@ -397,7 +397,7 @@
                                 <div class="form-group">
                                     <label class="hidden-xs" for="reason">Причина штрафа</label>
                                     <select class="form-control  js-select-reason" name="reason" id="reason">
-                                        <option></option>
+                                        <option value="-1"></option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
                                         <option value="3">3</option>
@@ -486,13 +486,13 @@
 <!-- Select2, https://select2.org/getting-started/basic-usage -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.full.min.js"></script>
 
+<script type="text/javascript" src="js/js-gl.js"></script>
+
 <script type="text/javascript">
     $(function () {
-        $('.js-select-single').select2({
-            tags: true,
-            width: '100%'
-        });
+        changeSurchargePeriodType();
 
+        //select2
         $('.js-select-employees').select2({
             width: '100%',
             placeholder: 'Причастные сотрудники',
@@ -505,32 +505,23 @@
 
         $('.js-select-whoGives').select2({
             tags: true,
-            width: '100%',
-            placeholder: 'Кто выдает',
+            placeholder: {
+                id: '-1',
+                text: 'Кто выдает'
+            },
+            allowClear: true,
+            width: '100%'
         });
 
         $('.js-select-reason').select2({
             tags: true,
-            width: '100%',
-            placeholder: 'Причина штрафа',
-        });
-
-        $('.js-select-multiple').select2({
+            placeholder: {
+                id: '-1',
+                text: 'Причина штрафа'
+            },
+            allowClear: true,
             width: '100%'
         });
-    });
-</script>
-
-<!-- https://github.com/LucasLazaro/bootstrap-nav-tab-scrollable -->
-<script type="text/javascript" src="js/scrolling-tabs/jquery.scrolling-tabs.js"></script>
-
-<script type="text/javascript" src="js/js-gl.js"></script>
-
-<script type="text/javascript">
-    $(function () {
-        initNavbar();
-        initSurcharge();
-        changeSurchargePeriodType();
 
         $('select.js-select-placeholder').each(function(index, value) {
             selectPlaceholder('#' + value.id);
@@ -549,66 +540,64 @@
         });
 
         // тестовая функция на изменение высоты стороки
-        $(document).ready(function () {
+        if ($(window).width() < 748) {
+            cellHeight($('.table-dissat'));
+        };
+
+        $(window).on('resize', function () {
             if ($(window).width() < 748) {
                 cellHeight($('.table-dissat'));
-            };
+            }
+            else {
+                $('.table-dissat').find('td').outerHeight('auto');
+                $('.table-dissat').find('th').outerHeight('auto');
+                $('.table-dissat').find('tr').outerHeight('auto');
+            }
+        });
 
-            $(window).on('resize', function () {
-                if ($(window).width() < 748) {
-                    cellHeight($('.table-dissat'));
-                }
-                else {
-                    $('.table-dissat').find('td').outerHeight('auto');
-                    $('.table-dissat').find('th').outerHeight('auto');
-                    $('.table-dissat').find('tr').outerHeight('auto');
-                }
+        function cellHeight(table) {
+            let _this = table,
+                trArray = [],
+                tdMaxHeightArr = [],
+                trTable = _this.find('tbody tr'),
+                trTableHead = _this.find('thead tr');
+
+            trTable.each(function(){
+                let tdArray = [];
+
+                $(this).find('td').each(function(){
+                    tdArray.push($(this).outerHeight());
+                });
+
+                trArray.push(tdArray);
             });
 
-            function cellHeight(table) {
-                let _this = table,
-                    trArray = [],
-                    tdMaxHeightArr = [],
-                    trTable = _this.find('tbody tr'),
-                    trTableHead = _this.find('thead tr');
+            for (let i = 0; i < trArray[0].length; i++) {
+                let max = 0;
 
-                trTable.each(function(){
-                    let tdArray = [];
-
-                    $(this).find('td').each(function(){
-                        tdArray.push($(this).outerHeight());
-                    });
-
-                    trArray.push(tdArray);
-                });
-
-                for (let i = 0; i < trArray[0].length; i++) {
-                    let max = 0;
-
-                    for (let j = 0; j < trArray.length; j++) {
-                        if (trArray[j][i] > max) {
-                            max = trArray[j][i];
-                        }
+                for (let j = 0; j < trArray.length; j++) {
+                    if (trArray[j][i] > max) {
+                        max = trArray[j][i];
                     }
-
-                    tdMaxHeightArr.push(max);
                 }
 
-                trTable.each(function(){
-                    $(this).find('td').each(function(i){
-                        $(this).outerHeight(tdMaxHeightArr[i]);
-                    });
-                });
-
-                trTableHead.each(function(){
-                    $(this).find('th').each(function(i){
-                        $(this).outerHeight(tdMaxHeightArr[i]);
-                    });
-                });
-
-                trTableHead.outerHeight(_this.find('tbody').outerHeight() - 1);
+                tdMaxHeightArr.push(max);
             }
-        })
+
+            trTable.each(function(){
+                $(this).find('td').each(function(i){
+                    $(this).outerHeight(tdMaxHeightArr[i]);
+                });
+            });
+
+            trTableHead.each(function(){
+                $(this).find('th').each(function(i){
+                    $(this).outerHeight(tdMaxHeightArr[i]);
+                });
+            });
+
+            trTableHead.outerHeight(_this.find('tbody').outerHeight() - 1);
+        }
     });
 </script>
 </body>
