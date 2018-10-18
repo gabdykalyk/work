@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Сводный отчет по нарушениям</title>
+  <!-- Bootstrap -->
+  <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Icons -->
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="fonts/fontawesome-pro-5.1.0-web/css/all.css" rel="stylesheet">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
+
+  <link href="css/styles.css" rel="stylesheet">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body class="container-fluid content">
+<nav class="navbar navbar-fixed-top navbar-lk">
+  <div class="container-fluid">
+    <div class="navbar-collapse collapse" id="navbar-collapse-block">
+      <ul class="nav navbar-nav navbar-nav-main">
+        <li class="item-menu-manper active"><a href="#">Расчёты<span class="count">1</span></a></li>
+        <li class="item-menu-messages"><a href="#">Новый расчёт<span class="count">5</span></a></li>
+        <li class="item-menu-alerts"><a href="#">Штрафы/Премии<span class="count">2</span></a></li>
+        <li class="item-menu-schedule"><a href="#">Приказы/Инструкции</a></li>
+        <li class="item-menu-index"><a href="#">Кадры<span class="count">3</span></a></li>
+        <li class="item-menu-docs"><a href="#">Отчёты<span class="count">1</span></a></li>
+        <li class="item-menu-discus"><a href="#">Обсуждения<span class="count">4</span></a></li>
+        <li class="item-menu-complaints"><a href="#">Жалобы и предложения<span class="count">1</span></a></li>
+        <li class="item-menu-friends"><a href="#">Друзья</a></li>
+        <li class="item-menu-groups"><a href="#">Группы</a></li>
+        <li class="item-menu-settings"><a href="#">Настройки</a></li>
+        <li class="item-menu-help"><a href="#">Помощь</a></li>
+      </ul>
+    </div>
+    <button type="button" class="navbar-toggle collapsed" id="navbar-toggle">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <i class="fa fa-chevron-left" aria-hidden="true"></i>
+    </button>
+    <div class="navbar-right navbar-login">
+      <a href="#" class="btn"><span>Александр Константиновский</span> <i class="fa fa-sign-out hidden-sm hidden-xs" aria-hidden="true"></i></a>
+    </div>
+    <ul class="nav navbar-nav navbar-right navbar-nav-social">
+      <li><a href="#" title="Вконтакте"><i class="fab fa-vk" aria-hidden="true"></i></a></li>
+      <li><a href="#" title="Есть непросмотренные сообщения"><i class="fa fa-envelope" aria-hidden="true"></i><span class="badge"></span></a></li>
+      <li class="item-bell" title="Есть непросмотренные уведомления"><a href="#"><i class="fa fa-bell" aria-hidden="true"></i><span class="badge"></span></a></li>
+    </ul>
+  </div>
+</nav>
+
+
+<div class="container-fluid content">
+  <div class="clearfix head-with-btn head-providers">
+    <h1>
+      <span class="hidden-xs">Сводный отчет по нарушениям</span>
+      <hr class="visible-lg visible-md">
+    </h1>
+  </div>
+
+  <form action="" method="post" class="form-respons form-dashreport">
+    <div class="js-surcharge">
+      
+      <div class="row">
+
+        <div class="form-group col-md-3 col-sm-5 col-xs-12 col-w-calc">
+          <label for="position" class="hidden-xs">Должность</label>
+          <select class="js-select-position" name="position[]" id="position" multiple="multiple">
+            <option value="1">Должность1</option>
+            <option value="2">Должность2</option>
+          </select>
+        </div>
+        <!-- должность -->
+
+        <div class="form-group dashreport-form-period col-md-2 col-sm-3 col-xs-12 col-w-calc">
+          <label for="surcharge[1]" class="hidden-xs">Период</label>
+          <select class="form-control js-emplsurcharge-period" name="surcharge[1][period]">
+            <option value="days">Сегодня</option>
+            <option value="week">Произвольный</option>
+          </select>
+        </div>
+        <!-- период -->
+
+        <div class="form-group form-group-datepicker col-md-4 col-sm-5 col-xs-12">
+          <div class="col-md-6 col-sm-6 col-xs-6">
+            <div class="input-group datepicker">
+              <input type="text" class="form-control" value="" name="date-begin" id="date-begin" placeholder="00.00.0000" maxlength="10">
+              <span class="input-group-btn">
+                  <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt" aria-hidden="true"></i></button>
+              </span>
+            </div>
+          </div>
+          <span class="input-group-dash"></span>
+          <div class="col-md-6 col-sm-6 col-xs-6">
+            <div class="input-group datepicker">
+              <input type="text" class="form-control" value="" name="date-end" id="date-end" placeholder="00.00.0000" maxlength="10">
+              <span class="input-group-btn">
+                  <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt" aria-hidden="true"></i></button>
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- Выбор периода -->
+
+      </div>
+
+      <div class="row">
+
+        <div class="form-group col-md-3 col-sm-4 col-xs-12">
+          <label for="cat-violations" class="hidden-xs">Категория нарушений</label>
+          <select class="js-select-cat-violations" name="cat-violations[]" id="cat-violations" multiple="multiple">
+            <option value="1">нарушение1</option>
+            <option value="2">нарушение2</option>
+          </select>
+        </div>
+        <!-- Категория нарушений -->
+
+        <div class="form-group dashreport-form-period col-md-2 col-sm-3 col-xs-12">
+          <span class="input-group-addon">
+            <input type="checkbox" aria-label="Показывать все">
+          </span>
+          Показывать все
+        </div>
+        <!-- показывать все -->
+
+        <div class="dashreport-btn-block">
+          <div class="form-group form-btns">
+            <div class="">
+              <button type="button" class="btn btn-primary">Показать</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="dashreport-table table--desktop">
+          <table class="table">
+            <thead>
+            <tr>
+              <th></th>
+              <th><a href="#">Причина <i class="fa fa-sort-alpha-down"></i></a></th>
+              <th class="text-center">Щербинка</th>
+              <th class="text-center">Бутово</th>
+              <th class="text-center">Ясенево</th>
+              <th class="text-center">Коммунарка</th>
+              <th class="text-center">Подольск</th>
+              <th class="text-center">Московский</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="dashreport-table--parent-tr" data-id="1">
+              <td>
+                <a href="#" class="js-dashreport-tr dashreport-tr-link"><i class="fa fa-chevron-circle-down"></i></a>
+              </td>
+              <td>Документы</td>
+              <td class="text-center">1</td>
+              <td class="text-center">150</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="1">
+              <td></td>
+              <td>от 5 до 10 мин</td>
+              <td class="text-center">11</td>
+              <td class="text-center">2200</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="1">
+              <td></td>
+              <td>от 10 до 20 мин</td>
+              <td class="text-center">8</td>
+              <td class="text-center">4000</td>
+            </tr>
+            <tr class="dashreport-table--parent-tr" data-id="2">
+              <td>
+                <a href="#" class="js-dashreport-tr dashreport-tr-link"><i class="fa fa-chevron-circle-down"></i></a>
+              </td>
+              <td>Опоздание / неявка</td>
+              <td class="text-center">25</td>
+              <td class="text-center">11 700</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="2">
+              <td></td>
+              <td>от 5 до 10 мин</td>
+              <td class="text-center">11</td>
+              <td class="text-center">2200</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="2">
+              <td></td>
+              <td>от 10 до 20 мин</td>
+              <td class="text-center">8</td>
+              <td class="text-center">4000</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="2">
+              <td></td>
+              <td>свыше 20 мин</td>
+              <td class="text-center">4</td>
+              <td class="text-center">2000</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="2">
+              <td></td>
+              <td>свыше 1ч</td>
+              <td class="text-center">1</td>
+              <td class="text-center">1000</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="2">
+              <td></td>
+              <td>неявка на работу без уважительной причины</td>
+              <td class="text-center">1</td>
+              <td class="text-center">2500</td>
+            </tr>
+            <tr class="dashreport-table--parent-tr" data-id="3">
+              <td>
+                <a href="#" class="js-dashreport-tr dashreport-tr-link"><i class="fa fa-chevron-circle-down"></i></a>
+              </td>
+              <td>Отсутствие на рабочем месте</td>
+              <td class="text-center">4</td>
+              <td class="text-center">1300</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="3">
+              <td></td>
+              <td>свыше 1ч</td>
+              <td class="text-center">1</td>
+              <td class="text-center">1000</td>
+            </tr>
+            <tr class="dashreport-table--child-tr" data-parent="3">
+              <td></td>
+              <td>неявка на работу без уважительной причины</td>
+              <td class="text-center">1</td>
+              <td class="text-center">2500</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+              <th class="td-grey"></th>
+              <th class="td-grey">ИТОГО</th>
+              <th class="text-center td-grey">20</th>
+              <th class="text-center td-grey">10</th>
+              <th class="text-center td-grey">1500</th>
+              <th class="text-center td-grey">3</th>
+              <th class="text-center td-grey">5200</th>
+              <th class="text-center td-grey">5000</th>
+            </tr>
+            <tr>
+              <th class="td-grey"></th>
+              <th class="td-grey">Администратор</th>
+              <th class="text-center td-grey">Анна Кузнецова</th>
+              <th class="text-center td-grey">Евгений Иванов</th>
+              <th class="text-center td-grey">Дарья Смирнова</th>
+              <th class="text-center td-grey">Мария Соколова</th>
+              <th class="text-center td-grey">Елизавета Петрова</th>
+              <th class="text-center td-grey">Денис Залесский</th>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="drivers-table table--mobile">
+          <table class="table">
+            <thead>
+            <tr>
+              <th class="text-center">Кол-во<br>смен</th>
+              <th class="text-center">KPI</th>
+              <th class="text-center">Средняя оценка<br>по опросам клиентов</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="table--parent-tr" data-id="1">
+              <td colspan="3">
+                <a href="#" class="js-drop-tr drop-tr-link"><i class="fa fa-chevron-circle-down"></i></a> Бутово
+              </td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td class="text-center">10</td>
+              <td class="text-center">8.21</td>
+              <td class="text-center">4.7</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td colspan="3">Антюхова Марина</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td class="text-center">3</td>
+              <td class="text-center td-red--l">6.61</td>
+              <td class="text-center td-red--l">3.9</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td colspan="3">Карипаин Иван</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td class="text-center">2</td>
+              <td class="text-center td-red--l">6.85</td>
+              <td class="text-center td-green--l">4.6</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td colspan="3">Федеев Юрий</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td class="text-center">2</td>
+              <td class="text-center td-red--l">6.85</td>
+              <td class="text-center td-red">4.6</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td colspan="3">Мельничук Юрий</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td class="text-center">2</td>
+              <td class="text-center td-green">6.85</td>
+              <td class="text-center td-green">4.6</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td colspan="3">Казаз Александр</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="1">
+              <td class="text-center">2</td>
+              <td class="text-center td-red--xl">6.85</td>
+              <td class="text-center td-green">4.6</td>
+            </tr>
+            <tr class="table--parent-tr" data-id="2">
+              <td colspan="3">
+                <a href="#" class="js-drop-tr drop-tr-link"><i class="fa fa-chevron-circle-down"></i></a> Коммунарка
+              </td>
+
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td class="text-center">10</td>
+              <td class="text-center">8.21</td>
+              <td class="text-center">4.7</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td colspan="3">Антюхова Марина</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td class="text-center">3</td>
+              <td class="text-center td-red--l">6.61</td>
+              <td class="text-center td-red--l">3.9</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td colspan="3">Карипаин Иван</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td class="text-center">2</td>
+              <td class="text-center td-red--l">6.85</td>
+              <td class="text-center td-green--l">4.6</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td colspan="3">Федеев Юрий</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td class="text-center">2</td>
+              <td class="text-center td-red--l">6.85</td>
+              <td class="text-center td-red">4.6</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td colspan="3">Мельничук Юрий</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td class="text-center">2</td>
+              <td class="text-center td-green">6.85</td>
+              <td class="text-center td-green">4.6</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td colspan="3">Казаз Александр</td>
+            </tr>
+            <tr class="table--child-tr" data-parent="2">
+              <td class="text-center">2</td>
+              <td class="text-center td-red--xl">6.85</td>
+              <td class="text-center td-green">4.6</td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+              <th class="text-center td-grey">20</th>
+              <th class="text-center td-grey">10</th>
+              <th class="text-center td-grey">1500</th>
+            </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </form>
+
+
+</div>
+
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap DateTimepicker, https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+<script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+
+<!-- Select2, https://select2.org/getting-started/basic-usage -->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.full.min.js"></script>
+
+<script type="text/javascript" src="js/js-gl.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        initNavbar();
+
+        // инициализация элементов формы
+        $('.datepicker').datetimepicker({
+            language: 'ru',
+            pickTime: false
+        });
+
+        $('.js-select-providers').select2({
+            placeholder: 'Все поставщики',
+            width: '100%'
+        });
+
+        $('.js-select-position').select2({
+            placeholder: 'Должность',
+            width: '100%'
+        });
+
+        $('.js-select-cat-violations').select2({
+            placeholder: 'Категория нарушений',
+            width: '100%'
+        });
+
+        $('.js-select-branches').select2({
+            placeholder: 'Все филиалы',
+            width: '100%'
+        });
+
+        $('.js-select-entity').select2({
+            placeholder: 'Все юр. лица',
+            width: '100%'
+        });
+
+        // функция при клике на стрелку
+        $('.js-drop-tr').click(function() {
+            var parent = $(this).closest('tr'),
+                id = parent.data('id');
+
+            parent.toggleClass('open');
+            if (parent.hasClass('open')) {
+                $(this).html('<i class="fa fa-chevron-circle-up"></i>');
+                $('.table-providers, .table-providers-head').find('tr[data-parent="' + id + '"]').show();
+            } else {
+                $(this).html('<i class="fa fa-chevron-circle-down"></i>');
+                $('.table-providers, .table-providers-head').find('tr[data-parent="' + id + '"]').hide();
+            }
+
+            return false;
+        });
+
+        $(document).on('click', '.js-dashreport-tr', function (e) {
+            e.preventDefault();
+            var parent = $(this).closest('tr'),
+                id = parent.data('id');
+
+            parent.toggleClass('open');
+            if (parent.hasClass('open')) {
+                $(this).html('<i class="fa fa-chevron-circle-up"></i>');
+                $(this).closest('table').find('tr[data-parent="' + id + '"]').show();
+            } else {
+                $(this).html('<i class="fa fa-chevron-circle-down"></i>');
+                $(this).closest('table').find('tr[data-parent="' + id + '"]').hide();
+            }
+        });
+
+
+        // инициализация информационного окна для кол-ва заказов
+        initTooltipProviders();
+    });
+</script>
+</body>
+</html>
