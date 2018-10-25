@@ -16,6 +16,7 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+    <link href="css/scrollbar.css" rel="stylesheet" />
     <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
 
     <link href="css/styles.css" rel="stylesheet">
@@ -64,7 +65,7 @@
 </nav>
 
 <div class="container-fluid content">
-    <div class="clearfix head-with-btn style_mobile_btn">
+    <div class="clearfix head-with-btn style_mobile_btn head-with-btn--rolelaws">
         <a href="#" class="btn btn-default">К списку ролей</a>
         <h1>Права для роли: Кадровик</h1>
     </div>
@@ -171,7 +172,7 @@
             <div class="modal-body">
                 <form action="" method="post" class="form-respons form-calclist">
                     <div class="form-group">
-                        <input class="form-control surcharge-price-input" type="text" placeholder="">
+                        <input class="form-control surcharge-price-input" id="searchInput" type="text" placeholder="" onkeyup="searchStr('searchInput', 'modalRoleFines');">
                     </div>
                     <div class="form-group">
                         <div class="form-group__checbox-wrap size_middle scrollbar-inner">
@@ -350,7 +351,7 @@
             <div class="modal-body">
                 <form action="" method="post" class="form-respons form-calclist">
                     <div class="form-group">
-                        <label for="filial">Филиал</label>
+                        <label class="hidden-xs" for="filial">Филиал</label>
                         <select class="form-control js-select-filial" name="filial" id="filial" multiple="multiple">
                             <option value="1">Все филиалы</option>
                             <option value="2">Бутово</option>
@@ -361,8 +362,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="cause"><b>Причина штрафа</b></label>
-                        <input class="form-control surcharge-price-input" type="text" placeholder="">
+                        <label for="cause"><b>Причины штрафа</b></label>
+                        <input class="form-control surcharge-price-input" id="reasonFine" type="text" placeholder="" onkeyup="searchStr('reasonFine', 'modalLaw');">
                     </div>
                     <div class="form-group">
                         <div class="form-group__checbox-wrap scrollbar-inner">
@@ -493,11 +494,7 @@
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
 
-<!-- Bootstrap DateTimepicker, https://eonasdan.github.io/bootstrap-datetimepicker/ -->
-<script type="text/javascript" src="js/moment-with-locales.min.js"></script>
-<script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
-
-<!-- Custom Scroll-->
+<!-- Custom Scroll, http://gromo.github.io/jquery.scrollbar/-->
 <script src="js/jquery.scrollbar.min.js"></script>
 
 <!-- Select2, https://select2.org/getting-started/basic-usage -->
@@ -507,33 +504,11 @@
 
 <script type="text/javascript">
     $(function () {
-        changeSurchargePeriodType();
-
         //select2
-        $('.js-select-employees').select2({
-            width: '100%',
-            placeholder: 'Причастные сотрудники',
-        });
-
         $('.js-select-filial').select2({
             width: '100%',
-            placeholder: 'Все филиалы',
+            placeholder: 'Свои филиалы',
         });
-
-        $('.js-select-whoGives').select2({
-            tags: true,
-            placeholder: {
-                id: '-1',
-                text: 'Кто выдает'
-            },
-            allowClear: true,
-            width: '100%'
-        });
-
-        // скрыть блок
-        $(document).on('click', '.js-deleteItem', function (e) {
-            $(this).closest("tr").remove();
-        })
 
         $('.js-select-reason').select2({
             tags: true,
@@ -544,7 +519,29 @@
             allowClear: true,
             width: '100%'
         });
+
+        // скрыть блок
+        $(document).on('click', '.js-deleteItem', function (e) {
+            $(this).closest("tr").remove();
+        })
     });
+
+    //поиск по строкам
+    function searchStr(inputId, modalId) {
+        let searchString = $(`#${inputId}`).val();
+        let labelArr = $(`#${modalId} .form-group__checbox label`);
+        let labelText = '';
+
+        labelArr.parent().addClass('hidden');
+
+        labelArr.each(function (i) {
+            labelText = labelArr.eq(i).text();
+
+            if (labelText.indexOf(searchString) != -1) {
+                labelArr.eq(i).parent().removeClass('hidden');
+            }
+        })
+    }
 </script>
 </body>
 </html>
