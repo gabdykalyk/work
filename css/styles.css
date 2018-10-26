@@ -489,7 +489,9 @@
   color: #333;
 }
 .table th a.asc:after,
-.table th a.desc:after {
+.table th a.desc:after,
+.table th a.asc-word:after,
+.table th a.desc-word:after {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   display: inline-block;
@@ -508,6 +510,12 @@
 }
 .table th a.desc:after {
   content: "\f162";
+}
+.table th a.asc-word:after {
+  content: "\f15e";
+}
+.table th a.desc-word:after {
+  content: "\f15d";
 }
 .table tbody {
   font-weight: 600;
@@ -6195,6 +6203,9 @@ td.bad3 .form-control {
   }
 }
 .dashreport-table {
+  border-left-color: #fff;
+  border-right-color: #fff;
+  margin-bottom: 0;
   font-family: "Open Sans", sans-serif;
   font-size: 12px;
 }
@@ -6207,23 +6218,116 @@ td.bad3 .form-control {
   position: relative;
   color: #333;
 }
-.dashreport-table tbody > tr > td {
-  color: #337ab7;
+.dashreport-table > thead > tr > th {
+  vertical-align: middle;
+  text-align: center;
+  line-height: 1.2;
+  font-size: 12px;
 }
-.dashreport-table tbody > tr > td:nth-child(2) {
+.dashreport-table > thead > tr > th:first-child {
+  border-left: 0;
+}
+.dashreport-table > thead > tr > th:last-child {
+  border-right: 0;
+}
+.dashreport-table > thead > tr > th.cell-head-num {
+  text-align: left;
+  border-right: 0;
+  width: 10px;
+}
+.dashreport-table > thead > tr > th.cell-head-nom {
+  text-align: left;
+  border-left: 0;
+}
+@media (max-width: 767px) {
+  .dashreport-table > thead > tr > th.cell-head-nom a {
+    text-indent: -9999px;
+    font-size: 0;
+  }
+}
+.dashreport-table > thead > tr > th.cell-head-count {
+  border-bottom-width: 1px;
+}
+.dashreport-table > thead > tr > th.cell-head-branch {
+  border-bottom: 0;
+}
+.dashreport-table > thead > tr > th.cell-head-provider {
+  white-space: nowrap;
+  border-top: 0;
+  padding-top: 0;
+  font-weight: 400;
+}
+.dashreport-table > thead > tr > th.cell-head-package {
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+}
+.dashreport-table > thead > tr > th.cell-head-sum {
+  text-transform: uppercase;
+  background-color: #eeeeee;
+  text-align: right;
+}
+.dashreport-table > tbody > tr > td {
+  color: #337ab7;
+  text-align: center;
+  vertical-align: middle;
+}
+.dashreport-table > tbody > tr > td:first-child {
+  border-left: 0;
+}
+.dashreport-table > tbody > tr > td:nth-child(2) {
   color: #333;
 }
-.dashreport-table tfoot > tr:first-child > td,
-.dashreport-table tfoot > tr:first-child > th {
+.dashreport-table > tbody > tr > td:last-child {
+  border-right: 0;
+}
+.dashreport-table > tbody > tr > td.dashreport-table-cell {
+  text-align: left;
+  position: relative;
+  width: 20%;
+}
+.dashreport-table > tbody > tr > td.dashreport-table-cell .drop-tr-link {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  margin-top: -9px;
+}
+.dashreport-table > tbody > tr > td.dashreport-table-cell h3 {
+  font-weight: 700;
+  font-size: 13px;
+  margin: 0;
+  padding-left: 22px;
+}
+.dashreport-table > tbody > tr > td.cell-sum {
+  background-color: #eeeeee;
+  text-align: right;
+  white-spce: nowrap;
+}
+.dashreport-table > tbody > tr > td.cell-sum.td-red {
+  background-color: #FFAAB3;
+  cursor: pointer;
+}
+.dashreport-table > tbody > tr > td.cell-num {
+  text-align: right;
+  border-right: 0;
+}
+.dashreport-table > tbody > tr > td.cell-title {
+  text-align: left;
+  border-left: 0;
+}
+.dashreport-table > tbody > tr.table--parent-tr > td {
+  border-top-width: 2px;
+}
+.dashreport-table > tfoot > tr:first-child > td,
+.dashreport-table > tfoot > tr:first-child > th {
   color: #337ab7;
 }
-.dashreport-table tfoot > tr > td:first-child,
-.dashreport-table tfoot > tr > th:first-child {
+.dashreport-table > tfoot > tr > td:first-child,
+.dashreport-table > tfoot > tr > th:first-child {
   color: #333;
 }
-.dashreport-table tfoot > tr:first-child > th:first-child,
-.dashreport-table tfoot > tr:last-child > td:nth-child(2),
-.dashreport-table tfoot > tr:last-child > th:nth-child(2) {
+.dashreport-table > tfoot > tr:first-child > th:first-child,
+.dashreport-table > tfoot > tr:last-child > td:nth-child(2),
+.dashreport-table > tfoot > tr:last-child > th:nth-child(2) {
   color: #333;
 }
 .dashreport-table.cell-head-nom {
@@ -6235,6 +6339,31 @@ td.bad3 .form-control {
     text-indent: -9999px;
     font-size: 0;
   }
+}
+.dashreport-table-head {
+  display: none;
+  width: 216px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  -webkit-box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
+  box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
+  z-index: 1;
+}
+.dashreport-table-head > thead > tr > th {
+  height: 100px;
+}
+.dashreport-table-head > tbody > tr > td {
+  height: 35px;
+}
+.dashreport-table-head > tbody > tr > td.dashreport-table-cell .dashreport-table-cell-content {
+  width: 200px;
+}
+.dashreport-table-head > tbody > tr > td.cell-title {
+  width: 170px;
 }
 .dashreport-table .ico {
   display: none;
@@ -6250,6 +6379,31 @@ td.bad3 .form-control {
 @media (max-width: 767px) {
   .dashreport-form .form-group__checbox--all {
     margin-top: 5px;
+  }
+}
+.dashreport-form-date {
+  max-width: 180px;
+  float: left;
+  padding: 0;
+  margin-right: 0;
+}
+@media (max-width: 767px) {
+  .dashreport-form-date {
+    width: 48%;
+    padding: 0;
+    max-width: 100%;
+    margin-right: 0;
+  }
+}
+.dashreport-form-date-del {
+  float: left;
+  padding: 30px 7px 0 7px;
+}
+@media (max-width: 767px) {
+  .dashreport-form-date-del {
+    padding-top: 0;
+    width: 4%;
+    text-align: center;
   }
 }
 .dashreport-form .form-group-datepicker .input-group-dash {
@@ -6277,339 +6431,117 @@ td.bad3 .form-control {
   }
 }
 @media (max-width: 992px) {
-  .dashreport-form .table-providers-head > thead > tr > th {
+  .dashreport-form .dashreport-table-head > thead > tr > th {
     height: auto!important;
   }
 }
-.dashreport .table-providers {
-  border-left-color: #fff;
-  border-right-color: #fff;
-  margin-bottom: 0;
+.dashreport-types {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
 }
-.dashreport .table-providers > thead > tr > th {
-  vertical-align: middle;
-  text-align: center;
-  line-height: 1.2;
-  font-size: 12px;
-}
-.dashreport .table-providers > thead > tr > th:first-child {
-  border-left: 0;
-}
-.dashreport .table-providers > thead > tr > th:last-child {
-  border-right: 0;
-}
-.dashreport .table-providers > thead > tr > th.cell-head-num {
-  text-align: left;
-  border-right: 0;
-  width: 10px;
-}
-.dashreport .table-providers > thead > tr > th.cell-head-nom {
-  text-align: left;
-  border-left: 0;
-}
-@media (max-width: 767px) {
-  .dashreport .table-providers > thead > tr > th.cell-head-nom a {
-    text-indent: -9999px;
-    font-size: 0;
-  }
-}
-.dashreport .table-providers > thead > tr > th.cell-head-count {
-  border-bottom-width: 1px;
-}
-.dashreport .table-providers > thead > tr > th.cell-head-branch {
-  border-bottom: 0;
-}
-.dashreport .table-providers > thead > tr > th.cell-head-provider {
-  white-space: nowrap;
-  border-top: 0;
-  padding-top: 0;
-  font-weight: 400;
-}
-.dashreport .table-providers > thead > tr > th.cell-head-package {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-}
-.dashreport .table-providers > thead > tr > th.cell-head-sum {
-  text-transform: uppercase;
-  background-color: #eeeeee;
-  text-align: right;
-}
-.dashreport .table-providers > tbody > tr > td {
-  text-align: center;
-  vertical-align: middle;
-}
-.dashreport .table-providers > tbody > tr > td:first-child {
-  border-left: 0;
-}
-.dashreport .table-providers > tbody > tr > td:last-child {
-  border-right: 0;
-}
-.dashreport .table-providers > tbody > tr > td.cell-provider {
-  text-align: left;
-  position: relative;
-  width: 20%;
-}
-.dashreport .table-providers > tbody > tr > td.cell-provider .drop-tr-link {
-  position: absolute;
-  left: 8px;
-  top: 50%;
-  margin-top: -9px;
-}
-.dashreport .table-providers > tbody > tr > td.cell-provider h3 {
-  font-weight: 700;
-  font-size: 13px;
-  margin: 0;
-  padding-left: 22px;
-}
-.dashreport .table-providers > tbody > tr > td.cell-sum {
-  background-color: #eeeeee;
-  text-align: right;
-  white-spce: nowrap;
-}
-.dashreport .table-providers > tbody > tr > td.cell-sum.td-red {
-  background-color: #FFAAB3;
-  cursor: pointer;
-}
-.dashreport .table-providers > tbody > tr > td.cell-num {
-  text-align: right;
-  border-right: 0;
-}
-.dashreport .table-providers > tbody > tr > td.cell-product {
-  text-align: left;
-  border-left: 0;
-}
-.dashreport .table-providers > tbody > tr.table--parent-tr > td {
-  border-top-width: 2px;
-}
-.dashreport .table-providers-head {
+.dashreport-types > .form-group {
   display: none;
-  width: 216px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #fff;
-  border-right: 1px solid #ddd;
-  -webkit-box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
-  -moz-box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
-  box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
-  z-index: 1;
-}
-.dashreport .table-providers-head > thead > tr > th {
-  height: 85px;
-}
-.dashreport .table-providers-head > tbody > tr > td {
-  height: 35px;
-}
-.dashreport .table-providers-head > tbody > tr > td.cell-provider .provider {
-  width: 200px;
-}
-.dashreport .table-providers-head > tbody > tr > td.cell-product {
-  width: 170px;
-}
-@media (max-width: 991px) {
-  .dashreport .table-responsive-wrapper-provider {
-    position: relative;
-  }
-  .dashreport .table-responsive-wrapper-provider .table-responsive2 .table-providers > tbody > tr > td {
-    height: 35px;
-  }
-  .dashreport .table-providers-head {
-    display: table;
-  }
-}
-@media (min-width: 768px) and (max-width: 991px) {
-  .dashreport .table-responsive-wrapper-provider .table-responsive2 .table-providers > tbody > tr > td.cell-provider {
-    width: 216px;
-  }
-  .dashreport .table-responsive-wrapper-provider .table-responsive2 .table-providers > tbody > tr > td.cell-provider .provider {
-    width: 200px;
-  }
-  .dashreport .table-responsive-wrapper-provider .table-responsive2 .table-providers > tbody > tr > td.cell-product {
-    width: 170px;
-  }
-}
-@media (max-width: 767px) {
-  .dashreport .table-responsive-wrapper-provider {
-    margin-left: -15px;
-    margin-right: -15px;
-  }
-  .dashreport .table-responsive-wrapper-provider .table-responsive2 .table-providers > tbody > tr > td {
-    white-space: normal;
-  }
-  .dashreport .table-responsive-wrapper-provider .table-responsive2 .table-providers > tbody > tr > td.cell-provider {
-    width: 146px;
-  }
-  .dashreport .table-responsive-wrapper-provider .table-responsive2 .table-providers > tbody > tr > td.cell-provider .provider {
-    width: 130px;
-  }
-  .dashreport .table-responsive-wrapper-provider .table-responsive2 .table-providers > tbody > tr > td.cell-product {
-    width: 100px;
-  }
-  .dashreport .table-providers-head {
-    width: 146px;
-  }
-  .dashreport .table-providers-head > tbody > tr > td {
-    white-space: normal;
-  }
-  .dashreport .table-providers-head > tbody > tr > td.cell-provider .provider {
-    width: 130px;
-  }
-  .dashreport .table-providers-head > tbody > tr > td.cell-product {
-    width: 100px;
-  }
-}
-.dashreport .providersmin-table .table {
-  max-width: 720px;
-}
-.dashreport .providersmin-table .table td,
-.dashreport .providersmin-table .table th {
-  border-right: 1px solid #ddd;
-}
-.dashreport .providersmin-table .table td:last-child,
-.dashreport .providersmin-table .table th:last-child {
-  border-right: 0;
 }
 @media (min-width: 768px) {
-  .dashreport .providersmin-table .table td:first-child,
-  .dashreport .providersmin-table .table th:first-child {
-    min-width: 180px;
-    text-align: left;
-  }
-}
-.dashreport .providersmin-table .table th {
-  text-align: center;
-}
-.dashreport .providersmin-table .table th:last-child {
-  text-transform: uppercase;
-}
-.dashreport .providersmin-table .table td {
-  font-weight: 600;
-  font-size: 13px;
-}
-@media (max-width: 992px) {
-  .dashreport .providersmin-table .table-providers-head {
-    display: none;
-  }
-  .dashreport .table-providers-head > thead > tr > th {
-    height: auto!important;
-  }
-}
-@media (max-width: 768px) {
-  .dashreport .providersmin-table .table {
-    max-width: 100%;
-  }
-}
-@media (max-width: 767px) {
-  .dashreport .providersmin-table .table-providers-head > thead > tr > th {
-    height: 50px;
-  }
-  .dashreport .providersmin-table .table td,
-  .dashreport .providersmin-table .table th {
-    border-right: 0;
-    text-align: center;
-  }
-  .dashreport .providersmin-table .table-providers-head {
-    display: table;
-  }
-  .dashreport .providersmin-table .table-responsive2 .table th {
-    height: 50px;
-    vertical-align: bottom;
-  }
-  .dashreport .providersmin-table .table-responsive2 .table th:first-child,
-  .dashreport .providersmin-table .table-responsive2 .table td:first-child {
-    width: 120px;
-    min-width: 120px;
-  }
-  .dashreport .providersmin-table .table-providers-head {
-    width: 120px;
-  }
-  .dashreport .providersmin-table .table-providers-head td {
-    text-align: left;
-  }
-}
-@media (min-width: 768px) {
-  .dashreport-table.table-providers td:first-child {
+  .dashreport-table td:first-child {
     width: 1%;
     min-width: 30px;
     position: relative;
     color: #333;
   }
-  .dashreport-table.table-providers tbody > tr > td {
+  .dashreport-table tbody > tr > td {
     color: #337ab7;
   }
-  .dashreport-table.table-providers tbody > tr > td:nth-child(2) {
+  .dashreport-table tbody > tr > td:nth-child(2) {
     color: #333;
   }
-  .dashreport-table.table-providers tfoot > tr:first-child > td,
-  .dashreport-table.table-providers tfoot > tr:first-child > th a {
+  .dashreport-table tfoot > tr:first-child > td,
+  .dashreport-table tfoot > tr:first-child > th a {
     color: #337ab7;
   }
-  .dashreport-table.table-providers tfoot > tr > td:first-child,
-  .dashreport-table.table-providers tfoot > tr > th:first-child {
+  .dashreport-table tfoot > tr > td:first-child,
+  .dashreport-table tfoot > tr > th:first-child {
     color: #333;
   }
-  .dashreport-table.table-providers tfoot > tr:last-child > td:nth-child(2),
-  .dashreport-table.table-providers tfoot > tr:last-child > th:nth-child(2) {
+  .dashreport-table tfoot > tr:last-child > td:nth-child(2),
+  .dashreport-table tfoot > tr:last-child > th:nth-child(2) {
     color: #333;
   }
-  .dashreport-table.table-providers tfoot > tr > th:first-child {
+  .dashreport-table tfoot > tr > th:first-child {
     padding-left: 30px;
     vertical-align: middle;
   }
-  .dashreport-table.table-providers > tbody > tr > td.cell-product {
+  .dashreport-table > tbody > tr > td.cell-title {
     padding-left: 30px;
   }
-  .dashreport-table.table-providers > thead > tr > th:first-child {
+  .dashreport-table > thead > tr > th:first-child {
     vertical-align: middle;
     text-align: left;
     padding-left: 30px;
     width: 30%;
   }
-  .dashreport-table.table-providers > tbody > tr > td:first-child,
-  .dashreport-table.table-providers > tfoot > tr > th:first-child {
+  .dashreport-table > tbody > tr > td:first-child,
+  .dashreport-table > tfoot > tr > th:first-child {
     width: 30%;
   }
-  .dashreport-table.table-providers > tbody > tr > td.cell-provider h3 {
-    display: block;
+  .dashreport-table > tbody > tr > td.dashreport-table-cell h3 {
     color: #333;
-  }
-  .dashreport-table-head.table-providers > tbody > tr > td.cell-provider h3 {
     display: block;
+    font-weight: 700;
+    font-size: 13px;
+    margin: 0;
+    padding-left: 22px;
   }
   .dashreport-table .ico {
     display: none;
   }
+  .dashreport-table-head > tbody > tr > td.dashreport-table-cell h3 {
+    display: block;
+    font-weight: 700;
+    font-size: 13px;
+    margin: 0;
+    padding-left: 22px;
+  }
   .dashreport-table-head .ico {
     display: none;
   }
-  .dashreport-table.table-providers > tfoot > tr > th h3 {
-    font-weight: 700;
-    font-size: 13px;
-    margin: 0;
-    padding-left: 0;
-    color: #333;
-  }
-  .dashreport-table-head.table-providers-head > tfoot > tr > td h3 {
+  .dashreport-table-head > tfoot > tr > td h3 {
     font-weight: 700;
     font-size: 13px;
     margin: 0;
     padding-left: 0;
   }
-  .dashreport-table-head.table-providers-head > tfoot > tr > td {
+  .dashreport-table-head > tfoot > tr > td {
     font-weight: 700;
   }
 }
 @media (max-width: 767px) {
-  .dashreport-table.table-providers > tbody > tr > td.cell-provider h3 {
+  .dashreport-table > thead > tr > th:first-child {
+    vertical-align: middle;
+    text-align: left;
+    padding-left: 30px;
+    width: 30%;
+  }
+  .dashreport-table > tbody > tr > td.dashreport-table-cell h3 {
     display: none!important;
   }
-  .dashreport-table.table-providers > tbody > tr > td.cell-provider h3 {
+  .dashreport-table > tbody > tr > td.dashreport-table-cell h3 {
     display: none!important;
   }
-  .dashreport-table.table-providers > tfoot > tr:last-child > td.cell-provider h3 {
+  .dashreport-table > tbody > tr > td.cell-title {
+    padding-left: 30px;
+    font-size: 0;
+  }
+  .dashreport-table > tfoot > tr > th:first-child {
+    padding-left: 30px;
+    vertical-align: middle;
+  }
+  .dashreport-table > tfoot > tr:last-child > td.dashreport-table-cell h3 {
     display: none!important;
   }
-  .dashreport-table.table-providers > tfoot > tr:last-child > th h3 {
+  .dashreport-table > tfoot > tr:last-child > th h3 {
     display: none!important;
   }
   .dashreport-table .ico {
@@ -6617,100 +6549,62 @@ td.bad3 .form-control {
     vertical-align: middle;
     margin: 0 0 0 25px;
   }
+  .dashreport-table-thead-name {
+    display: none;
+  }
+  .dashreport-table-head {
+    display: block;
+    width: 131px;
+    top: auto;
+    bottom: 0;
+    margin: 0;
+    border-top: none;
+    border-right: none;
+  }
+  .dashreport-table-head > thead tr {
+    height: 30px;
+  }
   .dashreport-table-head .ico {
     display: inline-block;
     vertical-align: middle;
     margin: 0 0 0 25px;
   }
-  .dashreport-table-head.table-providers-head {
-    width: 85px;
+  .dashreport-table-head > tbody > tr > td.dashreport-table-cell .dashreport-table-cell-content {
+    width: 115px;
   }
-  .dashreport-table-head > tbody > tr > td.cell-provider .provider {
-    width: 85px;
+  .dashreport-table-head > tbody > tr > td.dashreport-table-cell {
+    width: 115px;
   }
-  .dashreport-table.table-providers > tbody > tr > td.cell-provider {
-    width: 85px;
-  }
-  .table-responsive-wrapper-provider .table-responsive2 .dashreport-table.table-providers > tbody > tr > td.cell-provider {
-    width: 85px;
-  }
-  .table-responsive-wrapper-provider .table-responsive2 .dashreport-table.table-providers > tbody > tr > td.cell-provider .provider {
-    width: 85px;
-  }
-  .table-providers-head.dashreport-table-head > tfoot > tr > td.cell-provider h3 {
+  .dashreport-table-head > tbody > tr > td.dashreport-table-cell h3 {
     display: none;
   }
-  .dashreport-table-head.table-providers > tbody > tr > td.cell-provider h3 {
+  .dashreport-table-head > tfoot > tr > td.dashreport-table-cell h3 {
     display: none;
   }
-  .dashreport-table.table-providers > tbody > tr > td.cell-product {
-    padding-left: 30px;
-  }
-  .dashreport-table.table-providers tfoot > tr > th:first-child {
-    padding-left: 30px;
-    vertical-align: middle;
-  }
-  .dashreport-table.table-providers > tbody > tr > td.cell-product {
-    padding-left: 30px;
-  }
-  .dashreport-table-head.table-providers-head > tfoot > tr:first-child > td.cell-product > .provider {
+  .dashreport-table-head > tfoot > tr:first-child > td.cell-title > .dashreport-table-cell-content {
     font-weight: 700;
   }
-  .dashreport-table.table-providers > tbody > tr > td.cell-product {
-    padding-left: 30px;
-  }
-  .dashreport-table.table-providers > thead > tr > th:first-child {
-    vertical-align: middle;
-    text-align: left;
-    padding-left: 30px;
-    width: 30%;
-  }
-  .dashreport-table-head.table-providers-head > tfoot > tr:last-child > td h3 {
+  .dashreport-table-head > tfoot > tr:last-child > td h3 {
     display: none;
+  }
+  .table-responsive-wrapper-dashreport {
+    position: relative;
+  }
+  .table-responsive-wrapper-dashreport .table-responsive2 .dashreport-table > tbody > tr > td.dashreport-table-cell {
+    width: 115px;
+  }
+  .table-responsive-wrapper-dashreport .table-responsive2 .dashreport-table > tbody > tr > td.dashreport-table-cell .dashreport-table-cell-content {
+    width: 115px;
   }
 }
 @media (min-width: 480px) and (max-width: 992px) {
-  .dashreport-table-head.table-providers-head > tfoot > tr:last-child > td h3 {
+  .dashreport-table-head > tfoot > tr:last-child > td h3 {
     height: 34px;
     line-height: 34px;
     vertical-align: middle;
   }
-  .dashreport-table.table-providers > tbody > tr > td.cell-product {
+   > tbody > tr > td.cell-title {
     padding-left: 30px;
-  }
-}
-.dashreport-types > .form-group {
-  display: none;
-}
-.dashreport-form-date {
-  max-width: 155px;
-  float: left;
-  padding: 0 7px;
-}
-@media (max-width: 767px) {
-  .dashreport-form-date {
-    width: 48%;
-    padding: 0 15px;
-    max-width: 100%;
-  }
-}
-.dashreport-form-date-del {
-  float: left;
-  padding-top: 30px;
-}
-@media (max-width: 767px) {
-  .dashreport-form-date-del {
-    padding-top: 5px;
-    width: 4%;
-    text-align: center;
-  }
-}
-.dashreport-form-date:last-of-type {
-  margin-right: 15px;
-}
-@media (max-width: 767px) {
-  .dashreport-form-date:last-of-type {
-    margin-right: 0;
   }
 }
 .modal-dialog-sm {
