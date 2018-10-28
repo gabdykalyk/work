@@ -231,3 +231,55 @@ function fixedFiltersEmpllist(is_change) {
 		}
 	}
 }
+
+function changeHeightCellMobile(table) {
+	var h = setDefaultHeightCell(table);
+	h = calcMaxHeightCell(table, h);
+	setHeightCellMobile(table, h);
+}
+
+function setDefaultHeightCell(table) {
+	var h = [];
+	var h_size = table.find('thead > tr > th.js-cell-mobile').size();
+
+	for (var i = 0; i < h_size; i++) {
+		h[i] = 0;
+	}
+	
+	return h;
+}
+
+function calcMaxHeightCell(table, h) {
+	var tr, td, td_h;
+	
+	table.find('tbody > tr').each(function(key, value) {
+		tr = $(value);
+
+		tr.find('td.js-cell-mobile').each(function(key, value) {
+			td = $(value)
+			td_h = td.outerHeight();
+			
+			if (td_h > h[key]) h[key] = td_h;
+		});
+	});
+	
+	return h;
+}
+
+function setHeightCellMobile(table, h) {
+	var tr, td, th;
+
+	table.find('tbody > tr').each(function(key, value) {
+		tr = $(value);
+
+		tr.find('td.js-cell-mobile').each(function(key, value) {
+			td = $(value);
+			td.css('height', h[key]);
+		});
+	});
+
+	table.find('thead > tr > th.js-cell-mobile').each(function(key, value) {
+		th = $(value);
+		th.css('height', h[key]);
+	});
+}
