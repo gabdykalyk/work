@@ -283,3 +283,11 @@ function setHeightCellMobile(table, h) {
 		th.css('height', h[key]);
 	});
 }
+
+
+// Вызов сролла внутри модалки
+$('#modalLaw, #modalRoleFines').on('shown.bs.modal', function (e) {
+  	$(document).ready(function(){
+	    $('.scrollbar-inner').scrollbar();
+	});
+});
