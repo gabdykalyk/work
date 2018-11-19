@@ -204,34 +204,6 @@ function hideTooltipProviders() {
 }
 
 // инициализация блока фильтров для раздела Сотрудники
-function fixedFiltersEmpllist(is_change) {
-	const PADDING_TOP_DEFAULT = 70;
-
-	var btn = $('#btn-filter-empllist');
-	var is_fixed = btn.attr('class').indexOf('is-fixed');
-
-	var body = $('body');
-	var block_fix = $('#filter-fixed-empllist');
-	var padding_top = PADDING_TOP_DEFAULT;
-
-	if (is_change) {
-		if (is_fixed == -1) {
-			btn.addClass('is-fixed');
-			block_fix.addClass('filter-fixed-empllist');
-			padding_top = PADDING_TOP_DEFAULT + block_fix.height();
-		} else {
-			btn.removeClass('is-fixed');
-			block_fix.removeClass('filter-fixed-empllist');
-		}
-		body.css('padding-top', padding_top + 'px');
-	} else {
-		if (is_fixed > -1) {
-			padding_top = PADDING_TOP_DEFAULT + block_fix.height();
-			body.css('padding-top', padding_top + 'px');
-		}
-	}
-}
-
 function changeHeightCellMobile(table) {
 	var h = setDefaultHeightCell(table);
 	h = calcMaxHeightCell(table, h);
