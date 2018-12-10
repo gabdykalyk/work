@@ -970,9 +970,6 @@
                     if ($(e.target).is('.old')) {
                         day.subtract(1, 'M');
                     }
-                    if ($(e.target).is('.active')) {
-                        return false
-                    }
                     if ($(e.target).is('.new')) {
                         day.add(1, 'M');
                     }
