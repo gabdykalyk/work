@@ -69,7 +69,7 @@
         <div class="clearfix editbonuses-header">
             <a href="/hatimaki-indexbonus.html" class="btn btn-default">К списку правил</a>
             <h1>Зачисление на должность, добавление должности</h1>
-            <hr class="visible-lg">
+            <hr class="visible-lg visible-md">
         </div>
         <div class="row">
             <div class="col-md-7 col-sm-12 col-xs-12 column-editbonuses">
@@ -89,7 +89,7 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <select class="form-control" name="position-1">
+                                    <select class="form-control" name="position[]">
                                         <option value="" disabled selected>Должность</option> <!-- placeholder -->
                                         <option>Повар-сушист</option>
                                         <option>Старший повар</option>
@@ -97,7 +97,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control input-small hide-placeholder numbersOnly" name="bonuses-1" placeholder="Бонусов">
+                                    <input type="text" class="form-control input-small hide-placeholder numbersOnly" name="bonuses[]" placeholder="Бонусов">
                                 </td>
                                 <td class="alight-right">
                                     <button type="button" class="btn btn-xs btn-danger jsRemoveItem" title="Удалить должность">
@@ -116,7 +116,7 @@
                     <script id="rowTemplate" type="text/template">
                         <tr>
           <td>
-              <select class="form-control"  name="position">
+              <select class="form-control"  name="position[]">
 	          		<option value="" disabled selected>Должность</option> <!-- placeholder -->
 	          		<option>Повар-сушист</option>
 	          		<option>Старший повар</option>
@@ -124,7 +124,7 @@
 	          	</select>
           </td>
           <td>
-              <input type="text" class="form-control input-small hide-placeholder numbersOnly" name="bonuses" placeholder="Бонусов">
+              <input type="text" class="form-control input-small hide-placeholder numbersOnly" name="bonuses[]" placeholder="Бонусов">
           </td>
           <td class="alight-right">
           	<button type="button" class="btn btn-xs btn-danger jsRemoveItem" title="Удалить должность">
@@ -212,16 +212,12 @@
 
                     if (!rowTemplate) return false;
 
-                    var nextIndex = tr.length + 1;
-
                     rowTemplate = $(rowTemplate.html());
                     var inputs = rowTemplate.find('input');
 
-                    var input, name;
+                    var input;
                     for (var i = 0; i < inputs.length; i++) {
                         input = $(inputs[i]);
-                        name = input.attr('name');
-                        input.attr('name', name + '-' + nextIndex);
                         if (input.hasClass('numbersOnly')) {
                             input.inputFilter(me.numbersOnly);
                         }
@@ -237,15 +233,16 @@
                 me.toggleAddons = function() {
                     var btn = $(this),
                         tr = btn.closest('tr'),
-                        tableAddons = tr.find('.table-addons');
+                        tableAddons = tr.find('.addons-wrapper');
 
-                    tableAddons.toggleClass('active');
-
-                    if (tableAddons.hasClass('active')) {
-                        btn.html('<i class="fa fa-chevron-circle-up"></i>');
-                    } else {
-                        btn.html('<i class="fa fa-chevron-circle-down"></i>');
-                    }
+                    tableAddons.slideToggle('fast', function() {
+                        tableAddons.toggleClass('active');
+                        if (tableAddons.hasClass('active')) {
+                            btn.html('<i class="fa fa-chevron-circle-up"></i>');
+                        } else {
+                            btn.html('<i class="fa fa-chevron-circle-down"></i>');
+                        }
+                    });
 
                 }
                 return me;
