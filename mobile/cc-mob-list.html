@@ -16,6 +16,9 @@
         <!-- Icons -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 
+        <link rel="stylesheet" href="js/swiper/swiper.min.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
         <link href="css/styles.css" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -28,11 +31,11 @@
     <body>
         <div class="wrapper">
             <!-- beg: nav -->
-            <nav class="navbar navbar-fixed-top">
+            <nav class="navbar">
                 <div class="navbar-container">
 
                     <div class="navbar-header">
-                        <a class="navbar-brand" href="#"><img src="images/logo.png" alt="Логотип"></a>
+                        <a class="navbar-brand" href="#"><img src="images/svg/logo_new_hatimaki.svg" alt="Логотип"></a>
                         <div class="navbar-info">
                             <div class="navbar-info-item">
                                 <div class="time" title="Текущее время 15:30">15:30</div>
@@ -42,8 +45,7 @@
                     </div>
 
                     <ul class="nav navbar-nav">
-                        <li><a href="#">Настройки</a></li>
-                        <li><a href="#">Финансы</a></li>
+                        <li><a href="#">На главную</a></li>
                     </ul>
 
                 </div>
@@ -60,11 +62,11 @@
                             <div class="receipts-item--sum">82</div>
                         </div>
                         <div class="receipts-item">
-                            <div class="receipts-item--name">Средний <span class="circle red"></span></div>
+                            <div class="receipts-item--name">Средний <span class="circle green"></span></div>
                             <div class="receipts-item--sum">580.-</div>
                         </div>
                         <div class="receipts-item">
-                            <div class="receipts-item--name">Выручка <span class="circle red"></span></div>
+                            <div class="receipts-item--name">Выручка <span class="circle green"></span></div>
                             <div class="receipts-item--sum">80654.-</div>
                         </div>
                     </div>
@@ -73,10 +75,10 @@
                     <!-- beg: Employees -->
                     <div class="panel-info-item panel-info-empl">
                         <div class="empl-item">
-                            <i class="fa fa-clock-o" aria-hidden="true"></i>
+                            <img src="images/svg/time.svg"/>
                         </div>
                         <div class="empl-item">
-                            <i class="fa fa-user" aria-hidden="true"></i>
+                            <img src="images/svg/icons8-male-user-100.svg"/>
                             <span class="badge">80</span>
                         </div>
                     </div>
@@ -84,7 +86,8 @@
                 </div>
                 <!-- end: Panel Info -->
 
-                <!-- beg: Filters -->
+                <!-- beg: FILTERS -->
+
                 <div class="scrolling-wrapper filters-block filters-block-main">
                     <div class="filters-content">
                         <ul class="filters js-filters-main">
@@ -94,7 +97,7 @@
                             <li class="filter-has-sub js-branches">
                                 <a href="#">Филиал</a>
                             </li>
-                            <li>
+                            <li class="filter-has-sub js-goods">
                                 <a href="#">Товар</a>
                             </li>
                             <li>
@@ -110,38 +113,52 @@
                 <!-- beg: date filter -->
                 <div class="scrolling-wrapper filters-block filters-block-sub js-filters-block-sub js-date-menu">
                     <div class="filters-content">
-                        <ul class="filters">
-                            <li class="active">
-                                <a href="#">Сегодня</a>
-                            </li>
-                            <li>
-                                <a href="#">Вчера</a>
-                            </li>
-                            <li>
-                                <a href="#">С начала недели</a>
-                            </li>
-                            <li>
-                                <a href="#">Прошлая неделя</a>
-                            </li>
-                            <li>
-                                <a href="#">Последние 7 дней</a>
-                            </li>
-                            <li>
-                                <a href="#">Текущий месяц</a>
-                            </li>
-                            <li>
-                                <a href="#">Прошлый месяц</a>
-                            </li>
-                            <li>
-                                <a href="#">Последний месяц</a>
-                            </li>
-                            <li>
-                                <a href="#">Дата</a>
-                            </li>
-                            <li>
-                                <a href="#">Период</a>
-                            </li>
-                        </ul>
+
+                        <div class="clear-btn-container">
+                            <button class="clear-btn">
+                                <a href="#">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </button>
+                        </div>
+
+                        <div class="filters-date-container swiper-container">
+                            <ul class="filters filters-swiper swiper-wrapper" id="filters-date">
+                                <li class="swiper-slide">
+                                    <a href="#">Сегодня</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Вчера</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">С начала недели</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Прошлая неделя</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Последние 7 дней</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Текущий месяц</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Прошлый месяц</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Последний месяц</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#" id="filters-date-btn" class="special-button" data-reset-func="resetDaterangeFilter" data-default-label="Дата">Дата</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#" id="filters-period-btn" class="special-button" data-reset-func="resetDaterangeFilter" data-default-label="Период">Период</a>
+                                </li>
+                            </ul>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
+
                     </div>
                 </div>
                 <!-- end: date filter -->
@@ -149,26 +166,26 @@
                 <!-- beg: branches filter -->
                 <div class="scrolling-wrapper filters-block filters-block-sub js-filters-block-sub js-branches-menu">
                     <div class="filters-content">
-                        <ul class="filters">
+                        <ul class="filters" id="filters-branches">
                             <li>
                                 <a href="#">Ясенево</a>
                             </li>
-                            <li class="active">
+                            <li>
                                 <a href="#">Бутово</a>
                             </li>
                             <li>
                                 <a href="#">Коммунарка</a>
                             </li>
-                            <li class="active">
+                            <li>
                                 <a href="#">Московский</a>
                             </li>
-                            <li class="active">
+                            <li>
                                 <a href="#">Бутово</a>
                             </li>
                             <li>
                                 <a href="#">Коммунарка</a>
                             </li>
-                            <li class="active">
+                            <li>
                                 <a href="#">Московский</a>
                             </li>
                         </ul>
@@ -176,9 +193,70 @@
                 </div>
                 <!-- end: branches filter -->
 
+                <!-- beg: goods filter -->
+                <div class="scrolling-wrapper filters-block filters-block-sub js-filters-block-sub js-goods-menu">
+                    <div class="filters-content">
+
+                        <form method="post" class="search-input-group-form">
+                            <div class="search-input-group">
+                                <input class="form-control" type="text">
+                                <button type="button"><i class="fa fa-times"></i></button>
+                                <i class="fa fa-search"></i>
+                            </div>
+                        </form>
+
+                        <div class="clear-btn-container">
+                            <button class="clear-btn">
+                                <a href="#">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </button>
+                        </div>
+
+                        <div class="filters-goods-container swiper-container">
+                            <ul class="filters filters-swiper swiper-wrapper" id="filters-goods">
+                                <li class="swiper-slide">
+                                    <a href="#">3 сыра</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">4 сезона</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Бульон</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Бургеры и сендвичи</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Горячие роллы</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Бульон 2</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Бургеры и сендвичи 2</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Горячие роллы 2</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Гунканы</a>
+                                </li>
+                                <li class="swiper-slide">
+                                    <a href="#">Гункан с копченым лососем</a>
+                                </li>
+                            </ul>
+                            <div class="swiper-button-next"></div>
+                            <div class="swiper-button-prev"></div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- end: goods filter -->
+
                 <!-- beg: lates filter -->
                 <div class="scrolling-wrapper filters-block filters-block-sub filters-status js-filters-block-sub js-lates-menu">
-                    <div class="filters-content">
+                    <div class="filters-content filters-content--late">
                         <ul class="filters filters-late">
                             <li>
                                 <a href="#">Все</a>
@@ -205,211 +283,472 @@
                     </div>
                 </div>
                 <!-- end: lates filter -->
-                <!-- end: Filters -->
 
-                <h2 class="head-date">Сегодня</h2>
-                <!-- beg: Order list -->
-                <div class="order-list js-order-list">
-                    <div class="order-item">
-                        <div class="order-item--body">
-                            <div class="order-item--row">
-                                <div class="order-item--info">
-                                    <span class="time">21:17</span>
-                                    <span class="number">#466667</span>
-                                </div>
-                                <div class="order-item--price">
-                                    2641.-
-                                </div>
-                            </div>
-                            <h3>Ясенево</h3>
-                            <div class="order-item--row">
-                                <ul class="list-posts">
-                                    <li>О</li>
-                                    <li>А</li>
-                                    <li class="active bad1">С</li>
-                                    <li>П</li>
-                                    <li>Г</li>
-                                    <li>В</li>
-                                </ul>
-                                <div class="payment payment-card">Карта</div>
-                            </div>
-                        </div>
-                        <ul class="menu-action">
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                        </ul>
-                    </div>
-                    <div class="order-item">
-                        <div class="order-item--body">
-                            <div class="order-item--row">
-                                <div class="order-item--info">
-                                    <span class="time">21:17</span>
-                                    <span class="number">#466667</span>
-                                </div>
-                                <div class="order-item--price">
-                                    2641.-
-                                </div>
-                            </div>
-                            <h3>Коммунарка</h3>
-                            <div class="order-item--row">
-                                <ul class="list-posts">
-                                    <li>О</li>
-                                    <li>А</li>
-                                    <li>С</li>
-                                    <li>П</li>
-                                    <li class="active bad2">Г</li>
-                                    <li>В</li>
-                                </ul>
-                                <div class="payment payment-cash">Наличные</div>
-                            </div>
-                        </div>
-                        <ul class="menu-action">
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                        </ul>
-                    </div>
-                    <div class="order-item">
-                        <div class="order-item--body">
-                            <div class="order-item--row">
-                                <div class="order-item--info">
-                                    <span class="time">21:17</span>
-                                    <span class="number">#466667</span>
-                                </div>
-                                <div class="order-item--price">
-                                    2641.-
-                                </div>
-                            </div>
-                            <h3>Коммунарка</h3>
-                            <div class="order-item--row">
-                                <ul class="list-posts">
-                                    <li>О</li>
-                                    <li>А</li>
-                                    <li>С</li>
-                                    <li class="active bad2">П</li>
-                                    <li class="active bad2">Г</li>
-                                    <li>В</li>
-                                </ul>
-                                <div class="payment payment-cash">Наличные</div>
-                            </div>
-                        </div>
-                        <ul class="menu-action">
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                        </ul>
-                    </div>
-                </div>
-                <!-- end: Order list -->
+                <!-- end: FILTERS -->
 
-                <h2 class="head-date">Вчера</h2>
-                <!-- beg: Order list -->
-                <div class="order-list js-order-list">
-                    <div class="order-item">
-                        <div class="order-item--body">
-                            <div class="order-item--row">
-                                <div class="order-item--info">
-                                    <span class="time">21:17</span>
-                                    <span class="number">#466667</span>
+                <div class="order-list-container">
+
+                    <h2 class="head-date">Сегодня</h2>
+                    <!-- beg: Order list -->
+                    <div class="order-list js-order-list">
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">21:17</div>
+                                <div class="order-item-cell order-item-cell--number">#466667</div>
+                                <div class="order-item-cell order-item-cell--location">2. Ясенево</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
                                 </div>
-                                <div class="order-item--price">
-                                    2641.-
+                                <div class="order-item-cell order-item-cell--price">1941.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Доставка</div>
                                 </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--success">Закрыта</div>
+                                </div>
+
                             </div>
-                            <h3>Ясенево</h3>
-                            <div class="order-item--row">
-                                <ul class="list-posts">
-                                    <li>О</li>
-                                    <li>А</li>
-                                    <li class="active bad1">С</li>
-                                    <li>П</li>
-                                    <li>Г</li>
-                                    <li>В</li>
-                                </ul>
-                                <div class="payment payment-card">Карта</div>
-                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
                         </div>
-                        <ul class="menu-action">
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                        </ul>
-                    </div>
-                    <div class="order-item">
-                        <div class="order-item--body">
-                            <div class="order-item--row">
-                                <div class="order-item--info">
-                                    <span class="time">21:17</span>
-                                    <span class="number">#466667</span>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">11:21</div>
+                                <div class="order-item-cell order-item-cell--number">#3434333</div>
+                                <div class="order-item-cell order-item-cell--location">3. Подольск</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
                                 </div>
-                                <div class="order-item--price">
-                                    2641.-
+                                <div class="order-item-cell order-item-cell--price">2641.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Самовывоз</div>
                                 </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--warning">Не подтверждена</div>
+                                </div>
+
                             </div>
-                            <h3>Коммунарка</h3>
-                            <div class="order-item--row">
-                                <ul class="list-posts">
-                                    <li>О</li>
-                                    <li>А</li>
-                                    <li>С</li>
-                                    <li>П</li>
-                                    <li class="active bad2">Г</li>
-                                    <li>В</li>
-                                </ul>
-                                <div class="payment payment-cash">Наличные</div>
-                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
                         </div>
-                        <ul class="menu-action">
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                        </ul>
-                    </div>
-                    <div class="order-item">
-                        <div class="order-item--body">
-                            <div class="order-item--row">
-                                <div class="order-item--info">
-                                    <span class="time">21:17</span>
-                                    <span class="number">#466667</span>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">21:17</div>
+                                <div class="order-item-cell order-item-cell--number">#466667</div>
+                                <div class="order-item-cell order-item-cell--location">2. Ясенево</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
                                 </div>
-                                <div class="order-item--price">
-                                    2641.-
+                                <div class="order-item-cell order-item-cell--price">1941.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Доставка</div>
                                 </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--success">Закрыта</div>
+                                </div>
+
                             </div>
-                            <h3>Коммунарка</h3>
-                            <div class="order-item--row">
-                                <ul class="list-posts">
-                                    <li>О</li>
-                                    <li>А</li>
-                                    <li>С</li>
-                                    <li class="active bad2">П</li>
-                                    <li class="active bad2">Г</li>
-                                    <li>В</li>
-                                </ul>
-                                <div class="payment payment-cash">Наличные</div>
-                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
                         </div>
-                        <ul class="menu-action">
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                            <li><a href="#"></a></li>
-                        </ul>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">11:21</div>
+                                <div class="order-item-cell order-item-cell--number">#3434333</div>
+                                <div class="order-item-cell order-item-cell--location">3. Подольск</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">2641.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Самовывоз</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--warning">Не подтверждена</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">21:17</div>
+                                <div class="order-item-cell order-item-cell--number">#466667</div>
+                                <div class="order-item-cell order-item-cell--location">2. Ясенево</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">1941.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Доставка</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--success">Закрыта</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">11:21</div>
+                                <div class="order-item-cell order-item-cell--number">#3434333</div>
+                                <div class="order-item-cell order-item-cell--location">3. Подольск</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">2641.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Самовывоз</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--warning">Не подтверждена</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
                     </div>
+                    <!-- end: Order list -->
+
+                    <h2 class="head-date">Вчера</h2>
+                    <!-- beg: Order list -->
+                    <div class="order-list js-order-list">
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">21:17</div>
+                                <div class="order-item-cell order-item-cell--number">#466667</div>
+                                <div class="order-item-cell order-item-cell--location">2. Ясенево</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">1941.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Доставка</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--success">Закрыта</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">11:21</div>
+                                <div class="order-item-cell order-item-cell--number">#3434333</div>
+                                <div class="order-item-cell order-item-cell--location">3. Подольск</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">2641.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Самовывоз</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--warning">Не подтверждена</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">21:17</div>
+                                <div class="order-item-cell order-item-cell--number">#466667</div>
+                                <div class="order-item-cell order-item-cell--location">2. Ясенево</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">141.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">В пути</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--danger">Отменена</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">23:21</div>
+                                <div class="order-item-cell order-item-cell--number">#322223</div>
+                                <div class="order-item-cell order-item-cell--location">3. Александровск-Сахалинский</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">99999.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Самовывоз</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--warning">Не подтверждена</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">21:17</div>
+                                <div class="order-item-cell order-item-cell--number">#466667</div>
+                                <div class="order-item-cell order-item-cell--location">2. Ясенево</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">1941.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Доставка</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--success">Закрыта</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">11:21</div>
+                                <div class="order-item-cell order-item-cell--number">#3434333</div>
+                                <div class="order-item-cell order-item-cell--location">3. Подольск</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">2641.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Самовывоз</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--warning">Не подтверждена</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">21:17</div>
+                                <div class="order-item-cell order-item-cell--number">#466667</div>
+                                <div class="order-item-cell order-item-cell--location">2. Ясенево</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">141.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">В пути</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--danger">Отменена</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                        <div class="order-item">
+                            <div class="order-item--body">
+                                <div class="order-item-cell order-item-cell--time">23:21</div>
+                                <div class="order-item-cell order-item-cell--number">#322223</div>
+                                <div class="order-item-cell order-item-cell--location">3. Александровск-Сахалинский</div>
+                                <div class="order-item-cell order-item-cell--posts">
+                                    <ul class="list-posts">
+                                        <li>О</li>
+                                        <li>А</li>
+                                        <li class="active bad1">С</li>
+                                        <li>П</li>
+                                        <li>Г</li>
+                                        <li>В</li>
+                                    </ul>
+                                </div>
+                                <div class="order-item-cell order-item-cell--price">99999.-</div>
+                                <div class="order-item-cell order-item-cell--delivery">
+                                    <div class="order-item-btn order-item-btn--delivery">Самовывоз</div>
+                                </div>
+                                <div class="order-item-cell order-item-cell--orderstate">
+                                    <div class="order-item-btn order-item-btn--warning">Не подтверждена</div>
+                                </div>
+
+                            </div>
+                            <ul class="menu-action">
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                                <li><a href="#"></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- end: Order list -->
+
                 </div>
-                <!-- end: Order list -->
 
             </div>
         </div>
@@ -423,81 +762,171 @@
                     <div class="modal-header">
                         <button type="button" class="btn btn-sm btn-close" data-dismiss="modal" aria-label="Close"><i class="fas fa-times"></i>Закрыть</button>
                         <ul class="nav nav-tabs nav-justified nav-tabs-card">
-                            <li class="active"><a href="#" class="item-nav">#466667</a></li>
-                            <li><a href="#" class="item-nav">Профиль</a></li>
-                            <li><a href="#" class="item-nav">История</a></li>
+                            <li class="active"><a href="#tab-order" aria-controls="tab-order" role="tab" data-toggle="tab" class="item-nav">#466667</a></li>
+                            <li><a href="#tab-profile" aria-controls="tab-profile" role="tab" data-toggle="tab" class="item-nav">Профиль</a></li>
+                            <li><a href="#tab-events" aria-controls="tab-events" role="tab" data-toggle="tab" class="item-nav">События</a></li>
+                            <li><a href="#tab-history" aria-controls="tab-history" role="tab" data-toggle="tab" class="item-nav">История</a></li>
                         </ul>
                     </div>
                     <!-- end: Modal header -->
-                    
+
                     <!-- beg: Modal body -->
                     <div class="modal-body">
-                        <ul class="list-posts list-posts-card">
-                            <li>О</li>
-                            <li>А</li>
-                            <li class="active bad1"><span class="badge">5</span>С</li>
-                            <li>П</li>
-                            <li>Г</li>
-                            <li>В</li>
-                        </ul>
+                        <div class="tab-content">
+                            <!-- TAB ORDER -->
+                            <div role="tabpanel" class="tab-pane active" id="tab-order">
 
-                        <h3 class="filial-card">Ясенево</h3>
-                        <div class="info-card"><span class="info-card--item">21:17</span><span class="info-card--item">30.03.2018</span></div>
-                        
-                        <!-- beg: Table order -->
-                        <div class="container-table-order">
-                            <table class="table table-order" id="table-order">
-                                <thead>
-                                    <tr>
-                                        <th class="h-cell-name">Наименование</th>
-                                        <th>Цена</th>
-                                        <th>Кол-во</th>
-                                        <th class="h-cell-sum">Сумма</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="cell-name">Калифорния с крабом</td>
-                                        <td class="cell-price">150.-</td>
-                                        <td class="cell-count">1</td>
-                                        <td class="cell-sum">300.-</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cell-name">Гункан Тобико</td>
-                                        <td class="cell-price">100.-</td>
-                                        <td class="cell-count">1</td>
-                                        <td class="cell-sum">120.-</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cell-name">Мини с Тунцом</td>
-                                        <td class="cell-price">100.-</td>
-                                        <td class="cell-count">1</td>
-                                        <td class="cell-sum">120.-</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cell-name">Мини с Авокадо</td>
-                                        <td class="cell-price">100.-</td>
-                                        <td class="cell-count">1</td>
-                                        <td class="cell-sum">120.-</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- end: Table order -->
-                        
-                        <div class="panel-total">
-                            <div class="payment payment-cash">Наличные</div>
-                            <div class="panel-total--sum">2560.-</div>
+                                <div class="order-card-header">
+                                    <div class="header-item">
+                                        <h3 class="filial-card">Ясенево</h3>
+                                        <div class="info-card">
+                                            <span class="info-card--item">21:17</span>
+                                            <span class="info-card--item">30.03.2018</span>
+                                        </div>
+                                    </div>
+                                    <div class="header-item">
+                                        <ul class="list-posts list-posts-card-modal">
+                                            <li>О</li>
+                                            <li>А</li>
+                                            <li class="bad2">П</li>
+                                            <li class="bad1">Г</li>
+                                            <li>В</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- beg: Table order -->
+                                <div class="container-table-order">
+                                    <table class="table table-order" id="table-order">
+                                        <thead>
+                                        <tr>
+                                            <th class="h-cell-name">Наименование</th>
+                                            <th>Цена</th>
+                                            <th>Кол-во</th>
+                                            <th class="h-cell-sum">Сумма</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td class="cell-name">Калифорния с крабом</td>
+                                            <td class="cell-price">150.-</td>
+                                            <td class="cell-count">1</td>
+                                            <td class="cell-sum">300.-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="cell-name">Гункан Тобико</td>
+                                            <td class="cell-price">100.-</td>
+                                            <td class="cell-count">1</td>
+                                            <td class="cell-sum">120.-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="cell-name">Мини с Тунцом</td>
+                                            <td class="cell-price">100.-</td>
+                                            <td class="cell-count">1</td>
+                                            <td class="cell-sum">120.-</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="cell-name">Мини с Авокадо</td>
+                                            <td class="cell-price">100.-</td>
+                                            <td class="cell-count">1</td>
+                                            <td class="cell-sum">120.-</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- end: Table order -->
+
+                                <div class="panel-total">
+                                    <div class="order-item-btn order-item-btn--delivery">В зале</div>
+                                    <div class="panel-total--sum">2560.-</div>
+                                </div>
+
+                            </div>
+                            <!-- TAB PROFILE -->
+                            <div role="tabpanel" class="tab-pane" id="tab-profile">
+                                <div class="profile-card">
+                                    <div class="profile-card-item">
+                                        <label>Клиент</label>
+                                        <p>Ткач Екатерина</p>
+                                    </div>
+                                    <div class="profile-card-item">
+                                        <label>Телефон</label>
+                                        <p>+79537710001</p>
+                                    </div>
+                                    <div class="profile-card-item">
+                                        <label>Адрес</label>
+                                        <p>г.Москва, ул.Теплый Стан, д.21, к.5</p>
+                                    </div>
+                                    <div class="profile-card-item">
+                                        <label>Оператор</label>
+                                        <p>Булекова Ольга</p>
+                                    </div>
+                                    <div class="profile-card-item">
+                                        <label>Курьер</label>
+                                        <p>Абдунасиров Мансур</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- TAB EVENTS -->
+                            <div role="tabpanel" class="tab-pane" id="tab-events">
+                                Events
+                            </div>
+                            <!-- TAB HISTORY -->
+                            <div role="tabpanel" class="tab-pane" id="tab-history">
+
+                                <!-- beg: Table order -->
+                                <div class="container-table-order">
+                                    <div class="totalinfo-card">
+
+                                        <div class="totalinfo-card-item active">
+                                            <div class="item-icon"></div>
+                                            <div class="item-description">
+                                                <label>Всего</label>
+                                                <div class="item-count">3</div>
+                                            </div>
+                                        </div>
+                                        <div class="totalinfo-card-item">
+                                            <div class="item-icon"></div>
+                                            <div class="item-description">
+                                                <label>Доставка</label>
+                                                <div class="item-count">2</div>
+                                            </div>
+                                        </div>
+                                        <div class="totalinfo-card-item">
+                                            <div class="item-icon"></div>
+                                            <div class="item-description">
+                                                <label>Самовывоз</label>
+                                                <div class="item-count">1</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <table class="table table-order" id="table-history">
+                                        <tbody>
+                                        <tr>
+                                            <td class="cell-order-num">#46754675</td>
+                                            <td class="cell-date">24.01.2019</td>
+                                            <td class="cell-location">5. Подольск</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="cell-order-num">#565656565</td>
+                                            <td class="cell-date">24.01.2019</td>
+                                            <td class="cell-location">6. Подольск</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="cell-order-num">#67676767</td>
+                                            <td class="cell-date">24.01.2019</td>
+                                            <td class="cell-location">7. Подольск</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <!-- end: Table order -->
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <ul class="menu-action">
-                            <li><a href="#" class="btn"></a></li>
-                            <li><a href="#" class="btn"></a></li>
-                            <li><a href="#" class="btn"></a></li>
-                            <li><a href="#" class="btn"></a></li>
-                            <li><a href="#" class="btn"></a></li>
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -509,6 +938,10 @@
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
 
+    <script type="text/javascript" src="js/swiper/swiper.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
     <script src="js/js.js"></script>
     <script>
         $(window).on("load",function(){
@@ -518,7 +951,112 @@
         $(function() {
             initFilters();
             initModalOrder();
+
+            // кнопки на вкладке фильтра "Товары"
+            $("#filters-goods > li > a:not('.special-button')").click(function() {
+                initToggleFilters($(this), false);
+            });
+            // кнопки на вкладке фильтра "Филиалы"
+            $("#filters-branches > li > a").click(function() {
+                initToggleFilters($(this), false);
+            });
+            // кнопки на вкладке фильтра "Опоздания"
+            $('.filters-content--late .filters-late > li > a').click(function() {
+                initToggleFilters($(this), false);
+            });
+            $('.filters-content--late .filters-posts > li > a').click(function() {
+                initToggleFilters($(this), false);
+            });
+
+            initDatePicker('#filters-date-btn', function(dateSelector, start, end) {
+                activateDaterangeFilter(dateSelector);
+                $('#filters-date-btn').html(start.format('DD.MM.YYYY'));
+            });
+
+            initDateRangePicker('#filters-period-btn', function(dateSelector, start, end) {
+                activateDaterangeFilter(dateSelector);
+                $('#filters-period-btn').html(start.format('DD.MM.YYYY')+'-'+end.format('DD.MM.YYYY'));
+            });
+
+            /* активировать кнопки фильтра, но не специальные кнопки (даты и кнопка сброса) */
+            $("#filters-date > li > a:not('.special-button')").click(function(ev) {
+                activateFilter($(ev.target));
+            });
+
+            /* кнопка сброса выбранной даты */
+            $(".js-date-menu .clear-btn > a").click(function(ev) {
+                resetFilterDefault($(ev.target));
+                resetDaterangeFilter($(ev.target));
+            });
+
+            /* кнопка сброса выбраных товаров */
+            $(".js-goods-menu .clear-btn > a").click(function(ev) {
+                resetFilterDefault($(ev.target));
+            });
+
+            /* очистить поле поиска */
+            $(".search-input-group > button").click(function() {
+                $('.search-input-group > input').val('');
+            });
+
+            $(window).scroll(function(){
+                if ($(this).scrollTop() > 120) {
+                    $('.filters-block-main').addClass('filters-block-fixed', 200);
+                    $('.js-filters-block-sub').addClass('filters-subblock-fixed', 200);
+                    $('.order-list-container').addClass('order-list-container--fixed-filters', 200);
+                } else {
+                    $('.filters-block-main').removeClass('filters-block-fixed', 200);
+                    $('.js-filters-block-sub').removeClass('filters-subblock-fixed', 200);
+                    $('.order-list-container').removeClass('order-list-container--fixed-filters', 200);
+                }
+            });
+
         });
+
+        /* функция, которая вызывается, когда сбрасывается фильтр с датой или периодом */
+        function resetDaterangeFilter(el) {
+            // устанавливает метку фильтра к значению по умолчанию
+            var ul = $(el).closest('.filters-content');
+            ul.find('ul > li a').each(function(i,a) {
+                var def = $(a).data('default-label');
+                if (def) $(a).html(def);
+            });
+            ul.find('li').removeClass('active');
+        }
+
+        /* функция, которая вызывается, когда сбрасывается любой фильтр, если у него не указана функция ресета */
+        function resetFilterDefault(el) {
+            var ul = $(el).closest('.filters-content');
+            ul.find('ul > li').removeClass('active');
+        }
+
+        /* активировать фильтр с календарем */
+        function activateDaterangeFilter(lnk) {
+            resetDaterangeFilter(lnk);
+            $(lnk).closest('li').addClass('active');
+        }
+
+        /* подсветить нажатую кнопку фильтра */
+        function activateFilter(lnk) {
+            var li = lnk.closest('li');
+            var is_active = li.hasClass('active');
+
+            $('#filters-date > li > a').each(function() {
+                var resetFunc = $(this).data('reset-func');
+                if (resetFunc) {
+                    window[resetFunc](this);
+                } else {
+                    resetFilterDefault(this);
+                }
+            });
+
+            if (!is_active) {
+                li.addClass('active');
+            } else {
+                li.removeClass('active');
+            }
+        }
+
     </script>
     </body>
  </html>
