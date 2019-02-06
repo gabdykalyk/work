@@ -19,8 +19,7 @@ function initFilters() {
 				
 				lnk.parent().addClass('active');
 				sub_menu.show(300, function() {
-                    initFiltersDatesSwipers();
-                    initFiltersGoodsSwipers();
+                    initFiltersSwipers();
                 });
 			}
 
@@ -29,25 +28,8 @@ function initFilters() {
 	});
 }
 
-function initFiltersDatesSwipers() {
+function initFiltersSwipers() {
     // прокрутка для фильтра с датами
-    new Swiper('.swiper-container', {
-        slidesPerView: 'auto',
-        spaceBetween: 10,
-        mousewheel: {
-            invert: false
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev'
-        },
-    });
-
-}
-
-function initFiltersGoodsSwipers() {
-
-    // прокрутка для фильтра с товарами
     new Swiper('.swiper-container', {
         slidesPerView: 'auto',
         spaceBetween: 10,
