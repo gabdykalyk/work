@@ -18,12 +18,30 @@ function initFilters() {
 				var sub_menu = $('.' + sub_name + '-menu');
 				
 				lnk.parent().addClass('active');
-				sub_menu.show(300);
+				sub_menu.show(300, function() {
+                    initFiltersSwipers();
+                });
 			}
 
 			lnk.parent().addClass('active');
 		}
 	});
+}
+
+function initFiltersSwipers() {
+    // прокрутка для фильтра с датами
+    new Swiper('.swiper-container', {
+        slidesPerView: 'auto',
+        spaceBetween: 10,
+        mousewheel: {
+            invert: false
+        },
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev'
+        },
+    });
+
 }
 
 // инициализация модального окна для сотрудников
@@ -123,5 +141,123 @@ function initSwipe() {
         } else {
             slide(0);
         }
+    }
+}
+
+// datepicker
+function initDatePicker(dateSelector, onSelected) {
+    $(dateSelector).daterangepicker({
+        "singleDatePicker": true,
+        "minYear": 1901,
+        "maxYear": 2040,
+        "linkedCalendars": false,
+        "opens": "left",
+        "locale": {
+            "format": "MM.DD.YYYY",
+            "separator": " - ",
+            "applyLabel": "Применить",
+            "cancelLabel": "Отмена",
+            "fromLabel": "От",
+            "toLabel": "До",
+            "customRangeLabel": "Custom",
+            "weekLabel": "Н",
+            "daysOfWeek": [
+                "Пн",
+                "Вт",
+                "Ср",
+                "Чт",
+                "Пт",
+                "Сб",
+                "Вс"
+            ],
+            "monthNames": [
+                "Январь",
+                "Февраль",
+                "Март",
+                "Апрель",
+                "Май",
+                "Июнь",
+                "Июль",
+                "Август",
+                "Сентябрь",
+                "Октябрь",
+                "Ноябрь",
+                "Декабрь"
+            ],
+            "firstDay": 0
+        },
+    });
+
+    $(dateSelector).on('apply.daterangepicker', function(ev, picker) {
+        $(dateSelector+' input').val(picker.startDate.format('DD.MM.YYYY'));
+        $(dateSelector+' label').addClass('active');
+        if (onSelected) {
+            onSelected(dateSelector, picker.startDate, picker.endDate);
+        }
+    });
+}
+
+// daterangepicker
+function initDateRangePicker(dateSelector, onSelected) {
+    $(dateSelector).daterangepicker({
+        "minYear": 1901,
+        "maxYear": 2040,
+        "linkedCalendars": false,
+        "opens": "left",
+        "locale": {
+            "format": "MM.DD.YYYY",
+            "separator": " - ",
+            "applyLabel": "Применить",
+            "cancelLabel": "Отмена",
+            "fromLabel": "От",
+            "toLabel": "До",
+            "customRangeLabel": "Custom",
+            "weekLabel": "Н",
+            "daysOfWeek": [
+                "Пн",
+                "Вт",
+                "Ср",
+                "Чт",
+                "Пт",
+                "Сб",
+                "Вс"
+            ],
+            "monthNames": [
+                "Январь",
+                "Февраль",
+                "Март",
+                "Апрель",
+                "Май",
+                "Июнь",
+                "Июль",
+                "Август",
+                "Сентябрь",
+                "Октябрь",
+                "Ноябрь",
+                "Декабрь"
+            ],
+            "firstDay": 0
+        },
+    });
+    $(dateSelector).on('apply.daterangepicker', function(ev, picker) {
+        if (onSelected) {
+            onSelected(dateSelector, picker.startDate, picker.endDate);
+        }
+    });
+}
+
+function initToggleFilters(lnk, single) {
+    var li = lnk.parent();
+    var is_active = li.hasClass('active');
+
+    if (single) {
+        var ul = lnk.closest('ul');
+        ul.find('li').removeClass('active');
+    }
+
+    if (!is_active) {
+        li.addClass('active');
+    } else {
+        li.removeClass('active');
     }
 }
