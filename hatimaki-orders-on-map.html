@@ -182,7 +182,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-                <div class="couriers-list">
+                <div class="couriers-list" id="couriers-list">
                     <h2 class="couriers-list__title">Курьеры</h2>
 					<table class="table table-couriers">
 						<tbody>
@@ -281,8 +281,8 @@
             myCollection.add(myPlacemark);*/
 
             var colors = {
-                orangeStretchyIcon: '#FF931E',
-                darkgreenStretchyIcon: '#1BAD03'
+                orangeStretchyIcon: '#E3BE00',
+                darkgreenStretchyIcon: '#38A138'
             };
 
             myPlacemark = new ymaps.Placemark([55.5344, 37.7053], {
@@ -300,6 +300,31 @@
                 preset: 'islands#darkgreenStretchyIcon'
             });
             myCollection.add(myPlacemark);
+			
+			var myButton = new ymaps.control.Button({
+				data: {
+					// Зададим текст и иконку для кнопки.
+					content: '<span class="map-legend"><span class="item-legend"><span class="circle" style="background-color: ' + colors.orangeStretchyIcon + '"></span>Готовится</span><span class="item-legend"><span class="circle" style="background-color: ' + colors.darkgreenStretchyIcon + '"></span>Готово</span></span>'
+				},
+				options: {
+					maxWidth: 1000,
+				}
+			});
+			myMap.controls.add(myButton);	
+
+			myMap.container.events.add('fullscreenenter', show_courier);
+			myMap.container.events.add('fullscreenexit', hide_courier);
+			function show_courier()	{
+				//alert('fullscreen enter')
+				var couriers = $('#couriers-list');
+				couriers.addClass('couriers-list-onmap');
+			}
+			function hide_courier() {
+				//alert('fullscreen exit');
+				var couriers = $('#couriers-list');
+				couriers.removeClass('couriers-list-onmap');
+			}			
+			
             myMap.geoObjects.add(myCollection);
         }
 
