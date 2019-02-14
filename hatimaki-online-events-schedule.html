@@ -132,7 +132,7 @@
                     <div class="col-md-9 col-sm-12 col-xs-12 schedule-table">
                         <div class="table-responsive-wrapper">
                             <div class="table-responsive2">
-                                <table class="table table-hover table-empllist table-monitoring">
+                                <table class="table table-hover table-monitoring">
                                     <thead>
                                         <tr>
                                             <th class="cell-head cell-xs-icon wth1 js-cell-mobile" data-icon="&#xf007">
@@ -296,44 +296,6 @@
         <!-- end: Tab panes -->
     </div>
 
-    <!-- beg: Popover event details -->
-    <div id="popover-content-participants" style="display: none;">
-        <div class="participant-details-list">
-            <div class="participant-details-item">
-                <h2>Администратор филиала</h2>
-                <ul>
-                    <li>
-                        <span class="name">----------------</span>
-                        <span class="amount">3 р.</span>
-                    </li>
-                    <li>
-                        <span class="name">----------------</span>
-                        <span class="amount">4 р.</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="participant-details-item">
-                <h2>Повар пиццмейкер</h2>
-                <ul>
-                    <li>
-                        <span class="name">----------------</span>
-                        <span class="amount">4 р.</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="participant-details-item">
-                <h2>Повар сушист</h2>
-                <ul>
-                    <li>
-                        <span class="name">----------------</span>
-                        <span class="amount">5 р.</span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <!-- end: Popover event details -->
-
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -349,15 +311,6 @@
     <script type="text/javascript" src="js/js-gl.js"></script>
 
     <script type="text/javascript">
-        function showPopover(target) {
-            $('[data-toggle="popover"]').not(target).popover('hide');
-            $(target).popover('show');
-        }
-
-        function hidePopover() {
-            $('[data-toggle="popover"]').popover('hide');
-        }
-
         $(function() {
             initNavbar();
 
@@ -375,52 +328,6 @@
                 dateFormat: 'dd.mm.yyyy',
                 language: 'ru',
                 pickTime: false
-            });
-
-            // всплывающее окно при клике на ссылку в колонке таблицы Сотр.
-            $('[data-toggle="popover"]').popover({
-                placement: 'top',
-                html: true,
-                container: 'body',
-                content: function() {
-                    var id = $(this).attr('data-popovercontent');
-                    return $('#popover-content-' + id).html();
-                },
-                template: '<div class="popover popover-event-details" role="tooltip">' +
-                    '<div class="popover-header">' +
-                    '<button type="button" class="close" data-dismiss="popover" aria-label="Close" title="Закрыть окно" onclick="hidePopover();"><span aria-hidden="true">&times;</span></button>' +
-                    '</div>' +
-                    '<div class="popover-content"></div>' +
-                    '</div>'
-            });
-
-            // При наведении на ссылку (на десктопе) и при клике (на мобильном)
-            // показывает popover с участниками мероприятия
-            $('[data-toggle="popover"]').on({
-                click: function(e) {
-                    if ($(window).width() <= 768) {
-                        showPopover(e.target);
-                    }
-                },
-                mouseenter: function(e) {
-                    if ($(window).width() > 767) {
-                        showPopover(e.target);
-                    }
-                }
-            });
-
-            // скрывает предыдущий поповер при отображении нового
-            $('[data-toggle="popover"]').on('click', function() {
-                $('[data-toggle="popover"]').not(this).popover('hide');
-            });
-
-            // скрывает поповеры при клике на боди
-            $('body').on('click', function(e) {
-                $('[data-toggle="popover"]').each(function() {
-                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                        $(this).popover('hide');
-                    }
-                });
             });
         });
     </script>
