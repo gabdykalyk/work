@@ -1177,51 +1177,7 @@
                 detail.show();
             }
         });
-
-        // функция при клике на ссылку в блоке инструкций, убирает знак "#" из url
-        $('.js-instr').click(function() {
-            return false;
-        });
-
-        // всплывающее окно при клике на ссылку в блоке инструкций
-        $('[data-toggle="popover"]').popover({
-            placement: 'auto',
-            html: true,
-            container: 'body',
-            //trigger: 'click hover',
-            content: 
-                function() {
-                    var id = $(this).attr('data-idcontent');
-                    return $('#popover-content-' + id).html();
-                },
-            template:
-                '<div class="popover popover-online" role="tooltip">' +
-                    '<div class="popover-header">' +
-                        '<button type="button" class="close" data-dismiss="popover" aria-label="Close" title="Закрыть окно" onclick="hidePopoverOnline();"><span aria-hidden="true">&times;</span></button>' +
-                    '</div>' +
-                    '<div class="popover-content"></div>' +
-                '</div>'
-        });
-
-        // скрывает предыдущий поповер при отображении нового
-        $('[data-toggle="popover"]').on('click', function () {
-            $('[data-toggle="popover"]').not(this).popover('hide');
-        })
-
-        // скрывает поповеры при клике на боди 
-        $('body').on('click', function (e) {
-            $('[data-toggle="popover"]').each(function () {
-                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
-                    $(this).popover('hide');
-                }
-            });
-        });
-
     });
-
-    function hidePopoverOnline() {
-        $('[data-toggle="popover"]').popover('hide');
-    }
     </script>
 </body>
 </html>
