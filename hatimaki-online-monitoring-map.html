@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Онлайн мониторинг</title>
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="fonts/fontawesome-pro-5.1.0-web/css/all.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link href="fonts/open-sans.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
+
+    <link href="css/styles.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <nav class="navbar navbar-fixed-top navbar-lk">
+        <div class="container-fluid">
+            <div class="navbar-collapse collapse" id="navbar-collapse-block">
+                <ul class="nav navbar-nav navbar-nav-main">
+                    <li class="item-menu-manper active"><a href="#">Расчёты<span class="count">1</span></a></li>
+                    <li class="item-menu-messages"><a href="#">Новый расчёт<span class="count">5</span></a></li>
+                    <li class="item-menu-alerts"><a href="#">Штрафы/Премии<span class="count">2</span></a></li>
+                    <li class="item-menu-schedule"><a href="#">Приказы/Инструкции</a></li>
+                    <li class="item-menu-index"><a href="#">Кадры<span class="count">3</span></a></li>
+                    <li class="item-menu-docs"><a href="#">Отчёты<span class="count">1</span></a></li>
+                    <li class="item-menu-discus"><a href="#">Обсуждения<span class="count">4</span></a></li>
+                    <li class="item-menu-complaints"><a href="#">Жалобы и предложения<span class="count">1</span></a></li>
+                    <li class="item-menu-friends"><a href="#">Друзья</a></li>
+                    <li class="item-menu-groups"><a href="#">Группы</a></li>
+                    <li class="item-menu-settings"><a href="#">Настройки</a></li>
+                    <li class="item-menu-help"><a href="#">Помощь</a></li>
+                </ul>
+            </div>
+            <button type="button" class="navbar-toggle collapsed" id="navbar-toggle">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <i class="fa fa-chevron-left" aria-hidden="true"></i>
+            </button>
+            <div class="navbar-right navbar-login">
+                <a href="#" class="btn"><span>Александр Константиновский</span> <i class="fa fa-sign-out hidden-sm hidden-xs" aria-hidden="true"></i></a>
+            </div>
+            <ul class="nav navbar-nav navbar-right navbar-nav-social">
+                <li><a href="#" title="Вконтакте"><i class="fab fa-vk" aria-hidden="true"></i></a></li>
+                <li><a href="#" title="Есть непросмотренные сообщения"><i class="fa fa-envelope" aria-hidden="true"></i><span class="badge"></span></a></li>
+                <li class="item-bell" title="Есть непросмотренные уведомления"><a href="#"><i class="fa fa-bell" aria-hidden="true"></i><span class="badge"></span></a></li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <div class="container-fluid content">
+        <h1>Онлайн мониторинг</h1>
+
+        <!-- begin: Form -->
+        <form action="" method="post" class="clearfix form-respons form-online">
+            <div class="form-group">
+                <label for="filiation-field" class="hidden-xs">Филиал</label>
+                <select name="filiation" id="filiation-field" class="form-control">
+                    <option value="0">Без филиала</option>
+                    <option value="1">Бутово</option>
+                    <option value="2" selected>Коммунарка</option>
+                    <option value="3">Московский</option>
+                    <option value="4">Подольск</option>
+                    <option value="5">Щербинка</option>
+                    <option value="6">Ясенево</option>
+                </select>
+            </div>
+            <div class="form-group form-group-datepicker">
+                <label for="date-field" class="hidden-xs">На дату</label>
+                <div class="group-datepicker">
+                    <button type="button" class="btn btn-default" title="Предыдущая дата"><i class="fas fa-chevron-left"></i></button>
+                    <div class="input-group datepicker">
+                        <input type="text" class="form-control" name="date" id="date-field" placeholder="00.00.0000" maxlength="10" value="15.02.2018">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button"><i class="far fa-calendar-alt"></i></button>
+                        </span>
+                    </div>
+                    <button type="button" class="btn btn-default" title="Следующая дата"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </form>
+        <!-- end: Form -->
+
+        <!-- beg: tabs -->
+        <ul class="nav nav-tabs nav-tabs-lk hidden-xs">
+            <li><a href="#" data-toggle="tab">KPI</a></li>
+            <li class="active"><a href="#" data-toggle="tab">Карта</a></li>
+            <li><a href="#" data-toggle="tab">График работы</a></li>
+            <li><a href="#" data-toggle="tab">Отзывы</a></li>
+            <li><a href="#" data-toggle="tab">Мероприятия</a></li>
+        </ul>
+        <!-- end: tabs -->
+
+        <!-- beg: Tab panes -->
+        <div class="tab-content online-monitoring-map-page">
+            <div class="tab-pane active">
+                <ul class="nav nav-tabs-lk-xs">
+                    <li><a href="#" data-toggle="tab">KPI</a></li>
+                    <li class="active"><a href="#" data-toggle="tab">Карта</a></li>
+                </ul>
+                <div class="filters">
+                    <form class="columns" action="" method="post">
+                        <div class="form-group column-first">
+                            <label for="curiers">Курьеры</label>
+                            <select class="form-control js-select-multiple" name="curiers[]" id="curiers" multiple="" tabindex="-1" aria-hidden="true">
+                                <option value="1">Мальничук Юрий Иванович </option>
+                                <option value="2">Джаббаров Самир Джаббарович</option>
+                                <option value="3">Кабанов Владимир Сергеевич</option>
+                                <option value="4">Мальничук Мирослав Иванович</option>
+                                <option value="5">Абдунасиров Мансур</option>
+                                <option value="6">Воротников Сергей</option>
+                                <option value="6">Нурдинов Роман</option>
+                            </select>
+                        </div>
+                        <div class="form-group column-second">
+                            <label for="latenessRisk">Риск опоздания</label>
+                            <select class="form-control" name="latenessRisk" id="latenessRisk">
+                                <option value="1">Все</option>
+                                <option value="2">Незначительный риск</option>
+                                <option value="2">Не успевает</option>
+                            </select>
+                        </div>
+                        <div class="form-group column-third">
+                            <label for="remoteness">Удаленность</label>
+                            <div class="remoteness">
+                                <div class="remoteness__wrapper">
+                                    <input class="js-remoteness-slider" type="range" min="0" max="10" name="remoteness" value="5" />
+                                </div>
+                                <div class="remoteness__amount"><span class="js-remoteness-amount"></span> км</div>
+                            </div>
+                        </div>
+                        <div class="form-group column-fourth">
+                            <div class="checkbox-nice">
+                                <label>
+                                    <input type="checkbox" checked>
+                                    <span class="fa fa-check"></span>
+                                    <div class="checkbox-label">Показать рекомендации</div>
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="map-monitoring">
+                    <div class="column-first">
+                        <div class="container-map-orders">
+                            <!-- beg: Loading -->
+                            <div class="loader" title="Пожалуйста, подождите ...">
+                                <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+                            </div>
+                            <!-- end: Loading -->
+                            <div class="map-orders" id="map"></div>
+                        </div>
+                        <div class="monitoring-map">
+                            <div class="statuses">
+                                <div class="status state">Статусы:</div>
+                                <div class="status new">Новая</div>
+                                <div class="status preparing">Готовится</div>
+                                <div class="status ready">Готово</div>
+                                <div class="status waiting">Ждет отправки</div>
+                                <div class="status onTheWay">В пути</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column-second">
+                        <div class="monitoring-couriers">
+                            <div class="couriers-list" id="couriers-list">
+                                <table class="table table-couriers">
+                                    <tbody>
+                                        <tr>
+                                            <td><a href="#">Мельничук Юрий Иванович</a></td>
+                                            <td><i class="fas fa-clock"></i><strong>20:35</strong></td>
+                                            <td><i class="fas fa-star"></i><strong>5.0</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Джаббаров Самир Джаббарович</td>
+                                            <td><span class="label label-success">Свободен</span></td>
+                                            <td><i class="fas fa-star"></i><strong>4.7</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="#">Кабанов Владимир Сергеевич</a></td>
+                                            <td><i class="fas fa-clock"></i><strong>21:00</strong></td>
+                                            <td><i class="fas fa-star"></i><strong>3.9</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><a href="#">Мальничук Мирослав Иванович</a></td>
+                                            <td><i class="fas fa-clock"></i><strong>21:00</strong></td>
+                                            <td><i class="fas fa-star"></i><strong>4.1</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Абдунасиров Мансур</td>
+                                            <td><span class="label label-success">Свободен</span></td>
+                                            <td><i class="fas fa-star"></i><strong>4.7</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Воротников Сергей</td>
+                                            <td><span class="label label-success">Свободен</span></td>
+                                            <td><i class="fas fa-star"></i><strong>4.4</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Нурдинов Роман</td>
+                                            <td><span class="label label-success">Свободен</span></td>
+                                            <td><i class="fas fa-star"></i><strong>4.4</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column-third">
+                        <div class="forecast">
+                            <table class="table forecast-table">
+                                <thead>
+                                    <tr>
+                                        <th>Заказ</th>
+                                        <th>Время доставки</th>
+                                        <th>Прогноз</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><a href="#">#77560</a></td>
+                                        <td>20:50</td>
+                                        <td class="minimalRisk">21:00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">#77541</a></td>
+                                        <td>20:45</td>
+                                        <td class="minimalRisk">20:55</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">#77558</a></td>
+                                        <td>20:45</td>
+                                        <td class="notInTime">21:00</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">#77539</a></td>
+                                        <td>21:20</td>
+                                        <td class="minimalRisk">21:30</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">#77532</a></td>
+                                        <td>21:10</td>
+                                        <td class="notInTime">21:25</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="column-fourth">
+                        <div class="recommend">
+                            <div class="monitoring-recommend">
+                                <div class="column">
+                                    <div class="column-inner">
+                                        <div class="column-title">
+                                            <div class="color-mark" style="background-color: #38a138"></div>
+                                            <div class="courierName">Джаббаров Самир Джаббарович</div>
+                                        </div>
+                                        <div class="info">
+                                            <div class="order"><a href="#" class="numberLink" tabindex="0">#77564</a> Щербинка, ул. Советская, д. 4</div>
+                                            <div class="order"><a href="#" class="numberLink" tabindex="0">#77558</a> Щербинка, ул. Индустриальная, д. 16</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <div class="column-inner">
+                                        <div class="column-title">
+                                            <div class="color-mark" style="background-color: #8145e2"></div>
+                                            <div class="courierName">Абдунасиров Мансур</div>
+                                        </div>
+                                        <div class="info">
+                                            <div class="order"><a href="#" class="numberLink" tabindex="0">#77552</a> Московская обл, Ленинский район, деревня Дрожжино, ул. Новое шоссе, д. 6, корп. 1</div>
+                                            <div class="order"><a href="#" class="numberLink" tabindex="0">#77550</a> Московская обл, Ленинский район, деревня Дрожжино, ул. Южная, д. 25</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="column">
+                                    <div class="column-inner">
+                                        <div class="column-title">
+                                            <div class="color-mark" style="background-color: #337ab7"></div>
+                                            <div class="courierName">Воротников Сергей</div>
+                                        </div>
+                                        <div class="info">
+                                            <div class="order"><a href="#" class="numberLink" tabindex="0">#77549</a> Московская обл, Ленинский район, деревня Дрожжино, ул. Южная, д. 1</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="monitoring-table">
+                    <div class="table-responsive-wrapper">
+                        <div class="table-responsive2">
+                            <table class="table table-hover table-monitoring">
+                                <thead>
+                                    <tr>
+                                        <th class="cell-head cell-xs-icon  js-cell-mobile" data-icon="&#xf02b">
+                                            <div class="cell-head_name">Заказ</div>
+                                        </th>
+                                        <th class="cell-head cell-xs-icon" data-icon="&#xf007">
+                                            <div class="cell-head_name">Клиент</div>
+                                        </th>
+                                        <th class="cell-head cell-xs-icon" data-icon="&#xf360">
+                                            <div class="cell-head_name">Источник</div>
+                                        </th>
+                                        <th class="cell-head cell-xs-icon" data-icon="&#xf290">
+                                            <div class="cell-head_name">Реклама клиента</div>
+                                        </th>
+                                        <th class="cell-head cell-xs-icon" data-icon="&#xf502">
+                                            <div class="cell-head_name">Реклама заказа</div>
+                                        </th>
+                                        <th class="cell-head cell-xs-icon" data-icon="&#xf075">
+                                            <div class="cell-head_name">Комментарий</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><a href="#">#77560</a></td>
+                                        <td class="schedule-table-person js-cell-mobile">
+                                            Парамонова Дина
+                                        </td>
+                                        <td>Сайт</td>
+                                        <td>Промоутер</td>
+                                        <td>Партнеры/cотрудники</td>
+                                        <td>Давний постоянный клиент</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">#77541</a></td>
+                                        <td class="schedule-table-person js-cell-mobile">
+                                            Степанова Надежда
+                                            <span class="label label-success label-new hidden-xs">Новый</span>
+                                            <i class="fas fa-check-circle label-new-xs visible-xs"></i>
+                                        </td>
+                                        <td>Приложение</td>
+                                        <td>Партнеры/cотрудники</td>
+                                        <td>Яндекс</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">#77558</a></td>
+                                        <td class="schedule-table-person js-cell-mobile">
+                                            Суворов Сергей
+                                        </td>
+                                        <td>Приложение</td>
+                                        <td>Яндекс</td>
+                                        <td>Промоутер</td>
+                                        <td>Скандальный, придирчивый клиент</td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">#77539</a></td>
+                                        <td class="schedule-table-person js-cell-mobile">
+                                            Федотова Татьяна
+                                        </td>
+                                        <td>Сайт</td>
+                                        <td>Промоутер</td>
+                                        <td>Промоутер</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#">#77532</a></td>
+                                        <td class="schedule-table-person js-cell-mobile">
+                                            Петерфельд Валентин
+                                            <span class="label label-success label-new hidden-xs">Новый</span>
+                                            <i class="fas fa-check-circle label-new-xs visible-xs"></i>
+                                        </td>
+                                        <td>Приложение</td>
+                                        <td>Партнеры/cотрудники</td>
+                                        <td>Партнеры/cотрудники</td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="nav nav-tabs-lk-xs">
+                    <li><a href="#" data-toggle="tab">График работы</a></li>
+                    <li><a href="#" data-toggle="tab">Отзывы</a></li>
+                    <li><a href="#" data-toggle="tab">Мероприятия</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- end: Tab panes -->
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap DateTimepicker, https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+    <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+
+    <!-- Select2, https://select2.org/getting-started/basic-usage -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+
+    <script type="text/javascript" src="js/slick.min.js"></script>
+
+    <!-- Rangeslider, http://rangeslider.js.org/ -->
+    <script type="text/javascript" src="js/rangeslider.min.js"></script>
+
+    <script type="text/javascript" src="js/js-gl.js"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru-RU" type="text/javascript"></script>
+    <script type="text/javascript">
+        ymaps.ready(init);
+
+        function init() {
+            var myMap = new ymaps.Map("map", {
+                center: [55.5042099, 37.5596213],
+                zoom: 11
+            }, {
+                searchControlProvider: 'yandex#search'
+            });
+
+            var myCollection = new ymaps.GeoObjectCollection();
+
+            var myPlacemark;
+            myPlacemark = new ymaps.Placemark([
+                55.5042099, 37.5596213
+            ], {
+                balloonContent: 'Филиал: 1. Щербинка'
+            }, {
+                preset: 'islands#icon',
+                iconColor: '#4682B4'
+            });
+            myCollection.add(myPlacemark);
+
+            var colors = {
+                orangeStretchyIcon: '#FF931E',
+                darkgreenStretchyIcon: '#1BAD03',
+                redStretchyIcon: '#e8473e',
+                grayStretchyIcon: '#b3b3b3',
+            };
+            var formatString = function(str, variables) {
+                for (var i = 0; i < variables.length; i++) {
+                    str = str.replace('{' + i + '}', variables[i]);
+                }
+                return str;
+            }
+
+            var newPlacemark;
+
+            function addOrderToMap(orders) {
+                for (var k = 0; k < orders.length; k++) {
+                    var order = orders[k];
+                    var iconContentTemplate = '<span class="mapPoint"><b>#{0}</b> <b>{1}</b> <span class="mapAddress"><b class="orderStage {2}">{3}</b> {4}</span></span>';
+
+                    var distanceStatus = 'grayStretchyIcon';
+                    var distanceLabel = 'Успевает';
+                    switch (order.distance.status) {
+                        case 'minorRisk':
+                            distanceStatus = 'orangeStretchyIcon';
+                            distanceLabel = 'Незначительный риск';
+                            break;
+                        case 'late':
+                            distanceStatus = 'redStretchyIcon';
+                            distanceLabel = 'Не успевает';
+                            break;
+                    }
+                    var paymentLabel = 'Наличные';
+                    switch (order.paymentType) {
+                        case 'card':
+                            paymentLabel = 'Карта';
+                            break;
+                        case 'cash_card':
+                            paymentLabel = 'Наличные и карта';
+                            break;
+                    }
+
+                    var iconContent = formatString(iconContentTemplate, [
+                        order.id,
+                        order.time,
+                        order.stage.status,
+                        order.stage.time,
+                        order.address
+                    ]);
+
+                    var balloonContentTemplate = '<div class="mapBalloon"><div><b>#{0}&nbsp;&nbsp;{1}&nbsp;&nbsp;<span class="orderStage {2}">{3} {4}</span></b></div> <div class="distance"><b>{5}&nbsp;&nbsp;<span style="color: {6}">{7}</span></b></div> <div><b><i class="fas fa-map-marker-alt"></i>{8}</b></div> <div><b><i class="fas fa-car"></i>{9}</b></div> <div class="orders">{10}</div> <div> <label>Оплата:</label> <div><b>{11}</b></div> </div> <div style="margin-top: 5px;"> <label>Сумма заказа / cдача с суммы:</label> <div style="font-size: 14px"><b>{12} <i class="far fa-ruble-sign"></i> / {13} <i class="far fa-ruble-sign"></i></b></div></div></div>';
+
+                    var balloonContent = formatString(balloonContentTemplate, [
+                        order.id,
+                        order.time,
+                        order.stage.status,
+                        order.stage.time,
+                        order.stage.name,
+                        order.distance.text,
+                        colors[distanceStatus],
+                        distanceLabel,
+                        order.address,
+                        order.courier,
+                        order.order.join("\n"),
+                        paymentLabel,
+                        order.amount,
+                        order.change
+                    ]);
+
+                    // balloonContent = '<span class="mapAnnotation"><div><b>#775566</b> <b>20:45</b> <b style="color: ' + colors['redStretchyIcon'] + '">11 мин готовится</b></div><div>дер. Боброво, д. 35А</div><b>1420.50 р.</b></span>';
+
+                    newPlacemark = new ymaps.Placemark(order.coordinates, {
+                        balloonContent: balloonContent,
+                        iconContent: iconContent
+                    }, {
+                        preset: 'islands#' + distanceStatus
+                    });
+
+                    myMap.geoObjects.add(newPlacemark);
+                }
+            }
+
+            var orders = [{
+                id: '775566',
+                coordinates: [55.5344, 37.7053],
+                address: 'дер. Боброво, д. 35А',
+                time: '20:45',
+                stage: {
+                    name: 'готовится',
+                    time: '11 мин.',
+                    // new preparing ready waiting onTheWay 
+                    status: 'preparing'
+                },
+                distance: {
+                    text: '0,5 км',
+                    // 'ok', 'minorRisk', 'late'
+                    status: 'minorRisk'
+                },
+                courier: 'Кабанов Владимир Сергеевич',
+                order: ['Пицца', 'Теплые роллы'],
+                // cash card cash_card
+                paymentType: 'cash',
+                amount: '1420.50',
+                change: '0'
+            }, {
+                id: '775566',
+                coordinates: [55.4344, 37.5853],
+                address: 'Щербинка, ул. Почтовая, д. 9, кв. 1',
+                time: '20:45',
+                stage: {
+                    name: 'готово',
+                    time: '18 мин.',
+                    // new preparing ready waiting onTheWay 
+                    status: 'ready'
+                },
+                distance: {
+                    text: '0,5 км',
+                    // 'ok', 'minorRisk', 'late'
+                    status: 'late'
+                },
+                courier: 'Кабанов Владимир Сергеевич',
+                order: ['Пицца', 'Теплые роллы'],
+                // cash card
+                paymentType: 'cash',
+                amount: '2420.50',
+                change: '0'
+            }, {
+                id: '775566',
+                coordinates: [55.477701, 37.553844],
+                address: 'Советская, д. 25',
+                time: '20:45',
+                stage: {
+                    name: 'готовится',
+                    time: '5 мин.',
+                    // new preparing ready waiting onTheWay 
+                    status: 'preparing'
+                },
+                distance: {
+                    text: '0,5 км',
+                    // 'ok', 'minorRisk', 'late'
+                    status: 'ok'
+                },
+                courier: 'Кабанов Владимир Сергеевич',
+                order: ['Пицца', 'Теплые роллы'],
+                // cash card
+                paymentType: 'cash',
+                amount: '2420.50',
+                change: '0'
+            }, {
+                id: '775566',
+                coordinates: [55.513758, 37.562083],
+                address: 'Советская, д. 87',
+                time: '20:45',
+                stage: {
+                    name: 'готово',
+                    time: '2 мин.',
+                    // new preparing ready waiting onTheWay 
+                    status: 'ready'
+                },
+                distance: {
+                    text: '0,5 км',
+                    // 'ok', 'minorRisk', 'late'
+                    status: 'ok'
+                },
+                courier: 'Кабанов Владимир Сергеевич',
+                order: ['Пицца', 'Теплые роллы'],
+                // cash card
+                paymentType: 'cash',
+                amount: '2420.50',
+                change: '0'
+            }, {
+                id: '775566',
+                coordinates: [55.466000, 37.548007],
+                address: 'Советская, д. 4',
+                time: '20:45',
+                stage: {
+                    name: 'новая',
+                    time: '10 мин.',
+                    // new preparing ready waiting onTheWay 
+                    status: 'new'
+                },
+                distance: {
+                    text: '0,5 км',
+                    // 'ok', 'minorRisk', 'late'
+                    status: 'ok'
+                },
+                courier: 'Кабанов Владимир Сергеевич',
+                order: ['Пицца', 'Теплые роллы'],
+                // cash card
+                paymentType: 'cash',
+                amount: '2420.50',
+                change: '0'
+            }];
+
+            addOrderToMap(orders);
+
+            // myPlacemark = new ymaps.Placemark([55.499003, 37.554028], {
+            //     balloonContent: '<span class="mapAnnotation"><div><b>#775566</b> <b>21:00</b> <b style="color: ' + colors.redStretchyIcon + '">18 мин готово</b></div><div>Щербинка, ул. Почтовая, д. 9, кв. 1</div><b>2420.50 р.</b></span>',
+            //     iconContent: '<span class="mapPoint"><b>#775566</b> <b>21:00</b><span class="mapAddress"> <b style="color: ' + colors.redStretchyIcon + '">18 мин.</b> ул. Почтовая, д. 9</span></span>'
+            // }, {
+            //     preset: 'islands#redStretchyIcon'
+            // });
+            // myCollection.add(myPlacemark);
+
+            // myPlacemark = new ymaps.Placemark([55.499003, 37.554028], {
+            //     balloonContent: '<span class="mapAnnotation"><div><b>#775566</b> <b>21:00</b> <b style="color: ' + colors.redStretchyIcon + '">18 мин готово</b></div><div>Щербинка, ул. Почтовая, д. 9, кв. 1</div><b>2420.50 р.</b></span>',
+            //     iconContent: '<span class="mapPoint"><b>#775566</b> <b>21:00</b><span class="mapAddress"> <b style="color: ' + colors.redStretchyIcon + '">18 мин.</b> ул. Почтовая, д. 9</span></span>'
+            // }, {
+            //     preset: 'islands#redStretchyIcon'
+            // });
+            // myCollection.add(myPlacemark);
+
+
+            var myButton = new ymaps.control.Button({
+                data: {
+                    // Зададим текст и иконку для кнопки.
+                    content: '<span class="map-legend"><span class="item-legend"><span class="circle" style="background-color: ' + colors.orangeStretchyIcon + '"></span>Незначительный риск</span><span class="item-legend"><span class="circle" style="background-color: ' + colors.redStretchyIcon + '"></span>Не успевает</span></span>'
+                },
+                options: {
+                    maxWidth: 1000,
+                }
+            });
+            myMap.controls.add(myButton);
+
+            myMap.geoObjects.add(myCollection);
+        }
+
+        var sliderInit = function(Slider) {
+            $(Slider).slick({
+                infinite: false,
+                dots: false,
+                slidesToShow: 2,
+                slidesToScroll: 1,
+                arrows: true,
+                autoplay: false,
+                responsive: [{
+                    breakpoint: 768,
+                    settings: {
+                        slidesToShow: 1,
+                        adaptiveHeight: true
+                    }
+                }]
+            });
+        }
+        var Slider = '.online-monitoring-map-page .monitoring-recommend';
+        $(window).on('load resize', function() {
+            var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+            if (winWidth < 768) {
+                changeHeightCellMobile($('.table-monitoring'));
+            } else {
+                var reserHeight = $('.js-cell-mobile');
+                $(reserHeight).removeAttr('style');
+            }
+
+            if (winWidth < 992 && !$(Slider).hasClass('slick-initialized')) {
+                sliderInit(Slider);
+            }
+
+            if (winWidth > 991 && $(Slider).hasClass('slick-initialized')) {
+                setTimeout(function() {
+                    $(Slider).slick('unslick');
+                }, 100);
+            }
+        });
+
+        $(function() {
+            initNavbar();
+
+            $('.js-select-multiple').select2({
+                width: '100%'
+            });
+
+            $('.datepicker').datetimepicker({
+                dateFormat: 'dd.mm.yyyy',
+                language: 'ru',
+                pickTime: false
+            });
+
+
+            var remotenessAmount = $('.js-remoteness-amount');
+            $('.js-remoteness-slider').rangeslider({
+                // Feature detection the default is `true`.
+                // Set this to `false` if you want to use
+                // the polyfill also in Browsers which support
+                // the native <input type="range"> element.
+                polyfill: false,
+
+                // Callback function
+                onInit: function() {
+                    remotenessAmount.text(this.value);
+                },
+
+                // Callback function
+                onSlide: function(position, value) {
+                    remotenessAmount.text(value);
+                },
+
+                // Callback function
+                onSlideEnd: function(position, value) {
+                    remotenessAmount.text(value);
+                }
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>
