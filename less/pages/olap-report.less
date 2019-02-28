@@ -1,0 +1,573 @@
+@table-border-color: #CDCDCD;
+
+.draggable-olap-item {
+  position: relative;
+  padding: 4px 12px;
+  border: 1px solid #CDCDCD;
+  .border-radius(4px);
+  margin: 0 0 2px 0;
+  min-width: 260px;
+  min-height: 48px;
+  background-color: #fff;
+
+  label {
+    display: block;
+    font-size: 14px;
+    color: #000;
+    margin-bottom: 0;
+  }
+  span.group {
+    display: block;
+    font-size: 12px;
+    color: #555555;
+  }
+
+  &.ui-draggable--empty-placeholder {
+    label,
+    span {
+      display: none;
+    }
+    border-width: 0;
+  }
+
+  span.sort-btn {
+    position: absolute;
+    right: 5px;
+    top: 6px;
+    cursor: pointer;
+    display: none;
+    &:after {
+      font-family: "Font Awesome 5 Pro";
+      font-weight: 900;
+      color: #888888;
+    }
+    &.sort-btn-up:after {
+      content: "\f0d8";
+    }
+    &.sort-btn-down:after {
+      content: "\f0d7";
+    }
+  }
+
+}
+
+.olap-report-content {
+
+  .head-with-toolbar {
+
+    border-bottom: 1px solid #E5E5E5;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+
+    h1 {
+      display: inline-block;
+      float: left;
+    }
+
+    .head-toolbar {
+      margin-top: 12px;
+      display: inline-block;
+      float: right;
+      .btn-group {
+        margin-right: 20px;
+      }
+    }
+
+  }
+
+  .form-olap-report {
+
+    .form-btns {
+      margin-top: 0;
+      text-align: right;
+
+      .btn {
+        float: none;
+      }
+
+      &.form-btns--save {
+        button {
+          margin-right: 15px;
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+
+      &.form-btns--mt25 {
+        margin-top: 25px;
+      }
+    }
+
+    .form-group-datepicker {
+      margin-top: 25px;
+      .input-group-dash {
+        position: absolute;
+        top: 12%;
+        left: 49.5%;
+      }
+    }
+
+  }
+
+  .olap-report-groups {
+    border-top: 1px solid #E8E8E8;
+    margin-top: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    position: relative;
+    .group-btns {
+      padding-right: 50px;
+      .btn {
+        padding: 4px 12px;
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+    }
+    .highlight-data {
+      position: absolute;
+      right: 0;
+      top: 10px;
+      .btn {
+        padding: 2px 7px 6px 7px;
+      }
+    }
+  }
+
+  .olap-report-table-builder {
+
+    height: 430px;
+    display: flex;
+    align-items: stretch;
+    flex-wrap: nowrap;
+
+    .group-list-container {
+      flex-basis: 30%;
+      margin-right: 20px;
+      min-width: 270px;
+      height: 100%;
+      overflow-y: hidden;
+
+      .group-list-search {
+        margin: 0 0 4px 0;
+        padding-right: 15px;
+      }
+
+      .group-list-scroll {
+        height: 90%;
+        overflow-y: hidden;
+
+        .group-list {
+          padding: 0;
+          margin: 0;
+        }
+      }
+
+    }
+
+    .olap-report-table-container {
+      flex-basis: 70%;
+
+      .draggable-olap-item {
+        margin-right: 2px;
+        border: 1px solid #CDCDCD;
+        min-width: auto;
+        min-height: 30px;
+        background-color: #fff;
+        .border-radius(4px);
+        label {
+          display: block;
+          font-size: 12px;
+          color: #000;
+          margin-bottom: 0;
+          white-space: nowrap;
+        }
+        span.group {
+          display: none;
+        }
+        span.sort-btn {
+          display: block;
+        }
+      }
+
+      .dropzone-data {
+        border-top: 2px solid #CDCDCD;
+        min-height: 36px;
+        padding: 2px 0 0 0;
+        display: flex;
+        flex-wrap: nowrap;
+        .draggable-olap-item {
+          margin-right: 2px;
+          padding: 5px 12px 3px 12px;
+          span.sort-btn {
+            display: none;
+          }
+        }
+      }
+
+      .olap-report-table {
+        border: 1px solid @table-border-color;
+        height: 390px;
+        overflow: hidden;
+
+        .dropzone-column {
+          padding: 1px 0 1px 0;
+          display: flex;
+          flex-wrap: nowrap;
+
+          .draggable-olap-item {
+            margin-right: 2px;
+            margin-bottom: 0;
+            padding: 5px 22px 3px 12px;
+          }
+        }
+
+        .dropzone-row {
+          padding: 1px 0 1px 0;
+          display: flex;
+          flex-wrap: nowrap;
+
+          .draggable-olap-item {
+            margin-right: 2px;
+            margin-bottom: 0;
+            padding: 5px 22px 3px 12px;
+          }
+        }
+
+        table {
+          border-width: 0px;
+          margin-bottom: 0;
+
+          thead {
+            tr {
+
+              th {
+                background-color: #EEEEEE;
+                font-weight: normal;
+                border-right: 1px solid @table-border-color;
+                border-bottom: 1px solid @table-border-color;
+                border-left: 1px solid @table-border-color;
+
+                &:last-child {
+                  border-right-width: 0;
+                }
+
+                &.th-dropzone-row {
+                  padding: 0;
+                  vertical-align: bottom;
+                  border-left-width: 0 !important;
+                  border-right-width: 0 !important;
+                }
+                &.th-dropzone-column {
+                  padding: 0;
+                  border-left-width: 0 !important;
+                }
+                .ui-dropzone-placeholder {
+                  padding: 5px 0 5px 8px;
+                  font-size: 12px;
+                  font-weight: normal;
+                  color: #6A6A6A;
+                }
+              }
+            }
+          }
+
+          tbody {
+            tr {
+              &:first-child {
+                td {
+                  border-top-width: 0;
+                }
+              }
+              td {
+                position: relative;
+                border-top: 1px solid @table-border-color;
+                border-right: 1px solid @table-border-color;
+                border-bottom: 1px solid @table-border-color;
+                border-left: 1px solid @table-border-color;
+
+                &.th-total {
+                  background-color: #EEEEEE;
+                }
+
+                &:first-child {
+                  border-left-width: 0;
+                }
+
+                .sort-btn {
+                  position: absolute;
+                  right: 4px;
+                  top: 7px;
+                  cursor: pointer;
+                  &:after {
+                    font-family: "Font Awesome 5 Pro";
+                    font-weight: 900;
+                    color: #555555;
+                  }
+                  &.sort-btn-up:after {
+                    content: "\f139";
+                  }
+                  &.sort-btn-down:after {
+                    content: "\f13a";
+                  }
+                }
+              }
+            }
+          }
+        }
+
+      }
+
+    }
+
+  }
+
+  @media (min-width: 768px) and (max-width: 991px) {
+
+    .head-with-toolbar {
+      border-bottom-color: transparent;
+    }
+
+    .form-olap-report {
+      &.form-btns--save {
+        margin-bottom: 15px;
+      }
+      .form-btns--apply {
+        margin-top: 25px;
+      }
+    }
+
+  }
+
+  @media (max-width: 767px) {
+
+    .head-with-toolbar {
+      border-bottom-color: transparent;
+
+      h1 {
+        display: block;
+        float: none;
+      }
+
+      .head-toolbar {
+        width: 100%;
+        margin-top: 12px;
+        display: flex;
+        float: none;
+        .btn-group {
+          display: block;
+          margin-right: 10px;
+          flex-basis: 55%;
+          a {
+            width: 50%;
+          }
+        }
+        & > a {
+          display: block;
+          flex-basis: 55%;
+          margin-left: 10px;
+        }
+      }
+
+    }
+
+    .form-olap-report {
+
+      .form-btns {
+        &.form-btns--mt25 {
+          margin-top: 0;
+        }
+      }
+      .form-btns--save {
+        margin-bottom: 15px;
+      }
+      .form-group-datepicker {
+        margin-top: 0;
+      }
+      .form-btns--apply {
+        button {
+          float: none;
+          width: 100%;
+        }
+      }
+
+    }
+
+  }
+
+}
+
+/* --- modals --- */
+
+.modal-olap-report-message {
+  .modal-dialog {
+    width: 340px;
+    .modal-body {
+      padding-top: 0;
+      padding-bottom: 30px;
+    }
+  }
+  .modal-message {
+    color: #000;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .modal-btns {
+    text-align: center;
+    button {
+      padding: 6px 24px;
+    }
+  }
+}
+
+.modal-olap-report-saveas {
+  .modal-dialog {
+    width: 340px;
+    .modal-body {
+      padding-top: 0;
+    }
+  }
+  .modal-btns {
+    display: flex;
+    justify-content: flex-end;
+    button {
+      padding: 6px 20px;
+      margin: 0 5px;
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+  .form-ctrl {
+    margin-bottom: 20px;
+    input::placeholder {
+      opacity: 0;
+    }
+  }
+}
+
+.modal-olap-report-data-highlight {
+
+  .modal-dialog {
+    width: 500px;
+  }
+
+  .modal-header {
+    .modal-title {
+      font-size: 20px;
+    }
+  }
+
+  .modal-body {
+    h6 {
+      font-size: 14px;
+      font-weight: normal;
+      margin: 0 0 20px 0;
+    }
+
+    h5 {
+      font-size: 14px;
+      font-weight: bold;
+      margin: 0 0 15px 0;
+    }
+
+    .highlight-type-section {
+      margin-bottom: 20px;
+    }
+
+    .row-parameters-section {
+      margin-bottom: 20px;
+    }
+
+    .colorscale-section {
+      margin-bottom: 10px;
+      .radio {
+        margin-bottom: 20px;
+      }
+      ul.colorscale {
+        height: 20px;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        li {
+          padding: 0;
+          margin: -2px;
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+  }
+
+  .modal-btns {
+    display: flex;
+    justify-content: flex-end;
+    button {
+      padding: 6px 20px;
+      margin: 0 5px;
+      &:first-child {
+        margin-left: 0;
+      }
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+}
+
+@media (max-width: 767px) {
+
+  .modal-olap-report-message {
+    .modal-dialog {
+      width: 100%;
+      margin-top: 0;
+    }
+    .modal-btns {
+      text-align: center;
+      button {
+        padding: 6px 24px;
+      }
+    }
+  }
+
+  .modal-olap-report-saveas {
+    .modal-dialog {
+      width: 100%;
+      margin-top: 0;
+    }
+    .modal-btns {
+      justify-content: space-between;
+      button {
+        flex-basis: 50%;
+        margin: 0 10px;
+      }
+    }
+    .form-ctrl {
+      input::placeholder {
+        opacity: 1;
+      }
+    }
+  }
+
+  .modal-olap-report-data-highlight {
+    .modal-dialog {
+      width: 100%;
+      margin-top: 0;
+    }
+    .modal-btns {
+      justify-content: space-between;
+      button {
+        flex-basis: 50%;
+        margin: 0 10px;
+      }
+    }
+  }
+
+}
