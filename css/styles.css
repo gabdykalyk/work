@@ -1678,11 +1678,22 @@ fieldset[disabled] .btn-primary:focus {
 .ui-helper-hidden-accessible {
   display: none;
 }
+/* элементы, которые перетаскиваем */
+.ui-draggable {
+  /* пустое место, где был расположен перетаскиваемый элемент */
+  /* перетаскиваемый элемент захвачен */
+}
 .ui-draggable.ui-draggable--empty-placeholder {
   background-color: #ECF6FF !important;
 }
 .ui-draggable.ui-draggable--captured {
   position: fixed;
+}
+/* место, куда перетаскиваем */
+.ui-dropzone {
+  /* элемент с текстом примечания в зоне перетаксивания */
+  /* перетаскивание в эту зону разрешено */
+  /* перетаскивание в эту зону запрещено */
 }
 .ui-dropzone.ui-dropzone--accessible {
   background-color: #ECF6FF;
@@ -12401,7 +12412,6 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
   -moz-border-radius: 4px;
   border-radius: 4px;
   margin: 0 0 2px 0;
-  min-width: 260px;
   min-height: 48px;
   background-color: #fff;
 }
@@ -12458,12 +12468,12 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
 .olap-report-content .head-with-toolbar .head-toolbar .btn-group {
   margin-right: 20px;
 }
-.olap-report-content .form-olap-report .form-btns {
-  margin-top: 0;
-  text-align: right;
-}
 .olap-report-content .form-olap-report .form-btns .btn {
   float: none;
+}
+.olap-report-content .form-olap-report .form-btns.form-btns--save {
+  margin-top: 0;
+  text-align: right;
 }
 .olap-report-content .form-olap-report .form-btns.form-btns--save button {
   margin-right: 15px;
@@ -12471,8 +12481,21 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
 .olap-report-content .form-olap-report .form-btns.form-btns--save button:last-child {
   margin-right: 0;
 }
-.olap-report-content .form-olap-report .form-btns.form-btns--mt25 {
+.olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--setup-period {
+  margin-top: 0;
+  text-align: right;
+}
+.olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--setup-singleday {
+  margin-top: 0;
+  text-align: right;
+}
+.olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--view-period {
   margin-top: 25px;
+  text-align: right;
+}
+.olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--view-singleday {
+  margin-top: 25px;
+  text-align: left;
 }
 .olap-report-content .form-olap-report .form-group-datepicker {
   margin-top: 25px;
@@ -12512,15 +12535,16 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
   flex-wrap: nowrap;
 }
 .olap-report-content .olap-report-table-builder .group-list-container {
-  flex-basis: 30%;
-  margin-right: 20px;
-  min-width: 270px;
+  margin-right: 15px;
+  width: 280px;
   height: 100%;
   overflow-y: hidden;
 }
 .olap-report-content .olap-report-table-builder .group-list-container .group-list-search {
   margin: 0 0 4px 0;
-  padding-right: 15px;
+}
+.olap-report-content .olap-report-table-builder .group-list-container .group-list-search input {
+  width: 260px;
 }
 .olap-report-content .olap-report-table-builder .group-list-container .group-list-scroll {
   height: 90%;
@@ -12530,13 +12554,15 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
   padding: 0;
   margin: 0;
 }
+.olap-report-content .olap-report-table-builder .group-list-container .group-list-scroll .group-list .draggable-olap-item {
+  width: 260px;
+}
 .olap-report-content .olap-report-table-builder .olap-report-table-container {
   flex-basis: 70%;
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .draggable-olap-item {
   margin-right: 2px;
   border: 1px solid #CDCDCD;
-  min-width: auto;
   min-height: 30px;
   background-color: #fff;
   -webkit-border-radius: 4px;
@@ -12662,11 +12688,24 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
   .olap-report-content .head-with-toolbar {
     border-bottom-color: transparent;
   }
-  .olap-report-content .form-olap-report.form-btns--save {
+  .olap-report-content .form-olap-report .form-btns.form-btns--save {
     margin-bottom: 15px;
   }
-  .olap-report-content .form-olap-report .form-btns--apply {
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--setup-period {
     margin-top: 25px;
+    text-align: right;
+  }
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--setup-singleday {
+    margin-top: 25px;
+    text-align: left;
+  }
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--view-period {
+    margin-top: 25px;
+    text-align: right;
+  }
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--view-singleday {
+    margin-top: 25px;
+    text-align: left;
   }
 }
 @media (max-width: 767px) {
@@ -12696,18 +12735,31 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
     flex-basis: 55%;
     margin-left: 10px;
   }
-  .olap-report-content .form-olap-report .form-btns.form-btns--mt25 {
-    margin-top: 0;
-  }
-  .olap-report-content .form-olap-report .form-btns--save {
+  .olap-report-content .form-olap-report .form-btns.form-btns--save {
     margin-bottom: 15px;
+  }
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply button {
+    float: none;
+    width: 100%;
+  }
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--setup-period {
+    margin-top: 0;
+    text-align: center;
+  }
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--setup-singleday {
+    margin-top: 0;
+    text-align: center;
+  }
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--view-period {
+    margin-top: 0;
+    text-align: center;
+  }
+  .olap-report-content .form-olap-report .form-btns.form-btns--apply.form-btns--view-singleday {
+    margin-top: 0;
+    text-align: center;
   }
   .olap-report-content .form-olap-report .form-group-datepicker {
     margin-top: 0;
-  }
-  .olap-report-content .form-olap-report .form-btns--apply button {
-    float: none;
-    width: 100%;
   }
 }
 /* --- modals --- */
