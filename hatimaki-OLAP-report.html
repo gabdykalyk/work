@@ -258,32 +258,36 @@
 
             </div>
             <div class="table-responsive2 olap-report-table">
-                <table class="table">
+                <table class="table olap-table-head">
                     <thead>
-                        <tr>
-                            <th rowspan="2" class="th-dropzone-row">
-                                <div class="ui-dropzone dropzone-row">
-                                    <span class="ui-dropzone-placeholder">Перетащите сюда заголовки</span>
-                                </div>
-                            </th>
-                            <th colspan="10" class="th-dropzone-column">
-                                <div class="ui-dropzone dropzone-column">
-                                    <span class="ui-dropzone-placeholder">Перетащите сюда заголовки столбцов</span>
-                                </div>
-                            </th>
-                        </tr>
-                        <tr>
-                            <th>Итого</th>
-                        </tr>
+                    <tr>
+                        <th rowspan="2" class="th-dropzone-row">
+                            <div class="ui-dropzone dropzone-row">
+                                <span class="ui-dropzone-placeholder">Перетащите сюда заголовки</span>
+                            </div>
+                        </th>
+                        <th class="th-dropzone-column">
+                            <div class="ui-dropzone dropzone-column">
+                                <span class="ui-dropzone-placeholder">Перетащите сюда заголовки столбцов</span>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Итого</th>
+                    </tr>
                     </thead>
-                    <tbody>
+                </table>
+
+                <div class="olap-table-data-vscroll">
+                    <table class="table olap-table-data">
+                        <tbody>
                         <tr>
                             <td class="th-total">Итого</td>
                             <td></td>
                         </tr>
-
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -549,18 +553,76 @@
 
     (function($){
         $(window).on("load",function(){
+            updateOlapTableDimensions();
 
             $(".group-list-scroll").mCustomScrollbar({
                 axis: "y",
                 theme: "dark"
             });
             $(".olap-report-table").mCustomScrollbar({
-                axis: "yx",
+                axis: "x",
+                theme: "dark"
+            });
+            $(".olap-table-data-vscroll").mCustomScrollbar({
+                axis: "y",
                 theme: "dark"
             });
 
         });
     })(jQuery);
+
+    /* обновление ширины колонок в таблице с данными на основе ширины заголовков */
+    function updateOlapTableDimensions() {
+        // ширина контейнера с данными
+        var listW = $('.group-list-container').outerWidth();
+        var bldW = $('.olap-report-table-builder').outerWidth();
+        $('.olap-report-table-container').outerWidth(bldW - listW - 15); // компенс гэп между списком и таблицей
+
+        // высота таблицы
+        var ortcH = $('.olap-report-table-container').outerHeight();
+        var dzdH = $('.dropzone-data').outerHeight();
+        $('.olap-report-table').outerHeight(ortcH - dzdH - 2);
+
+        // высота скроллируемой области с данными
+        var tblH = $('.olap-report-table').outerHeight();
+        var hdrH = $('.olap-table-head').outerHeight();
+        $('.olap-table-data-vscroll').outerHeight(tblH - hdrH - 18);
+
+        let thWidths = [];
+
+        // ширина колонок с данными, которые подпадают под первую колонку заголовка
+        // расчитываются из ширины "кнопок", которые туда добавлены
+        var firstThW = $('.olap-table-head thead tr .th-dropzone-row').outerWidth();
+
+        var sumRowBtnW = 0; // суммарная ширина колонок в первой ячейке заголовка
+        $('.olap-table-head thead tr .dropzone-row .draggable-olap-item').each(function(idx, item) {
+            var tmpW = sumRowBtnW + $(item).outerWidth() + 30;
+            if (tmpW <= firstThW) {
+                thWidths.push($(item).outerWidth()+2);
+                sumRowBtnW += ($(item).outerWidth()+2);
+            } else {
+                thWidths.push(firstThW - sumRowBtnW);
+                sumRowBtnW = firstThW;
+                return false;
+            }
+        });
+        if (thWidths.length == 0) {
+            thWidths.push(firstThW);
+        } else if (thWidths.length == 1 && sumRowBtnW < firstThW) {
+            thWidths.pop();
+            thWidths.push(firstThW);
+        } else if (thWidths.length > 1 && sumRowBtnW < firstThW) {
+            var w = thWidths.pop();
+            thWidths.push(firstThW - sumRowBtnW + w);
+        }
+
+        $('.olap-table-head thead tr:last-child th').each(function(idx, th) {
+            thWidths.push($(th).outerWidth());
+        });
+        $('.olap-table-data tbody td').each(function(idx, td) {
+            $(td).css('min-width', thWidths[idx]);
+        });
+    }
 
     /* быстрый поиск в левом списке групп */
     function initGroupListSearch() {
@@ -582,7 +644,47 @@
     }
 
     function onDrop(event) {
-        console.log('ON DROP '+event);
+        // event.target - куда перетаскиваем
+        // event.relatedTarget - что перетаскиваем
+
+        var dropzoneRow = $(event.target).hasClass('dropzone-row');
+        if (dropzoneRow) {
+            // begin: демонстрация добавления колонок
+            $('.olap-table-data tbody tr .th-total').remove();
+
+            var itemCount = $(event.target).find('.draggable-olap-item').length;
+            $(event.target).closest('th').attr('colspan', itemCount);
+            if (itemCount == 1) {
+                addTestColumn1();
+            } else {
+                addTestColumn2();
+            }
+            // end: демонстрация добавления колонок
+        }
+
+        // пересчет ширины колонок
+        updateOlapTableDimensions();
+
+        // рефреш гориз. скролбара
+        $(".olap-report-table").mCustomScrollbar("destroy");
+        $(".olap-report-table").mCustomScrollbar({
+            axis: "x",
+            theme: "dark"
+        });
+    }
+
+    function addTestColumn1() {
+        $('.olap-table-data tbody tr').each(function(idx, tr) {
+            if (idx%4 == 0) {
+                $(tr).prepend('<td rowspan="4">Бутово<span class="sort-btn sort-btn-down"></span></td>');
+            }
+        });
+    }
+
+    function addTestColumn2() {
+        $('.olap-table-data tbody tr').each(function(idx, tr) {
+            $('<td>Агапова Ю.</td>').insertAfter($(tr).find('td:first-child'));
+        });
     }
 
     function initDragAndDrop() {

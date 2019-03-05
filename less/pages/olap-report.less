@@ -152,7 +152,7 @@
 
   .olap-report-table-builder {
 
-    height: 430px;
+    height: 430px; // высота контейнера с OLAP данными
     display: flex;
     align-items: stretch;
     flex-wrap: nowrap;
@@ -160,6 +160,7 @@
     .group-list-container {
       margin-right: 15px;
       width: 280px;
+      min-width: 280px;
       height: 100%;
       overflow-y: hidden;
 
@@ -186,7 +187,8 @@
     }
 
     .olap-report-table-container {
-      flex-basis: 70%;
+      height: 100%;
+      //border: 1px solid red;
 
       .draggable-olap-item {
         margin-right: 2px;
@@ -211,7 +213,7 @@
 
       .dropzone-data {
         border-top: 2px solid @component-border-color;
-        min-height: 36px;
+        height: 36px;
         padding: 2px 0 0 0;
         display: flex;
         flex-wrap: nowrap;
@@ -225,9 +227,8 @@
       }
 
       .olap-report-table {
-        border: 1px solid @component-border-color;
-        height: 390px;
-        overflow: hidden;
+        border-top: 1px solid @component-border-color;
+        height: 100%;
 
         .dropzone-column {
           padding: 1px 0 1px 0;
@@ -250,11 +251,19 @@
             margin-right: 2px;
             margin-bottom: 0;
             padding: 5px 22px 3px 12px;
+            min-width: 120px;
           }
         }
 
+        .olap-table-data-vscroll {
+            position: relative;
+            .mCSB_container {
+              margin-right: 0 !important;
+            }
+        }
+
         table {
-          border-width: 0px;
+          border-width: 0;
           margin-bottom: 0;
 
           thead {
@@ -266,15 +275,11 @@
                 border-right: 1px solid @component-border-color;
                 border-bottom: 1px solid @component-border-color;
                 border-left: 1px solid @component-border-color;
-
-                &:last-child {
-                  border-right-width: 0;
-                }
+                min-width: 80px;
 
                 &.th-dropzone-row {
                   padding: 0;
                   vertical-align: bottom;
-                  border-left-width: 0 !important;
                   border-right-width: 0 !important;
                 }
                 &.th-dropzone-column {
@@ -292,6 +297,7 @@
           }
 
           tbody {
+
             tr {
               &:first-child {
                 td {
@@ -307,10 +313,6 @@
 
                 &.th-total {
                   background-color: #EEEEEE;
-                }
-
-                &:first-child {
-                  border-left-width: 0;
                 }
 
                 .sort-btn {
