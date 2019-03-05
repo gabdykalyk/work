@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OLAP-отчёт</title>
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="fonts/fontawesome-pro-5.1.0-web/css/all.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
+
+    <!-- Scrollbar -->
+    <link href="js/scrollbar/jquery.mCustomScrollbar.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
+
+    <link href="css/styles.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<nav class="navbar navbar-fixed-top navbar-lk">
+    <div class="container-fluid">
+        <div class="navbar-collapse collapse" id="navbar-collapse-block">
+            <ul class="nav navbar-nav navbar-nav-main">
+                <li class="item-menu-manper active"><a href="#">Расчёты<span class="count">1</span></a></li>
+                <li class="item-menu-messages"><a href="#">Новый расчёт<span class="count">5</span></a></li>
+                <li class="item-menu-alerts"><a href="#">Штрафы/Премии<span class="count">2</span></a></li>
+                <li class="item-menu-schedule"><a href="#">Приказы/Инструкции</a></li>
+                <li class="item-menu-index"><a href="#">Кадры<span class="count">3</span></a></li>
+                <li class="item-menu-docs"><a href="#">Отчёты<span class="count">1</span></a></li>
+                <li class="item-menu-discus"><a href="#">Обсуждения<span class="count">4</span></a></li>
+                <li class="item-menu-complaints"><a href="#">Жалобы и предложения<span class="count">1</span></a></li>
+                <li class="item-menu-friends"><a href="#">Друзья</a></li>
+                <li class="item-menu-groups"><a href="#">Группы</a></li>
+                <li class="item-menu-settings"><a href="#">Настройки</a></li>
+                <li class="item-menu-help"><a href="#">Помощь</a></li>
+            </ul>
+        </div>
+        <button type="button" class="navbar-toggle collapsed" id="navbar-toggle">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+        </button>
+        <div class="navbar-right navbar-login">
+            <a href="#" class="btn"><span>Александр Константиновский</span> <i class="fa fa-sign-out hidden-sm hidden-xs" aria-hidden="true"></i></a>
+        </div>
+        <ul class="nav navbar-nav navbar-right navbar-nav-social">
+            <li><a href="#" title="Вконтакте"><i class="fab fa-vk" aria-hidden="true"></i></a></li>
+            <li><a href="#" title="Есть непросмотренные сообщения"><i class="fa fa-envelope" aria-hidden="true"></i><span class="badge"></span></a></li>
+            <li class="item-bell" title="Есть непросмотренные уведомления"><a href="#"><i class="fa fa-bell" aria-hidden="true"></i><span class="badge"></span></a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container-fluid content olap-report-content">
+    <div class="clearfix head-with-toolbar">
+        <h1>OLAP-отчёт</h1>
+        <div class="head-toolbar">
+            <div class="btn-group" role="group">
+                <a href="#" type="button" class="btn btn-default active" data-mode="setup" onclick="toggleFilterMode(this)">Настройка</a>
+                <a href="#" type="button" class="btn btn-default" data-mode="view" onclick="toggleFilterMode(this)">Просмотр</a>
+            </div>
+            <a href="#" class="btn btn-default btn-with-icon">
+                <i class="fas fa-file-excel"></i>Экспорт в Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- begin: Form -->
+    <form action="" method="post" class="form-respons form-olap-report">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 col-xs-12" id="olap-filter-1">
+
+                <div class="form-group">
+                    <label for="reportformat" class="hidden-xs">Формат отчета</label>
+                    <select class="form-control" name="reportformat" id="reportformat">
+                        <option value="1">Отчет по продажам</option>
+                        <option value="2">Отчет по продажам 1</option>
+                        <option value="3">Отчет по продажам 2</option>
+                        <option value="4">Отчет по продажам 3</option>
+                    </select>
+                </div>
+
+                <div class="form-btns form-btns--save">
+                    <button type="button" class="btn  btn-default btn-default--dangerlabel">Удалить</button>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalMessage">Сохранить</button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modalChangeReportname">Сохранить как...</button>
+                </div>
+
+            </div>
+            <div class="col-md-6 col-sm-12 col-xs-12" id="olap-filter-2">
+
+                <div class="row">
+
+                    <div class="form-group col-md-4 col-sm-3 col-xs-12" id="olap-filter-period-select">
+                        <label for="period-select" class="hidden-xs">За период</label>
+                        <select class="form-control" name="period-select" id="period-select">
+                            <option value="any">Произвольный</option>
+                            <option value="today">Сегодня</option>
+                            <option value="yesterday">Вчера</option>
+                            <option value="fromstart">С начала недели</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-8 col-sm-6 col-xs-10 form-group-datepicker" id="olap-filter-period-datepicker">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-6 period-start">
+                                <div class="input-group datepicker">
+                                    <input type="text" class="form-control" value="" name="date-begin" id="date-begin" placeholder="00.00.0000" maxlength="10">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt" aria-hidden="true"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="input-group-dash">-</span>
+                            <div class="col-md-6 col-sm-6 col-xs-6 period-end">
+                                <div class="input-group datepicker">
+                                    <input type="text" class="form-control" value="" name="date-end" id="date-end" placeholder="00.00.0000" maxlength="10">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt" aria-hidden="true"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-3 col-xs-12" id="olap-filter-apply-btn">
+                        <div class="form-btns form-btns--apply">
+                            <button type="submit" class="btn btn-primary">Обновить отчет</button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </form>
+    <!-- end: Form -->
+
+    <!-- begin: Groups -->
+    <div class="olap-report-groups">
+        <div class="group-btns">
+            <button class="btn btn-default" id="btn-toggle-all-groups">Все</button>
+            <button class="btn btn-default">Время</button>
+            <button class="btn btn-default">Доставка</button>
+            <button class="btn btn-default">НДС</button>
+            <button class="btn btn-default">Отзывы клиентов</button>
+            <button class="btn btn-default">Себестоимость</button>
+            <button class="btn btn-default">Скидки</button>
+            <button class="btn btn-default">Доставка</button>
+            <button class="btn btn-default">НДС</button>
+            <button class="btn btn-default">Отзывы клиентов</button>
+            <button class="btn btn-default">Себестоимость</button>
+            <button class="btn btn-default">Скидки</button>
+            <button class="btn btn-default">Доставка</button>
+            <button class="btn btn-default">НДС</button>
+            <button class="btn btn-default">Отзывы клиентов</button>
+            <button class="btn btn-default">Себестоимость</button>
+            <button class="btn btn-default">Скидки</button>
+            <button class="btn btn-default">Сотрудники</button>
+        </div>
+        <div class="highlight-data">
+            <button class="btn btn-default" title="Подсветка данных OLAP-отчёта" data-toggle="modal" data-target="#modalReportDataHighlight">
+                <i class="fas fa-fill-drip"></i>
+            </button>
+        </div>
+    </div>
+    <!-- end: Groups -->
+
+    <!-- begin: Table -->
+    <div class="olap-report-table-builder">
+
+        <div class="group-list-container">
+            <div class="group-list-search">
+                <input class="form-control" placeholder="Поиск"/>
+            </div>
+            <div class="group-list-scroll">
+                <div class="group-list">
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Год</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable non-numeric">
+                        <label>Дата</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>День недели</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Квартал</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Месяц</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Неделя года</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Учетный день</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Год</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Дата</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>День недели</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Квартал</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="olap-report-table-container">
+            <div class="ui-dropzone dropzone-data">
+
+            </div>
+            <div class="table-responsive2 olap-report-table">
+                <table class="table olap-table-head">
+                    <thead>
+                    <tr>
+                        <th colspan="2" rowspan="3" class="th-dropzone-row">
+                            <div class="ui-dropzone dropzone-row">
+                                <div class="draggable-olap-item">
+                                    <label>Филиал</label>
+                                    <span class="sort-btn sort-btn-up"></span>
+                                </div>
+                                <div class="draggable-olap-item">
+                                    <label>Сотрудник</label>
+                                    <span class="sort-btn sort-btn-up"></span>
+                                </div>
+                            </div>
+                        </th>
+                        <th colspan="10" class="th-dropzone-column">
+                            <div class="ui-dropzone dropzone-column">
+                                <div class="draggable-olap-item">
+                                    <label>Месяц</label>
+                                    <span class="sort-btn sort-btn-down"></span>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Октябрь (1)</th>
+                        <th colspan="2">Ноябрь (2)</th>
+                        <th colspan="2">Декабрь (3)</th>
+                        <th colspan="2">Январь (4)</th>
+                        <th colspan="2">Февраль (5)</th>
+                    </tr>
+                    <tr>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 1</th>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 2</th>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 3</th>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 4</th>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 5</th>
+                    </tr>
+                    </thead>
+                </table>
+
+                <div class="olap-table-data-vscroll">
+                    <table class="table olap-table-data">
+                        <tbody>
+                        <tr>
+                            <td rowspan="4">Бутово<span class="sort-btn sort-btn-down"></span></td>
+                            <td>Агапова Ю.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>Богма Д.</td>
+                            <td>67 350</td>
+                            <td>34</td>
+                            <td>30 350</td>
+                            <td>5</td>
+                            <td>37 350</td>
+                            <td>9</td>
+                            <td>48 350</td>
+                            <td>2</td>
+                            <td>99 350</td>
+                            <td>19</td>
+                        </tr>
+                        <tr>
+                            <td>Вахненко Е.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>Волков И.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+
+                        <tr>
+                            <td rowspan="4">Коммунарка<span class="sort-btn sort-btn-up"></span></td>
+                            <td>Агапова Ю.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>Богма Д.</td>
+                            <td>67 350</td>
+                            <td>34</td>
+                            <td>30 350</td>
+                            <td>5</td>
+                            <td>37 350</td>
+                            <td>9</td>
+                            <td>48 350</td>
+                            <td>2</td>
+                            <td>99 350</td>
+                            <td>19</td>
+                        </tr>
+                        <tr>
+                            <td>Вахненко Е.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>Волков И.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+
+                        <tr>
+                            <td rowspan="4">Московский<span class="sort-btn sort-btn-down"></span></td>
+                            <td>Агапова Ю.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>Богма Д.</td>
+                            <td>67 350</td>
+                            <td>34</td>
+                            <td>30 350</td>
+                            <td>5</td>
+                            <td>37 350</td>
+                            <td>9</td>
+                            <td>48 350</td>
+                            <td>2</td>
+                            <td>99 350</td>
+                            <td>19</td>
+                        </tr>
+                        <tr>
+                            <td>Вахненко Е.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>Волков И.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+
+                        <tr>
+                            <td rowspan="4">Московский<span class="sort-btn sort-btn-down"></span></td>
+                            <td>Агапова Ю.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>Богма Д.</td>
+                            <td>67 350</td>
+                            <td>34</td>
+                            <td>30 350</td>
+                            <td>5</td>
+                            <td>37 350</td>
+                            <td>9</td>
+                            <td>48 350</td>
+                            <td>2</td>
+                            <td>99 350</td>
+                            <td>19</td>
+                        </tr>
+                        <tr>
+                            <td>Вахненко Е.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+                        <tr>
+                            <td>Волков И.</td>
+                            <td>35 350</td>
+                            <td>11</td>
+                            <td>36 350</td>
+                            <td>12</td>
+                            <td>37 350</td>
+                            <td>13</td>
+                            <td>38 350</td>
+                            <td>14</td>
+                            <td>39 350</td>
+                            <td>15</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- beg: Modal message -->
+<div class="modal modal-olap-report-message fade" tabindex="-1" role="dialog" id="modalMessage">
+    <div class="modal-dialog modal-dialog-gl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message">OLAP отчёт по сотрудникам успешно изменён</p>
+                <div class="modal-btns">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">ОК</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end: Modal message -->
+
+<!-- beg: Modal change report name -->
+<div class="modal modal-olap-report-saveas fade" tabindex="-1" role="dialog" id="modalChangeReportname">
+    <div class="modal-dialog modal-dialog-gl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post">
+                    <div class="form-ctrl">
+                        <label for="report-name" class="hidden-xs">Название отчёта</label>
+                        <input class="form-control" name="report-name" id="report-name" placeholder="Название отчёта">
+                    </div>
+                    <div class="modal-btns">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+                        <button type="submit" class="btn btn-primary">Применить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end: Modal change report name -->
+
+<!-- beg: Modal report data highlight  -->
+<div class="modal modal-olap-report-data-highlight fade" tabindex="-1" role="dialog" id="modalReportDataHighlight">
+    <div class="modal-dialog modal-dialog-gl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Подсветка данных OLAP-отчёта</h4>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post">
+                    <div class="highlight-type-section">
+                        <h6>Подсвечивать</h6>
+                        <label class="radio-inline">
+                            <input type="radio" name="highlight" id="highlightRadio1" value="1"> Строки
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="highlight" id="highlightRadio2" value="2"> Столбцы
+                        </label>
+                    </div>
+
+                    <div class="row row-parameters-section">
+                        <div class="col-sm-6 col-xs-12">
+                            <h5>Параметры строк</h5>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от выручки
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> Сумма расхода
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от общей выручки
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от выручки
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> Сумма расхода
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <h5>Показатели в отчёте</h5>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от выручки
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> Сумма расхода
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от общей выручки
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="colorscale-section">
+                        <h5>Цветовая шкала</h5>
+                        <div class="row">
+                            <div class="col-sm-4 col-xs-5">
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option1" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #A969AF"></li>
+                                            <li style="background-color: #BE83B9"></li>
+                                            <li style="background-color: #D49EC2"></li>
+                                            <li style="background-color: #E7B5CA"></li>
+                                            <li style="background-color: #FFD4D4"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option2" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #29C4AA"></li>
+                                            <li style="background-color: #4BD5BC"></li>
+                                            <li style="background-color: #8EE2B5"></li>
+                                            <li style="background-color: #C7EEA9"></li>
+                                            <li style="background-color: #EFF5A8"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option2" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #9E77EC"></li>
+                                            <li style="background-color: #B18CFB"></li>
+                                            <li style="background-color: #B8A2EB"></li>
+                                            <li style="background-color: #CAB6F8"></li>
+                                            <li style="background-color: #DFD8FF"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-4 col-xs-5">
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option1" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #A65216"></li>
+                                            <li style="background-color: #BB7940"></li>
+                                            <li style="background-color: #D3A56F"></li>
+                                            <li style="background-color: #EACE9B"></li>
+                                            <li style="background-color: #FEF4C3"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option2" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #657CFF"></li>
+                                            <li style="background-color: #6DA0F8"></li>
+                                            <li style="background-color: #73C2EF"></li>
+                                            <li style="background-color: #78DCEA"></li>
+                                            <li style="background-color: #7DF9E1"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option2" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #DC427F"></li>
+                                            <li style="background-color: #E6678C"></li>
+                                            <li style="background-color: #EF8B97"></li>
+                                            <li style="background-color: #F6A8A1"></li>
+                                            <li style="background-color: #FDC8AA"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-btns">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+                        <button type="submit" class="btn btn-primary">Применить</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end: Modal report data highlight -->
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap DateTimepicker, https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+<script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+
+<!-- scrollbar http://manos.malihu.gr/jquery-custom-content-scroller/ -->
+<script src="js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<!-- Select2, https://select2.org/getting-started/basic-usage -->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.full.min.js"></script>
+<!-- https://github.com/taye/interact.js -->
+<script src="https://unpkg.com/interactjs@1.3.4/dist/interact.min.js"></script>
+
+<script type="text/javascript" src="js/js-gl.js"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+        initNavbar();
+        $('.datepicker').datetimepicker({
+            language: 'ru',
+            pickTime: false
+        });
+
+        $('#period-select').on('change', function() {
+            onPeriodChanged(this);
+        });
+        $('#btn-toggle-all-groups').on('click', function(btn) {
+            onToggleAllGroupButtons($(btn.target));
+        });
+        $('.olap-report-groups .group-btns').find('button:not(#btn-toggle-all-groups)').on('click', function(btn) {
+            onClickGroupButton($(btn.target), false);
+        });
+
+        initGroupListSearch();
+        initDragAndDrop();
+
+    });
+
+    (function($){
+        $(window).on("load",function(){
+            updateOlapTableDimensions();
+
+            $(".group-list-scroll").mCustomScrollbar({
+                axis: "y",
+                theme: "dark"
+            });
+            $(".olap-report-table").mCustomScrollbar({
+                axis: "x",
+                theme: "dark"
+            });
+            $(".olap-table-data-vscroll").mCustomScrollbar({
+                axis: "y",
+                theme: "dark"
+            });
+
+        });
+    })(jQuery);
+
+    /* обновление ширины колонок в таблице с данными на основе ширины заголовков */
+    function updateOlapTableDimensions() {
+        // ширина контейнера с данными
+        var listW = $('.group-list-container').outerWidth();
+        var bldW = $('.olap-report-table-builder').outerWidth();
+        $('.olap-report-table-container').outerWidth(bldW - listW - 15); // компенс гэп между списком и таблицей
+
+        // высота таблицы
+        var ortcH = $('.olap-report-table-container').outerHeight();
+        var dzdH = $('.dropzone-data').outerHeight();
+        $('.olap-report-table').outerHeight(ortcH - dzdH - 2);
+
+        // высота скроллируемой области с данными
+        var tblH = $('.olap-report-table').outerHeight();
+        var hdrH = $('.olap-table-head').outerHeight();
+        $('.olap-table-data-vscroll').outerHeight(tblH - hdrH - 18);
+
+        let thWidths = [];
+
+        // ширина колонок с данными, которые подпадают под первую колонку заголовка
+        // расчитываются из ширины "кнопок", которые туда добавлены
+        var firstThW = $('.olap-table-head thead tr .th-dropzone-row').outerWidth();
+
+        var sumRowBtnW = 0; // суммарная ширина колонок в первой ячейке заголовка
+        $('.olap-table-head thead tr .dropzone-row .draggable-olap-item').each(function(idx, item) {
+            var tmpW = sumRowBtnW + $(item).outerWidth() + 30;
+            if (tmpW <= firstThW) {
+                thWidths.push($(item).outerWidth()+2);
+                sumRowBtnW += ($(item).outerWidth()+2);
+            } else {
+                thWidths.push(firstThW - sumRowBtnW);
+                sumRowBtnW = firstThW;
+                return false;
+            }
+        });
+        if (thWidths.length == 0) {
+            thWidths.push(firstThW);
+        } else if (thWidths.length == 1 && sumRowBtnW < firstThW) {
+            thWidths.pop();
+            thWidths.push(firstThW);
+        } else if (thWidths.length > 1 && sumRowBtnW < firstThW) {
+            var w = thWidths.pop();
+            thWidths.push(firstThW - sumRowBtnW + w);
+        }
+
+        $('.olap-table-head thead tr:last-child th').each(function(idx, th) {
+            thWidths.push($(th).outerWidth());
+        });
+        $('.olap-table-data tbody td').each(function(idx, td) {
+            $(td).css('min-width', thWidths[idx]).css('max-width', thWidths[idx]);
+        });
+    }
+
+    /* быстрый поиск в левом списке групп */
+    function initGroupListSearch() {
+        $('.group-list-search input').on('change input keydown keyup', function(e) {
+            var val = $(e.target).val();
+            $('.group-list-scroll .group-list .draggable-olap-item').each(function(idx, item) {
+                var txt = $(item).find('label').html();
+                if (new RegExp(val, 'i').test(txt)) {
+                    $(item).show();
+                } else {
+                    $(item).hide();
+                }
+            });
+        });
+    }
+
+    function onDragStart(event) {
+        // event.target - что перетаскиваем
+    }
+
+    function onDrop(event) {
+        // event.target - куда перетаскиваем
+        // event.relatedTarget - что перетаскиваем
+
+        var dropzoneRow = $(event.target).hasClass('dropzone-row');
+        if (dropzoneRow) {
+            // begin: демонстрация добавления колонок
+            $('.olap-table-data tbody tr .th-total').remove();
+
+            var itemCount = $(event.target).find('.draggable-olap-item').length;
+            $(event.target).closest('th').attr('colspan', itemCount);
+            if (itemCount == 1) {
+                addTestColumn1();
+            } else {
+                addTestColumn2();
+            }
+            // end: демонстрация добавления колонок
+        }
+
+        // пересчет ширины колонок
+        updateOlapTableDimensions();
+
+        // рефреш гориз. скролбара
+        $(".olap-report-table").mCustomScrollbar("destroy");
+        $(".olap-report-table").mCustomScrollbar({
+            axis: "x",
+            theme: "dark"
+        });
+    }
+
+    function addTestColumn1() {
+        $('.olap-table-data tbody tr').each(function(idx, tr) {
+            if (idx%4 == 0) {
+                $(tr).prepend('<td rowspan="4">Бутово<span class="sort-btn sort-btn-down"></span></td>');
+            }
+        });
+    }
+
+    function addTestColumn2() {
+        $('.olap-table-data tbody tr').each(function(idx, tr) {
+                $('<td>Агапова Ю.</td>').insertAfter($(tr).find('td:first-child'));
+        });
+    }
+
+    function initDragAndDrop() {
+        initDraggable(".ui-draggable");
+        setupDropzone(".dropzone-data", ".ui-draggable", "non-numeric", onDragStart, onDrop);
+        setupDropzone(".dropzone-column", ".ui-draggable", "", onDragStart, onDrop);
+        setupDropzone(".dropzone-row", ".ui-draggable", "", onDragStart, onDrop);
+    }
+
+    var draggableItem;
+
+    function initDraggable(draggableElementSelector) {
+        interact(draggableElementSelector)
+            .draggable({
+                inertia: true,
+                max: Infinity
+            })
+            .on('dragstart', function (event) {
+                draggableItem = $(event.target).clone();
+                $(draggableItem).addClass('ui-draggable--captured').appendTo('body');
+                $(event.target).addClass('ui-draggable--empty-placeholder');
+            })
+            .on('dragmove', function (event) {
+                $(draggableItem).offset({ top: event.pageY, left: event.pageX });
+            })
+            .on('dragend', function (event) {
+                $(event.target).removeClass('ui-draggable--empty-placeholder');
+                $(draggableItem).remove();
+            });
+    }
+
+    /**
+     * dropzoneSelector - куда перетаскиваем
+     * draggableElementSelector - что перетаскиваем
+     * forbiddenElementSelector - селектор элементов, которые запрещено перетаскивать
+     * onDragStart - функция вызывается в момент начала перетаскивания
+     * onDrop - функция вызывается в момент размещения элемента в целевой области
+     */
+    function setupDropzone(dropzoneSelector, draggableElementSelector, forbiddenElementClass, onDragStart, onDrop) {
+        interact(dropzoneSelector)
+            .dropzone({
+                accept: draggableElementSelector,
+                ondropactivate: function (event) { /* вызывается вторым при начале перетаскивания */
+                },
+                ondropdeactivate: function (event) { /* вызывается последним при завершении перетаскивания */
+                },
+            })
+            .on('dropactivate', function (event) { /* вызывается первым при начале перетаскивания */
+                var frb =$(event.relatedTarget).hasClass(forbiddenElementClass);
+                $(event.target).addClass('ui-dropzone--'+(frb?'in':'')+'accessible');
+                if (onDragStart) {
+                    onDragStart(event);
+                }
+            })
+            .on('dropdeactivate', function (event) { /* вызывается предпоследним при завершении перетаскивания */
+                $(event.target)
+                    .removeClass('ui-dropzone--accessible ui-dropzone--inaccessible');
+            })
+            .on('dragenter', function (event) {
+            })
+            .on('dragleave', function (event) {
+            })
+            .on('drop', function (event) {
+                // перетаскиваемый элемент запрещено перетаскивать в эту область
+                var frb =$(event.relatedTarget).hasClass(forbiddenElementClass);
+                if (frb) {
+                    return true;
+                }
+
+                // удалить текст подсказки
+                $(dropzoneSelector + ' .ui-dropzone-placeholder').remove();
+
+                var item = $(event.relatedTarget); // перетаскиваемый элемент
+                item.detach(); // отсоединить его из старого списка
+                item.appendTo(dropzoneSelector); // добавить в новую область
+                item.removeClass('ui-draggable'); // отключить возможность перетаскивания
+
+                // вызвать функцию после перетаскивания
+                if (onDrop) {
+                    onDrop(event);
+                }
+            });
+    }
+
+    /* проверяет, если страница в режиме редактирования */
+    function isSetupMode() {
+        return $(".head-toolbar .btn-group a[data-mode='setup']").hasClass('active');
+    }
+
+    /* проверяет, если в селекте выбран период, для которого надо показать только одну дату */
+    var singleDayArray = ['today','yesterday'];
+    function isSingleDaySelected() {
+        var val = $('#period-select').val();
+        return singleDayArray.includes(val);
+    }
+
+    function alignApplyFilterButton() {
+        $('#olap-filter-apply-btn').find('.form-btns')
+            .removeClass('form-btns--setup-period form-btns--setup-singleday form-btns--view-period form-btns--view-singleday')
+            .addClass('form-btns--'+(isSetupMode()?'setup':'view')+'-'+(isSingleDaySelected()?'singleday':'period'));
+    }
+
+    /* вызывается при изменении в селекте Период. Меняет видимость второго календаря */
+    function onPeriodChanged(sel) {
+        var el = $(sel);
+        var val = el.val();
+
+        var datePicker = $('#olap-filter-period-datepicker');
+        var btnCol = $('#olap-filter-apply-btn');
+
+        if (singleDayArray.includes(val)) { // режим одного дня
+
+            // скрыть вторую дату
+            datePicker.find('.input-group-dash').hide();
+            datePicker.find('.period-end').hide();
+
+            $('#olap-filter-period-datepicker')
+                .attr('class', (isSetupMode()?'col-md-8 col-sm-3 col-xs-10':'col-md-3 col-sm-3 col-xs-10')+' form-group form-group-datepicker');
+            datePicker.find('.period-start')
+                .attr('class', (isSetupMode()?'col-md-6 col-sm-12 col-xs-6':'col-md-12 col-sm-12 col-xs-6')+' period-start');
+            btnCol.attr('class', isSetupMode()?'col-md-8 col-sm-6 col-xs-12':'col-md-6 col-sm-6 col-xs-12');
+
+        } else {
+
+            datePicker.find('.input-group-dash').show();
+            datePicker.find('.period-end').show();
+
+            $('#olap-filter-period-datepicker')
+                .attr('class', (isSetupMode()?'col-md-8 col-sm-6 col-xs-10':'col-md-6 col-sm-6 col-xs-10')+' form-group form-group-datepicker');
+            datePicker.find('.period-start')
+                .attr('class', (isSetupMode()?'col-md-6 col-sm-6 col-xs-6':'col-md-6 col-sm-6 col-xs-6')+' period-start');
+            btnCol.attr('class', isSetupMode()?'col-md-12 col-sm-3 col-xs-12':'col-md-3 col-sm-3 col-xs-12');
+
+        }
+
+        alignApplyFilterButton();
+    }
+
+    /* вид фильтра при изменении режима отчёта */
+    function toggleFilterMode(aEl) {
+        var el = $(aEl);
+        el.parent().find('a').each(function(idx,item) {
+            $(item).removeClass('active');
+        });
+        el.addClass('active');
+        var mode = el.data('mode');
+
+        var datePicker = $('#olap-filter-period-datepicker');
+        var btnCol = $('#olap-filter-apply-btn');
+
+        if ('setup' == mode) {
+            $('#olap-filter-1').attr('class', 'col-md-6 col-sm-12 col-sx-12');
+            $('.form-olap-report .form-btns--save').show();
+            $('#olap-filter-2').attr('class', 'col-md-6 col-sm-12 col-sx-12');
+
+            $('#olap-filter-period-select').attr('class', 'col-md-4 col-sm-3 col-xs-12 form-group');
+
+            datePicker.attr('class', (isSingleDaySelected()?'col-md-8 col-sm-3 col-xs-10':'col-md-8 col-sm-6 col-xs-10')+' form-group form-group-datepicker');
+            datePicker.find('.period-start')
+                .attr('class', (isSingleDaySelected()?'col-md-6 col-sm-12 col-xs-6':'col-md-6 col-sm-6 col-xs-6')+' period-start');
+
+            btnCol.attr('class', isSingleDaySelected()?'col-md-8 col-sm-6 col-xs-12':'col-md-12 col-sm-3 col-xs-12');
+
+        } else {
+            $('#olap-filter-1').attr('class', 'col-md-4 col-sm-6 col-sx-6');
+            $('.form-olap-report .form-btns--save').hide();
+            $('#olap-filter-2').attr('class', 'col-md-8 col-sm-12 col-sx-12');
+
+            $('#olap-filter-period-select').attr('class', 'col-md-3 col-sm-3 col-xs-12 form-group');
+
+            datePicker.attr('class', (isSingleDaySelected()?'col-md-3 col-sm-3 col-xs-10':'col-md-6 col-sm-6 col-xs-10')+' form-group form-group-datepicker');
+            datePicker.find('.period-start')
+                .attr('class', (isSingleDaySelected()?'col-md-12 col-sm-12 col-xs-6':'col-md-6 col-sm-6 col-xs-6')+' period-start');
+
+            btnCol.attr('class', isSingleDaySelected()?'col-md-6 col-sm-6 col-xs-12':'col-md-3 col-sm-3 col-xs-12');
+        }
+
+        alignApplyFilterButton();
+    }
+
+    /* выбрать или сбросить все группы */
+    function onToggleAllGroupButtons(btn) {
+        var is_active = btn.hasClass('active');
+
+        if (is_active) {
+            btn.removeClass('active');
+            btn.parent().find('button').removeClass('active');
+        } else {
+            btn.addClass('active');
+            btn.parent().find('button').addClass('active');
+        }
+    }
+
+    // инициализация фильтров
+    function onClickGroupButton(btn, single) {
+        var is_active = btn.hasClass('active');
+
+        if (single) {
+            var ul = btn.closest('div');
+            ul.find('button').removeClass('active');
+        }
+
+        if (!is_active) {
+            btn.addClass('active');
+        } else {
+            btn.removeClass('active');
+        }
+    }
+
+</script>
+</body>
+</html>
