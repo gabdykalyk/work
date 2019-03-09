@@ -6,7 +6,7 @@ function toggleWrappableRow(btnEl) {
     if (isExpanded) {
         collapseRows(btnEl);
     } else {
-        expandeRows(btnEl);
+        expandRows(btnEl);
     }
 }
 
@@ -23,13 +23,12 @@ function collapseRows(btnEl) {
     });
 }
 
-function expandeRows(btnEl) {
+function expandRows(btnEl) {
     var rowId = $(btnEl).closest('tr').data('row-id');
 
     $(btnEl).removeClass('wrap-btn-up').addClass('wrap-btn-down');
     var size = $(btnEl).closest('td').data('wrap');
     $(btnEl).closest('.olap-report-table-container').find("tr[data-row-id='"+rowId+"']").each(function(idx, trItem) {
-        console.log("TR "+$(trItem).data('row-id')+" / "+$(trItem).find('td:first-child')[0]);
         $(trItem).find('td:first-child').attr('rowspan', size);
     });
     $(btnEl).closest('.olap-report-table-container').find("tr[data-parent-row-id='"+rowId+"']").each(function(idx, trItem) {
