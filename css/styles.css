@@ -12564,6 +12564,8 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
   display: flex;
   align-items: stretch;
   flex-wrap: nowrap;
+  /* левый список с группами, не виден в мобильных версиях */
+  /* вся правая область с таблицей и областями данных для перетаскивания */
 }
 .olap-report-content .olap-report-table-builder .group-list-container {
   margin-right: 15px;
@@ -12605,6 +12607,12 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
 .olap-report-content .olap-report-table-builder .olap-report-table-container {
   position: relative;
   height: 100%;
+  /* OLAP группа которую можно перетаскивать*/
+  /* область строк, зона для перетаскивания */
+  /* область данных, зона для перетаскивания */
+  /* вся OLAP таблица */
+  /* первая фиксированная колонка таблицы для мобильной версии */
+  /* кнопка для сворач\разворач строк */
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .draggable-olap-item {
   margin-right: 2px;
@@ -12628,6 +12636,26 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
 .olap-report-content .olap-report-table-builder .olap-report-table-container .draggable-olap-item span.sort-btn {
   display: block;
 }
+.olap-report-content .olap-report-table-builder .olap-report-table-container .dropzone-row {
+  padding: 1px 0 1px 0;
+  display: flex;
+  flex-wrap: nowrap;
+}
+.olap-report-content .olap-report-table-builder .olap-report-table-container .dropzone-row .draggable-olap-item {
+  margin-right: 2px;
+  margin-bottom: 0;
+  padding: 5px 22px 3px 12px;
+  min-width: 120px;
+}
+@media (max-width: 480px) {
+  .olap-report-content .olap-report-table-builder .olap-report-table-container .dropzone-row {
+    flex-wrap: wrap;
+  }
+  .olap-report-content .olap-report-table-builder .olap-report-table-container .dropzone-row .draggable-olap-item {
+    margin: 0 0 1px 1px;
+    min-width: 98%;
+  }
+}
 .olap-report-content .olap-report-table-builder .olap-report-table-container .dropzone-data {
   border-top: 2px solid #CDCDCD;
   height: 36px;
@@ -12645,6 +12673,9 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table {
   border-top: 1px solid #CDCDCD;
   height: 100%;
+  /* область столбцов, зона для перетаскивания */
+  /* вертикальный скроллер данных в таблице */
+  /* отдельные таблицы для заголовка и данных */
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table .dropzone-column {
   padding: 1px 0 1px 0;
@@ -12656,19 +12687,9 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
   margin-bottom: 0;
   padding: 5px 22px 3px 12px;
 }
-.olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table .dropzone-row {
-  padding: 1px 0 1px 0;
-  display: flex;
-  flex-wrap: nowrap;
-}
-.olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table .dropzone-row .draggable-olap-item {
-  margin-right: 2px;
-  margin-bottom: 0;
-  padding: 5px 22px 3px 12px;
-  min-width: 120px;
-}
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table .olap-table-data-vscroll {
   position: relative;
+  border-bottom: 1px solid #CDCDCD;
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table .olap-table-data-vscroll .mCSB_container {
   margin-right: 0 !important;
@@ -12687,6 +12708,10 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
   border-left: 1px solid #CDCDCD;
   min-width: 80px;
 }
+.olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table table.olap-table-head thead tr th:first-child,
+.olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table table.olap-table-data thead tr th:first-child {
+  min-width: 145px;
+}
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table table.olap-table-head thead tr th.th-dropzone-row,
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table table.olap-table-data thead tr th.th-dropzone-row {
   padding: 0;
@@ -12695,7 +12720,7 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table table.olap-table-head thead tr th.th-dropzone-column,
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table table.olap-table-data thead tr th.th-dropzone-column {
-  padding: 0;
+  padding: 0 0 0 3px;
   border-left-width: 0 !important;
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .olap-report-table table.olap-table-head thead tr th .ui-dropzone-placeholder,
@@ -12724,33 +12749,35 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
 .olap-report-content .olap-report-table-builder .olap-report-table-container .table-first-column {
   height: 430px;
   border-left: 1px solid #CDCDCD;
-  border-bottom: 1px solid #CDCDCD;
   position: absolute;
-  top: 37px;
+  top: 36px;
   left: 0;
   min-width: 229px;
   background-color: #fff;
-  box-shadow: 4px 0 5px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 7px 0 5px -3px rgba(0, 0, 0, 0.25);
   z-index: 1020;
+  /*display: none;*/
+}
+.olap-report-content .olap-report-table-builder .olap-report-table-container .table-first-column .table-first-column-head {
+  border-top: 1px solid #CDCDCD;
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .table-first-column .table-first-column-data-vscroll {
   position: relative;
   overflow: hidden;
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .table-first-column .table-first-column-data-vscroll > table {
+  border-top-width: 0;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .table-first-column table {
-  border-top-width: 0;
   border-bottom-width: 0;
   margin-bottom: 0;
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .table-first-column table > thead > tr > th {
-  padding-left: 15px;
-  padding-right: 15px;
+  padding: 0;
   border-top-width: 0;
   border-bottom: 1px solid #CDCDCD;
   vertical-align: bottom;
@@ -12761,7 +12788,6 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
   height: 33px;
   padding-left: 10px;
   padding-right: 10px;
-  background-color: #fff !important;
   border-top-width: 0;
   border-bottom: 1px solid #CDCDCD;
 }
@@ -12779,6 +12805,12 @@ a.btn[aria-expanded="true"] .fa-chevron-circle-up {
 @media (min-width: 768px) {
   .olap-report-content .olap-report-table-builder .olap-report-table-container .table-first-column {
     display: none;
+  }
+}
+@media (max-width: 480px) {
+  .olap-report-content .olap-report-table-builder .olap-report-table-container .table-first-column {
+    min-width: 145px;
+    width: 145px;
   }
 }
 .olap-report-content .olap-report-table-builder .olap-report-table-container .wrap-btn {

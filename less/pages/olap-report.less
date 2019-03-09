@@ -158,6 +158,7 @@
     align-items: stretch;
     flex-wrap: nowrap;
 
+    /* левый список с группами, не виден в мобильных версиях */
     .group-list-container {
       margin-right: 15px;
       width: 280px;
@@ -200,10 +201,12 @@
 
     }
 
+    /* вся правая область с таблицей и областями данных для перетаскивания */
     .olap-report-table-container {
       position: relative;
       height: 100%;
 
+      /* OLAP группа которую можно перетаскивать*/
       .draggable-olap-item {
         margin-right: 2px;
         border: 1px solid @component-border-color;
@@ -225,6 +228,30 @@
         }
       }
 
+      /* область строк, зона для перетаскивания */
+      .dropzone-row {
+        padding: 1px 0 1px 0;
+        display: flex;
+        flex-wrap: nowrap;
+
+        .draggable-olap-item {
+          margin-right: 2px;
+          margin-bottom: 0;
+          padding: 5px 22px 3px 12px;
+          min-width: 120px;
+        }
+
+        @media (max-width: 480px) {
+          flex-wrap: wrap;
+          .draggable-olap-item {
+            margin: 0 0 1px 1px;
+            min-width: 98%;
+          }
+        }
+
+      }
+
+      /* область данных, зона для перетаскивания */
       .dropzone-data {
         border-top: 2px solid @component-border-color;
         height: 36px;
@@ -240,10 +267,12 @@
         }
       }
 
+      /* вся OLAP таблица */
       .olap-report-table {
         border-top: 1px solid @component-border-color;
         height: 100%;
 
+        /* область столбцов, зона для перетаскивания */
         .dropzone-column {
           padding: 1px 0 1px 0;
           display: flex;
@@ -256,26 +285,16 @@
           }
         }
 
-        .dropzone-row {
-          padding: 1px 0 1px 0;
-          display: flex;
-          flex-wrap: nowrap;
-
-          .draggable-olap-item {
-            margin-right: 2px;
-            margin-bottom: 0;
-            padding: 5px 22px 3px 12px;
-            min-width: 120px;
-          }
-        }
-
+        /* вертикальный скроллер данных в таблице */
         .olap-table-data-vscroll {
             position: relative;
+            border-bottom: 1px solid @component-border-color;
             .mCSB_container {
               margin-right: 0 !important;
             }
         }
 
+        /* отдельные таблицы для заголовка и данных */
         table.olap-table-head,
         table.olap-table-data {
           border-width: 0;
@@ -292,13 +311,16 @@
                 border-left: 1px solid @component-border-color;
                 min-width: 80px;
 
+                &:first-child {
+                  min-width: 145px;
+                }
                 &.th-dropzone-row {
                   padding: 0;
                   vertical-align: bottom;
                   border-right-width: 0 !important;
                 }
                 &.th-dropzone-column {
-                  padding: 0;
+                  padding: 0 0 0 3px;
                   border-left-width: 0 !important;
                 }
                 .ui-dropzone-placeholder {
@@ -337,24 +359,28 @@
 
       }
 
+      /* первая фиксированная колонка таблицы для мобильной версии */
       .table-first-column {
         height: @olap-container-height;
         border-left: 1px solid @component-border-color;
-        border-bottom: 1px solid @component-border-color;
         position: absolute;
-        top: 37px;
+        top: 36px;
         left: 0;
         min-width: 229px;
         background-color: #fff;
-        box-shadow: 4px 0 5px 0 rgba(0, 0, 0, 0.25);
+        box-shadow: 7px 0 5px -3px rgba(0, 0, 0, 0.25);
         z-index: 1020;
-
+        /*display: none;*/
+        .table-first-column-head {
+          border-top: 1px solid @component-border-color;
+        }
         .table-first-column-data-vscroll {
           //height: @olap-container-height;
           position: relative;
           overflow: hidden;
          // border: 1px solid red;
           & > table {
+            border-top-width: 0;
             position: absolute;
             top: 0;
             left: 0;
@@ -363,14 +389,12 @@
         }
 
         table {
-          border-top-width: 0;
           border-bottom-width: 0;
           margin-bottom: 0;
           > thead {
             > tr {
               > th {
-                padding-left: 15px;
-                padding-right: 15px;
+                padding: 0;
                 border-top-width: 0;
                 border-bottom: 1px solid @component-border-color;
                 vertical-align: bottom;
@@ -385,7 +409,6 @@
                 height: 33px;
                 padding-left: 10px;
                 padding-right: 10px;
-                background-color: #fff !important;
                 border-top-width: 0;
                 border-bottom: 1px solid @component-border-color;
                 &.non-first-cell {
@@ -405,8 +428,13 @@
         @media (min-width: 768px) {
           display: none;
         }
+        @media (max-width: 480px) {
+          min-width: 145px;
+          width: 145px;
+        }
       }
 
+      /* кнопка для сворач\разворач строк */
       .wrap-btn {
         position: absolute;
         right: 4px;
