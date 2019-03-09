@@ -4,13 +4,13 @@
 function toggleWrappableRow(btnEl) {
     var isExpanded = $(btnEl).hasClass('wrap-btn-down');
     if (isExpanded) {
-        wrapRows(btnEl);
-    } else {
         collapseRows(btnEl);
+    } else {
+        expandeRows(btnEl);
     }
 }
 
-function wrapRows(btnEl) {
+function collapseRows(btnEl) {
     var rowId = $(btnEl).closest('tr').data('row-id');
 
     $(btnEl).removeClass('wrap-btn-down').addClass('wrap-btn-up');
@@ -23,12 +23,13 @@ function wrapRows(btnEl) {
     });
 }
 
-function collapseRows(btnEl) {
+function expandeRows(btnEl) {
     var rowId = $(btnEl).closest('tr').data('row-id');
 
     $(btnEl).removeClass('wrap-btn-up').addClass('wrap-btn-down');
     var size = $(btnEl).closest('td').data('wrap');
     $(btnEl).closest('.olap-report-table-container').find("tr[data-row-id='"+rowId+"']").each(function(idx, trItem) {
+        console.log("TR "+$(trItem).data('row-id')+" / "+$(trItem).find('td:first-child')[0]);
         $(trItem).find('td:first-child').attr('rowspan', size);
     });
     $(btnEl).closest('.olap-report-table-container').find("tr[data-parent-row-id='"+rowId+"']").each(function(idx, trItem) {
