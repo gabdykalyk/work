@@ -1,44 +1,37 @@
 /* см. страницы hatimaki-OLAP-report-many.html, hatimaki-OLAP-report.html */
 
-/* свернуть или развернуть несколько строк */
-function toggleWrappableRow(btnEl, rowId) {
+/* свернуть или развернуть несколько строк
+ * TR c атрибутом data-wrappable-set-id = setId будут скрыты
+ * treeMode - режим отображения групп в первом фикс. столбце в один столбец
+ **/
+function toggleWrappableRow(btnEl, setId, treeMode) {
     var isExpanded = $(btnEl).hasClass('wrap-btn-down');
     if (isExpanded) {
-        collapseRows(btnEl, rowId);
+        collapseRows(btnEl, setId, treeMode);
     } else {
-        expandRows(btnEl, rowId);
+        expandRows(btnEl, setId, treeMode);
     }
 }
 
-function collapseRows(btnEl, rowId) {
-    //var rowId = $(btnEl).closest('tr').data('row-id');
-    var thisTr = $(btnEl).closest('tr')[0];
-
+function collapseRows(btnEl, setId, treeMode) {
     $(btnEl).removeClass('wrap-btn-down').addClass('wrap-btn-up');
-    $(btnEl).closest('.olap-report-table-container').find("tr[data-parent-row-id='"+rowId+"']").each(function(idx, trItem) {
-        if (!thisTr.isEqualNode(trItem)) {
+
+    if (!treeMode) {
+        $(btnEl).closest('td').removeClass('td-rowspan');
+    }
+    $(btnEl).closest('.olap-report-table-container').find("tr[data-wrappable-set-id='"+setId+"']").each(function(idx, trItem) {
+        if ($(trItem).find('.wrap-btn').length == 0 || treeMode) {
             $(trItem).css('display', 'none');
         }
     });
-
-    /*
-    $(btnEl).closest('.olap-report-table-container').find("tr[data-row-id='"+rowId+"']").each(function(idx, trItem) {
-        $(trItem).find('td:first-child').attr('rowspan', 1);
-    });
-    */
 }
 
-function expandRows(btnEl, rowId) {
-    //var rowId = $(btnEl).closest('tr').data('row-id');
-
+function expandRows(btnEl, setId, treeMode) {
     $(btnEl).removeClass('wrap-btn-up').addClass('wrap-btn-down');
-    //var size = $(btnEl).closest('td').data('wrap');
-    /*
-    $(btnEl).closest('.olap-report-table-container').find("tr[data-row-id='"+rowId+"']").each(function(idx, trItem) {
-        $(trItem).find('td:first-child').attr('rowspan', size);
-    });
-    */
-    $(btnEl).closest('.olap-report-table-container').find("tr[data-parent-row-id='"+rowId+"']").each(function(idx, trItem) {
+    if (!treeMode) {
+        $(btnEl).closest('td').addClass('td-rowspan');
+    }
+    $(btnEl).closest('.olap-report-table-container').find("tr[data-wrappable-set-id='"+setId+"']").each(function(idx, trItem) {
         $(trItem).css('display', 'table-row');
     });
 }
@@ -67,7 +60,8 @@ function updateOlapTableDimensions(isViewMode) {
     var hdrH = $('.olap-table-head').outerHeight();
     $('.olap-table-data-vscroll').outerHeight(tblH - hdrH - 18);
 
-    let thWidths = [];
+    var thColumns = 0;
+    var thWidths = [];
     // ширина колонок с данными, которые подпадают под первую колонку заголовка
     // расчитываются из ширины "кнопок", которые туда добавлены
     var firstThW = $('.olap-table-head thead tr .th-dropzone-row').outerWidth();
@@ -96,13 +90,30 @@ function updateOlapTableDimensions(isViewMode) {
         var w = thWidths.pop();
         thWidths.push(firstThW - sumRowBtnW + w);
     }
+    thColumns = thWidths.length;
 
     $('.olap-table-head thead tr:last-child th').each(function(idx, th) {
         thWidths.push($(th).outerWidth());
     });
-    $('.olap-table-data tbody td').each(function(idx, td) {
-        $(td).css('min-width', thWidths[idx]).css('max-width', thWidths[idx]);
+
+    $('.olap-table-data tbody tr').each(function(i, tr) {
+        var tdIdx = 0;
+        $(tr).find('td').each(function(idx, td) {
+            var fhc = $(td).hasClass('fix-hdr-cell');
+            var fhcL = $(td).hasClass('fix-hdr-cell--last');
+            if (thColumns < 2) { // если в левом столбце один столбец
+                // пропустить первые столбцы, они скрыты
+                if (!fhc || (fhc && fhcL)) {
+                    $(td).css('min-width', thWidths[tdIdx]).css('max-width', thWidths[tdIdx]);
+                    tdIdx++;
+                }
+            } else { // если больше одного, то применить расчитанную ширину ко всем ячейкам
+                $(td).css('min-width', thWidths[tdIdx]).css('max-width', thWidths[tdIdx]);
+                tdIdx++;
+            }
+        });
     });
+
 }
 
 // скроллить данные в первой колонке таблицы в моб.версии
