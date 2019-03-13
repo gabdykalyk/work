@@ -1,48 +1,55 @@
 /* см. страницы hatimaki-OLAP-report-many.html, hatimaki-OLAP-report.html */
 
 /* свернуть или развернуть несколько строк */
-function toggleWrappableRow(btnEl) {
+function toggleWrappableRow(btnEl, rowId) {
     var isExpanded = $(btnEl).hasClass('wrap-btn-down');
     if (isExpanded) {
-        collapseRows(btnEl);
+        collapseRows(btnEl, rowId);
     } else {
-        expandRows(btnEl);
+        expandRows(btnEl, rowId);
     }
 }
 
-function collapseRows(btnEl) {
-    var rowId = $(btnEl).closest('tr').data('row-id');
+function collapseRows(btnEl, rowId) {
+    //var rowId = $(btnEl).closest('tr').data('row-id');
+    var thisTr = $(btnEl).closest('tr')[0];
 
     $(btnEl).removeClass('wrap-btn-down').addClass('wrap-btn-up');
     $(btnEl).closest('.olap-report-table-container').find("tr[data-parent-row-id='"+rowId+"']").each(function(idx, trItem) {
-        $(trItem).css('display', 'none');
+        if (!thisTr.isEqualNode(trItem)) {
+            $(trItem).css('display', 'none');
+        }
     });
 
+    /*
     $(btnEl).closest('.olap-report-table-container').find("tr[data-row-id='"+rowId+"']").each(function(idx, trItem) {
         $(trItem).find('td:first-child').attr('rowspan', 1);
     });
+    */
 }
 
-function expandRows(btnEl) {
-    var rowId = $(btnEl).closest('tr').data('row-id');
+function expandRows(btnEl, rowId) {
+    //var rowId = $(btnEl).closest('tr').data('row-id');
 
     $(btnEl).removeClass('wrap-btn-up').addClass('wrap-btn-down');
-    var size = $(btnEl).closest('td').data('wrap');
+    //var size = $(btnEl).closest('td').data('wrap');
+    /*
     $(btnEl).closest('.olap-report-table-container').find("tr[data-row-id='"+rowId+"']").each(function(idx, trItem) {
         $(trItem).find('td:first-child').attr('rowspan', size);
     });
+    */
     $(btnEl).closest('.olap-report-table-container').find("tr[data-parent-row-id='"+rowId+"']").each(function(idx, trItem) {
         $(trItem).css('display', 'table-row');
     });
 }
 
 /* обновление ширины колонок в таблице с данными на основе ширины заголовков */
-function updateOlapTableDimensions() {
+function updateOlapTableDimensions(isViewMode) {
     var winW = $(window).outerWidth();
 
     // ширина контейнера с данными
     var listW = $('.group-list-container').outerWidth();
-    if ($(window).outerWidth() < 768) {
+    if ($(window).outerWidth() < 768 || isViewMode) {
         listW = 0;
     } else {
         listW += 15;
@@ -166,7 +173,7 @@ function onDrop(item, event) {
     }
 
     // пересчет ширины колонок
-    updateOlapTableDimensions();
+    updateOlapTableDimensions(false);
     //  $('.dropzone-in-grouplist').css('height', '0');
 
     // рефреш гориз. скролбара
@@ -394,8 +401,11 @@ function activateSetupMode() {
         .attr('class', (isSingleDaySelected()?'col-md-6 col-sm-12 col-xs-6':'col-md-6 col-sm-6 col-xs-6')+' period-start');
 
     btnCol.attr('class', isSingleDaySelected()?'col-md-8 col-sm-6 col-xs-12':'col-md-12 col-sm-3 col-xs-12');
-
+    $('.olap-report-groups').show();
+    $('.olap-report-table-container .dropzone-data').show();
+    $('.group-list-container').show();
     alignApplyFilterButton();
+    updateOlapTableDimensions(false);
 }
 
 function activateViewMode() {
@@ -413,8 +423,11 @@ function activateViewMode() {
         .attr('class', (isSingleDaySelected()?'col-md-12 col-sm-12 col-xs-6':'col-md-6 col-sm-6 col-xs-6')+' period-start');
 
     btnCol.attr('class', isSingleDaySelected()?'col-md-6 col-sm-6 col-xs-12':'col-md-3 col-sm-3 col-xs-12');
-
+    $('.olap-report-groups').hide();
+    $('.olap-report-table-container .dropzone-data').hide();
+    $('.group-list-container').hide();
     alignApplyFilterButton();
+    updateOlapTableDimensions(true);
 }
 
 /* выбрать или сбросить все группы */
