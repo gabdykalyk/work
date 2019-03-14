@@ -191,6 +191,10 @@
             </div>
             <div class="group-list-scroll">
                 <div class="group-list">
+                    <div class="ui-dropzone dropzone-in-grouplist">
+
+                    </div>
+
                     <div class="draggable-olap-item ui-draggable">
                         <label>Год</label>
                         <span class="group">Время</span>
@@ -204,6 +208,11 @@
                     <div class="draggable-olap-item ui-draggable">
                         <label>День недели</label>
                         <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Сумма со скидкой</label>
+                        <span class="group">Другое</span>
                         <span class="sort-btn sort-btn-up"></span>
                     </div>
 
@@ -526,6 +535,7 @@
 <script src="https://unpkg.com/interactjs@1.3.4/dist/interact.min.js"></script>
 
 <script type="text/javascript" src="js/js-gl.js"></script>
+<script type="text/javascript" src="js/js-olap.js"></script>
 
 <script type="text/javascript">
 
@@ -548,12 +558,13 @@
 
         initGroupListSearch();
         initDragAndDrop();
-
+        checkFilterMode();
     });
 
     (function($){
         $(window).on("load",function(){
-            updateOlapTableDimensions();
+            updateOlapTableDimensions(false);
+            updateOlapTableFirstColumn();
 
             $(".group-list-scroll").mCustomScrollbar({
                 axis: "y",
@@ -565,334 +576,19 @@
             });
             $(".olap-table-data-vscroll").mCustomScrollbar({
                 axis: "y",
-                theme: "dark"
+                theme: "dark",
+                callbacks:{
+                    whileScrolling:function() {
+                        onDataScrollUpdateFirstColumnY(this.mcs.top);
+                    },
+                    onOverflowYNone:function() {
+                        onDataScrollUpdateFirstColumnY(0);
+                    }
+                }
             });
 
         });
     })(jQuery);
-
-    /* обновление ширины колонок в таблице с данными на основе ширины заголовков */
-    function updateOlapTableDimensions() {
-        // ширина контейнера с данными
-        var listW = $('.group-list-container').outerWidth();
-        var bldW = $('.olap-report-table-builder').outerWidth();
-        $('.olap-report-table-container').outerWidth(bldW - listW - 15); // компенс гэп между списком и таблицей
-
-        // высота таблицы
-        var ortcH = $('.olap-report-table-container').outerHeight();
-        var dzdH = $('.dropzone-data').outerHeight();
-        $('.olap-report-table').outerHeight(ortcH - dzdH - 2);
-
-        // высота скроллируемой области с данными
-        var tblH = $('.olap-report-table').outerHeight();
-        var hdrH = $('.olap-table-head').outerHeight();
-        $('.olap-table-data-vscroll').outerHeight(tblH - hdrH - 18);
-
-        let thWidths = [];
-
-        // ширина колонок с данными, которые подпадают под первую колонку заголовка
-        // расчитываются из ширины "кнопок", которые туда добавлены
-        var firstThW = $('.olap-table-head thead tr .th-dropzone-row').outerWidth();
-
-        var sumRowBtnW = 0; // суммарная ширина колонок в первой ячейке заголовка
-        $('.olap-table-head thead tr .dropzone-row .draggable-olap-item').each(function(idx, item) {
-            var tmpW = sumRowBtnW + $(item).outerWidth() + 30;
-            if (tmpW <= firstThW) {
-                thWidths.push($(item).outerWidth()+2);
-                sumRowBtnW += ($(item).outerWidth()+2);
-            } else {
-                thWidths.push(firstThW - sumRowBtnW);
-                sumRowBtnW = firstThW;
-                return false;
-            }
-        });
-        if (thWidths.length == 0) {
-            thWidths.push(firstThW);
-        } else if (thWidths.length == 1 && sumRowBtnW < firstThW) {
-            thWidths.pop();
-            thWidths.push(firstThW);
-        } else if (thWidths.length > 1 && sumRowBtnW < firstThW) {
-            var w = thWidths.pop();
-            thWidths.push(firstThW - sumRowBtnW + w);
-        }
-
-        $('.olap-table-head thead tr:last-child th').each(function(idx, th) {
-            thWidths.push($(th).outerWidth());
-        });
-        $('.olap-table-data tbody td').each(function(idx, td) {
-            $(td).css('min-width', thWidths[idx]).css('max-width', thWidths[idx]);
-        });
-    }
-
-    /* быстрый поиск в левом списке групп */
-    function initGroupListSearch() {
-        $('.group-list-search input').on('change input keydown keyup', function(e) {
-            var val = $(e.target).val();
-            $('.group-list-scroll .group-list .draggable-olap-item').each(function(idx, item) {
-                var txt = $(item).find('label').html();
-                if (new RegExp(val, 'i').test(txt)) {
-                    $(item).show();
-                } else {
-                    $(item).hide();
-                }
-            });
-        });
-    }
-
-    function onDragStart(event) {
-        console.log('ON DRAG START '+event);
-    }
-
-    function onDrop(event) {
-        // event.target - куда перетаскиваем
-        // event.relatedTarget - что перетаскиваем
-
-        var dropzoneRow = $(event.target).hasClass('dropzone-row');
-        if (dropzoneRow) {
-            // begin: демонстрация добавления колонок
-            $('.olap-table-data tbody tr .th-total').remove();
-
-            var itemCount = $(event.target).find('.draggable-olap-item').length;
-            $(event.target).closest('th').attr('colspan', itemCount);
-            if (itemCount == 1) {
-                addTestColumn1();
-            } else {
-                addTestColumn2();
-            }
-            // end: демонстрация добавления колонок
-        }
-
-        // пересчет ширины колонок
-        updateOlapTableDimensions();
-
-        // рефреш гориз. скролбара
-        $(".olap-report-table").mCustomScrollbar("destroy");
-        $(".olap-report-table").mCustomScrollbar({
-            axis: "x",
-            theme: "dark"
-        });
-    }
-
-    function addTestColumn1() {
-        $('.olap-table-data tbody tr').each(function(idx, tr) {
-            if (idx%4 == 0) {
-                $(tr).prepend('<td rowspan="4">Бутово<span class="sort-btn sort-btn-down"></span></td>');
-            }
-        });
-    }
-
-    function addTestColumn2() {
-        $('.olap-table-data tbody tr').each(function(idx, tr) {
-            $('<td>Агапова Ю.</td>').insertAfter($(tr).find('td:first-child'));
-        });
-    }
-
-    function initDragAndDrop() {
-        initDraggable(".ui-draggable");
-        setupDropzone(".dropzone-data", ".ui-draggable", "non-numeric", onDragStart, onDrop);
-        setupDropzone(".dropzone-column", ".ui-draggable", "", onDragStart, onDrop);
-        setupDropzone(".dropzone-row", ".ui-draggable", "", onDragStart, onDrop);
-    }
-
-    var draggableItem;
-
-    function initDraggable(draggableElementSelector) {
-        interact(draggableElementSelector)
-            .draggable({
-                inertia: true,
-                max: Infinity
-            })
-            .on('dragstart', function (event) {
-                draggableItem = $(event.target).clone();
-                $(draggableItem).addClass('ui-draggable--captured').appendTo('body');
-                $(event.target).addClass('ui-draggable--empty-placeholder');
-            })
-            .on('dragmove', function (event) {
-                $(draggableItem).offset({ top: event.pageY, left: event.pageX });
-            })
-            .on('dragend', function (event) {
-                $(event.target).removeClass('ui-draggable--empty-placeholder');
-                $(draggableItem).remove();
-            });
-    }
-
-    /**
-     * dropzoneSelector - куда перетаскиваем
-     * draggableElementSelector - что перетаскиваем
-     * forbiddenElementSelector - селектор элементов, которые запрещено перетаскивать
-     * onDragStart - функция вызывается в момент начала перетаскивания
-     * onDrop - функция вызывается в момент размещения элемента в целевой области
-     */
-    function setupDropzone(dropzoneSelector, draggableElementSelector, forbiddenElementClass, onDragStart, onDrop) {
-        interact(dropzoneSelector)
-            .dropzone({
-                accept: draggableElementSelector,
-                ondropactivate: function (event) { /* вызывается вторым при начале перетаскивания */
-                },
-                ondropdeactivate: function (event) { /* вызывается последним при завершении перетаскивания */
-                },
-            })
-            .on('dropactivate', function (event) { /* вызывается первым при начале перетаскивания */
-                var frb =$(event.relatedTarget).hasClass(forbiddenElementClass);
-                $(event.target).addClass('ui-dropzone--'+(frb?'in':'')+'accessible');
-                if (onDragStart) {
-                    onDragStart(event);
-                }
-            })
-            .on('dropdeactivate', function (event) { /* вызывается предпоследним при завершении перетаскивания */
-                $(event.target)
-                    .removeClass('ui-dropzone--accessible ui-dropzone--inaccessible');
-            })
-            .on('dragenter', function (event) {
-            })
-            .on('dragleave', function (event) {
-            })
-            .on('drop', function (event) {
-                // перетаскиваемый элемент запрещено перетаскивать в эту область
-                var frb =$(event.relatedTarget).hasClass(forbiddenElementClass);
-                if (frb) {
-                    return true;
-                }
-
-                // удалить текст подсказки
-                $(dropzoneSelector + ' .ui-dropzone-placeholder').remove();
-
-                var item = $(event.relatedTarget); // перетаскиваемый элемент
-                item.detach(); // отсоединить его из старого списка
-                item.appendTo(dropzoneSelector); // добавить в новую область
-                item.removeClass('ui-draggable'); // отключить возможность перетаскивания
-
-                // вызвать функцию после перетаскивания
-                if (onDrop) {
-                    onDrop(event);
-                }
-            });
-    }
-
-    /* проверяет, если страница в режиме редактирования */
-    function isSetupMode() {
-        return $(".head-toolbar .btn-group a[data-mode='setup']").hasClass('active');
-    }
-
-    /* проверяет, если в селекте выбран период, для которого надо показать только одну дату */
-    var singleDayArray = ['today','yesterday'];
-    function isSingleDaySelected() {
-        var val = $('#period-select').val();
-        return singleDayArray.includes(val);
-    }
-
-    function alignApplyFilterButton() {
-        $('#olap-filter-apply-btn').find('.form-btns')
-            .removeClass('form-btns--setup-period form-btns--setup-singleday form-btns--view-period form-btns--view-singleday')
-            .addClass('form-btns--'+(isSetupMode()?'setup':'view')+'-'+(isSingleDaySelected()?'singleday':'period'));
-    }
-
-    /* вызывается при изменении в селекте Период. Меняет видимость второго календаря */
-    function onPeriodChanged(sel) {
-        var el = $(sel);
-        var val = el.val();
-
-        var datePicker = $('#olap-filter-period-datepicker');
-        var btnCol = $('#olap-filter-apply-btn');
-
-        if (singleDayArray.includes(val)) { // режим одного дня
-
-            // скрыть вторую дату
-            datePicker.find('.input-group-dash').hide();
-            datePicker.find('.period-end').hide();
-
-            $('#olap-filter-period-datepicker')
-                .attr('class', (isSetupMode()?'col-md-8 col-sm-3 col-xs-10':'col-md-3 col-sm-3 col-xs-10')+' form-group form-group-datepicker');
-            datePicker.find('.period-start')
-                .attr('class', (isSetupMode()?'col-md-6 col-sm-12 col-xs-6':'col-md-12 col-sm-12 col-xs-6')+' period-start');
-            btnCol.attr('class', isSetupMode()?'col-md-8 col-sm-6 col-xs-12':'col-md-6 col-sm-6 col-xs-12');
-
-        } else {
-
-            datePicker.find('.input-group-dash').show();
-            datePicker.find('.period-end').show();
-
-            $('#olap-filter-period-datepicker')
-                .attr('class', (isSetupMode()?'col-md-8 col-sm-6 col-xs-10':'col-md-6 col-sm-6 col-xs-10')+' form-group form-group-datepicker');
-            datePicker.find('.period-start')
-                .attr('class', (isSetupMode()?'col-md-6 col-sm-6 col-xs-6':'col-md-6 col-sm-6 col-xs-6')+' period-start');
-            btnCol.attr('class', isSetupMode()?'col-md-12 col-sm-3 col-xs-12':'col-md-3 col-sm-3 col-xs-12');
-
-        }
-
-        alignApplyFilterButton();
-    }
-
-    /* вид фильтра при изменении режима отчёта */
-    function toggleFilterMode(aEl) {
-        var el = $(aEl);
-        el.parent().find('a').each(function(idx,item) {
-            $(item).removeClass('active');
-        });
-        el.addClass('active');
-        var mode = el.data('mode');
-
-        var datePicker = $('#olap-filter-period-datepicker');
-        var btnCol = $('#olap-filter-apply-btn');
-
-        if ('setup' == mode) {
-            $('#olap-filter-1').attr('class', 'col-md-6 col-sm-12 col-sx-12');
-            $('.form-olap-report .form-btns--save').show();
-            $('#olap-filter-2').attr('class', 'col-md-6 col-sm-12 col-sx-12');
-
-            $('#olap-filter-period-select').attr('class', 'col-md-4 col-sm-3 col-xs-12 form-group');
-
-            datePicker.attr('class', (isSingleDaySelected()?'col-md-8 col-sm-3 col-xs-10':'col-md-8 col-sm-6 col-xs-10')+' form-group form-group-datepicker');
-            datePicker.find('.period-start')
-                .attr('class', (isSingleDaySelected()?'col-md-6 col-sm-12 col-xs-6':'col-md-6 col-sm-6 col-xs-6')+' period-start');
-
-            btnCol.attr('class', isSingleDaySelected()?'col-md-8 col-sm-6 col-xs-12':'col-md-12 col-sm-3 col-xs-12');
-
-        } else {
-            $('#olap-filter-1').attr('class', 'col-md-4 col-sm-6 col-sx-6');
-            $('.form-olap-report .form-btns--save').hide();
-            $('#olap-filter-2').attr('class', 'col-md-8 col-sm-12 col-sx-12');
-
-            $('#olap-filter-period-select').attr('class', 'col-md-3 col-sm-3 col-xs-12 form-group');
-
-            datePicker.attr('class', (isSingleDaySelected()?'col-md-3 col-sm-3 col-xs-10':'col-md-6 col-sm-6 col-xs-10')+' form-group form-group-datepicker');
-            datePicker.find('.period-start')
-                .attr('class', (isSingleDaySelected()?'col-md-12 col-sm-12 col-xs-6':'col-md-6 col-sm-6 col-xs-6')+' period-start');
-
-            btnCol.attr('class', isSingleDaySelected()?'col-md-6 col-sm-6 col-xs-12':'col-md-3 col-sm-3 col-xs-12');
-        }
-
-        alignApplyFilterButton();
-    }
-
-    /* выбрать или сбросить все группы */
-    function onToggleAllGroupButtons(btn) {
-        var is_active = btn.hasClass('active');
-
-        if (is_active) {
-            btn.removeClass('active');
-            btn.parent().find('button').removeClass('active');
-        } else {
-            btn.addClass('active');
-            btn.parent().find('button').addClass('active');
-        }
-    }
-
-    // инициализация фильтров
-    function onClickGroupButton(btn, single) {
-        var is_active = btn.hasClass('active');
-
-        if (single) {
-            var ul = btn.closest('div');
-            ul.find('button').removeClass('active');
-        }
-
-        if (!is_active) {
-            btn.addClass('active');
-        } else {
-            btn.removeClass('active');
-        }
-    }
 
 </script>
 </body>

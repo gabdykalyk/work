@@ -1,4 +1,5 @@
 @component-border-color: #CDCDCD;
+@olap-container-height: 430px; // высота контейнера с OLAP данными
 
 .draggable-olap-item {
   position: relative;
@@ -133,7 +134,7 @@
     padding-bottom: 10px;
     position: relative;
     .group-btns {
-      padding-right: 50px;
+      padding-right: 30px;
       .btn {
         padding: 4px 12px;
         font-size: 12px;
@@ -152,11 +153,12 @@
 
   .olap-report-table-builder {
 
-    height: 430px; // высота контейнера с OLAP данными
+    height: @olap-container-height;
     display: flex;
     align-items: stretch;
     flex-wrap: nowrap;
 
+    /* левый список с группами, не виден в мобильных версиях */
     .group-list-container {
       margin-right: 15px;
       width: 280px;
@@ -178,6 +180,19 @@
         .group-list {
           padding: 0;
           margin: 0;
+
+          .dropzone-in-grouplist {
+            position: relative;
+            .border-radius(4px);
+            width: 260px;
+            margin: 0 0 2px 0;
+            height: 48px;
+            display: none;
+            &.ui-dropzone--accessible {
+              display: block;
+            }
+          }
+
           .draggable-olap-item {
              width: 260px;
           }
@@ -186,10 +201,12 @@
 
     }
 
+    /* вся правая область с таблицей и областями данных для перетаскивания */
     .olap-report-table-container {
+      position: relative;
       height: 100%;
-      //border: 1px solid red;
 
+      /* OLAP группа которую можно перетаскивать*/
       .draggable-olap-item {
         margin-right: 2px;
         border: 1px solid @component-border-color;
@@ -211,6 +228,30 @@
         }
       }
 
+      /* область строк, зона для перетаскивания */
+      .dropzone-row {
+        padding: 1px 0 1px 0;
+        display: flex;
+        flex-wrap: nowrap;
+
+        .draggable-olap-item {
+          margin-right: 2px;
+          margin-bottom: 0;
+          padding: 5px 22px 3px 12px;
+          min-width: 120px;
+        }
+
+        @media (max-width: 480px) {
+          flex-wrap: wrap;
+          .draggable-olap-item {
+            margin: 0 0 1px 1px;
+            min-width: 98%;
+          }
+        }
+
+      }
+
+      /* область данных, зона для перетаскивания */
       .dropzone-data {
         border-top: 2px solid @component-border-color;
         height: 36px;
@@ -226,10 +267,12 @@
         }
       }
 
+      /* вся OLAP таблица */
       .olap-report-table {
         border-top: 1px solid @component-border-color;
         height: 100%;
 
+        /* область столбцов, зона для перетаскивания */
         .dropzone-column {
           padding: 1px 0 1px 0;
           display: flex;
@@ -242,27 +285,18 @@
           }
         }
 
-        .dropzone-row {
-          padding: 1px 0 1px 0;
-          display: flex;
-          flex-wrap: nowrap;
-
-          .draggable-olap-item {
-            margin-right: 2px;
-            margin-bottom: 0;
-            padding: 5px 22px 3px 12px;
-            min-width: 120px;
-          }
-        }
-
+        /* вертикальный скроллер данных в таблице */
         .olap-table-data-vscroll {
             position: relative;
+            border-bottom: 1px solid @component-border-color;
             .mCSB_container {
               margin-right: 0 !important;
             }
         }
 
-        table {
+        /* отдельные таблицы для заголовка и данных */
+        table.olap-table-head,
+        table.olap-table-data {
           border-width: 0;
           margin-bottom: 0;
 
@@ -277,13 +311,16 @@
                 border-left: 1px solid @component-border-color;
                 min-width: 80px;
 
+                &:first-child {
+                  min-width: 145px;
+                }
                 &.th-dropzone-row {
                   padding: 0;
                   vertical-align: bottom;
                   border-right-width: 0 !important;
                 }
                 &.th-dropzone-column {
-                  padding: 0;
+                  padding: 0 0 0 3px;
                   border-left-width: 0 !important;
                 }
                 .ui-dropzone-placeholder {
@@ -305,8 +342,9 @@
                 }
               }
               td {
+                height: 33px;
                 position: relative;
-                border-top: 1px solid @component-border-color;
+                border-top: 0 solid @component-border-color;
                 border-right: 1px solid @component-border-color;
                 border-bottom: 1px solid @component-border-color;
                 border-left: 1px solid @component-border-color;
@@ -315,23 +353,6 @@
                   background-color: #EEEEEE;
                 }
 
-                .sort-btn {
-                  position: absolute;
-                  right: 4px;
-                  top: 7px;
-                  cursor: pointer;
-                  &:after {
-                    font-family: "Font Awesome 5 Pro";
-                    font-weight: 900;
-                    color: #555555;
-                  }
-                  &.sort-btn-up:after {
-                    content: "\f139";
-                  }
-                  &.sort-btn-down:after {
-                    content: "\f13a";
-                  }
-                }
               }
             }
           }
@@ -339,114 +360,244 @@
 
       }
 
-    }
-
-  }
-
-  @media (min-width: 768px) and (max-width: 991px) {
-
-    .head-with-toolbar {
-      border-bottom-color: transparent;
-    }
-
-    .form-olap-report {
-
-      .form-btns {
-        &.form-btns--save {
-          margin-bottom: 15px;
+      /* первая фиксированная колонка таблицы для мобильной версии */
+      .table-first-column {
+        height: @olap-container-height;
+        border-left: 1px solid @component-border-color;
+        position: absolute;
+        top: 0;
+        left: 0;
+        min-width: 229px;
+        background-color: #fff;
+        box-shadow: 7px 0 5px -3px rgba(0, 0, 0, 0.25);
+        z-index: 1020;
+        /*display: none;*/
+        .table-first-column-head {
+          border-top: 1px solid @component-border-color;
         }
-        &.form-btns--apply {
-          &.form-btns--setup-period {
-            margin-top: 25px;
-            text-align: right;
-          }
-          &.form-btns--setup-singleday {
-            margin-top: 25px;
-            text-align: left;
-          }
-          &.form-btns--view-period {
-            margin-top: 25px;
-            text-align: right;
-          }
-          &.form-btns--view-singleday {
-            margin-top: 25px;
-            text-align: left;
-          }
-        }
-      }
-
-    }
-
-  }
-
-  @media (max-width: 767px) {
-
-    .head-with-toolbar {
-      border-bottom-color: transparent;
-
-      h1 {
-        display: block;
-        float: none;
-      }
-
-      .head-toolbar {
-        width: 100%;
-        margin-top: 12px;
-        display: flex;
-        float: none;
-        .btn-group {
-          display: block;
-          margin-right: 10px;
-          flex-basis: 55%;
-          a {
-            width: 50%;
-          }
-        }
-        & > a {
-          display: block;
-          flex-basis: 55%;
-          margin-left: 10px;
-        }
-      }
-
-    }
-
-    .form-olap-report {
-
-      .form-btns {
-        &.form-btns--save {
-          margin-bottom: 15px;
-        }
-        &.form-btns--apply {
-          button {
-            float: none;
+        .table-first-column-data-vscroll {
+          //height: @olap-container-height;
+          position: relative;
+          overflow: hidden;
+          & > table {
+            border-top-width: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
           }
-          &.form-btns--setup-period {
-            margin-top: 0;
-            text-align: center;
+        }
+
+        table {
+          border-bottom-width: 0;
+          margin-bottom: 0;
+          > thead {
+            > tr {
+              > th {
+                padding: 0;
+                border-top-width: 0;
+                border-bottom: 1px solid @component-border-color;
+                vertical-align: bottom;
+                background-color: #EEEEEE;
+              }
+            }
           }
-          &.form-btns--setup-singleday {
-            margin-top: 0;
-            text-align: center;
+          > tbody {
+            > tr {
+              > td {
+                position: relative;
+                height: 33px;
+                padding-left: 10px;
+                padding-right: 10px;
+                border-top-width: 0;
+                border-bottom: 1px solid @component-border-color;
+                &.fix-hdr-cell--last {
+                  border-left: 1px solid @component-border-color;
+                }
+                &:last-child {
+                  text-align: left;
+                  @media (max-width: 480px) {
+                    font-size: 12px;
+                  }
+                }
+              }
+            }
           }
-          &.form-btns--view-period {
-            margin-top: 0;
-            text-align: center;
-          }
-          &.form-btns--view-singleday {
-            margin-top: 0;
-            text-align: center;
-          }
+        }
+
+        @media (min-width: 992px) {
+          display: none;
+        }
+        @media (max-width: 480px) {
+          min-width: 145px;
+          width: 145px;
         }
       }
 
-      .form-group-datepicker {
-        margin-top: 0;
+      /* кнопка для сворач\разворач строк */
+      .wrap-btn {
+        position: absolute;
+        right: 4px;
+        top: 7px;
+        cursor: pointer;
+        &:after {
+          font-family: "Font Awesome 5 Pro";
+          font-weight: 900;
+          color: #555555;
+        }
+        &.wrap-btn-up:after {
+          content: "\f139";
+        }
+        &.wrap-btn-down:after {
+          content: "\f13a";
+        }
+      }
+
+      .tr-visible-480 {
+        display: none;
+      }
+
+      .td-rowspan {
+        border-bottom-color: transparent !important;
       }
 
     }
 
+  }
+
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+
+  .head-with-toolbar {
+    border-bottom-color: transparent;
+  }
+
+  .form-olap-report {
+
+    .form-btns {
+      &.form-btns--save {
+        margin-bottom: 15px;
+      }
+      &.form-btns--apply {
+        &.form-btns--setup-period {
+          margin-top: 25px;
+          text-align: right;
+        }
+        &.form-btns--setup-singleday {
+          margin-top: 25px;
+          text-align: left;
+        }
+        &.form-btns--view-period {
+          margin-top: 25px;
+          text-align: right;
+        }
+        &.form-btns--view-singleday {
+          margin-top: 25px;
+          text-align: left;
+        }
+      }
+    }
+
+  }
+
+}
+
+@media (max-width: 767px) {
+
+  .head-with-toolbar {
+    border-bottom-color: transparent;
+
+    h1 {
+      display: block;
+      float: none;
+    }
+
+    .head-toolbar {
+      width: 100%;
+      margin-top: 12px;
+      display: flex;
+      float: none;
+      .btn-group {
+        display: block;
+        margin-right: 10px;
+        flex-basis: 55%;
+        a {
+          width: 50%;
+        }
+      }
+      & > a {
+        display: block;
+        flex-basis: 55%;
+        margin-left: 10px;
+      }
+    }
+
+  }
+
+  .form-olap-report {
+
+    .form-btns {
+      &.form-btns--save {
+        margin-bottom: 15px;
+      }
+      &.form-btns--apply {
+        button {
+          float: none;
+          width: 100%;
+        }
+        &.form-btns--setup-period {
+          margin-top: 0;
+          text-align: center;
+        }
+        &.form-btns--setup-singleday {
+          margin-top: 0;
+          text-align: center;
+        }
+        &.form-btns--view-period {
+          margin-top: 0;
+          text-align: center;
+        }
+        &.form-btns--view-singleday {
+          margin-top: 0;
+          text-align: center;
+        }
+      }
+    }
+
+    .form-group-datepicker {
+      margin-top: 0;
+    }
+
+  }
+
+  .group-list-container {
+    display: none;
+  }
+
+  .olap-report-table-container {
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 480px) {
+
+  .olap-report-table-container {
+    .table-first-column {
+      min-width: 140px;
+    }
+
+    .tr-visible-480 {
+      display: table-row !important;
+    }
+
+    .fix-hdr-cell {
+      display: none;
+      &.fix-hdr-cell--last {
+        display: table-cell !important;
+      }
+    }
   }
 
 }
