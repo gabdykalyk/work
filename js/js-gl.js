@@ -205,19 +205,39 @@ function hideTooltipProviders() {
 
 // инициализация блока фильтров для раздела Сотрудники
 function changeHeightCellMobile(table) {
+	resetDefaultHeight(table);
 	var h = setDefaultHeightCell(table);
 	h = calcMaxHeightCell(table, h);
 	setHeightCellMobile(table, h);
+}
+var resetDefaultHeight = function(table) {
+	table.find('thead > tr > th.js-cell-mobile').each(function(key, value) {
+		$(value).removeAttr('style');
+	});
+	var tr, td, td_h;
+	table.find('tbody > tr').each(function(key, value) {
+		tr = $(value);
+		tr.find('td.js-cell-mobile').each(function(key, value) {
+			td = $(value)
+			td.removeAttr('style');
+		});
+	});
 }
 
 function setDefaultHeightCell(table) {
 	var h = [];
 	var h_size = table.find('thead > tr > th.js-cell-mobile').size();
-
 	for (var i = 0; i < h_size; i++) {
 		h[i] = 0;
 	}
-	
+
+	var th, th_h;
+	table.find('thead > tr > th.js-cell-mobile').each(function(key, value) {
+		th = $(value)
+		th_h = th.outerHeight();
+		h[key] = th_h;
+	});
+
 	return h;
 }
 
@@ -230,7 +250,7 @@ function calcMaxHeightCell(table, h) {
 		tr.find('td.js-cell-mobile').each(function(key, value) {
 			td = $(value)
 			td_h = td.outerHeight();
-			
+
 			if (td_h > h[key]) h[key] = td_h;
 		});
 	});
