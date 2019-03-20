@@ -1,4 +1,6 @@
 .emplneeds {
+	@component-border-color: #CDCDCD;
+
 	&__form {
 		margin-bottom: 10px;
 		
@@ -185,5 +187,823 @@
 	            display: none;
 	        }
 	    }
-	}	
+	}
+
+	&__revenue-table-filter {
+		margin-bottom: 20px;
+		label {
+			white-space: normal;
+			.opt-date {
+				padding-left: 4px;
+				@media (max-width: 767px) {
+					padding-left: 0;
+					display: block;
+					text-align: center;
+				}
+			}
+		}
+	}
+
+	&__revenue-table {
+		position: relative;
+
+		.table-responsive2 {
+			.table {
+				max-width: 768px;
+				th {
+					border-right: 1px solid @component-border-color;
+					text-align: center;
+					@media (max-width: 767px) {
+						&:last-child {
+							border-right: 0 solid @component-border-color;
+						}
+					}
+					&:not(:first-child) {
+						width: 33%;
+					}
+				}
+				td {
+					vertical-align: middle !important;
+					border-right: 1px solid @component-border-color;
+					@media (max-width: 767px) {
+						&:last-child {
+							border-right: 0 solid @component-border-color;
+						}
+					}
+					&:first-child {
+						min-width: 180px;
+						max-width: 180px;
+						font-weight: bold;
+
+						@media (max-width: 767px) {
+							white-space: nowrap;
+							overflow: hidden;
+							min-width: 44px;
+							max-width: 44px;
+							padding: 0;
+						}
+					}
+					&.td-digit {
+						text-align: center;
+						font-weight: bold;
+						@media (max-width: 480px) {
+							font-size: 14px;
+						}
+					}
+					&.td-string {
+						a {
+							display: block;
+							margin: 3px 0 3px 0;
+							white-space: nowrap;
+							overflow: hidden;
+							text-overflow: ellipsis;
+						}
+					}
+				}
+
+			}
+		}
+
+		.table-head {
+			position: absolute;
+			top: 0;
+			left: 0;
+			min-width: 45px;
+			max-width: 45px;
+			background-color: #fff;
+			box-shadow: 6px 0 4px -2px rgba(0, 0, 0, 0.25);
+
+			> tbody {
+				> tr {
+					> td {
+						padding: 0 0 0 0;
+						background-color: #fff !important;
+						vertical-align: middle;
+						text-align: center;
+
+						.cell-head {
+							display: inline-block;
+							line-height: 1.13;
+
+							&:before {
+								display: inline-block;
+								-moz-osx-font-smoothing: grayscale;
+								-webkit-font-smoothing: antialiased;
+								font-style: normal;
+								font-variant: normal;
+								text-rendering: auto;
+								line-height: 1;
+								font-size: 14px;
+
+								font-family: "Font Awesome 5 Pro";
+								font-weight: 900;
+							}
+
+							//
+							&.cell-head-calc {
+								&:before {
+									content: "\f1ec";
+								}
+							}
+
+							//
+							&.cell-head-users {
+								&:before {
+									content: "\f0c0";
+								}
+							}
+
+							//
+							&.cell-head-events {
+								&:before {
+									content: "\f783";
+								}
+							}
+						}
+					}
+				}
+			}
+
+			@media (min-width: 768px) {
+				display: none;
+			}
+		}
+
+		@media (min-width: 768px) and (max-width: 991px) {
+			.table-responsive2 {
+				.table {
+					max-width: 100%;
+				}
+			}
+
+		}
+		@media (max-width: 767px) {
+			margin-left: -15px;
+			margin-right: -15px;
+		}
+
+	}
+
+	&__positions-table-filter {}
+
+	&__positions-table {
+
+		.table-positions {
+            margin-bottom: 0;
+			thead {
+				.cell-head {
+					text-align: center;
+					.head-line {
+						white-space: nowrap;
+					}
+
+					&.cell-head-name,
+					&.cell-head-timework {
+						text-align: left;
+					}
+				}
+			}
+			tbody {
+				tr.row-head + tr {
+					td {
+						border-top-width: 0;
+					}
+				}
+				td {
+					text-align: center;
+					vertical-align: middle;
+					&.row-head-title {
+						text-align: left;
+						color: #337AB7;
+						font-weight: bold;
+					}
+					&.cell-name {
+						text-align: left;
+					}
+					&.cell-min-revenue {
+                        border-top-width: 0;
+						&.cell-min-revenue_group {
+                          border-top-width: 1px !important;
+                        }
+						&.cell-min-revenue_ok {
+							background-color: #D9F6CB;
+						}
+						&.cell-min-revenue_warn {
+							background-color: #FFA9B1;
+						}
+					}
+
+					&.cell-states,
+					&.cell-btn-del {
+						text-align: left;
+						.btn {
+							background-color: transparent !important;
+							padding: 0 0 0 0 !important;
+						}
+					}
+					&.cell-btn-del {
+						padding: 0 0 0 8px !important;
+						width:35px;
+					}
+					&.cell-states {
+						padding: 0 0 0 0 !important;
+						width:15px;
+					}
+
+					&.cell-timework {
+						white-space: nowrap;
+						width: 200px;
+						.form-timework {
+							text-align: left;
+							white-space: nowrap;
+							margin-bottom: 4px;
+
+							.form-control {
+								width: 55px;
+								display: inline-block;
+							}
+							.form-control:nth-of-type(2) {
+								margin-right: 4px;
+							}
+
+							.btn {
+								padding: 0 4px 0 4px;
+								cursor: pointer;
+								&:focus {
+									outline: none;
+								}
+								&:active {
+									box-shadow: none;
+									i {
+										top: 0;
+										left: -1px;
+									}
+								}
+								i {
+									position: relative;
+									top: -1px;
+								}
+							}
+
+							.btn-add-time {
+								color: #4ba34c;
+								background-color: transparent !important;
+							}
+
+							.btn-del-time {
+								display: none;
+								color: #ff0000;
+								background-color: transparent !important;
+							}
+						}
+
+					}
+
+				}
+			}
+		}
+        .table-footer {
+            width: 100%;
+            background-color: #EEEEEE;
+            border-bottom: 2px solid @component-border-color;
+            padding: 10px 0 10px 8px;
+            margin-bottom: 20px;
+		    font-size: 12px;
+			.itogo {
+				text-transform: uppercase;
+			}
+			.dig {
+				padding-left: 10px;
+			}
+        }
+	}
+
+	&__footer-btns {
+		text-align: right;
+		.btn {
+			padding: 6px 20px;
+		}
+	}
+
+}
+
+@media (min-width: 992px) {
+	.emplneeds__positions-table {
+		.table-responsive2 {
+			.table-positions {
+				> thead {
+					> tr {
+						> th {
+							&.cell-head-timework {
+								height: auto !important;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: 991px) {
+	.emplneeds__positions-table {
+		border-top: 1px solid #ddd;
+		.table-responsive2 {
+			.table-positions {
+				> thead {
+					> tr {
+						> th {
+							border: 1px solid #ddd;
+							border-left-color: transparent;
+							border-right: 0;
+							border-bottom-color: transparent;
+
+							&.cell-selected {
+								border-left-color: #468cc8;
+								border-right-color: #468cc8;
+								border-top-color: #468cc8 !important;
+								border-bottom-color: #468cc8;
+								background-color: #f6f9fc;
+							}
+
+							&:last-child {
+								border-bottom-color: #ddd;
+							}
+						}
+					}
+				}
+
+				> tbody {
+					> tr.row-head + tr {
+						td {
+							border-top-width: 1px;
+						}
+					}
+					> tr {
+						position: relative;
+
+						> td {
+							border-bottom-color: transparent;
+							border-top: 1px solid #ddd;
+
+							&.cell-selected {
+								border-top-color: #468cc8;
+								border-bottom-color: #468cc8;
+								background-color: #f6f9fc;
+								border-left-color: transparent;
+								border-right-color: transparent;
+							}
+
+							&:last-child {
+								border-bottom-color: #ddd;
+							}
+						}
+
+						&.row-selected {
+							> td {
+								background-color: #f6f9fc;
+								border-left-color: #468cc8;
+								border-right-color: #468cc8;
+								border-top-color: #ddd;
+								border-bottom-color: transparent;
+
+								&:first-child {
+									border-left-color: transparent;
+								}
+
+								&.cell-name {
+									border-top-color: #468cc8;
+								}
+
+								&:last-child {
+									border-right-color: #468cc8;
+									border-bottom-color: #468cc8;
+								}
+
+								&.cell-selected {
+									border-top-color: #468cc8;
+									border-bottom-color: #468cc8;
+								}
+							}
+						}
+
+						&:last-child {
+							> td {
+								&.cell-selected {
+									border-right-color: #468cc8;
+								}
+							}
+						}
+					}
+				}
+
+				.cell-states,
+				.cell-btn-del {
+					position: absolute;
+					top: 24px;
+					height: 35px;
+					line-height: 35px;
+					vertical-align: middle;
+					border: 0;
+					padding: 0 !important;
+					background-color: transparent !important;
+					z-index: 1;
+				}
+
+				.cell-btn-del {
+					left: 13px;
+					top: 23px;
+				}
+
+				.cell-states {
+					left: 27px;
+					width: 30px;
+					text-align: center;
+
+					.fas {
+						margin-right: 1px;
+
+						&:last-child {
+							margin-right: 0;
+						}
+					}
+				}
+
+				.cell-name {
+					padding-left: 55px;
+					height: 60px;
+					padding-top: 32px;
+					position: relative;
+
+					&:before {
+						content: attr(data-post);
+						position: absolute;
+						top: 5px;
+						left: 15px;
+						background-color: transparent;
+						color: #337AB7;
+						font-weight: 700;
+						font-size: 12px;
+					}
+				}
+
+				.cell-head-name {
+					height: 60px;
+					.cell-head_name {
+					}
+				}
+
+				.cell-timework {
+					min-height: 52px;
+					width: auto;
+					.form-timework {
+						margin-bottom: 3px;
+					}
+				}
+
+				.cell-persacc {
+					padding-left: 7px;
+
+					.btn {
+						padding-left: 8px;
+						padding-right: 8px;
+					}
+				}
+
+				.cell-fine-prem {
+					padding-top: 0px;
+					padding-bottom: 0px;
+					height: 35px;
+				}
+			}
+		}
+
+	}
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+	.emplneeds__positions-table {
+		position: relative;
+		margin-left: -15px;
+		margin-right: -15px;
+
+		.table-responsive2 {
+			margin-left: 145px;
+			width: -webkit-calc(~'100% - 145px');
+			width: -moz-calc(~'100% - 145px');
+			width: calc(~'100% - 145px');
+
+			// Должности
+			.table-positions {
+				margin-bottom: 0;
+				border-top: 0px solid #ddd;
+
+				> thead {
+					display: block;
+					width: 145px;
+					position: absolute;
+					top: 0;
+					left: 0;
+					z-index: 1;
+					.box-shadow(7px 0 5px -5px rgba(0, 0, 0, 0.25));
+					background-color: #fff;
+					border-right: 1px solid #ddd;
+					border-top: 0px solid #ddd;
+					border-bottom: 1px solid #ddd;
+
+					> tr {
+						display: block;
+
+						> th {
+							display: block;
+							position: relative;
+							text-align: left;
+							vertical-align: middle;
+
+							.line-wrap {
+								display: block;
+							}
+
+							&.cell-head-name,
+							&.cell-head-receipts,
+							&.cell-head-coeff,
+							&.cell-head-min-revenue,
+							&.cell-head-timework {
+								white-space: normal;
+								min-height: 52px;
+								line-height: 1.3;
+								.flex();
+								.flex-align-items(center);
+							}
+							&.cell-head-min-revenue {
+								white-space: normal;
+								min-height: 53px;
+								line-height: 1.3;
+								.flex();
+								.flex-align-items(center);
+							}
+
+						}
+					}
+				}
+
+				> tbody {
+					.flex();
+
+					> tr {
+						.flex();
+						flex-direction: column;
+						position: relative;
+
+						> td {
+							display: block;
+							text-align: left;
+							padding: 8px 15px;
+
+							&.cell-name {
+								white-space: nowrap;
+							}
+
+							&.cell-coeff,
+							&.cell-min-revenue,
+							&.cell-receipts {
+								min-height: 52px;
+								.flex();
+								.flex-align-items(center);
+							}
+
+							&.cell-fine-prem {
+								.flex();
+								.flex-align-items(center);
+							}
+
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@media (max-width: 767px) {
+	.emplneeds__positions-table {
+		.table-responsive2 {
+            margin-bottom: 0;
+
+			// Должности
+			.table-positions {
+				border-top: 0px solid #ddd;
+				> thead {
+					border-right: 1px solid #ddd;
+					border-top: 0px solid #ddd;
+					border-bottom: 2px solid #ddd;
+
+					> tr {
+						> th {
+							// ФИО
+							&.cell-head-name {
+								height: 75px;
+
+								&:before {
+									content: "\f007";
+									margin-top: 42px;
+								}
+							}
+
+							// Разряд
+							&.cell-head-posts {
+								&:before {
+									content: "\f47f";
+								}
+							}
+
+							// Начало/конец работы
+							&.cell-head-timework {
+								height: 48px;
+
+								&:before {
+									content: "\f2f2";
+									margin-top: -9px;
+									top: 50%;
+								}
+							}
+
+							// Рабочее время
+							&.cell-head-time {
+								&:before {
+									content: "\f4d3";
+								}
+							}
+
+							// Оклад
+							&.cell-head-salary {
+								&:before {
+									content: "\f555";
+								}
+							}
+
+							// Норматив выручки/ч
+							&.cell-head-receipts {
+								&:before {
+									content: "\f571";
+								}
+							}
+
+							// Коэфф. норм.
+							&.cell-head-coeff {
+								&:before {
+									content: "\f009";
+								}
+							}
+
+							// Норматив выручки
+							&.cell-head-receipts2 {
+								&:before {
+									content: "\f0b1";
+								}
+							}
+
+							// Коэфф. прем.
+							&.cell-head-coeff2 {
+								&:before {
+									content: "\f00a";
+								}
+							}
+
+							// Коррект. время
+							&.cell-head-correct-time {
+								&:before {
+									content: "\f017";
+								}
+							}
+
+							// Минимальная выручка
+							&.cell-head-min-revenue {
+								&:before {
+									content: "\f258";
+								}
+							}
+						}
+					}
+				}
+
+				> tbody {
+					> tr {
+						min-width: 200px;
+
+						> td {
+							&.cell-name {
+								height: 75px;
+								padding-top: 25px;
+								overflow: hidden;
+
+								.cell-name_cont {
+									max-width: 180px;
+									height: 45px;
+									white-space: normal;
+									line-height: 1.2;
+									overflow: hidden;
+									.flex();
+									.flex-align-items(center);
+								}
+							}
+
+							&.cell-total {
+								height: 75px;
+								padding-top: 38px;
+							}
+
+							&.cell-btn-del,
+							&.cell-states {
+								top: 32px;
+							}
+
+							&.cell-persacc,
+							&.cell-fine-prem {
+								.flex();
+								.flex-align-items(center);
+							}
+
+							&.cell-persacc {
+								height: 38px;
+							}
+
+							&.cell-timework {
+								.form-control {
+									width: 60px;
+								}
+							}
+
+							&.cell-fine-prem {
+								height: 38px;
+							}
+						}
+					}
+				}
+			}
+
+		}
+	}
+}
+
+.emplneeds__table-position-popup {
+    .table {
+		thead {
+			th:not(:first-child) {
+				text-align: center;
+			}
+		}
+		tbody {
+			tr:last-child {
+				td:first-child {
+					text-transform: uppercase;
+				}
+			}
+			td:first-child {
+				width: 90px;
+			}
+			td:not(:first-child) {
+				text-align: center;
+			}
+		}
+	}
+}
+
+.popover-emplneeds-details {
+	width: 350px;
+	max-width: none;
+	.box-shadow(10px);
+	overflow-y: auto;
+	max-height: 100%;
+
+	.popover-header {
+		padding: 15px 20px 0 20px;
+		.clearfix();
+		@media (min-width: 992px) {
+			padding: 15px 20px 0 20px;
+			button {
+				display: none;
+			}
+		}
+	}
+	.popover-content {
+		padding: 5px 20px 0 20px;
+	}
+
+}
+
+#emplneeds_positionModal {
+	.modal-dialog {
+		width: 480px;
+		max-width: 480px;
+		margin: 0 auto;
+		.modal-header {
+			border-bottom-width: 0;
+			padding-bottom: 0;
+		}
+		@media (max-width: 480px) {
+			width: 100%;
+			margin: 0;
+		}
+	}
 }
