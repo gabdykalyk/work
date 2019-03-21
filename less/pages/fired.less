@@ -172,13 +172,13 @@
 			flex-wrap: wrap;
 			width: 100%;
 		}
-	 .line {
-		display: flex;
-		
-		align-items: center;
-		width: 100%;
-		@media (max-width: 767px) {
-			flex-direction: column;
+		.line {
+			display: flex;
+			
+			align-items: center;
+			width: 100%;
+			@media (max-width: 767px) {
+				flex-direction: column;
 			}
 		}
 		.column {
@@ -338,6 +338,7 @@
 	}
 	.table-fired-block {
 		margin-top: 18px;
+		
 		.wd24 {
 			width: 24%;
 		}
@@ -353,56 +354,53 @@
 		.wd8 {
 			width: 8%;
 		}
-		.cell-head {
+		
+		.table-responsive2 {
+			@media (max-width: 767px) {
+				margin-left: 0;
+				width: inherit;
+			}
 			@media (min-width: 768px) and (max-width: 991px) {
-				padding-left: 16px;
+			    margin-left: 15px;
+			    margin-right: 15px;
+			    width: inherit;
 			}
 		}
-		.mobile-title {
-			display: none;
-			@media (max-width: 767px) {
-				display: block;
-				font-size: 10px;
-				font-weight: normal;
-				font-style: normal;
-				font-stretch: normal;
-				letter-spacing: normal;
-				text-align: center;
-			}
-		}
-		.cell-head_name {
-			font-size: 11px;
-			@media (max-width: 767px) {
-				font-size: 14px;
-			}
-		}
-		.table-responsive-wrapper-empllist {
+		
+		.table-fired {
 			@media (min-width: 768px) and (max-width: 991px) {
 				position: inherit;
 				margin: 0;
+				width: 100%;
 			}
-		}
-		.table-fired {
+			@media (max-width: 767px) {
+				margin-left: 52px;
+				width: ~'calc(100% - 52px)';
+			}
+			
 			thead {
 				z-index: 102;
-				@media (max-width: 767px) {
-					width: 52px;
-				}
+				
 				@media (min-width: 768px) and (max-width: 991px) {
 					width: 100%;
 					display: table-row-group;
 					position: inherit;
-				}
-				
-				tr {
-					@media (min-width: 768px) and (max-width: 991px) {
-						display: table-row;
-					}
 					
-					th {
-						@media (min-width: 768px) and (max-width: 991px) {
+					> tr {
+						display: table-row;
+						
+						> th {
 							display: table-cell;
-							
+							&:last-child {
+								margin-top: -1px;
+							}
+							&.cell-head {
+								padding-left: 16px;
+								
+								.cell-head_name {
+									font-size: 11px;
+								}
+							}		
 							&.wd24 {
 								width: 24% !important;
 							}
@@ -421,57 +419,106 @@
 							a.desc:after {
 								position: absolute;
 							    top: calc(50% - 6px);
-    							right: 5px;
+								right: 5px;
 							}
-						}	
+						}
+					}
+				}
+				@media (max-width: 767px) {
+					width: 52px;
+					
+					> tr {
+						> th {
+							&:last-child {
+								margin-top: -1px;
+							}
+							&.cell-head {
+								.cell-head_name {
+									font-size: 14px;
+								}
+							}
+							&.cell-xs-icon {
+								&:before {
+									content: attr(data-icon);
+									font-size: 14px;
+								}
+								&.big-xs:before {
+									top: 50%;
+									margin: 0;
+									transform: translate(0, -50%);
+								}
+								.cell-xs-icon-sort {
+									visibility: visible !important;
+									display: flex;
+									justify-content: center;
+									padding-top: 3px;
+									&:before {
+										display: inline-block;
+										-moz-osx-font-smoothing: grayscale;
+										-webkit-font-smoothing: antialiased;
+										font-style: normal;
+										font-variant: normal;
+										text-rendering: auto;
+										line-height: 1;
+										font-size: 16px;
+										font-family: "Font Awesome 5 Pro";
+										font-weight: 900;
+										text-align: center;
+										content: attr(data-icon);
+										font-size: 14px;
+									}
+									&:after {
+										font-size: 11px;
+										padding-left: 4px;
+									}
+								}
+							}
+						}
 					}
 				}
 			}
 			tbody {
-				@media (min-width: 768px) and (max-width: 991px) {
-					display: table-row-group;
-				}
-				
-				& > tr {
-					@media (min-width: 768px) and (max-width: 991px) {
-						display: table-row;
-					}
-					
-					& > td {
+				> tr {
+					> td {
 						padding: 14px 8px;
 						font-weight: normal;
+					}
+				}
+				@media (min-width: 768px) and (max-width: 991px) {
+					display: table-row-group;
+					
+					> tr {
+						display: table-row;
 						
-						@media (min-width: 768px) and (max-width: 991px) {
+						> td {
 							display: table-cell;
 							padding: 13px 15px;
-							width: 195px;
+							width: 195px;	
 						}
-						@media (max-width: 767px) {
+						
+						&:first-child > td {
+							padding: 13px 15px;
+						}
+					}
+				}
+				@media (max-width: 767px) {
+					> tr {
+						> td {
 							width: 233px;
 							padding: 8px 14px !important;
 							white-space: normal;
 							display: flex;
 							align-items: center;
 							padding-top: 0;
-						}
-						
-						&:first-child {
-							@media (max-width: 767px) {
+							&:first-child {
 								color: #000;
 							}
 						}
-					}
-					
-					&:first-child > td {
-						@media (min-width: 768px) and (max-width: 991px) {
-							padding: 13px 15px;
-						}
-						@media (max-width: 767px) {
+						&:first-child > td {
 							padding-left: 17px !important;
 						}
 					}
 				}
-				
 			}
 			tfoot {
 				display: none;
@@ -482,69 +529,9 @@
 					right: 0;
 					z-index: 100;
 					background: fade(#ffffff, 80%);
+					left: 52px;
 					.spinnerLoader();
 				}
-				@media (max-width: 767px) {
-					left: 52px;
-				}
-			}
-			@media (max-width: 767px) {
-				thead tr .cell-xs-icon {
-					&:before {
-						content: attr(data-icon);
-						font-size: 14px;
-					}
-					@media (max-width: 767px) {
-						&.big-xs:before {
-							top: 50%;
-							margin: 0;
-							transform: translate(0, -50%);
-						}
-					}
-					&-sort {
-						visibility: visible !important;
-						display: flex;
-						justify-content: center;
-						padding-top: 3px;
-						&:before {
-							display: inline-block;
-							-moz-osx-font-smoothing: grayscale;
-							-webkit-font-smoothing: antialiased;
-							font-style: normal;
-							font-variant: normal;
-							text-rendering: auto;
-							line-height: 1;
-							font-size: 16px;
-							font-family: "Font Awesome 5 Pro";
-							font-weight: 900;
-							text-align: center;
-							content: attr(data-icon);
-							font-size: 14px;
-						}
-						&:after {
-							font-size: 11px;
-							padding-left: 4px;
-						}
-					}
-				}
-			}
-		}
-		.table-responsive2 {
-			@media (max-width: 767px) {
-				margin-left: 52px;
-				width: ~'calc(100% - 52px)';
-			}
-			@media (min-width: 768px) and (max-width: 991px) {
-				margin-left: 0;
-				width: 100%;
-			}
-		}
-		.table tr > th:last-child {
-			@media (min-width: 768px) and (max-width: 991px) {
-				margin-top: -1px;
-			}
-			@media (max-width: 767px) {
-				margin-top: -1px;
 			}
 		}
 		.btn {
