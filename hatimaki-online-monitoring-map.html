@@ -155,8 +155,11 @@
                                     <div class="checkbox-label">Показать рекомендации</div>
                                 </label>
                             </div>
-                        </div>
+                        </div>						
                     </form>
+					<div class="filters__loader hide" title="Пожалуйста, подождите ...">
+						<i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>			
+					</div>					
                 </div>
                 <div class="map-monitoring">
                     <div class="column-first">
@@ -210,7 +213,7 @@
                         </div>
                     </div>
                     <div class="column-second">
-                        <div class="monitoring-couriers">
+                        <div class="monitoring-couriers" id="monitoring-couriers">
 							<div class="form-group form-group-status">
 								<select class="form-control hidden-sm hidden-xs" name="" id="">
 									<option value="1">Все</option>
@@ -229,7 +232,7 @@
 									</label>
 								</div>								
 							</div>
-                            <div class="couriers-list" id="couriers-list">
+                            <div class="couriers-list">
                                 <table class="table table-couriers">
                                     <tbody>
                                         <tr>
@@ -732,6 +735,19 @@
                 }
             });
             myMap.controls.add(myButton);
+			
+			myMap.container.events.add('fullscreenenter', show_courier);
+			myMap.container.events.add('fullscreenexit', hide_courier);
+			function show_courier()	{
+				//alert('fullscreen enter')
+				var couriers = $('#monitoring-couriers');
+				couriers.addClass('couriers-list-onmap');
+			}
+			function hide_courier() {
+				//alert('fullscreen exit');
+				var couriers = $('#monitoring-couriers');
+				couriers.removeClass('couriers-list-onmap');
+			}			
 
             myMap.geoObjects.add(myCollection);
         }
