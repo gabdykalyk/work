@@ -284,13 +284,7 @@
 			position: relative;
 		}
 	}
-	.table-mangen {
-		
-		@media (max-width: 767px) {
-			margin-left: 185px;
-    		width: calc(100% - 185px);
-    		border: none;
-		}
+	.table-mangen.hidden-xs {
 		thead {
 			tr {
 				th {
@@ -303,7 +297,6 @@
 						text-align: left;
 					}
 				}
-				
 				&:last-child th {
 					font-weight: normal;
 					text-align: center;
@@ -330,38 +323,6 @@
 					}
 				}
 			}
-			
-			@media (max-width: 767px) {
-				display: block;
-				width: 185px;
-				z-index: 102;
-				position: absolute;
-			    top: 0;
-			    left: 0;
-			    border-bottom: 2px solid #ddd;
-				border-top: 2px solid #ddd;
-				border-right: 1px solid #ddd;
-				-webkit-box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
-    			-moz-box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
-    			box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
-				tr {
-					display: block;
-					th {
-						display: block;
-						text-align: left;
-						border-bottom-width: 1px;
-						padding: 8px 8px;
-						
-						&.sub-col {
-							margin-left: 20px;
-							padding-left: 0;
-						}
-						&:last-child {
-							border-bottom: none;
-						}
-					}
-				}
-	        }
 		}
 		tbody {
 			tr {
@@ -385,42 +346,81 @@
 					}
 				}
 			}
-			@media (max-width: 767px) {
-				display: -webkit-flex;
-    			display: -ms-flex;
-				display: flex;
-				flex-direction: row-reverse;
-				border-bottom: 2px solid #ddd;
-				border-top: 2px solid #ddd;
-				tr {
-					display: -webkit-flex;
-    				display: -ms-flex;
-					display: flex;
-					flex-direction: column;
-					td {
-						display: -webkit-flex;
-    					display: -ms-flex;
-						display: flex;
-						justify-content: center;
-						align-items: center;
-						&:first-child {
-							border-top: none;
-						}
-						&.visible-xs {
-							display: -webkit-flex !important;
-    						display: -ms-flex !important;
-							display: flex !important;
-						}
-					}
-				}
-	        }
 		}
 	    .cell-all {        
 	        background-color: #ededed;
 	    }
-	    .txt-xs {
-	        display: none;
-	    }
+	}
+
+	@media (max-width: 767px) {
+		.table-mangen-wrapper {
+		    margin-left: 0;
+		    margin-right: 0;
+		    .table-responsive2 {
+				margin-left: 0;
+				width: inherit;
+			}
+		}
+		.table-mangen.visible-xs {
+			margin-left: 185px;
+			width: ~'calc(100% - 185px)'; 
+			border: none;
+			thead {
+				z-index: 102;
+				width: 185px;
+				position: absolute;
+			    top: 0;
+			    left: 0;
+			    border-bottom: 2px solid #ddd;
+				border-top: 2px solid #ddd;
+				border-right: 1px solid #ddd;
+				-webkit-box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
+				-moz-box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
+				box-shadow: 7px 0 5px -5px rgba(0, 0, 0, 0.25);
+				> tr {
+					> th {
+						font-weight: 600;
+						font-size: 12px;
+						text-align: left;
+						border-bottom-width: 1px;
+						padding: 8px 8px;
+						&:first-child {
+							font-weight: bold;
+							text-align: left;
+						}
+						&:last-child {
+							border-bottom: none;
+						}
+						&.sub-col {
+							margin-left: 20px;
+							padding-left: 0;
+						}
+					}
+				}
+			}
+			tbody {
+			    border-top: 2px solid #ddd;
+			    border-bottom: 2px solid #ddd;
+				> tr {
+					> td {
+						padding: 8px 15px;
+						font-weight: normal;
+						font-size: 12px;
+						min-width: 100px;
+						white-space: normal;
+						align-items: center;
+						text-align: center;
+						&:first-child {
+							font-weight: bold;
+							border-top: none;
+						}
+					}
+				}
+			}
+		    .cell-all {        
+		        background-color: #ededed;
+		    }
+		}
 	}
 	
 	.table-fired-block {
@@ -483,7 +483,7 @@
 								.cell-head_name {
 									font-size: 11px;
 								}
-							}		
+							}	
 							&.wd40 {
 								width: 40% !important;
 							}
@@ -514,6 +514,9 @@
 								.cell-head_name {
 									font-size: 14px;
 								}
+							}	
+							&.cell-short-text {
+								padding: 0 8px;
 							}
 							&.cell-xs-icon {
 								&:before {
@@ -611,6 +614,9 @@
 							}
 							.allcontent {
 							    width: 300px;
+							}
+							&.cell-short-text {
+								padding: 0 8px;
 							}
 						}
 						&:first-child > td {
