@@ -89,7 +89,7 @@
 				</div>
                 <div class="col-sm-6 col-xs-12 form-group">
 					<label for="nationality">Гражданство</label>
-					<select class="form-control js-select-multiple" name="nationality[]" id="nationality" multiple="multiple" tabindex="-1" aria-hidden="true">
+					<select class="form-control js-select-multiple js-select-nationality" name="nationality[]" id="nationality" multiple="multiple" tabindex="-1" aria-hidden="true">
 						<option value="1">Россия</option>
 						<option value="2">Украина</option>
 						<option value="3">Белоруссия</option>
@@ -157,7 +157,7 @@
                                 </td>
                                 <td class="cell-btn">
                                 	<button type="button" class="btn btn-xs btn-danger btn-remove-row jsRemoveItem" title="Удалить"><i class="fa fa-minus" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-xs btn-default btn-add-row visible-xs-inline-block jsAddNewItem" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                                    <button type="button" class="btn btn-xs btn-default btn-add-row jsAddNewItem" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
                                 </td>
                             </tr>
                         </tbody>
@@ -204,7 +204,7 @@
             </td>
             <td class="cell-btn">
             	<button type="button" class="btn btn-xs btn-danger btn-remove-row jsRemoveItem" title="Удалить"><i class="fa fa-minus" aria-hidden="true"></i></button>
-                <button type="button" class="btn btn-xs btn-default btn-add-row visible-xs-inline-block jsAddNewItem" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                <button type="button" class="btn btn-xs btn-default btn-add-row jsAddNewItem" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
             </td>
         </tr>
 	</script>
@@ -237,6 +237,11 @@
                 placeholder: 'Выберите должности',
             });
 
+            $('.js-select-nationality').select2({
+                width: '100%',
+                placeholder: 'Выберите гражданство',
+            });
+            
             $('.js-select-branch').select2({
                 width: '100%',
                 placeholder: 'Выберите филиал',
@@ -274,7 +279,8 @@
                         itemTemplate = table.data('itemTemplate') || 'rowTemplate',
                         rowTemplate = $('#' + itemTemplate),
                         tbody = table.find('> tbody'),
-                        tr = tbody.find('tr');
+                        tr = tbody.find('tr'),
+                        addBtn = tr.find('.jsAddNewItem');
 
                     if (!rowTemplate) return false;
 
@@ -290,8 +296,8 @@
                     }
 
                     rowTemplate.appendTo(tbody);
+                    addBtn.hide();
                     var newTr = tbody.find('tr:last-child');
-                    console.log(newTr);
                     newTr.fadeIn(500);
                     $('.js-select-branch').select2({
 		                width: '100%',
@@ -299,7 +305,18 @@
 		            });
                 }
                 me.removeItem = function() {
-                    var tr = $(this).closest('tr');
+                    var tr = $(this).closest('tr'),
+                    	trLastChild = $(this).closest('table').find('> tbody > tr:last-child'),
+                    	lastTr, addBtn;
+                    if (tr.index() == trLastChild.index()) {
+                    	var lastTr_index = tr.index() - 1;
+			        	lastTr = $(this).closest('table').find('> tbody > tr:eq(' + lastTr_index + ')');
+			        } else {
+			        	lastTr = trLastChild;
+			        }
+					addBtn = lastTr.find('.jsAddNewItem');
+					
+                	addBtn.show();
 					tr.fadeOut(500, function() {
 			            tr.remove();
 			        });
