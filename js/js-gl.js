@@ -276,9 +276,18 @@ function setHeightCellMobile(table, h) {
 	});
 }
 
-// Вызов сролла внутри модалки
+// Вызов скролла внутри модалки
 $('#modalLaw, #modalRoleFines').on('shown.bs.modal', function (e) {
   	$(document).ready(function(){
 	    $('.scrollbar-inner').scrollbar();
 	});
+});
+
+// Проверяет, выбран ли элемент в select2
+var isItemInSelect2 = (function(item, itemName, now) {
+	return now.indexOf(itemName) > -1;
+});
+// Показывает блоки, которые выбраны в select2
+var showOrHideBlock = (function(item, itemName, now) {
+	return (isItemInSelect2(item, itemName, now) ? item.show() : item.hide());
 });
