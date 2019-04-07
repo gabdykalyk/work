@@ -291,3 +291,82 @@ var isItemInSelect2 = (function(item, itemName, now) {
 var showOrHideBlock = (function(item, itemName, now) {
 	return (isItemInSelect2(item, itemName, now) ? item.show() : item.hide());
 });
+
+// Функция задает placeholder для select2
+var placeholderSelect2 = (function(select, placeholder) {
+	return $(select).select2({
+		width: '100%',
+		placeholder: placeholder,
+	});
+});
+
+// Массив data для выбора даты в select2
+var dataDays = [
+	{ 
+		"text": "", 
+		"children" : [
+			{id: 1, text: '1'},
+			{id: 2, text: '2'},
+			{id: 3, text: '3'},
+			{id: 4, text: '4'},
+			{id: 5, text: '5'},
+			{id: 6, text: '6'},
+			{id: 7, text: '7'}
+		]
+	},
+	{ 
+		"text": "", 
+		"children" : [
+			{id: 8, text: '8'},
+			{id: 9, text: '9'},
+			{id: 10, text: '10'},
+			{id: 11, text: '11'},
+			{id: 12, text: '12'},
+			{id: 13, text: '13'},
+			{id: 14, text: '14'}
+		]
+	},
+	{ 
+		"text": "", 
+		"children" : [
+			{id: 15, text: '15'},
+			{id: 16, text: '16'},
+			{id: 17, text: '17'},
+			{id: 18, text: '18'},
+			{id: 19, text: '19'},
+			{id: 20, text: '20'},
+			{id: 21, text: '21'}
+		]
+	},
+	{ 
+		"text": "", 
+		"children" : [
+			{id: 22, text: '22'},
+			{id: 23, text: '23'},
+			{id: 24, text: '24'},
+			{id: 25, text: '25'},
+			{id: 26, text: '26'},
+			{id: 27, text: '27'},
+			{id: 28, text: '28'}
+		]
+	},
+	{ 
+		"text": "", 
+		"children" : [
+			{id: 29, text: '29'},
+			{id: 30, text: '30'},
+			{id: 31, text: '31'}
+		]
+	}
+];
+
+// Выбор дней месяца в select2
+var dayOfMonth = (function(block) {
+	var block_select2 = $(block).select2({
+		width: '100%',
+		data: dataDays,
+		minimumResultsForSearch: Infinity
+	});
+	block_select2.data('select2').$dropdown.addClass('day-of-month-block');
+	block_select2.data('select2').$container.addClass('day-of-month-input');
+});

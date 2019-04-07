@@ -258,100 +258,34 @@
 							<div class="clearfix"></div>
 							<div class="form-group col-md-4 col-sm-6 col-xs-12" data-type="month">
 								<label for="discount[1][day-of-month]">Число</label>
-								<select class="form-control js-day-of-month-input" name="discount[1][day-of-month]" multiple="multiple">
-									<optgroup>
-										<option value="1">1</option>
-										<option value="2">2</option>
-										<option value="3">3</option>
-										<option value="4">4</option>
-										<option value="5">5</option>
-										<option value="6">6</option>
-										<option value="7">7</option>
-									</optgroup>
-									<optgroup>
-										<option value="8">8</option>
-										<option value="9">9</option>
-										<option value="10">10</option>
-										<option value="11">11</option>
-										<option value="12">12</option>
-										<option value="13">13</option>
-										<option value="14">14</option>
-									</optgroup>
-									<optgroup>
-										<option value="15">15</option>
-										<option value="16">16</option>
-										<option value="17">17</option>
-										<option value="18">18</option>
-										<option value="19">19</option>
-										<option value="20">20</option>
-										<option value="21">21</option>
-									</optgroup>
-									<optgroup>
-										<option value="22">22</option>
-										<option value="23">23</option>
-										<option value="24">24</option>
-										<option value="25">25</option>
-										<option value="26">26</option>
-										<option value="27">27</option>
-										<option value="28">28</option>
-									</optgroup>
-									<optgroup>
-										<option value="29">29</option>
-										<option value="30">30</option>
-										<option value="31">31</option>
-									</optgroup>
-								</select>
+								<select class="form-control js-day-of-month-input" name="discount[1][day-of-month]" multiple="multiple"></select>
 							</div>
 						</div>
 						
 						<div class="js-period-of-month-group" style="display: none;">
 							<div class="clearfix"></div>
-							<div class="form-group col-md-4 col-sm-6 col-xs-12" data-type="month">
-								<label for="discount[1][period-of-month]">Период месяца</label>
-								<select class="form-control js-period-of-month-input" name="discount[1][period-of-month]" multiple="multiple">
-									<optgroup>
-										<option value="1">1</option>
-										<option value="2">2</option>
-										<option value="3">3</option>
-										<option value="4">4</option>
-										<option value="5">5</option>
-										<option value="6">6</option>
-										<option value="7">7</option>
-									</optgroup>
-									<optgroup>
-										<option value="8">8</option>
-										<option value="9">9</option>
-										<option value="10">10</option>
-										<option value="11">11</option>
-										<option value="12">12</option>
-										<option value="13">13</option>
-										<option value="14">14</option>
-									</optgroup>
-									<optgroup>
-										<option value="15">15</option>
-										<option value="16">16</option>
-										<option value="17">17</option>
-										<option value="18">18</option>
-										<option value="19">19</option>
-										<option value="20">20</option>
-										<option value="21">21</option>
-									</optgroup>
-									<optgroup>
-										<option value="22">22</option>
-										<option value="23">23</option>
-										<option value="24">24</option>
-										<option value="25">25</option>
-										<option value="26">26</option>
-										<option value="27">27</option>
-										<option value="28">28</option>
-									</optgroup>
-									<optgroup>
-										<option value="29">29</option>
-										<option value="30">30</option>
-										<option value="31">31</option>
-									</optgroup>
-								</select>
+							<div class="js-period-days-row-block">
+								<div class="js-period-days-row">
+									<div class="form-group col-md-2 col-sm-3 col-xs-4" data-type="month">
+										<label for="discount[1][period-from]">Число начала</label>
+										<select class="form-control js-period-from-input" name="discount[1][period-from]"></select>
+									</div>
+									<div class="form-group col-md-2 col-sm-3 col-xs-4" data-type="month">
+										<label for="discount[1][period-to]">Число окончания</label>
+										<select class="form-control js-period-to-input" name="discount[1][period-to]"></select>
+									</div>
+									<div class="col-lg-8 col-md-8 col-sm-6 col-xs-4 no-label form-group-btns">
+										<button class="btn btn-cancel btn-neutral jsRemovePeriod" style="display: none;" type="button" title="Удалить период">
+											<i class="fa fa-times" aria-hidden="true"></i>
+										</button>
+										<button class="btn btn-add btn-neutral jsAddNewPeriod" type="button" title="Добавить период">
+											<i class="fa fa-plus" aria-hidden="true"></i>
+										</button>
+									</div>
+									<div class="clearfix"></div>
+								</div>
 							</div>
+							<div class="clearfix"></div>
 						</div>
 						
 						<div class="col-lg-2 col-md-2 col-sm-3 discount__times no-label js-timepicker-block">
@@ -378,6 +312,7 @@
 								<input type="text" class="form-control small-input" value="" name="discount[1][num-repeats]">
 							</div>
 						</div>
+						<div class="clearfix js-clearfix-before-btn" style="display: none"></div>
 						<div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 time-btn-block no-label form-group">
 							<button type="button" class="btn btn-danger btn-remove-row jsRemove" title="Удалить" style="display: none;"><i class="fa fa-times" aria-hidden="true"></i></button>
 							<button type="button" class="btn btn-success btn-add-row jsAddNew" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
@@ -469,53 +404,206 @@
 			<div class="clearfix"></div>
 		</div>
 	</script>
+	
+    <script id="periodDaysRowTemplate" type="text/template">
+		<div class="js-period-days-row" style="display:none;">
+			<div class="form-group col-md-2 col-sm-3 col-xs-4" data-type="month">
+				<label for="discount[1][period-from]">Число начала</label>
+				<select class="form-control js-period-from-input" name="discount[1][period-from]"></select>
+			</div>
+			<div class="form-group col-md-2 col-sm-3 col-xs-4" data-type="month">
+				<label for="discount[1][period-to]">Число окончания</label>
+				<select class="form-control js-period-to-input" name="discount[1][period-to]"></select>
+			</div>
+			<div class="col-lg-8 col-md-8 col-sm-6 col-xs-4 no-label form-group-btns">
+				<button class="btn btn-cancel btn-neutral jsRemovePeriod" style="display: none;" type="button" title="Удалить период">
+					<i class="fa fa-times" aria-hidden="true"></i>
+				</button>
+				<button class="btn btn-add btn-neutral jsAddNewPeriod" type="button" title="Добавить период">
+					<i class="fa fa-plus" aria-hidden="true"></i>
+				</button>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+	</script>
 
     <script id="timeRowTemplate" type="text/template">
         <div class="js-time-row" style="display:none;">
 			<div class="col-lg-4 col-md-4 col-sm-6 form-group">
-                <label for="period">Период проведения</label>
-				<select class="form-control" name="period">
-					<option value="1">Определенные даты</option>
-					<option value="2">Период</option>
-					<option value="3">День недели</option>
-					<option value="4" selected="">Нечетные числа месяца</option>
-					<option value="5">Число месяца</option>
-					<option value="6">Период месяца</option>
+                <label for="select-period">Период проведения</label>
+				<select class="form-control js-select-period" name="select-period">
+					<option value="dates">Определенные даты</option>
+					<option value="period">Период</option>
+					<option value="weekday">День недели</option>
+					<option value="odd-days" selected="">Нечетные числа месяца</option>
+					<option value="day-of-month">Число месяца</option>
+					<option value="period-of-month">Период месяца</option>
 				</select>
 			</div>
-			<div class="col-lg-2 col-md-2 col-sm-3 discount__times no-label">
+			
+			<div class="js-dates-block" style="display: none;">
+				<div class="clearfix"></div>
+				<div class="js-dates-row-block">
+					<div class="js-dates-row discount__dates-row">
+						<div class="col-lg-2 col-md-2 col-sm-3 col-xs-5">
+							<label for="discount[1][date]">Дата</label>
+							<div class="input-group datepicker">
+								<input type="text" class="form-control" value="01.01.1995" name="discount[1][date]" placeholder="00.00.0000" maxlength="10">
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+								</span>
+							</div>
+						</div>
+						<div class="clearfix visible-xs"></div>
+						<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 discount__times no-label">
+							<div class="form-group">
+								<input type="text" class="form-control js-timework" value="" name="discount[1][dates-timebeg]" maxlength="5" placeholder="00:00">
+							</div>
+							<div class="form-group-dash">&ndash;</div>
+							<div class="form-group">
+								<input type="text" class="form-control js-timework" value="" name="discount[1][dates-timeend]" maxlength="5" placeholder="00:00">
+							</div>
+						</div>
+						<div class="col-lg-8 col-md-8 col-sm-6 col-xs-6 no-label form-group-btns">
+							<button class="btn btn-cancel btn-neutral jsRemoveDate" style="display: none;" type="button" title="Удалить разряд">
+								<i class="fa fa-times" aria-hidden="true"></i>
+							</button>
+							<button class="btn btn-add btn-neutral jsAddNewDate" type="button" title="Добавить разряд">
+								<i class="fa fa-plus" aria-hidden="true"></i>
+							</button>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+			
+			<div class="js-period-block" style="display: none;">
+				<div class="clearfix"></div>
+				<div class="col-lg-2 col-md-2 col-sm-3 col-xs-5">
+					<label for="discount[1][period-start]">Дата начала</label>
+					<div class="input-group datepicker">
+						<input type="text" class="form-control" value="01.01.1995" name="discount[1][period-start]" placeholder="00.00.0000" maxlength="10">
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+				</div>
+				<div class="col-lg-1 col-md-1 col-sm-2 col-xs-3 no-label">
+					<div class="form-group">
+						<input type="text" class="form-control js-timework" value="" name="discount[1][period-start]" maxlength="5" placeholder="00:00">
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-2 col-sm-3 col-xs-5">
+					<label for="discount[1][period-end]">Дата окончания</label>
+					<div class="input-group datepicker">
+						<input type="text" class="form-control" value="01.01.1995" name="discount[1][period-end]" placeholder="00.00.0000" maxlength="10">
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+						</span>
+					</div>
+				</div>
+				<div class="col-lg-1 col-md-1 col-sm-2 col-xs-3 no-label">
+					<div class="form-group">
+						<input type="text" class="form-control js-timework" value="" name="discount[1][period-end]" maxlength="5" placeholder="00:00">
+					</div>
+				</div>
+			</div>
+			
+			<div class="js-weekdays-block" style="display: none;">
+				<div class="clearfix"></div>
+				<div class="col-lg-3 col-md-3 col-sm-5 col-xs-12 form-group form-group-date" data-type="week">
+					<label>Дни недели</label>
+					<div class="discount-weekdays weekdays">
+						<div class="checkbox">
+							<label><input type="checkbox" name="discount[1][weekdays]" value="0"><span>ПН</span></label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" name="discount[1][weekdays]" value="1"><span>ВТ</span></label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" name="discount[1][weekdays]" value="2"><span>СР</span></label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" name="discount[1][weekdays]" value="3"><span>ЧТ</span></label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" name="discount[1][weekdays]" value="4"><span>ПТ</span></label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" name="discount[1][weekdays]" value="5"><span>СБ</span></label>
+						</div>
+						<div class="checkbox">
+							<label><input type="checkbox" name="discount[1][weekdays]" value="6"><span>ВС</span></label>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="js-day-of-month-group" style="display: none;">
+				<div class="clearfix"></div>
+				<div class="form-group col-md-4 col-sm-6 col-xs-12" data-type="month">
+					<label for="discount[1][day-of-month]">Число</label>
+					<select class="form-control js-day-of-month-input" name="discount[1][day-of-month]" multiple="multiple"></select>
+				</div>
+			</div>
+			
+			<div class="js-period-of-month-group" style="display: none;">
+				<div class="clearfix"></div>
+				<div class="js-period-days-row-block">
+					<div class="js-period-days-row">
+						<div class="form-group col-md-2 col-sm-3 col-xs-4" data-type="month">
+							<label for="discount[1][period-from]">Число начала</label>
+							<select class="form-control js-period-from-input" name="discount[1][period-from]"></select>
+						</div>
+						<div class="form-group col-md-2 col-sm-3 col-xs-4" data-type="month">
+							<label for="discount[1][period-to]">Число окончания</label>
+							<select class="form-control js-period-to-input" name="discount[1][period-to]"></select>
+						</div>
+						<div class="col-lg-8 col-md-8 col-sm-6 col-xs-4 no-label form-group-btns">
+							<button class="btn btn-cancel btn-neutral jsRemovePeriod" style="display: none;" type="button" title="Удалить период">
+								<i class="fa fa-times" aria-hidden="true"></i>
+							</button>
+							<button class="btn btn-add btn-neutral jsAddNewPeriod" type="button" title="Добавить период">
+								<i class="fa fa-plus" aria-hidden="true"></i>
+							</button>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+			</div>
+			
+			<div class="col-lg-2 col-md-2 col-sm-3 discount__times no-label js-timepicker-block">
 				<div class="form-group">
-					<input type="text" class="form-control js-timework" value="" name="" id="timebeg" maxlength="5" placeholder="00:00">
+					<input type="text" class="form-control js-timework" value="" name="discount[1][timebeg]" maxlength="5" placeholder="00:00">
 				</div>
 				<div class="form-group-dash">&ndash;</div>
 				<div class="form-group">
-					<input type="text" class="form-control js-timework" value="" name="" id="timeend" maxlength="5" placeholder="00:00">
+					<input type="text" class="form-control js-timework" value="" name="discount[1][timeend]" maxlength="5" placeholder="00:00">
 				</div>
 			</div>
-			<div class="clearfix visible-sm"></div>
-			<div class="col-lg-2 col-md-2 col-sm-3 col-xs-7 form-group">
-				<label for="to-repeat">Повторять</label>
-				<select class="form-control js-select-repeat" name="to-repeat">
-					<option value="no-repeat">Не повторять</option>
-					<option value="repeat" selected="">Кол-во повторов</option>
-					<option value="all">Весь период акции</option>
-				</select>
-			</div>
-			<div class="col-lg-3 col-md-3 col-sm-6 col-xs-5 time-btn-block no-label">
-				<div class="form-group js-repeat-block repeat-block">
-					<input type="text" class="form-control small-input" value="" name="num_repeats" id="num_repeats">
+			
+			<div class="js-repeat-block">
+				<div class="clearfix visible-sm"></div>
+				<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group">
+					<label for="to-repeat">Повторять</label>
+					<select class="form-control js-select-repeat" name="to-repeat">
+						<option value="no-repeat">Не повторять</option>
+						<option value="repeat" selected="">Кол-во повторов</option>
+						<option value="all">Весь период акции</option>
+					</select>
 				</div>
-				<div class="form-group hidden-sm">
-					<button type="button" class="btn btn-danger btn-remove-row jsRemove" title="Удалить"><i class="fa fa-times" aria-hidden="true"></i></button>
-					<button type="button" class="btn btn-success btn-add-row jsAddNew" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
+				<div class="col-lg-1 col-md-1 col-sm-2 col-xs-3 no-label form-group js-num-repeats-block num-repeats-block">
+					<input type="text" class="form-control small-input" value="" name="discount[1][num-repeats]">
 				</div>
 			</div>
-			<div class="col-sm-3 visible-sm time-btn-block no-label">
-				<div class="form-group">
-					<button type="button" class="btn btn-danger btn-remove-row jsRemove" title="Удалить"><i class="fa fa-times" aria-hidden="true"></i></button>
-					<button type="button" class="btn btn-success btn-add-row jsAddNew" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
-				</div>
+			<div class="clearfix js-clearfix-before-btn" style="display: none"></div>
+			<div class="col-lg-2 col-md-2 col-sm-2 col-xs-3 time-btn-block no-label form-group">
+				<button type="button" class="btn btn-danger btn-remove-row jsRemove" title="Удалить" style="display: none;"><i class="fa fa-times" aria-hidden="true"></i></button>
+				<button type="button" class="btn btn-success btn-add-row jsAddNew" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
 			</div>
+			<div class="clearfix"></div>
 		</div>
 	</script>
 	
@@ -579,13 +667,10 @@
 				pickTime: false
 			});
             
-            var placeholderSelect2 = (function(select, placeholder) {
-				return $(select).select2({
-					width: '100%',
-					placeholder: placeholder,
-				});
-            });
-            
+			dayOfMonth('.js-day-of-month-input');
+			dayOfMonth('.js-period-from-input');
+			dayOfMonth('.js-period-to-input');
+			
 	        var placeholdersOnXS = (function() {
 	        	var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 				if (winWidth < 768) {
@@ -600,7 +685,7 @@
 	        $(window).on('load resize', function() {
 				placeholdersOnXS();
 			});
-	        
+			
             $(document).on('change', '.js-action-type', function() {
                 var select = $(document).find('.js-action-type'),
                     now = select.val(),
@@ -644,7 +729,8 @@
 					day_of_month = block.find('.js-day-of-month-group'),
 					period_of_month = block.find('.js-period-of-month-group'),
 					timepicker = block.find('.js-timepicker-block'),
-					repeat = block.find('.js-repeat-block');
+					repeat = block.find('.js-repeat-block'),
+					clearfix = block.find('.js-clearfix-before-btn');
 					
 				switch(now) {
 					case 'dates':
@@ -655,6 +741,7 @@
 						period_of_month.hide();
 						timepicker.hide();
 						repeat.hide();
+						clearfix.hide();
 						break;
 					case 'period':
 						dates.hide();
@@ -664,6 +751,7 @@
 						period_of_month.hide();
 						timepicker.hide();
 						repeat.hide();
+						clearfix.hide();
 						break;
 					case 'weekday':
 						dates.hide();
@@ -673,6 +761,7 @@
 						period_of_month.hide();
 						timepicker.show();
 						repeat.show();
+						clearfix.hide();
 						break;
 					case 'odd-days':
 						dates.hide();
@@ -682,6 +771,7 @@
 						period_of_month.hide();
 						timepicker.show();
 						repeat.show();
+						clearfix.hide();
 						break;
 					case 'day-of-month':
 						weekdays.hide();
@@ -691,6 +781,7 @@
 						period_of_month.hide();
 						timepicker.show();
 						repeat.show();
+						clearfix.hide();
 						break;
 					case 'period-of-month':
 						dates.hide();
@@ -700,10 +791,11 @@
 						period_of_month.show();
 						timepicker.show();
 						repeat.show();
+						clearfix.show();
 						break;
 				}
 			});
-            
+ 
             $(document).on('change', '.js-select-repeat', function() {
                 var select = $(this),
                     now = select.val(),
@@ -747,8 +839,8 @@
 						pickDate: false
 					});
 					
-					// ОШИБКА! Cannot read property 'dateFormat' of undefined
-					$('.datepicker').datetimepicker({
+					datepicker = newRow.find('.datepicker');
+					datepicker.datetimepicker({
 						language: 'ru',
 						pickTime: false
 					});
@@ -781,6 +873,63 @@
                 return me;
             }());
            
+            var editPeriods = (function() {
+                var me = {};
+                me.blockEdit = $('.js-period-days-row-block');
+                me.init = function() {
+                    me.blockEdit.on('click', '.jsAddNewPeriod', me.addNewPeriod);
+                    me.blockEdit.on('click', '.jsRemovePeriod', me.removePeriod);
+                }
+                me.addNewPeriod = function() {
+                    var parent = $(this).closest('.js-period-days-row-block'),
+                        periodRowTemplate = $('#periodDaysRowTemplate'),
+                        row = parent.find('.js-period-days-row'),
+                        addBtn = row.find('.jsAddNewPeriod'),
+                        allDelBtn, newRow, inputFrom, inputTo;
+                    
+                    if (!periodRowTemplate) return false;
+                    periodRowTemplate = $(periodRowTemplate.html());
+                    periodRowTemplate.appendTo(parent);
+                    addBtn.hide();
+                    
+					allDelBtn = parent.find('.jsRemovePeriod');
+					allDelBtn.show();
+					newRow = parent.find('.js-period-days-row:last-child');
+                    newRow.fadeIn(500);
+					
+                    inputFrom = newRow.find('.js-period-from-input');
+                    inputTo = newRow.find('.js-period-to-input');
+					dayOfMonth(inputFrom);
+					dayOfMonth(inputTo);
+                }
+                me.removePeriod = function() {
+                    var parent = $(this).closest('.js-period-days-row-block'),
+                    	row = $(this).closest('.js-period-days-row'),
+                    	rowLastChild = parent.find('.js-period-days-row:last-child'),
+                    	lastRow, lastRow_index, addBtn, delBtn;
+                    
+                    if (row.index() === rowLastChild.index()) {
+                    	lastRow_index = row.index() - 1;
+			        	lastRow = $(this).closest('.js-period-days-row-block').find('.js-period-days-row:eq(' + lastRow_index + ')');
+			        } else {
+			        	lastRow = rowLastChild;
+			        }
+			        
+					addBtn = lastRow.find('.jsAddNewPeriod');
+                	addBtn.show();
+                	
+					row.fadeOut(500, function() {
+						row.remove();
+					});
+					
+					if (rowLastChild.index() === 1) {
+						delBtn = parent.find('.jsRemovePeriod');
+						delBtn.hide();
+					}
+                }
+                return me;
+            }());
+            
             var editTime = (function() {
                 var me = {};
                 me.blockEdit = $('.js-time-block');
@@ -793,7 +942,7 @@
                         rowTemplate = $('#timeRowTemplate'),
                         row = parent.find('.js-time-row'),
                         addBtn = row.find('.jsAddNew'),
-                        allDelBtn, newRow;
+                        allDelBtn, newRow, datepicker, inputDay, inputFrom, inputTo;
                     
                     if (!rowTemplate) return false;
                     rowTemplate = $(rowTemplate.html());
@@ -804,12 +953,25 @@
 					allDelBtn.show();
 					newRow = parent.find('.js-time-row:last-child');
                     newRow.fadeIn(500);
-                    
-			        $('.js-timework').datetimepicker({
-			            language: 'ru',
-			            format: 'LT',
-			            pickDate: false
-			        });
+					
+					$('.js-timework').datetimepicker({
+						language: 'ru',
+						format: 'LT',
+						pickDate: false
+					});
+					
+					datepicker = newRow.find('.datepicker');
+					datepicker.datetimepicker({
+						language: 'ru',
+						pickTime: false
+					});
+					
+                    inputDay = newRow.find('.js-day-of-month-input');
+					dayOfMonth(inputDay);
+                    inputFrom = newRow.find('.js-period-from-input');
+					dayOfMonth(inputFrom);
+                    inputTo = newRow.find('.js-period-to-input');
+					dayOfMonth(inputTo);
                 }
                 me.removeItem = function() {
                     var parent = $(this).closest('.js-time-block'),
@@ -893,43 +1055,9 @@
 
             // если на странице есть нужный селектор, запускать функцию
             document.querySelector('.js-dates-row-block') && editDates.init();
+            document.querySelector('.js-period-days-row-block') && editPeriods.init();
             document.querySelector('.js-time-block') && editTime.init();
             document.querySelector('.js-order-block') && editOrder.init();
-            
-            
-			// Выбор дней месяца
-			var day_of_month = $('.js-day-of-month-input').select2({
-				width: '100%'
-			});
-			day_of_month.data('select2').$dropdown.addClass('day-of-month-block');
-			day_of_month.data('select2').$container.addClass('day-of-month-input');
-			day_of_month.data('select2').$dropdown.find('.select2-dropdown').append('<i class="fa fa-times"></i>');
-			
-			// Выбор периода месяца
-			var period_of_month = $('.js-period-of-month-input').select2({
-				width: '100%'
-			});
-			period_of_month.data('select2').$dropdown.addClass('day-of-month-block').addClass('period-block');
-			period_of_month.data('select2').$container.addClass('day-of-month-input').addClass('period-input');
-			period_of_month.data('select2').$dropdown.find('.select2-dropdown').append('<i class="fa fa-times"></i>');
-			/* 
-			var chosen_dates = [];
-			period_of_month.on('select2:select', function (e) {
-				chosen_dates.push(e.params.data.text);
-				console.log(chosen_dates);
-				
-				if (chosen_dates.length % 2 === 1) {
-					period_of_month.select2('open');
-					e.params.data.text = e.params.data.text + " - ";
-				}
-				//cur_val = period_of_month.val();
-				//console.log(cur_val);
-			});
-			*/
-			// Добавляем крестик для закрытия блока выбора дня
-			$(document).on('click', '.day-of-month-block .fa-times', function() {
-				day_of_month.select2('close');
-			});
         });
 		
     </script>
