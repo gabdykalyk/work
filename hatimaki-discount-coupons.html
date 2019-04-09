@@ -291,8 +291,8 @@
     <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
     <script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
 
-	<!-- http://viralpatel.net/blogs/dynamically-shortened-text-show-more-link-jquery/ -->
-	<script type="text/javascript" src="js/shorten.js"></script>
+	<!-- http://viralpatel.net/blogs/dynamically-shortened-text-show-more-link-jquery/ 
+	<script type="text/javascript" src="js/shorten.js"></script>-->
 	
     <script type="text/javascript" src="js/js-gl.js"></script>
     <!-- noUiSlider https://refreshless.com/nouislider/download/ -->
@@ -305,6 +305,7 @@
                 pickTime: false
             });
             
+
 			var shortenText = (function(showChars) {
 				$('.js-short-text').each(function () {
 					var replaceToI = (function (el) {
@@ -314,12 +315,12 @@
 					
 					var num = $(this).data('num');
 					
-					$(this).shorten({
+					/* $(this).shorten({
 						"showChars" : showChars,
 						"moreText"	: "Все (" + num + ")",
 						"lessText"	: "Свернуть",
 						"ellipsesText": ""
-					});
+					}); */
 						
 					if ( $(this).find('.shortcontent').length !== 0) {
 						replaceToI($(this).find('.shortcontent'));
@@ -330,30 +331,119 @@
 				});
 			});
 			
+			var short = (function(el, numChars) {
+				var content = el.text(),
+					countChars = 0,
+					str = '';
+				for (var i = 0; i <= numChars; i++) {
+					if (countChars <= numChars) {
+						str += content.charAt(i);
+						countChars++;
+					}
+				}
+				return str;
+			});
+			
+			var replaceToI = (function (el) {
+				var text = el.text().replace(/\ /g, '</i> <i>');
+				el.html('<i>' + text + '</i>');
+			});
+			
 			$(window).on('load', function() {
+				var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				var wrapAllcontent = (function(el){
+					el.wrapInner('<div class="allcontent"></div>');
+				});
+				
 				$('.js-short-text').each(function () {
-					var number = $(this).text().split(' ').length;
+					const number = $(this).text().split(' ').length;
 					$(this).attr('data-num', number);
+					
+					wrapAllcontent($(this));
+					
+					var shortText,
+						allcontent = $(this).find('.allcontent');
+					if (winWidth > 991) {
+						shortText = short(allcontent, 31);
+					} else if (winWidth < 992 && winWidth > 767){
+						shortText = short(allcontent, 20);
+					} else {
+						shortText = short(allcontent, 42);
+					}
+					$(this).prepend('<div class="shortcontent">' + shortText + '</div>');
+				
+					replaceToI($(this).find('.shortcontent'));
+					replaceToI($(this).find('.allcontent'));
 				});
 			});
 			
 			$(window).on('load resize', function() {
 				var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-				if (winWidth > 991) {
-					shortenText(32);
-				} else if (winWidth < 992 && winWidth > 767){
-					shortenText(21);
-				} else {
-					shortenText(43);
-				}
-			}); 
-			
-			//чтобы заново запустился скрипт shorten и текст смотрелся хорошо
-			$(window).on('resize', function() {
-				window.location.reload();
+				var appendOrRefreshLink = (function(el, num) {
+					if (el.has('.morelink').length) {
+						el.find('.morelink').html('Все (' + num + ')');
+					} else {
+						el.append('<a href="javascript: void(0);" class="morelink">Все (' + num + ')</a>');
+					}
+				});
+				var addOrDeleteLink = (function(el, num, min){
+					if (num > min) {
+						appendOrRefreshLink(el, num);
+					} else {
+						el.find('.morelink').remove();
+					}
+				});
+				var checkShortContent = (function(el, num) {
+					var curShort = el.find('.shortcontent').children('i').length;
+					var curAll = el.find('.allcontent').children('i').length;
+					if (curShort > num || (curShort < num && curAll > num)) refreshShortContent(el, num);
+				});
+				var refreshShortContent = (function(el, num) {
+					el.find('.shortcontent').find('i').remove();
+					var children = el.find('.allcontent').find('i');
+					console.log(el.find('.allcontent').find('i').length);
+					for (var i = 0; i < num; i++) {
+						$(children[i]).clone().appendTo(el.find('.shortcontent'));
+					}
+					console.log(el.find('.allcontent').find('i').length);
+				});
+				
+				$('.js-short-text').each(function () {
+					var number = $(this).data('num');
+					
+					if (winWidth > 991) {
+						addOrDeleteLink($(this), number, 3);
+						checkShortContent($(this), 3);
+					} else if (winWidth < 992 && winWidth > 767){
+						addOrDeleteLink($(this), number, 2);
+						checkShortContent($(this), 2);
+					} else {
+						addOrDeleteLink($(this), number, 4);
+						checkShortContent($(this), 4);
+					}
+					
+				});
+				
 			});
 			
-        });
+			$(document).on({click: function() {
+					if ($(this).hasClass('less')) {
+						$(this).removeClass('less');
+						var num = $(this).parent().data('num');
+						$(this).html('Все (' + num + ')'); //Заменить на 'Все (' + num + ')'
+						$(this).prev().hide();
+						$(this).prev().prev().show();
+					} else {
+						$(this).addClass('less');
+						$(this).html('Свернуть');
+						$(this).prev().prev().hide();
+						$(this).prev().show('middle');
+					}
+					return false;
+				}
+			}, '.morelink');
+				
+			});
     </script>
 
 </body>
