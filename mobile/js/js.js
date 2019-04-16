@@ -246,6 +246,18 @@ function initDateRangePicker(dateSelector, onSelected) {
     });
 }
 
+// timepicker
+function initTimePicker(dateSelector, onSelected) {
+    $(dateSelector).datetimepicker({
+		language: 'ru',
+		format: 'LT',
+		pickDate: false
+	});
+    $(dateSelector).on('dp.show', function(e) {
+        $(dateSelector).closest('li').addClass('active');
+    });
+}
+
 function initToggleFilters(lnk, single) {
     var li = lnk.parent();
     var is_active = li.hasClass('active');
