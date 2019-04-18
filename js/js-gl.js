@@ -275,6 +275,30 @@ function setHeightCellMobile(table, h) {
 		th.css('height', h[key]);
 	});
 }
+var resetDefaultHeightTR = function(table) {
+	table.find('thead > tr > th.js-cell-mobile').each(function(key, value) {
+		$(value).removeAttr('style');
+	});
+	var tr, td, td_h;
+	table.find('tbody > tr').each(function(key, value) {
+		tr = $(value);
+		tr.removeAttr('style');
+		tr.find('td.js-cell-mobile').each(function(key, value) {
+			td = $(value)
+			td.removeAttr('style');
+		});
+	});
+}
+function setHeightCellReverse(table, h) {
+	var tr, td, th;
+	table.find('tbody > tr.js-row').each(function(key, value) {
+		tr = $(value).css('height', h[key]);
+	});
+	table.find('thead > tr > th.js-cell-mobile').each(function(key, value) {
+		th = $(value);
+		th.css('height', h[key]);
+	});
+}
 
 // Вызов скролла внутри модалки
 $('#modalLaw, #modalRoleFines').on('shown.bs.modal', function (e) {
