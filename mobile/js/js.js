@@ -46,7 +46,7 @@ function initFiltersSwipers() {
 
 // инициализация модального окна для сотрудников
 function initModalEmpl() {
-	$('.js-empl-list .item').click(function() {
+	$('.js-empl-list .empl-item').click(function() {
 		$('.modal-cc-empl').modal({
 			show: 'true'
 		}); 
