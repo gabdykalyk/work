@@ -719,82 +719,7 @@
                 showOrHideBlock(order, 'order', now);
 			});
 			
-			$(document).on('change', '.js-select-period', function() {
-				var select = $(this),
-					now = select.val(),
-					block = select.closest('.js-time-row'),
-					dates = block.find('.js-dates-block'),
-					period = block.find('.js-period-block'),
-					weekdays = block.find('.js-weekdays-block'),
-					day_of_month = block.find('.js-day-of-month-group'),
-					period_of_month = block.find('.js-period-of-month-group'),
-					timepicker = block.find('.js-timepicker-block'),
-					repeat = block.find('.js-repeat-block'),
-					clearfix = block.find('.js-clearfix-before-btn');
-					
-				switch(now) {
-					case 'dates':
-						dates.show();
-						period.hide();
-						weekdays.hide();
-						day_of_month.hide();
-						period_of_month.hide();
-						timepicker.hide();
-						repeat.hide();
-						clearfix.hide();
-						break;
-					case 'period':
-						dates.hide();
-						period.show();
-						weekdays.hide();
-						day_of_month.hide();
-						period_of_month.hide();
-						timepicker.hide();
-						repeat.hide();
-						clearfix.hide();
-						break;
-					case 'weekday':
-						dates.hide();
-						period.hide();
-						weekdays.show();
-						day_of_month.hide();
-						period_of_month.hide();
-						timepicker.show();
-						repeat.show();
-						clearfix.hide();
-						break;
-					case 'odd-days':
-						dates.hide();
-						period.hide();
-						weekdays.hide();
-						day_of_month.hide();
-						period_of_month.hide();
-						timepicker.show();
-						repeat.show();
-						clearfix.hide();
-						break;
-					case 'day-of-month':
-						weekdays.hide();
-						period.hide();
-						dates.hide();
-						day_of_month.show();
-						period_of_month.hide();
-						timepicker.show();
-						repeat.show();
-						clearfix.hide();
-						break;
-					case 'period-of-month':
-						dates.hide();
-						period.hide();
-						weekdays.hide();
-						day_of_month.hide();
-						period_of_month.show();
-						timepicker.show();
-						repeat.show();
-						clearfix.show();
-						break;
-				}
-			});
+
  
             $(document).on('change', '.js-select-repeat', function() {
                 var select = $(this),
@@ -808,13 +733,15 @@
                     num_repeats.hide();
                 }
             });
-            
+			
             var editDates = (function() {
                 var me = {};
                 me.blockEdit = $('.js-dates-row-block');
                 me.init = function() {
-                    me.blockEdit.on('click', '.jsAddNewDate', me.addNewDate);
-                    me.blockEdit.on('click', '.jsRemoveDate', me.removeDate);
+					$(document).on('click', '.jsAddNewDate', me.addNewDate);
+					$(document).on('click', '.jsRemoveDate', me.removeDate);					
+                    //me.blockEdit.on('click', '.jsAddNewDate', me.addNewDate);
+                    //me.blockEdit.on('click', '.jsRemoveDate', me.removeDate);
                 }
                 me.addNewDate = function() {
                     var parent = $(this).closest('.js-dates-row-block'),
@@ -1052,6 +979,85 @@
                 }
                 return me;
             }());
+			
+			$(document).on('change', '.js-select-period', function() {
+				var select = $(this),
+					now = select.val(),
+					block = select.closest('.js-time-row'),
+					dates = block.find('.js-dates-block'),
+					period = block.find('.js-period-block'),
+					weekdays = block.find('.js-weekdays-block'),
+					day_of_month = block.find('.js-day-of-month-group'),
+					period_of_month = block.find('.js-period-of-month-group'),
+					timepicker = block.find('.js-timepicker-block'),
+					repeat = block.find('.js-repeat-block'),
+					clearfix = block.find('.js-clearfix-before-btn');
+					
+				switch(now) {
+					case 'dates':
+						dates.show();
+						period.hide();
+						weekdays.hide();
+						day_of_month.hide();
+						period_of_month.hide();
+						timepicker.hide();
+						repeat.hide();
+						clearfix.hide();
+						break;
+					case 'period':
+						dates.hide();
+						period.show();
+						weekdays.hide();
+						day_of_month.hide();
+						period_of_month.hide();
+						timepicker.hide();
+						repeat.hide();
+						clearfix.hide();
+						break;
+					case 'weekday':
+						dates.hide();
+						period.hide();
+						weekdays.show();
+						day_of_month.hide();
+						period_of_month.hide();
+						timepicker.show();
+						repeat.show();
+						clearfix.hide();
+						break;
+					case 'odd-days':
+						dates.hide();
+						period.hide();
+						weekdays.hide();
+						day_of_month.hide();
+						period_of_month.hide();
+						timepicker.show();
+						repeat.show();
+						clearfix.hide();
+						break;
+					case 'day-of-month':
+						weekdays.hide();
+						period.hide();
+						dates.hide();
+						day_of_month.show();
+						period_of_month.hide();
+						timepicker.show();
+						repeat.show();
+						clearfix.hide();
+						break;
+					case 'period-of-month':
+						dates.hide();
+						period.hide();
+						weekdays.hide();
+						day_of_month.hide();
+						period_of_month.show();
+						timepicker.show();
+						repeat.show();
+						clearfix.show();
+						break;
+				}
+				
+				
+			});			
 
             // если на странице есть нужный селектор, запускать функцию
             document.querySelector('.js-dates-row-block') && editDates.init();
