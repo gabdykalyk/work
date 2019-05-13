@@ -35,6 +35,27 @@ function initNavbar() {
 			}
 		}
 	});
+
+	$("[data-toggle=popover]").each(function (i, obj) {
+		var id = $(this).attr('id');
+
+		$(this).popover({
+			html: true,
+			content: function () {
+				return $('#popover-content-' + id).html();
+			},
+			template: '<div class="popover popover-' + id +
+				'" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>'
+		});
+
+		$(this).on('shown.bs.popover', function (e) {
+			$('.scrollbar-inner').scrollbar();
+		});
+
+		$(this).on('hidden.bs.popover', function (e) {
+			$('.scrollbar-inner').scrollbar('destroy');
+		});
+	});
 }
 
 function switchPayments(lnk) {
