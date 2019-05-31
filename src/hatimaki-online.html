@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Онлайн мониторинг</title>
+    <!-- Bootstrap -->
+    <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="fonts/fontawesome-pro-5.1.0-web/css/all.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link href="fonts/open-sans.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
+
+    <link href="css/styles.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <nav class="navbar navbar-fixed-top navbar-lk">
+        <div class="container-fluid">
+            <div class="navbar-collapse collapse" id="navbar-collapse-block">
+                <ul class="nav navbar-nav navbar-nav-main">
+                    <li class="item-menu-manper active"><a href="#">Расчёты<span class="count">1</span></a></li>
+                    <li class="item-menu-messages"><a href="#">Новый расчёт<span class="count">5</span></a></li>
+                    <li class="item-menu-alerts"><a href="#">Штрафы/Премии<span class="count">2</span></a></li>
+                    <li class="item-menu-schedule"><a href="#">Приказы/Инструкции</a></li>
+                    <li class="item-menu-index"><a href="#">Кадры<span class="count">3</span></a></li>
+                    <li class="item-menu-docs"><a href="#">Отчёты<span class="count">1</span></a></li>
+                    <li class="item-menu-discus"><a href="#">Обсуждения<span class="count">4</span></a></li>
+                    <li class="item-menu-complaints"><a href="#">Жалобы и предложения<span class="count">1</span></a></li>
+                    <li class="item-menu-friends"><a href="#">Друзья</a></li>
+                    <li class="item-menu-groups"><a href="#">Группы</a></li>
+                    <li class="item-menu-settings"><a href="#">Настройки</a></li>
+                    <li class="item-menu-help"><a href="#">Помощь</a></li>
+                </ul>
+            </div>
+            <button type="button" class="navbar-toggle collapsed" id="navbar-toggle">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <i class="fa fa-chevron-left" aria-hidden="true"></i>
+            </button>
+            <div class="navbar-right navbar-login">
+                <a href="#" class="btn"><span>Александр Константиновский</span> <i class="fa fa-sign-out hidden-sm hidden-xs" aria-hidden="true"></i></a>
+            </div>
+            <ul class="nav navbar-nav navbar-right navbar-nav-social">
+                <li><a href="#" title="Вконтакте"><i class="fab fa-vk" aria-hidden="true"></i></a></li>
+                <li><a href="#" title="Есть непросмотренные сообщения"><i class="fa fa-envelope" aria-hidden="true"></i><span class="badge"></span></a></li>
+                <li class="item-bell" title="Есть непросмотренные уведомления"><a href="#"><i class="fa fa-bell" aria-hidden="true"></i><span class="badge"></span></a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    
+    <div class="container-fluid content">
+        <h1>Онлайн мониторинг</h1>
+
+        <!-- begin: Form -->
+        <form action="" method="post" class="form-online clearfix">
+            <div class="form-group">
+                <label for="filiation-field">Филиал</label>
+                <select name="filiation" id="filiation-field" class="form-control">
+                    <option value="0">Без филиала</option>
+                    <option value="1">Бутово</option>
+                    <option value="2" selected>Коммунарка</option>
+                    <option value="3">Московский</option>
+                    <option value="4">Подольск</option>
+                    <option value="5">Щербинка</option>
+                    <option value="6">Ясенево</option>
+                </select>
+            </div>
+            <div class="form-group form-group-datepicker">
+                <label for="date-field">На дату</label>
+                <div class="input-group datepicker">
+                    <input type="text" class="form-control" name="date" id="date-field" placeholder="00.00.0000" maxlength="10" value="15.02.2018">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                    </span>
+                </div>
+            </div>
+            <div class="form-btns">
+                <button type="submit" class="btn btn-primary">Показать</button>
+            </div>
+        </form>
+        <!-- end: Form -->
+        
+        <!-- begin: Table -->
+        <div class="table-responsive-wrapper">
+            <div class="table-responsive2">
+                <table class="table table-filiation table-online-late-report">
+                    <thead>
+                        <tr>
+                            <th class="cell-head cell-head-posts"><div class="cell-head_name">Должность</div></th>
+                            <th class="cell-head cell-head-type"><div class="cell-head_name">Тип</div></th>
+                            <th class="cell-head cell-head-load"><div class="cell-head_name">Нагрузка</div></th>
+                            <th class="cell-head cell-align-center cell-head-standard"><div class="cell-head_name">Норматив выработки,&nbsp;%</div></th>
+                            <th class="cell-head cell-align-center cell-head-lateness" colspan="3"><div class="cell-head_name">Опоздания</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Администратор филиала</td>
+                            <td>Выручка</td>
+                            <td class="cell-price">91 649 <i class="far fa-ruble-sign"></i></td>
+                            <td class="cell-standard good1">50%</td>
+                            <td colspan="3">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>Повар-пиццмейкер</td>
+                            <td>Выручка</td>
+                            <td class="cell-price">28 шт.</td>
+                            <td class="cell-standard good1">47%</td>
+                            <td class="cell-lateness bad1">2</td>
+                            <td class="cell-lateness bad2">3</td>
+                            <td class="cell-lateness bad3">7</td>
+                        </tr>
+                        <tr>
+                            <td>Повар-сушист</td>
+                            <td>Пиццы</td>
+                            <td class="cell-price">77 000 <i class="far fa-ruble-sign"></i></td>
+                            <td class="cell-standard good1">52%</td>
+                            <td class="cell-lateness bad1">11</td>
+                            <td class="cell-lateness bad2">2</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>Водители</td>
+                            <td>Цена заказа</td>
+                            <td class="cell-price">124,5 <i class="far fa-ruble-sign"></i></td>
+                            <td class="cell-standard good1">49%</td>
+                            <td class="cell-lateness bad1">6</td>
+                            <td class="cell-lateness bad2">11</td>
+                            <td class="cell-lateness bad3">11</td>
+                        </tr>
+                        <tr>
+                            <td class="cell-gray">Итого</td>
+                            <td class="cell-gray">&nbsp;</td>
+                            <td class="cell-price cell-gray">91 649 <i class="far fa-ruble-sign"></i></td>
+                            <td class="cell-standard good1">49%</td>
+                            <td class="cell-lateness bad1">19</td>
+                            <td class="cell-lateness bad2">16</td>
+                            <td class="cell-lateness bad3">18</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- end: Table -->
+
+        <!-- beg: Buttons group for screen < 768 -->
+        <div class="btn-group btn-group-radio btn-group-late btn-group-online-late hidden-lg hidden-md hidden-sm" role="group">
+            <button type="button" class="btn btn-default btn-sushi active" data-label="sushi"></button>
+            <button type="button" class="btn btn-default btn-driver" data-label="driver"></button>
+            <button type="button" class="btn btn-default btn-pizza" data-label="pizza"></button>
+            <button type="button" class="btn btn-default btn-card" data-label="card"></button>
+        </div>
+        <!-- end: Buttons group -->
+
+        <!-- beg: Table of late -->
+        <div class="table-responsive-wrapper table-responsive-wrapper-late table-responsive-wrapper-sushi" id="table-responsive-late">
+            <div class="table-responsive2">
+                <table class="table table-online-late">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Время</th>
+                            <th colspan="5" class="load-delayed">Повар-сушист</th>
+                            <th colspan="5" class="load-delayed">Водитель</th>
+                            <th colspan="5" class="load-delayed">Повар-пиццемейкер</th>
+                            <th colspan="4" class="load-delayed">БЕЗНАЛ</th>
+                        </tr>
+
+                        <tr>
+                            <th class="cell-head cell-head-time"><div class="cell-head_name">Время</div></th>
+                            <th class="cell-head cell-head-load load-delayed cell-sushi"><div class="cell-head_name">Нагрузка</div></th>
+                            <th class="cell-head cell-head-receipts cell-sushi"><div class="cell-head_name">Выручка</div></th>
+                            <th class="cell-head cell-head-late cell-sushi"><div class="cell-head_name">&lt;5</div></th>
+                            <th class="cell-head cell-head-late cell-sushi"><div class="cell-head_name">5-10</div></th>
+                            <th class="cell-head cell-head-late cell-sushi"><div class="cell-head_name">&gt;10</div></th>
+                            <th class="cell-head cell-head-load load-delayed cell-driver"><div class="cell-head_name">Нагрузка</div></th>
+                            <th class="cell-head cell-head-orders cell-driver"><div class="cell-head_name"><span>Кол-во</span> <span>заказов</span></div></th>
+                            <th class="cell-head cell-head-late cell-driver"><div class="cell-head_name">&lt;5</div></th>
+                            <th class="cell-head cell-head-late cell-driver"><div class="cell-head_name">5-10</div></th>
+                            <th class="cell-head cell-head-late cell-driver"><div class="cell-head_name">&gt;10</div></th>
+                            <th class="cell-head cell-head-load load-delayed cell-pizza"><div class="cell-head_name">Нагрузка</div></th>
+                            <th class="cell-head cell-head-orders cell-pizza"><div class="cell-head_name"><span>Кол-во</span> <span>пицц</span></div></th>
+                            <th class="cell-head cell-head-late cell-pizza"><div class="cell-head_name">&lt;5</div></th>
+                            <th class="cell-head cell-head-late cell-pizza"><div class="cell-head_name">5-10</div></th>
+                            <th class="cell-head cell-head-late cell-pizza"><div class="cell-head_name">&gt;10</div></th>
+                            <th class="cell-head cell-head-load load-delayed cell-card"><div class="cell-head_name">Нагрузка</div></th>
+                            <th class="cell-head cell-head-late cell-card"><div class="cell-head_name">&lt;5</div></th>
+                            <th class="cell-head cell-head-late cell-card"><div class="cell-head_name">5-10</div></th>
+                            <th class="cell-head cell-head-late cell-card"><div class="cell-head_name">&gt;10</div></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <td class="cell-time">&lt;12</td>
+                            <td class="load-delayed cell-sushi">1.0</td>
+                            <td class="cell-sushi">4624</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">1.0</td>
+                            <td class="cell-driver">2</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">1.0</td>
+                            <td class="cell-pizza">2</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">1.0</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">12-13</td>
+                            <td class="load-delayed cell-sushi">0.7</td>
+                            <td class="cell-sushi">3078</td>
+                            <td class="bad1 cell-sushi cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">0.7</td>
+                            <td class="cell-driver">5</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">0.7</td>
+                            <td class="cell-pizza">5</td>
+                            <td class="bad1 cell-pizza cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">0.7</td>
+                            <td class="bad1 cell-card cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">13-14</td>
+                            <td class="load-delayed cell-sushi">0.8</td>
+                            <td class="cell-sushi">5082</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="bad2 cell-sushi cell-lateness js-show-modal-late">4</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">0.8</td>
+                            <td class="cell-driver">6</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">0.8</td>
+                            <td class="cell-pizza">6</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">0.8</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="bad2 cell-card cell-lateness js-show-modal-late">4</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">14-15</td>
+                            <td class="load-delayed cell-sushi">1.2</td>
+                            <td class="cell-sushi">6347</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="bad3 cell-sushi cell-lateness js-show-modal-late">1</td>
+                            <td class="load-delayed cell-driver">1.2</td>
+                            <td class="cell-driver">5</td>
+                            <td class="bad1 cell-driver cell-lateness js-show-modal-late">3</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">1.2</td>
+                            <td class="cell-pizza">5</td>
+                            <td class="cell-pizza bad1 cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">1.2</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card bad3 cell-lateness js-show-modal-late">1</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">15-16</td>
+                            <td class="load-delayed cell-sushi">1.0</td>
+                            <td class="cell-sushi">3678</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="bad3 cell-sushi cell-lateness js-show-modal-late">2</td>
+                            <td class="load-delayed cell-driver">1.0</td>
+                            <td class="cell-driver">8</td>
+                            <td class="bad1 cell-driver cell-lateness js-show-modal-late">2</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="bad3 cell-driver cell-lateness js-show-modal-late">1</td>
+                            <td class="load-delayed cell-pizza">1.0</td>
+                            <td class="cell-pizza">8</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">1.0</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card bad3 cell-lateness js-show-modal-late">2</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">16-17</td>
+                            <td class="load-delayed cell-sushi">0.7</td>
+                            <td class="cell-sushi">4919</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">0.7</td>
+                            <td class="cell-driver">7</td>
+                            <td class="bad1 cell-driver cell-lateness js-show-modal-late">3</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">0.7</td>
+                            <td class="cell-pizza">7</td>
+                            <td class="cell-pizza bad1 cell-lateness js-show-modal-late">2</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">0.7</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">17-18</td>
+                            <td class="load-delayed cell-sushi">0.8</td>
+                            <td class="cell-sushi">4210</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">0.8</td>
+                            <td class="cell-driver">8</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver bad2 cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">0.8</td>
+                            <td class="cell-pizza">8</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">0.8</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">18-19</td>
+                            <td class="load-delayed cell-sushi">1.2</td>
+                            <td class="cell-sushi">7037</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">1.2</td>
+                            <td class="cell-driver">10</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver bad3 cell-lateness js-show-modal-late">1</td>
+                            <td class="load-delayed cell-pizza">1.2</td>
+                            <td class="cell-pizza">10</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza bad3 cell-lateness js-show-modal-late">1</td>
+                            <td class="load-delayed cell-card">1.2</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">19-20</td>
+                            <td class="load-delayed cell-sushi">1.0</td>
+                            <td class="cell-sushi">10 540</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">1.0</td>
+                            <td class="cell-driver">4</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">1.0</td>
+                            <td class="cell-pizza">4</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza bad2 cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">1.0</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">20-21</td>
+                            <td class="load-delayed cell-sushi">0.7</td>
+                            <td class="cell-sushi">4412</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">0.7</td>
+                            <td class="cell-driver">3</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">0.7</td>
+                            <td class="cell-pizza">3</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">0.7</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">21-22</td>
+                            <td class="load-delayed cell-sushi">0.8</td>
+                            <td class="cell-sushi">4864</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">0.8</td>
+                            <td class="cell-driver">2</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">0.8</td>
+                            <td class="cell-pizza">2</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">0.8</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">22-23</td>
+                            <td class="load-delayed cell-sushi">1.2</td>
+                            <td class="cell-sushi">8065</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">1.2</td>
+                            <td class="cell-driver">0</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">1.2</td>
+                            <td class="cell-pizza">0</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">1.2</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time">&gt;23</td>
+                            <td class="load-delayed cell-sushi">1.0</td>
+                            <td class="cell-sushi">0</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="cell-sushi cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-driver">1.0</td>
+                            <td class="cell-driver">0</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="cell-driver cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-pizza">1.0</td>
+                            <td class="cell-pizza">0</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="cell-pizza cell-lateness">&nbsp;</td>
+                            <td class="load-delayed cell-card">1.0</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                            <td class="cell-card cell-lateness">&nbsp;</td>
+                        </tr>
+
+                        <tr>
+                            <td class="cell-time cell-sum">&nbsp;</td>
+                            <td class="load-delayed cell-sushi cell-sum">0.9</td>
+                            <td class="cell-sushi cell-sum">66 856</td>
+                            <td class="cell-sushi cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-sushi cell-lateness js-show-modal-late">4</td>
+                            <td class="cell-sushi cell-lateness js-show-modal-late">3</td>
+                            <td class="load-delayed cell-driver cell-sum">0.9</td>
+                            <td class="cell-driver cell-sum">60</td>
+                            <td class="cell-driver cell-lateness js-show-modal-late">8</td>
+                            <td class="cell-driver cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-driver cell-lateness js-show-modal-late">2</td>
+                            <td class="load-delayed cell-pizza cell-sum">0.9</td>
+                            <td class="cell-pizza cell-sum">60</td>
+                            <td class="cell-pizza cell-lateness js-show-modal-late">3</td>
+                            <td class="cell-pizza cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-pizza cell-lateness js-show-modal-late">1</td>
+                            <td class="load-delayed cell-card cell-sum">0.9</td>
+                            <td class="cell-card cell-lateness js-show-modal-late">1</td>
+                            <td class="cell-card cell-lateness js-show-modal-late">4</td>
+                            <td class="cell-card cell-lateness js-show-modal-late">3</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- beg: Time Line for Table, for 768px <= screen <= 992px -->
+            <div class="table-online-late_timeline visible-sm">
+                <div class="item-elem">Время</div>
+                <div class="item-elem">&lt;12</div>
+                <div class="item-elem">12-13</div>
+                <div class="item-elem">13-14</div>
+                <div class="item-elem">14-15</div>
+                <div class="item-elem">15-16</div>
+                <div class="item-elem">16-17</div>
+                <div class="item-elem">17-18</div>
+                <div class="item-elem">18-19</div>
+                <div class="item-elem">19-20</div>
+                <div class="item-elem">20-21</div>
+                <div class="item-elem">21-22</div>
+                <div class="item-elem">22-23</div>
+                <div class="item-elem">&gt;23</div>
+                <div class="item-elem">&nbsp;</div>
+            </div>
+            <!-- end: Time Line for Table -->
+
+        </div>
+        <!-- end: Table of late -->
+    </div>
+
+
+    <!-- beg: Modal Late -->
+    <div class="modal fade modal-detail-late" tabindex="-1" role="dialog" id="modalDetailLate">
+        <div class="modal-dialog modal-dialog-gl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Заказы за 12:00 &mdash; 13:00 15.02.2018</h4>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="table-responsive">
+                        <table class="table table-detail-late">
+                            <thead>
+                                <tr>
+                                    <th class="cell-head-number">№ заказа</th>
+                                    <th class="cell-align-center">Старт обработки</th>
+                                    <th class="cell-align-center">Завершение обработки</th>
+                                    <th class="cell-align-center">Сумма заказа</th>
+                                    <th>Обработал</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="cell-number">252126</td>
+                                    <td class="cell-time-start cell-align-center">12:35 <span class="time-end">/ 12:59</span></td>
+                                    <td class="cell-align-center hidden-xs">12:59</td>
+                                    <td class="cell-sum cell-align-center">2000 <i class="fas fa-ruble-sign"></i></td>
+                                    <td class="cell-name">Константинопольский Анатолий</td>
+                                    <td class="cell-btn">
+                                        <button type="button" class="btn btn-link btn-detail-order" data-label="order1"></button>
+                                    </td>
+                                </tr>
+                                <!-- beg: row detail -->
+                                <tr class="row-detail-order order1">
+                                    <td colspan="6">
+
+                                        <div class="clearfix head-detail-order">
+                                            <h3>Состав заказа</h3>
+                                            <div class="head-detail-order_sum">590 <i class="fas fa-ruble-sign"></i></div>
+                                        </div>
+                                        
+                                        <table class="table table-detail-order">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Ролл Аляска</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">200 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ролл Эби Темпура</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">190 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Жареный тофу с курицей и овощами с соусом терияки</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">200 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                        <h3>История изменения</h3>
+                                        <div class="row row-detail-order-history">
+                                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                                <table class="table table-detail-order-history">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Создан</td>
+                                                            <td class="cell-time">12:04</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Подтвержден</td>
+                                                            <td class="cell-time">12:05</td>
+                                                        </tr>
+                                                        <tr class="bad1">
+                                                            <td>Приготовлен</td>
+                                                            <td class="cell-time">12:17</td>
+                                                        </tr>
+                                                        <tr class="bad1">
+                                                            <td>Отправлен</td>
+                                                            <td class="cell-time">12:19</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                                <div class="row row-detail-order-history">
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 order-detail-info">
+                                                        <strong>Оператор</strong>
+                                                        <div class="order-detail-info_cont">Кирилюк Сергей</div>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 order-detail-info">
+                                                        <strong>Водитель</strong>
+                                                        <div class="order-detail-info_cont">Константинопольский Евгений</div>
+                                                    </div>
+                                                    <div class="col-md-12 col-sm-12 col-xs-12 order-detail-info">
+                                                        <h3 class="hidden-xs">Доставка</h3>
+                                                        <div class="order-detail-info_cont"><strong>Время:</strong> 13:30 <span class="order-detail-info_date">15.02.2018</span></div>
+                                                        <div class="order-detail-info_cont"><strong>Опоздание:</strong> 10 мин.</div>
+                                                        <div class="order-detail-info_cont"><strong>Адрес:</strong> г. Москва, ул. Космонавтов, д. 26, кв. 159</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <!-- end: row detail -->
+                                
+                                <tr>
+                                    <td class="cell-number">252125</td>
+                                    <td class="cell-time-start cell-align-center">12:29 <span class="time-end">/ 12:44</span></td>
+                                    <td class="cell-align-center hidden-xs">12:44</td>
+                                    <td class="cell-sum cell-align-center">890 <i class="fas fa-ruble-sign"></i></td>
+                                    <td class="cell-name">Смирнова Евгения</td>
+                                    <td class="cell-btn">
+                                        <button type="button" class="btn btn-link btn-detail-order" data-label="order2"></button>
+                                    </td>
+                                </tr>
+                                <!-- beg: row detail -->
+                                <tr class="row-detail-order order2">
+                                    <td colspan="6">
+
+                                        <div class="clearfix head-detail-order">
+                                            <h3>Состав заказа</h3>
+                                            <div class="head-detail-order_sum">590 <i class="fas fa-ruble-sign"></i></div>
+                                        </div>
+                                        
+                                        <table class="table table-detail-order">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Ролл Аляска</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">200 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ролл Эби Темпура</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">190 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Жареный тофу с курицей и овощами с соусом терияки</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">200 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                        <h3>История изменения</h3>
+                                        <div class="row row-detail-order-history">
+                                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                                <table class="table table-detail-order-history">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Создан</td>
+                                                            <td class="cell-time">12:04</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Подтвержден</td>
+                                                            <td class="cell-time">12:05</td>
+                                                        </tr>
+                                                        <tr class="bad1">
+                                                            <td>Приготовлен</td>
+                                                            <td class="cell-time">12:17</td>
+                                                        </tr>
+                                                        <tr class="bad1">
+                                                            <td>Отправлен</td>
+                                                            <td class="cell-time">12:19</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                                <div class="row row-detail-order-history">
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 order-detail-info">
+                                                        <strong>Оператор</strong>
+                                                        <div class="order-detail-info_cont">Кирилюк Сергей</div>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 order-detail-info">
+                                                        <strong>Водитель</strong>
+                                                        <div class="order-detail-info_cont">Константинопольский Евгений</div>
+                                                    </div>
+                                                    <div class="col-md-12 col-sm-12 col-xs-12 order-detail-info">
+                                                        <h3 class="hidden-xs">Доставка</h3>
+                                                        <div class="order-detail-info_cont"><strong>Время:</strong> 13:30 <span class="order-detail-info_date">15.02.2018</span></div>
+                                                        <div class="order-detail-info_cont"><strong>Опоздание:</strong> 10 мин.</div>
+                                                        <div class="order-detail-info_cont"><strong>Адрес:</strong> г. Москва, ул. Космонавтов, д. 26, кв. 159</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <!-- end: row detail -->
+                                
+                                <tr>
+                                    <td class="cell-number">252124</td>
+                                    <td class="cell-time-start cell-align-center">12:17 <span class="time-end">/ 12:36</span></td>
+                                    <td class="cell-align-center hidden-xs">12:36</td>
+                                    <td class="cell-sum cell-align-center">550 <i class="fas fa-ruble-sign"></i></td>
+                                    <td class="cell-name">Загайная Светлана</td>
+                                    <td class="cell-btn">
+                                        <button type="button" class="btn btn-link btn-detail-order" data-label="order3"></button>
+                                    </td>
+                                </tr>
+                                <!-- beg: row detail -->
+                                <tr class="row-detail-order order3">
+                                    <td colspan="6">
+
+                                        <div class="clearfix head-detail-order">
+                                            <h3>Состав заказа</h3>
+                                            <div class="head-detail-order_sum">590 <i class="fas fa-ruble-sign"></i></div>
+                                        </div>
+                                        
+                                        <table class="table table-detail-order">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Ролл Аляска</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">200 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ролл Эби Темпура</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">190 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Жареный тофу с курицей и овощами с соусом терияки</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">200 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                        <h3>История изменения</h3>
+                                        <div class="row row-detail-order-history">
+                                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                                <table class="table table-detail-order-history">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Создан</td>
+                                                            <td class="cell-time">12:04</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Подтвержден</td>
+                                                            <td class="cell-time">12:05</td>
+                                                        </tr>
+                                                        <tr class="bad1">
+                                                            <td>Приготовлен</td>
+                                                            <td class="cell-time">12:17</td>
+                                                        </tr>
+                                                        <tr class="bad1">
+                                                            <td>Отправлен</td>
+                                                            <td class="cell-time">12:19</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                                <div class="row row-detail-order-history">
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 order-detail-info">
+                                                        <strong>Оператор</strong>
+                                                        <div class="order-detail-info_cont">Кирилюк Сергей</div>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 order-detail-info">
+                                                        <strong>Водитель</strong>
+                                                        <div class="order-detail-info_cont">Константинопольский Евгений</div>
+                                                    </div>
+                                                    <div class="col-md-12 col-sm-12 col-xs-12 order-detail-info">
+                                                        <h3 class="hidden-xs">Доставка</h3>
+                                                        <div class="order-detail-info_cont"><strong>Время:</strong> 13:30 <span class="order-detail-info_date">15.02.2018</span></div>
+                                                        <div class="order-detail-info_cont"><strong>Опоздание:</strong> 10 мин.</div>
+                                                        <div class="order-detail-info_cont"><strong>Адрес:</strong> г. Москва, ул. Космонавтов, д. 26, кв. 159</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <!-- end: row detail -->
+
+                                <tr>
+                                    <td class="cell-number">252123</td>
+                                    <td class="cell-time-start cell-align-center">12:04 <span class="time-end">/ 12:19</span></td>
+                                    <td class="cell-align-center hidden-xs">12:19</td>
+                                    <td class="cell-sum cell-align-center">590 <i class="fas fa-ruble-sign"></i></td>
+                                    <td class="cell-name">Кирилюк Сергей</td>
+                                    <td class="cell-btn">
+                                        <button type="button" class="btn btn-link btn-detail-order" data-label="order4"></button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- beg: row detail -->
+                                <tr class="row-detail-order order4">
+                                    <td colspan="6">
+
+                                        <div class="clearfix head-detail-order">
+                                            <h3>Состав заказа</h3>
+                                            <div class="head-detail-order_sum">590 <i class="fas fa-ruble-sign"></i></div>
+                                        </div>
+                                        
+                                        <table class="table table-detail-order">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Ролл Аляска</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">200 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ролл Эби Темпура</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">190 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Жареный тофу с курицей и овощами с соусом терияки</td>
+                                                    <td class="cell-count">1 шт.</td>
+                                                    <td class="cell-price">200 <i class="fas fa-ruble-sign"></i></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                        <h3>История изменения</h3>
+                                        <div class="row row-detail-order-history">
+                                            <div class="col-md-3 col-sm-3 col-xs-12">
+                                                <table class="table table-detail-order-history">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>Создан</td>
+                                                            <td class="cell-time">12:04</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>Подтвержден</td>
+                                                            <td class="cell-time">12:05</td>
+                                                        </tr>
+                                                        <tr class="bad1">
+                                                            <td>Приготовлен</td>
+                                                            <td class="cell-time">12:17</td>
+                                                        </tr>
+                                                        <tr class="bad1">
+                                                            <td>Отправлен</td>
+                                                            <td class="cell-time">12:19</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-9 col-sm-9 col-xs-12">
+                                                <div class="row row-detail-order-history">
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 order-detail-info">
+                                                        <strong>Оператор</strong>
+                                                        <div class="order-detail-info_cont">Кирилюк Сергей</div>
+                                                    </div>
+                                                    <div class="col-md-6 col-sm-6 col-xs-12 order-detail-info">
+                                                        <strong>Водитель</strong>
+                                                        <div class="order-detail-info_cont">Константинопольский Евгений</div>
+                                                    </div>
+                                                    <div class="col-md-12 col-sm-12 col-xs-12 order-detail-info">
+                                                        <h3 class="hidden-xs">Доставка</h3>
+                                                        <div class="order-detail-info_cont"><strong>Время:</strong> 13:30 <span class="order-detail-info_date">15.02.2018</span></div>
+                                                        <div class="order-detail-info_cont"><strong>Опоздание:</strong> 10 мин.</div>
+                                                        <div class="order-detail-info_cont"><strong>Адрес:</strong> г. Москва, ул. Космонавтов, д. 26, кв. 159</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <!-- end: row detail -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- end: Modal Late -->
+
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap DateTimepicker, https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+    <script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+
+    <!-- Select2, https://select2.org/getting-started/basic-usage -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+    $(function () {
+        $('.datepicker').datetimepicker({
+            dateFormat: 'dd.mm.yyyy',
+            language: 'ru',
+            pickTime: false
+        });
+
+        // функция при клике на кнопки должностей, которые появляются при ширине экрана < 992px
+        $('.btn-group-late .btn').click(function() {
+            var btn = $(this);
+            
+            var btns_group = btn.parent();
+            btns_group.find('.btn').removeClass('active');
+            btn.addClass('active');
+            
+            var active_class = ' table-responsive-wrapper-' + btn.attr('data-label');
+            var block_table = $('#table-responsive-late');
+
+            block_table.attr('class', 'table-responsive-wrapper table-responsive-wrapper-late' + active_class);
+        });
+
+        // вызов модального окна при клике на ячейку с классом .js-show-modal-late
+        $('.js-show-modal-late').click(function() {
+            $('#modalDetailLate').modal('show');
+        });
+        
+        // в модальном окне подробная информация о заказе
+        $('.table-detail-late .btn-detail-order').click(function() {
+            var btn = $(this);
+            var row = btn.parent().parent();
+            var table = $('.table-detail-late');
+            var order = btn.attr('data-label');
+            var detail = $('.table-detail-late .row-detail-order.' + order);
+
+            var is_show = btn.attr('class').indexOf('active');
+
+            if (is_show > -1) {
+                btn.removeClass('active');
+                row.removeClass('active');
+                table.find('.row-detail-order').hide();
+            } else {
+                $('.table-detail-late .btn-detail-order').removeClass('active');
+                $('.table-detail-late > tbody > tr').removeClass('active');
+                table.find('.row-detail-order').hide();
+
+                btn.addClass('active');
+                row.addClass('active');
+                detail.show();
+            }
+
+        });
+
+    });
+    </script>
+</body>
+</html>

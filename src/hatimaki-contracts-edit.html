@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Редактирование договора</title>
+    
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+
+<div class="container-fluid content">
+  <div class="clearfix head-with-btn resp">
+    <h1>Редактирование договора</h1>
+    <button class="btn btn-default btn-ugly">К списку договоров</button>
+  </div>
+
+  <form action="" method="post" class="form-respons form-contract">
+    <div class="row">
+
+      <div class="form-group col-md-3 col-sm-4 col-xs-12">
+        <label for="doctype">Тип документа</label>
+        <select class="form-control" name="doctype" id="doctype">
+          <option value="1">договор</option>
+          <option value="2">договор субподряда</option>
+        </select>
+      </div>
+
+      <div class="form-group dashreport-form-period col-md-3 col-sm-4 col-xs-12">
+        <label for="position">Должность для договора</label>
+        <select name="position" id="position">
+          <option value="1">директор</option>
+          <option value="2">председатель совета директоров</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="form-group dashreport-form-period col-md-3 col-sm-4 col-xs-12">
+        <label for="orgname_short">Краткое название организации</label>
+        <input type="text" class="form-control" name="orgname_short" id="orgname_short">
+      </div>
+
+      <div class="form-group dashreport-form-period col-md-6 col-sm-8 col-xs-12">
+        <label for="orgname">Полное название организации</label>
+        <textarea type="text" class="form-control orgname" name="orgname" id="orgname"></textarea>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-9 col-sm-12 col-xs-12">
+        <label for="requisites" class="visible-sm visible-md visible-lg">Реквизиты</label>
+        <div class="form-group visible-xs editor-shortcuts" data-editor="requisites">
+          <h5>Реквизиты</h5>
+          <a href="#">#KPP#</a> — КПП<br>
+          <a href="#">#BIK#</a> — БИК<br>
+          <a href="#">#ADDRESS#</a> — Юридический адрес<br>
+        </div>
+        <textarea class="form-control form-control-inp-text" name="requisites" id="requisites"></textarea>
+      </div>
+    </div>
+    <div class="form-group visible-sm visible-md visible-lg editor-shortcuts" data-editor="requisites">
+      <h5>Доступные поля</h5>
+      <a href="#">#KPP#</a> — КПП<br>
+      <a href="#">#BIK#</a> — БИК<br>
+      <a href="#">#ADDRESS#</a> — Юридический адрес<br>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-9 col-sm-12 col-xs-12">
+        <label for="contract" class="visible-sm visible-md visible-lg">Текст договора</label>
+        <div class="form-group visible-xs editor-shortcuts" data-editor="contract">
+          <h5>Текст договора</h5>
+          <a href="#">#ORDER_ID#</a> —ID в системе заказа Битрикс<br>
+          <a href="#">#ORDER_DATE#</a> — Дата и время заказа<br>
+          <a href="#">#PS_NAME#</a> — Тип оплаты<br>
+          <a href="#">#PHONE#</a> — Номер телефона клиента<br>
+          <a href="#">#ORDER_USER#</a> — Клиент<br>
+          <a href="#">#ADDRESS#</a> — Адрес<br>
+          <a href="#">#ZONE#</a> — Зона<br>
+          <a href="#">#COST#</a> — Стоимость<br>
+        </div>
+        <textarea class="form-control form-control-inp-text" name="contract" id="contract"></textarea>
+      </div>
+    </div>
+    <div class="form-group visible-sm visible-md visible-lg editor-shortcuts" data-editor="contract">
+      <h5>Доступные поля</h5>
+      <div class="row">
+        <div class="col-md-4 col-sm-6">
+          <a href="#">#ORDER_ID#</a> — ID в системе заказа Битрикс<br>
+          <a href="#">#ORDER_DATE#</a> — Дата и время заказа<br>
+          <a href="#">#PS_NAME#</a> — Тип оплаты<br>
+          <a href="#">#PHONE#</a> — Номер телефона клиента<br>
+        </div>
+        <div class="col-md-4 col-sm-6">
+          <a href="#">#ORDER_USER#</a> — Клиент<br>
+          <a href="#">#ADDRESS#</a> — Адрес<br>
+          <a href="#">#ZONE#</a> — Зона<br>
+          <a href="#">#COST#</a> — Стоимость<br>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="form-btns col-md-9 col-sm-12 col-xs-12">
+        <button type="button" class="btn btn-primary">Сохранить</button>
+      </div>
+    </div>
+  </form>
+
+</div>
+
+@@include('include/_js.html')
+
+<!-- editor, https://www.tinymce.com/docs/demo/full-featured/ -->
+<script type="text/javascript" src="js/tinymce/js/tinymce/tinymce.min.js"></script>
+
+<script type="text/javascript">
+    $(function () {
+        initNavbar();
+
+        // инициализация элементов формы
+        $('#position').select2({
+            placeholder: 'Должность для договора',
+            width: '100%'
+        });
+        tinymce.init({
+            selector: '#requisites',
+            statusbar: false,
+            height: 180
+        });
+        tinymce.init({
+            selector: '#contract',
+            statusbar: false,
+            height: 500
+        });
+
+        // вставка доступных полей в редактор
+        $('.editor-shortcuts').each(function(index, shortcuts){
+            var editorId = $(shortcuts).data("editor");
+            $(shortcuts).on("click", "a", function(e){
+                var editor = tinymce.get(editorId);
+				editor.focus();
+                editor.selection.setContent($(e.target).text());
+                editor.focus();
+                return false;
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Отработанные адреса по листовкам</title>
+    
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content leaflet">
+		<div class="clearfix head-with-btn resp">
+			<h1>Отработанные адреса по листовкам</h1>
+			<a href="#" class="btn btn-default btn-p25">К статистике листовок</a>
+		</div>
+		<hr class="hr-margin hr-xs-100 hidden-xs">
+		<form class="form-respons leaflet__form js-leaflet" action="" method="post" id="leaflet__form">
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-6 form-group">
+					<label for="city">Город</label>
+					<select class="form-control js-select2" name="city" id="city" tabindex="-1" aria-hidden="true">
+						<option value="1" selected="">Московский</option>
+						<option value="2">Москва</option>
+						<option value="3">Щербинка</option>
+					</select>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-6 form-group">
+					<label for="street">Улица</label>
+					<select class="form-control js-select2" name="street" id="street" tabindex="-1" aria-hidden="true">
+						<option value="1" selected="">Передельцевский просп.</option>
+						<option value="2">Атласова ул.</option>
+						<option value="3">Радужный пр.</option>
+					</select>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-9 leaflet__form-flex">
+					<div class="form-group">
+						<label for="house">Дом</label>
+						<input class="form-control" type="text" name="house" id="house" />
+					</div>
+					<div class="form-group">
+						<label for="building">Корп.</label>
+						<input class="form-control" type="text" name="building" id="building" />
+					</div>
+					<div class="form-group">
+						<label for="build">Стр.</label>
+						<input class="form-control" type="text" name="build" id="build" />
+					</div>
+					<div class="form-group">
+						<label for="floor">Этажей</label>
+						<input class="form-control" type="text" name="floor" id="floor" />
+					</div>
+					<div class="form-group">
+						<label for="entrance">Под.</label>
+						<input class="form-control js-entrance-input" type="text" name="entrance" id="entrance" />
+					</div>
+					<div class="form-group">
+						<label for="leaflets">Лист/эт.</label>
+						<input class="form-control" type="text" name="leaflets" id="leaflets" />
+					</div>
+					<div class="form-group no-label">
+						<button type="button" class="btn btn-success btn-add-row js-add-entrances" title="Добавить">
+							<i class="fa fa-plus hidden-xs" aria-hidden="true"></i>
+							<span class="visible-xs">Применить</span>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="row leaflet__entrance js-leaflet-entrance" style="display: none;">
+				<div class="col-lg-3 col-md-3 col-sm-4 col-xs-8 leaflet__entrance-block js-entrance-block">
+					<label class="leaflet__entrance-title">Расклеено по подъездам</label>
+				</div>
+				<div class="col-lg-9 col-md-9 col-sm-9 leaflet__entrance-btn">
+					<button type="button" class="btn btn-success btn-p25" title="Добавить">Сохранить</button>
+				</div>
+			</div>
+		</form>
+		<hr class="hr-margin hr-xs-100 leaflet__hr">
+		<form class="form-respons leaflet__filter" action="" method="post">
+			<div class="row">
+				<div class="col-lg-5 col-md-5 col-sm-4 form-group">
+					<label for="employee">ФИО листовщика/сотрудника</label>
+					<input class="form-control" type="text" name="employee" id="employee" />
+				</div>
+				<div class="col-lg-5 col-md-5 col-sm-4 form-group">
+					<label for="address">Адрес</label>
+					<input class="form-control" type="text" name="address" id="address" />
+				</div>
+				<div class="col-lg-2 col-md-2 col-sm-4 form-group no-label">
+					<button type="button" class="btn btn-primary btn-p25" title="Добавить">Применить</button>
+				</div>
+			</div>
+		</form>
+		<div class="row">
+			<div class="col-lg-10 col-md-10">
+				<div class="leaflet__table table-responsive-wrapper">
+					<div class="table-responsive2">
+						<table class="table table-valign-middle table-hover leaflet__table-table">
+							<thead>
+								<tr>
+									<th class="cell-head cell-xs-icon js-cell-mobile">
+										<a href="#" class="cell-xs-icon-sort desc-word cell-head_name" data-icon="&#xf007">
+											<span class="hidden-xs">ФИО листовщика/сотрудника</span>
+										</a>
+									</th>
+									<th class="cell-head cell-xs-icon js-cell-mobile" data-icon="&#xf64f">
+										<div class="cell-head_name">Город</div>
+									</th>
+									<th class="cell-head cell-xs-icon js-cell-mobile" data-icon="&#xf018">
+										<div class="cell-head_name">Улица</div>
+									</th>
+									<th class="cell-head cell-xs-icon js-cell-mobile" data-icon="&#xf1ad">
+										<div class="cell-head_name">Дом</div>
+									</th>
+									<th class="cell-head hidden-xs">
+										<div class="cell-head_name">Корп.</div>
+									</th>
+									<th class="cell-head hidden-xs">
+										<div class="cell-head_name">Стр.</div>
+									</th>
+									<th class="cell-head cell-xs-icon w-middle js-cell-mobile" data-icon="&#xf249">
+										<div class="cell-head_name">Расклеено листовок</div>
+									</th>
+									<th class="cell-head js-cell-mobile">
+										<div class="cell-head_name">&nbsp;</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="cell-info js-cell-mobile">Константинопольский Александр</td>
+									<td class="cell-info js-cell-mobile">Московский</td>
+									<td class="cell-info js-cell-mobile">Передельцевский просп.</td>
+									<td class="cell-info js-cell-mobile visible-xs">19 / 2 / —</td>
+									<td class="cell-info hidden-xs">19</td>
+									<td class="cell-info hidden-xs">2</td>
+									<td class="cell-info hidden-xs">—</td>
+									<td class="cell-info js-cell-mobile">5</td>
+									<td class="cell-btn js-cell-mobile">
+										<a href="#leaflet__form" class="js-scroll-link btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></a>
+										<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+									</td>
+								</tr>
+								<tr>
+									<td class="cell-info js-cell-mobile">Константинопольский Александр</td>
+									<td class="cell-info js-cell-mobile">Московский</td>
+									<td class="cell-info js-cell-mobile">Передельцевский просп.</td>
+									<td class="cell-info js-cell-mobile visible-xs">19 / 2 / —</td>
+									<td class="cell-info hidden-xs">19</td>
+									<td class="cell-info hidden-xs">2</td>
+									<td class="cell-info hidden-xs">—</td>
+									<td class="cell-info js-cell-mobile">5</td>
+									<td class="cell-btn js-cell-mobile">
+										<a href="#leaflet__form" class="js-scroll-link btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></a>
+										<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+									</td>
+								</tr>
+								<tr>
+									<td class="cell-info js-cell-mobile">Константинопольский Александр</td>
+									<td class="cell-info js-cell-mobile">Московский</td>
+									<td class="cell-info js-cell-mobile">Передельцевский просп.</td>
+									<td class="cell-info js-cell-mobile visible-xs">19 / 2 / —</td>
+									<td class="cell-info hidden-xs">19</td>
+									<td class="cell-info hidden-xs">2</td>
+									<td class="cell-info hidden-xs">—</td>
+									<td class="cell-info js-cell-mobile">5</td>
+									<td class="cell-btn js-cell-mobile">
+										<a href="#leaflet__form" class="js-scroll-link btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></a>
+										<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+									</td>
+								</tr>
+								<tr>
+									<td class="cell-info js-cell-mobile">Константинопольский Александр</td>
+									<td class="cell-info js-cell-mobile">Московский</td>
+									<td class="cell-info js-cell-mobile">Передельцевский просп.</td>
+									<td class="cell-info js-cell-mobile visible-xs">19 / 2 / —</td>
+									<td class="cell-info hidden-xs">19</td>
+									<td class="cell-info hidden-xs">2</td>
+									<td class="cell-info hidden-xs">—</td>
+									<td class="cell-info js-cell-mobile">5</td>
+									<td class="cell-btn js-cell-mobile">
+										<a href="#leaflet__form" class="js-scroll-link btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></a>
+										<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+									</td>
+								</tr>
+								<tr>
+									<td class="cell-info js-cell-mobile">Константинопольский Александр</td>
+									<td class="cell-info js-cell-mobile">Московский</td>
+									<td class="cell-info js-cell-mobile">Передельцевский просп.</td>
+									<td class="cell-info js-cell-mobile visible-xs">19 / 2 / —</td>
+									<td class="cell-info hidden-xs">19</td>
+									<td class="cell-info hidden-xs">2</td>
+									<td class="cell-info hidden-xs">—</td>
+									<td class="cell-info js-cell-mobile">5</td>
+									<td class="cell-btn js-cell-mobile">
+										<a href="#leaflet__form" class="js-scroll-link btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></a>
+										<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+									</td>
+								</tr>
+								<tr>
+									<td class="cell-info js-cell-mobile">Константинопольский Александр</td>
+									<td class="cell-info js-cell-mobile">Московский</td>
+									<td class="cell-info js-cell-mobile">Передельцевский просп.</td>
+									<td class="cell-info js-cell-mobile visible-xs">19 / 2 / —</td>
+									<td class="cell-info hidden-xs">19</td>
+									<td class="cell-info hidden-xs">2</td>
+									<td class="cell-info hidden-xs">—</td>
+									<td class="cell-info js-cell-mobile">5</td>
+									<td class="cell-btn js-cell-mobile">
+										<a href="#leaflet__form" class="js-scroll-link btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></a>
+										<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+									</td>
+								</tr>
+								<tr>
+									<td class="cell-info js-cell-mobile">Константинопольский Александр</td>
+									<td class="cell-info js-cell-mobile">Московский</td>
+									<td class="cell-info js-cell-mobile">Передельцевский просп.</td>
+									<td class="cell-info js-cell-mobile visible-xs">19 / 2 / —</td>
+									<td class="cell-info hidden-xs">19</td>
+									<td class="cell-info hidden-xs">2</td>
+									<td class="cell-info hidden-xs">—</td>
+									<td class="cell-info js-cell-mobile">5</td>
+									<td class="cell-btn js-cell-mobile">
+										<a href="#leaflet__form" class="js-scroll-link btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></a>
+										<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+									</td>
+								</tr>
+								<tr>
+									<td class="cell-info js-cell-mobile">Константинопольский Александр</td>
+									<td class="cell-info js-cell-mobile">Московский</td>
+									<td class="cell-info js-cell-mobile">Передельцевский просп.</td>
+									<td class="cell-info js-cell-mobile visible-xs">19 / 2 / —</td>
+									<td class="cell-info hidden-xs">19</td>
+									<td class="cell-info hidden-xs">2</td>
+									<td class="cell-info hidden-xs">—</td>
+									<td class="cell-info js-cell-mobile">5</td>
+									<td class="cell-btn js-cell-mobile">
+										<a href="#leaflet__form" class="js-scroll-link btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></a>
+										<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+									</td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="9">
+										<div class="hatimakiSpinnerLoader">
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+										</div>
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+					<!-- удалить тестовую кнопку для показа лоадера -->
+					<button class="toogleLoader" style="margin-top: 20px;">Toggle Loader</button>
+				</div>
+			</div>
+		</div>
+		
+        @@include('include/pagination.html')
+	</div>
+	<script id="entranceTemplate" type="text/template">
+		<div class="form-group">
+			<label for="entrance[1]">1</label>
+			<input class="form-control" type="text" name="entrance[1]" />
+		</div>
+	</script>
+	
+	@@include('include/_js.html')
+	
+    <script type="text/javascript">
+		$(function() {			
+			initNavbar();
+
+			$('.js-select2').select2({
+				width: '100%'
+			});
+			
+			$('.leaflet__form').on('click', '.js-add-entrances', function() {
+				var btn = $(this),
+					parent = $(this).closest('.leaflet__form'),
+					input = parent.find('.js-entrance-input'),
+					number = input.val(),
+					wrapper = parent.find('.js-leaflet-entrance'),
+					block = wrapper.find('.js-entrance-block'),
+					template = $($('#entranceTemplate').html()),
+					last;
+				if (number) {
+					for (var i = 1; i <= number; i++) {
+						last = template.clone().appendTo(block);
+						last.find('label').attr('for','entrance[' + i + ']').html(i);
+						last.find('.form-control').attr('name','entrance[' + i + ']');
+						console.log(last);
+					}
+					btn.css('opacity', '0');
+					wrapper.slideDown('middle');
+				}
+			});
+			
+			// изменение высоты ячеек в таблице для моб. версии (w < 768px)
+			$(window).on('load resize', function() {
+				var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				if (winWidth < 768) {
+					changeHeightCellMobile($('.leaflet__table-table'));
+				} else {
+					var reserHeight = $('.js-cell-mobile');
+					$(reserHeight).removeAttr('style');
+				}
+			});
+			
+			$('.leaflet__table').on('click', '.toogleLoader', function() {
+				var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				if (winWidth < 768) {
+					$('.leaflet__table-table tfoot').toggle();
+				}
+			});
+			
+			$('.leaflet').on('click', '.js-scroll-link', function (event) {
+				event.preventDefault(); //опустошим стандартную обработку
+				var id  = $(this).attr('href'), //заберем айдишник блока с параметром URL
+					top = $(id).offset().top - 60; //определим высоту от начала страницы до якоря
+				$('body,html').animate({scrollTop: top}, 500); //сделаем прокрутку за 1 с
+			});
+            
+		});
+    </script>
+
+</body>
+
+</html>

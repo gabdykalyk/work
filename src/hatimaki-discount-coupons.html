@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Купоны (многоповторные) для акции «Скидка 20% на обед»</title>
+    
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content discount-coupons">
+		<div class="clearfix head-with-btn">
+			<a href="#" class="btn btn-default btn-p25 hidden-xs">К списку кампаний</a>
+			<h1 class="big-h1">Купоны (многоповторные) для акции «Скидка 20% на обед»</h1>
+		</div>
+		<hr class="hr-margin hr-xs-100 hidden-xs" />
+		<div class="coupons-btn-block">
+			<a href="#" class="btn btn-default btn-p25 visible-xs">К списку кампаний</a>
+			<button type="button" class="btn btn-success btn-p25"  data-toggle="modal" data-target="#modal-alert">Добавить промокод</button>
+			<button type="button" class="btn btn-default btn-with-icon"><i class="fas fa-file-excel"></i> Экспорт в Excel</button>
+			<button type="button" class="btn btn-primary btn-with-icon"><i class="fas fa-upload"></i> Импорт из Excel</button>
+		</div>
+        <form class="form-respons js-compatibility" action="" method="post">
+			<div class="row">
+				<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group">
+					<label for="coupon-number">Номер купона</label>
+					<input type="text" class="form-control" value="" name="coupon-number">
+				</div>
+				<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group">
+					<label for="phone-number">Телефон клиента</label>
+					<input type="text" class="form-control" value="" name="phone-number">
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-6 form-group js-types has-error">
+					<label class="change-period-block">
+						<span class="js-change-period active">Период создания</span> / <span class="js-change-period click">Период использования</span>
+					</label>
+					<div class="input-groups-periods">
+						<div class="input-group datepicker">
+							<input type="text" class="form-control periodDateInput" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+							</span>
+						</div>
+						<span class="input-group-dash">‐</span>
+						<div class="input-group datepicker">
+							<input type="text" class="form-control periodDateInput" value="01.01.1995" name="todate" placeholder="00.00.0000" maxlength="10">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+							</span>
+						</div>
+					</div>
+					<div class="help-block">Некорректное значение даты</div>
+				</div>
+				<div class="clearfix visible-sm"></div>
+				<div class="col-lg-4 col-md-4 col-sm-12 form-group form-group-chbxs">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="used"> Использован
+						</label>
+					</div>
+					<div class="clearfix visible-xs"></div>
+					<button class="btn btn-primary btn-p25" type="submit">Применить</button>
+				</div>
+			</div>
+		</form>
+		<div class="table-responsive-wrapper">
+			<table class="table table-hover table-valign-middle coupons__table">
+				<thead>
+					<tr>
+						<th class="cell-head cell-xs-icon js-cell-mobile">
+							<a href="#" class="cell-xs-icon-sort asc cell-head_name" data-icon="&#xf073">
+								<span class="hidden-xs">Код</span>
+							</a>
+						</th>
+						<th class="cell-head cell-xs-icon js-cell-mobile">
+							<div class="cell-head_name">Имя клиента</div>
+						</th>
+						<th class="cell-head cell-xs-icon js-cell-mobile">
+							<div class="cell-head_name hidden-sm">Телефон клиента</div>
+							<div class="cell-head_name visible-sm">Телефон/email клиента</div>
+						</th>
+						<th class="cell-head cell-xs-icon js-cell-mobile hidden-sm">
+							<div class="cell-head_name">Email клиента</div>
+						</th>
+						<th class="cell-head cell-xs-icon js-cell-mobile">
+							<div class="cell-head_name">Создан</div>
+						</th>
+						<th class="cell-head cell-xs-icon js-cell-mobile">
+							<div class="cell-head_name">Использован</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>HM-PW2U</td>
+						<td>Смирнов Алексей Анатольевич</td>
+						<td>+7 (900) 234-5678
+							<div class="coupon__email visible-sm visible-xs">smirnovalex@mail.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">smirnovalex@mail.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">22.03.2019 14.03.2019 08.03.2019 06.03.2019 05.03.2019 04.03.2019 03.03.2019 02.03.2019</div></td>
+					</tr>
+					<tr>
+						<td>HM-PW2T</td>
+						<td>Кузнецова Анастасия Евгеньевна</td>
+						<td>+7 (910) 345-5678
+							<div class="coupon__email visible-sm visible-xs">kuznetsova@yandex.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">kuznetsova@yandex.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">21.03.2019 11.03.2019</td>
+					</tr>
+					<tr>
+						<td>HM-PW2L</td>
+						<td>Соколова Мария Александровна</td>
+						<td>+7 (901) 234-5678
+							<div class="coupon__email visible-sm visible-xs">marysokol@gmail.com</div>
+						</td>
+						<td class="hidden-sm hidden-xs">marysokol@gmail.com</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">23.03.2019 14.03.2019 06.03.2019 05.03.2019 04.03.2019 03.03.2019 02.03.2019 01.03.2019</div></td>
+					</tr>
+					<tr>
+						<td>HM-PW2K</td>
+						<td>Смирнов Алексей Анатольевич</td>
+						<td>+7 (900) 234-5678
+							<div class="coupon__email visible-sm visible-xs">smirnovalex@mail.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">smirnovalex@mail.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">22.03.2019 14.03.2019</div></td>
+					</tr>
+					<tr>
+						<td>HM-PW2G</td>
+						<td>Кузнецова Анастасия Евгеньевна</td>
+						<td>+7 (910) 345-5678
+							<div class="coupon__email visible-sm visible-xs">kuznetsova@yandex.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">kuznetsova@yandex.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">21.03.2019</div></td>
+					</tr>
+					<tr>
+						<td>HM-PW2F</td>
+						<td>Смирнов Алексей Анатольевич</td>
+						<td>+7 (900) 234-5678
+							<div class="coupon__email visible-sm visible-xs">smirnovalex@mail.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">smirnovalex@mail.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">22.03.2019 14.03.2019 08.03.2019</div></td>
+					</tr>
+					<tr>
+						<td>HM-PW2E</td>
+						<td>Кузнецова Анастасия Евгеньевна</td>
+						<td>+7 (910) 345-5678
+							<div class="coupon__email visible-sm visible-xs">kuznetsova@yandex.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">kuznetsova@yandex.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">21.03.2019</div></td>
+					</tr>
+					<tr>
+						<td>HM-PW2D</td>
+						<td>Смирнов Алексей Анатольевич</td>
+						<td>+7 (900) 234-5678
+							<div class="coupon__email visible-sm visible-xs">smirnovalex@mail.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">smirnovalex@mail.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">22.03.2019 14.03.2019 08.03.2019 06.03.2019 05.03.2019</div></td>
+					</tr>
+					<tr>
+						<td>HM-PW2C</td>
+						<td>Кузнецова Анастасия Евгеньевна</td>
+						<td>+7 (910) 345-5678
+							<div class="coupon__email visible-sm visible-xs">kuznetsova@yandex.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">kuznetsova@yandex.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">21.03.2019 11.03.2019</div></td>
+					</tr>
+					<tr>
+						<td>HM-PW2B</td>
+						<td>Смирнов Алексей Анатольевич</td>
+						<td>+7 (900) 234-5678
+							<div class="coupon__email visible-sm visible-xs">smirnovalex@mail.ru</div>
+						</td>
+						<td class="hidden-sm hidden-xs">smirnovalex@mail.ru</td>
+						<td class="coupon__date">01.03.2019</td>
+						<td><div class="js-short-text short-text-block">22.03.2019 14.03.2019</div></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		@@include('include/pagination.html')
+		
+	</div>
+	
+	<!-- Modal add-doc-modal -->
+	<div class="modal fade" id="modal-alert" tabindex="-1" role="dialog" aria-labelledby="add-doc-modal-label">
+		<div class="modal-dialog modal-dialog-gl modal-dialog-centered" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+							aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title">Предупреждение</h4>
+				</div>
+				<div class="modal-body">
+					Использован лимит создания купонов для акции <strong>«Скидка 20% на обед»</strong>.
+				</div>
+			</div>
+		</div>
+	</div>
+
+	@@include('include/_js.html')
+	
+	<script type="text/javascript">
+        $(function() {
+			initNavbar();
+
+            $('.datepicker').datetimepicker({
+                language: 'ru',
+                pickTime: false
+            });
+            
+
+			var shortenText = (function(showChars) {
+				$('.js-short-text').each(function () {
+					var replaceToI = (function (el) {
+						var text = el.text().replace(/\ /g, '</i> <i>');
+						el.html('<i>' + text + '</i>');
+					});
+					
+					var num = $(this).data('num');
+					
+					/* $(this).shorten({
+						"showChars" : showChars,
+						"moreText"	: "Все (" + num + ")",
+						"lessText"	: "Свернуть",
+						"ellipsesText": ""
+					}); */
+						
+					if ( $(this).find('.shortcontent').length !== 0) {
+						replaceToI($(this).find('.shortcontent'));
+						replaceToI($(this).find('.allcontent'));
+					} else {
+						replaceToI($(this));
+					}
+				});
+			});
+			
+			var short = (function(el, numChars) {
+				var content = el.text(),
+					countChars = 0,
+					str = '';
+				for (var i = 0; i <= numChars; i++) {
+					if (countChars <= numChars) {
+						str += content.charAt(i);
+						countChars++;
+					}
+				}
+				return str;
+			});
+			
+			var replaceToI = (function (el) {
+				var text = el.text().replace(/\ /g, '</i> <i>');
+				el.html('<i>' + text + '</i>');
+			});
+			
+			$(window).on('load', function() {
+				var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				var wrapAllcontent = (function(el){
+					el.wrapInner('<div class="allcontent"></div>');
+				});
+				
+				$('.js-short-text').each(function () {
+					const number = $(this).text().split(' ').length;
+					$(this).attr('data-num', number);
+					
+					wrapAllcontent($(this));
+					
+					var shortText,
+						allcontent = $(this).find('.allcontent');
+					if (winWidth > 991) {
+						shortText = short(allcontent, 31);
+					} else if (winWidth < 992 && winWidth > 767){
+						shortText = short(allcontent, 20);
+					} else {
+						shortText = short(allcontent, 42);
+					}
+					$(this).prepend('<div class="shortcontent">' + shortText + '</div>');
+				
+					replaceToI($(this).find('.shortcontent'));
+					replaceToI($(this).find('.allcontent'));
+				});
+			});
+			
+			$(window).on('load resize', function() {
+				var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+				var appendOrRefreshLink = (function(el, num) {
+					if (el.has('.morelink').length) {
+						el.find('.morelink').html('Все (' + num + ')');
+					} else {
+						el.append('<a href="javascript: void(0);" class="morelink">Все (' + num + ')</a>');
+					}
+				});
+				var addOrDeleteLink = (function(el, num, min){
+					if (num > min) {
+						appendOrRefreshLink(el, num);
+					} else {
+						el.find('.morelink').remove();
+					}
+				});
+				var checkShortContent = (function(el, num) {
+					var curShort = el.find('.shortcontent').children('i').length;
+					var curAll = el.find('.allcontent').children('i').length;
+					if (curShort > num || (curShort < num && curAll > num)) refreshShortContent(el, num);
+				});
+				var refreshShortContent = (function(el, num) {
+					el.find('.shortcontent').find('i').remove();
+					var children = el.find('.allcontent').find('i');
+					console.log(el.find('.allcontent').find('i').length);
+					for (var i = 0; i < num; i++) {
+						$(children[i]).clone().appendTo(el.find('.shortcontent'));
+					}
+					console.log(el.find('.allcontent').find('i').length);
+				});
+				
+				$('.js-short-text').each(function () {
+					var number = $(this).data('num');
+					
+					if (winWidth > 991) {
+						addOrDeleteLink($(this), number, 3);
+						checkShortContent($(this), 3);
+					} else if (winWidth < 992 && winWidth > 767){
+						addOrDeleteLink($(this), number, 2);
+						checkShortContent($(this), 2);
+					} else {
+						addOrDeleteLink($(this), number, 4);
+						checkShortContent($(this), 4);
+					}
+					
+				});
+				
+			});
+			
+			$(document).on({click: function() {
+					if ($(this).hasClass('less')) {
+						$(this).removeClass('less');
+						var num = $(this).parent().data('num');
+						$(this).html('Все (' + num + ')'); //Заменить на 'Все (' + num + ')'
+						$(this).prev().hide();
+						$(this).prev().prev().show();
+					} else {
+						$(this).addClass('less');
+						$(this).html('Свернуть');
+						$(this).prev().prev().hide();
+						$(this).prev().show('middle');
+					}
+					return false;
+				}
+			}, '.morelink');
+				
+			});
+    </script>
+
+</body>
+
+</html>
