@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Добавление кампании</title>
+
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content discount">
+
+        <h1>
+            Добавление кампании
+        </h1>
+        <hr class="hr-margin hr-xs-100 hidden-xs">
+		<div class="btn-group" role="group">
+			<a href="#" type="button" class="btn btn-default active">Основные настройки</a>
+			<a href="#" type="button" class="btn btn-default">Свойства</a>
+			<a href="#" type="button" class="btn btn-default">Действия</a>
+		</div>
+		<form class="form-respons discount__form js-compatibility" action="" method="post">
+			<div class="row">
+				<div class="col-lg-7 col-md-7 col-sm-9 form-group has-error">
+                    <label for="campaign_name">Название</label>
+                    <input class="form-control" type="text" name="campaign_name" id="campaign_name" />		
+					<div class="help-block">«Название» обязательное для заполнения</div>
+				</div>
+				<div class="col-lg-2 col-md-2 col-sm-3 form-group form-group-chbxs">
+					<div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="active" checked=""> Активная
+                        </label>
+                    </div>
+				</div>
+				<div class="clearfix visible-lg visible-md"></div>
+				<div class="col-lg-5 col-md-5 col-sm-6 form-group">
+					<label for="responsible">Ответственный</label>
+					<select class="form-control" name="responsible">
+						<option value="ivanovaa">Иванов Анатолий Александрович</option>
+						<option value="semenovek">Семёнов Евгений Константинович</option>
+					</select>
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-6 form-group js-types">
+					<label for="fromdate">Даты проведения</label>
+					<div class="input-groups-periods">
+                        <div class="input-group datepicker">
+                            <input type="text" class="form-control periodDateInput" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10">
+                            <span class="input-group-btn">
+								<button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+							</span>
+                        </div>
+                        <span class="input-group-dash">&dash;</span>
+                        <div class="input-group datepicker">
+                            <input type="text" class="form-control periodDateInput" value="01.01.1995" name="todate" placeholder="00.00.0000" maxlength="10">
+                            <span class="input-group-btn">
+								<button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+							</span>
+                        </div>
+					</div>
+				</div>
+				<div class="clearfix visible-lg visible-md"></div>
+				<div class="col-lg-9 col-md-9 col-sm-12 form-group">
+        			<label for="description">Описание</label>
+					<textarea class="form-control form-control-inp-text" name="description" id="description"></textarea>
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-6 form-group">
+					<label for="compatibility">Сочетаемость с другими акциями</label>
+					<select class="form-control js-compatibility-actions" name="compatibility">
+						<option value="no">не сочетается</option>
+						<option value="yes-with-all">сочетается со всеми</option>
+						<option value="yes-with-certain" selected="">сочетается с определёнными</option>
+					</select>
+				</div>
+				<div class="col-lg-5 col-md-5 col-sm-6 form-group select-actions js-actions">
+                    <select class="form-control js-select-multiple js-actions-placeholder" name="actions[]" id="actions" multiple="" tabindex="-1" aria-hidden="true">
+                        <option value="1">Скидка 5% на заказ от 600 рублей</option>
+                        <option value="2">Cкидка 10% на заказ от 1500 рублей</option>
+                        <option value="3">Блюдо в подарок</option>
+                        <option value="4" disabled="disabled">Скидка 3% на товар из категории Супы</option>
+                        <option value="5" selected="selected">Скидка студентам 15%</option>
+                    </select>
+				</div>
+				<div class="clearfix visible-lg visible-md"></div>
+				<div class="col-lg-9 col-md-9 col-sm-12 discount__right-btn">
+					<button class="btn btn-default btn-p25" type="submit">Вернуться</button>
+					<button class="btn btn-primary btn-p25" type="submit">Сохранить</button>
+				</div>
+			</div>
+		</form>
+    </div>
+
+    @@include('include/_js.html')
+	<!-- editor, https://www.tinymce.com/docs/demo/full-featured/ -->
+    <script type="text/javascript" src="js/tinymce/js/tinymce/tinymce.min.js"></script>
+    
+    <script type="text/javascript">
+        $(function() {
+			initNavbar();
+
+            $('.js-select-multiple').select2({
+                width: '100%'
+            });
+            
+			$('.js-actions-placeholder').select2({
+				width: '100%',
+				placeholder: 'Выберите акции',
+            });
+
+            $('.datepicker').datetimepicker({
+                language: 'ru',
+                pickTime: false
+            });
+
+            $(document).on('change', '.js-compatibility-actions', function() {
+                var select = $(document).find('.js-compatibility-actions'),
+                    now = select.val(),
+                    block = select.closest('.js-compatibility'),
+                    actions = block.find('.js-actions');
+
+                if (now === 'yes-with-certain') {
+                    actions.show();
+                } else {
+                    actions.hide();
+                }
+            });
+            
+			tinymce.init({
+				selector: '#description',
+				statusbar: false,
+				height: 180
+			});
+
+        });
+		
+    </script>
+
+</body>
+
+</html>

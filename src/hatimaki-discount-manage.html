@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>Управление акциями</title>
+	
+    @@include('include/_css.html')
+
+	@@include('include/_ie8.html')
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content discount-manage">
+		<div class="clearfix head-with-btn">
+            <a href="#" class="btn btn-success btn-p25 hidden-xs">Добавить акцию</a>
+            <h1>Управление акциями</h1>
+        </div>
+        <a href="#" class="btn btn-success visible-xs">Добавить акцию</a>
+        <hr class="hr-margin hr-xs-100 hidden-xs">
+		<form class="form-respons js-compatibility" action="" method="post">
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-4 form-group">
+					<label for="action-name">Название</label>
+					<input type="text" class="form-control" value="" name="action-name">
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-6 form-group js-types has-error">
+					<label>Даты проведения</label>
+					<div class="input-groups-periods">
+						<div class="input-group datepicker">
+							<input type="text" class="form-control periodDateInput" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+							</span>
+						</div>
+						<span class="input-group-dash">‐</span>
+						<div class="input-group datepicker">
+							<input type="text" class="form-control periodDateInput" value="01.01.1995" name="todate" placeholder="00.00.0000" maxlength="10">
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+							</span>
+						</div>
+					</div>
+					<div class="help-block">Некорректное значение даты</div>
+				</div>
+				<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group">
+					<label for="action-type">Тип акции</label>
+					<select class="form-control" name="action-type">
+						<option value="promocode">Промокод</option>
+						<option value="requirement">Условие</option>
+						<option value="both">Промокод и условие</option>
+					</select>
+				</div>
+				<div class="col-lg-1 col-md-1 col-sm-2 col-xs-6 form-group">
+					<label for="discount">Скидка, %</label>
+					<input type="text" class="form-control" value="" name="discount">
+				</div>
+				<div class="clearfix hidden-sm"></div>
+				<div class="col-lg-3 col-md-3 col-sm-4 form-group">
+					<label for="type">Тип действия</label>
+					<select class="form-control" name="type">
+						<option value="discounts">Скидки</option>
+						<option value="fixprice">Фиксированная цена на товар</option>
+						<option value="gifts">Подарки</option>
+					</select>
+				</div>
+				<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group form-group-chbxs">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="required-doc"> Действует сегодня
+						</label>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-2 col-sm-3 col-xs-6 form-group form-group-chbxs">
+					<div class="checkbox">
+						<label>
+							<input type="checkbox" id="required-doc"> Активная
+						</label>
+					</div>
+				</div>
+				<div class="clearfix visible-xs"></div>
+				<div class="col-lg-4 col-md-4 col-sm-4 form-group right-btn-group">
+					<button class="btn btn-primary btn-p25" type="submit">Применить</button>
+				</div>
+			</div>
+		</form>
+		<div class="table-discmanage-wrapper">
+			<div class="table-responsive-wrapper">
+				<div class="table-responsive2">
+					<table class="table table-hover table-discmanage">
+						<thead>
+							<tr>
+								<th class="cell-head cell-xs-icon js-cell-mobile" data-icon="&#xf02b">
+									<div class="cell-head_name">ID акции</div>
+								</th>
+								<th class="cell-head cell-xs-icon js-cell-mobile" data-icon="&#xf646">
+									<div class="cell-head_name">Название акции</div>
+								</th>
+								<th class="cell-head cell-xs-icon js-cell-mobile cell-wide">
+									<a href="#" class="cell-xs-icon-sort asc cell-head_name" data-icon="&#xf073">
+										<span class="hidden-xs">Период проведения</span>
+									</a>
+								</th>
+								<th class="cell-head cell-xs-icon js-cell-mobile" data-icon="&#xf022">
+									<div class="cell-head_name">Тип акции</div>
+								</th>
+								<th class="cell-head cell-xs-icon js-cell-mobile" data-icon="&#xf466">
+									<div class="cell-head_name">Действия</div>
+								</th>
+								<th class="cell-head js-cell-mobile">
+									<div class="cell-head_name">&nbsp;</div>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="success">
+								<td class="cell-info js-cell-mobile">027</td>
+								<td class="cell-info js-cell-mobile">Скидка 10% в день рождения</td>
+								<td class="cell-info js-cell-mobile">01.03.2019 – 01.04.2019</td>
+								<td class="cell-info js-cell-mobile">Условие</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 10% на заказ в день рождения<br />
+									Любой запеченный ролл в подарок<br />
+									Любая пицца за 200 рублей
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr>
+								<td class="cell-info js-cell-mobile">026</td>
+								<td class="cell-info js-cell-mobile">Скидка 13% студентам</td>
+								<td class="cell-info js-cell-mobile">01.03.2019 – 01.04.2019</td>
+								<td class="cell-info js-cell-mobile">Условие</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 13% при предъявлении студенческого билета
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr class="active">
+								<td class="cell-info js-cell-mobile">025</td>
+								<td class="cell-info js-cell-mobile">Скидка 20% на обед</td>
+								<td class="cell-info js-cell-mobile">01.02.2019 – 01.03.2019</td>
+								<td class="cell-info js-cell-mobile">Промокод и условие</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 20% на заказ с 11:30 до 14:30
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Список купонов"><i class="fas fa-list"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr>
+								<td class="cell-info js-cell-mobile">024</td>
+								<td class="cell-info js-cell-mobile">Скидка 10% в день рождения</td>
+								<td class="cell-info js-cell-mobile">01.02.2019 – 01.03.2019</td>
+								<td class="cell-info js-cell-mobile">Промокод и условие</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 10% на заказ в день рождения
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Список купонов"><i class="fas fa-list"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr class="active">
+								<td class="cell-info js-cell-mobile">023</td>
+								<td class="cell-info js-cell-mobile">Скидка 13% студентам</td>
+								<td class="cell-info js-cell-mobile">01.02.2019 – 01.03.2019</td>
+								<td class="cell-info js-cell-mobile">Условие</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 5% при заказе от 1000 рублей
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr class="active">
+								<td class="cell-info js-cell-mobile">022</td>
+								<td class="cell-info js-cell-mobile">Скидка 20% на обед</td>
+								<td class="cell-info js-cell-mobile">01.01.2019 – 01.02.2019</td>
+								<td class="cell-info js-cell-mobile">Условие</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 20% на заказ с 11:30 до 14:30
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr class="active">
+								<td class="cell-info js-cell-mobile">021</td>
+								<td class="cell-info js-cell-mobile">8 марта</td>
+								<td class="cell-info js-cell-mobile">01.01.2019 – 01.02.2019</td>
+								<td class="cell-info js-cell-mobile">Промокод</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 20% клиентам женского пола
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Список купонов"><i class="fas fa-list"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr class="active">
+								<td class="cell-info js-cell-mobile">020</td>
+								<td class="cell-info js-cell-mobile">-5% в воскресенье</td>
+								<td class="cell-info js-cell-mobile">01.01.2019 – 01.02.2019</td>
+								<td class="cell-info js-cell-mobile">Условие</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 5% по воскресеньям
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr class="active">
+								<td class="cell-info js-cell-mobile">019</td>
+								<td class="cell-info js-cell-mobile">Скидка 20% на обед</td>
+								<td class="cell-info js-cell-mobile">01.12.2018 – 01.01.2019</td>
+								<td class="cell-info js-cell-mobile">Условие</td>
+								<td class="cell-info js-cell-mobile">
+									Скидка 20% на заказ с 11:30 до 14:30
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+							<tr class="active">
+								<td class="cell-info js-cell-mobile">018</td>
+								<td class="cell-info js-cell-mobile">Скидка 10% в день рождения</td>
+								<td class="cell-info js-cell-mobile">01.12.2018 – 01.01.2019</td>
+								<td class="cell-info js-cell-mobile">Условие</td>
+								<td class="cell-info js-cell-mobile">
+									скидка 10% на заказ в день рождения
+								</td>
+								<td class="cell-btn js-cell-mobile">
+									<button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil"></i></button>
+									<button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fas fa-times"></i></button>
+								</td>
+							</tr>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan="9">
+									<div class="hatimakiSpinnerLoader">
+										<div></div>
+										<div></div>
+										<div></div>
+										<div></div>
+										<div></div>
+										<div></div>
+										<div></div>
+										<div></div>
+									</div>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+			<!-- удалить тестовую кнопку для показа лоадера -->
+			<button class="toogleLoader" style="margin-top: 20px;">Toggle Loader</button>
+		</div>
+		@@include('include/pagination.html')
+    </div>
+
+	@@include('include/_js.html')
+	
+	<script type="text/javascript">
+        $(function() {
+			initNavbar();
+
+            $('.js-select-multiple').select2({
+                width: '100%'
+            });
+
+            $('.datepicker').datetimepicker({
+                language: 'ru',
+                pickTime: false
+            });
+            
+            // изменение высоты ячеек в таблице для моб. версии (w < 768px)
+            $(window).on('load resize', function() {
+                var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                if (winWidth < 768) {
+                    changeHeightCellMobile($('.table-discmanage'));
+                } else {
+                    var reserHeight = $('.js-cell-mobile');
+                    $(reserHeight).removeAttr('style');
+                }
+
+            });
+            $('.table-discmanage-wrapper').on('click', '.toogleLoader', function() {
+                var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                if (winWidth < 768) {
+                    $('.table-discmanage tfoot').toggle();
+                }
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Основные показатели</title>
+
+    <link rel="stylesheet" href="js/scrolling-tabs/jquery.scrolling-tabs.min.css" />
+ 
+    @@include('include/_css.html')
+
+    <link href="css/styles-lk.css" rel="stylesheet">
+
+    @@include('include/_ie8.html')
+
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content mangen">
+		<div class="clearfix head-with-btn resp">
+            <h1>Александр Константиновский</h1>
+            <a href="#" class="btn btn-default hidden-xs">К списку сотрудников</a>
+        </div>
+        
+        <div class="clearfix info-peracc">
+            <ul class="list-unstyled list-posts">
+                <li>Повар-сушист / 9 / универсал</li>
+                <li>Сборщик / 3 / &mdash;</li>
+            </ul>
+            <a href="#" class="btn btn-default visible-xs">К списку сотрудников</a>
+            <ul class="list-unstyled list-accounts">
+                <li><span class="name">Депозит</span><span class="sum stat-dep-partly">10 000 <i class="fas fa-ruble-sign"></i></span></li>
+                <li><span class="name"><span class="full">Премиальный фонд</span><span class="short">Прем. фонд</span></span><span class="sum sum-yes">3000 <i class="fas fa-ruble-sign"></i></span></li>
+                <li><span class="name">Личный счёт</span><span class="sum sum-no">-500 <i class="fas fa-ruble-sign"></i></span></li>
+                <li><button class="modal-btn-add-time btn btn-success btn-p25" type="button" data-toggle="modal" data-target="#addTime-modal">Отметить время</button></li>
+            </ul>
+        </div>
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs nav-tabs-lk">
+            <li><a href="#" data-toggle="tab">Движение в компании</a></li>
+            <li class="active"><a href="#" data-toggle="tab">Основные показатели</a></li>
+            <li><a href="#" data-toggle="tab">Штрафы и поощрения</a></li>
+            <li><a href="#" data-toggle="tab">Анкета</a></li>
+            <li><a href="#" data-toggle="tab">Депозит</a></li>
+            <li><a href="#" data-toggle="tab">Личный счет</a></li>
+            <li><a href="#" data-toggle="tab">Документы</a></li>
+            <li><a href="#" data-toggle="tab">Форма</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content tab-content-lk big-margin-top">
+            <div class="tab-pane active">
+                <ul class="nav nav-tabs-lk-xs">
+                    <li><a href="#">Движение в компании</a></li>
+                    <li class="active"><a href="#">Основные показатели</a></li>
+                </ul>
+
+                <form action="" method="post" class="form-inline form-filters-inline no-indents form-mangen">
+                    <div class="form-group">
+                        <label for="branches" class="hidden-xs">Место работы</label>
+                        <select name="branches" id="branches" class="form-control">
+                            <option value="1" selected>Все</option>
+                            <option value="2">Щербинка</option>
+                            <option value="3">Бутово</option>
+                            <option value="4">Ясенево</option>
+                            <option value="5">Коммунарка</option>
+                            <option value="6">Подольск</option>
+                            <option value="7">Московский</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group no-margin js-surcharge">
+                        <div class="form-group choosePeriod">
+	                        <label for="period">За период</label>
+	                        <select class="form-control selectPeriod js-emplsurcharge-period" name="period">
+	                            <option value="days">Сегодня</option>
+	                            <option value="arbitrary" selected="">Произвольный</option>
+	                        </select>
+                		</div>
+                    	<div class="form-group periodDate js-types">
+	                        <div class="input-group datepicker">
+	                            <input type="text" class="form-control periodDateInput" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10">
+	                            <span class="input-group-btn">
+	      							<button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+	  							</span>
+	                        </div>
+	                        <span class="input-group-dash">–</span>
+	                        <div class="input-group datepicker">
+	                            <input type="text" class="form-control periodDateInput" value="01.01.1995" name="todate" placeholder="00.00.0000" maxlength="10">
+	                            <span class="input-group-btn">
+	        						<button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+	    						</span>
+	                        </div>
+						</div>
+                    </div>
+                    <div class="form-group no-margin blockBtn">
+                    	<button type="submit" class="btn btn-primary">Показать</button>
+                    </div>
+                </form>
+                <!-- Таблица для планшетов и больше -->
+                <div class="table-responsive2 table-mangen-wrapper hidden-xs">
+                    <table class="table table-mangen">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">Место&nbsp;работы</th>
+                                <th rowspan="2">Отработано&nbsp;смен</th>
+                                <th rowspan="2" class="md-big-pad">Отработано&nbsp;часов</th>
+                                <th>Выплачено</th>
+                                <th>Получено штрафов</th>
+                                <th>Получено поощрений</th>
+                            </tr>
+                            <tr>
+                                <th class="md-align-left md-wide-col">Всего / Основная&nbsp;часть / Премиальная&nbsp;часть / Депремирование </th>
+                                <th>Кол-во / На&nbsp;сумму</th>
+                                <th>Кол-во / На&nbsp;сумму</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="cell-head">Коммунарка</td>
+                                <td>7</td>
+                                <td>77</td>
+                                <td>13 100 / 12 833 / 279 / 0</td>
+                                <td>3 / 225</td>
+                                <td>0 / 0</td>
+                            </tr>
+                            <tr>
+                                <td class="cell-head">Удалённо</td>
+                                <td>9</td>
+                                <td>92</td>
+                                <td>13 550 / 13 650 / 53 / 0</td>
+                                <td>0 / 0</td>
+                                <td>0 / 0</td>
+                            </tr>
+                            <tr>
+                                <td class="cell-all">Все</td>
+                                <td class="cell-all">16</td>
+                                <td class="cell-all">169</td>
+                                <td class="cell-all">26 650 / 26 483 / 332 / 0</td>
+                                <td class="cell-all">3 / 225</td>
+                                <td class="cell-all">0 / 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Таблица для телефонов -->
+				<div class="table-responsive-wrapper table-mangen-wrapper visible-xs">
+	                <div class="table-responsive2">
+	                    <table class="table table-mangen">
+	                        <thead>
+	                            <tr>
+	                                <th rowspan="2">Филиал</th>
+	                                <th rowspan="2">Отработано&nbsp;смен</th>
+	                                <th rowspan="2" class="md-big-pad">Отработано&nbsp;часов</th>
+	                                <th>Выплачено</th>
+	                                <th class="sub-col">основная часть</th>
+	                                <th class="sub-col">премиальная часть</th>
+	                                <th class="sub-col">депремирование</th>
+	                                <th>Получено штрафов</th>
+	                                <th class="sub-col">на сумму</th>
+	                                <th>Получено поощрений</th>
+	                                <th class="sub-col">на сумму</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <tr>
+	                                <td class="cell-all">Все</td>
+	                                <td class="cell-all">16</td>
+	                                <td class="cell-all">169</td>
+	                                <td class="cell-all">26 650</td>
+	                                <td class="cell-all">26 483</td>
+	                                <td class="cell-all">332</td>
+	                                <td class="cell-all">0</td>
+	                                <td class="cell-all">3</td>
+	                                <td class="cell-all">225</td>
+	                                <td class="cell-all">0</td>
+	                                <td class="cell-all">0</td>
+	                            </tr>
+	                            <tr>
+	                                <td class="cell-head">Коммунарка</td>
+	                                <td>7</td>
+	                                <td>77</td>
+	                                <td>13 100</td>
+	                                <td>12 833</td>
+	                                <td>279</td>
+	                                <td>0</td>
+	                                <td>3</td>
+	                                <td>225</td>
+	                                <td>0</td>
+	                                <td>0</td>
+	                            </tr>
+	                            <tr>
+	                                <td class="cell-head">Удалённо</td>
+	                                <td>9</td>
+	                                <td>92</td>
+	                                <td>13 550</td>
+	                                <td>13 650</td>
+	                                <td>53</td>
+	                                <td>0</td>
+	                                <td>0</td>
+	                                <td>0</td>
+	                                <td>0</td>
+	                                <td>0</td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
+	                </div>
+	            </div>
+
+				<div class="table-responsive-wrapper table-mangen-worktime ">
+					<div class="table-responsive2">
+						<table class="table table-hover js-table-mangen-worktime">
+							<thead>
+								<tr>
+									<th class="cell-head cell-xs-icon js-cell-mobile">
+										<a href="#" class="cell-xs-icon-sort desc cell-head_name" data-icon="&#xf783">
+											<span class="hidden-xs">Смена</span>
+										</a>
+									</th>
+									<th class="cell-head cell-xs-icon js-cell-mobile" data-icon="&#xf3c5">
+										<div class="cell-head_name">Место работы</div>
+									</th>
+									<th class="cell-head cell-xs-icon cell-align-center wd10 js-cell-mobile" data-icon="&#xf555">
+										<div class="cell-head_name">ЗП за смену</div>
+									</th>
+									<th class="cell-head cell-xs-icon cell-align-center wd10 js-cell-mobile" data-icon="&#xf165">
+										<div class="cell-head_name">Штрафы за&nbsp;смену</div>
+									</th>
+									<th class="cell-head cell-xs-icon cell-align-center wd10 js-cell-mobile" data-icon="&#xf164">
+										<div class="cell-head_name">Премии за&nbsp;смену</div>
+									</th>
+									<th class="cell-head cell-xs-icon js-cell-mobile cell-short-text" data-icon="&#xf27a">
+										<div class="cell-head_name">Комментарий</div>
+									</th>
+									<th class="cell-head cell-xs-icon js-cell-mobile"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											20.02.2019
+											<ul>
+												<li>11:00 - </li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Удалённо</td>
+									<td class="js-cell-mobile"></td>
+									<td class="js-cell-mobile"></td>
+									<td class="js-cell-mobile"></td>
+									<td class="js-cell-mobile cell-short-text"></td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											20.02.2019
+											<ul>
+												<li>18:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Удалённо</td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-short-text">
+										<div class="js-short-text">Воздействие на потребителя, отбрасывая подробности, концентрирует коллективный CTR, работая над проектом.<br />
+										Стратегия предоставления скидок и бонусов, на первый взгляд, восстанавливает стратегический рыночный план.</div>
+									</td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">									
+											18.02.2019
+											<ul>
+												<li>11:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Офис</td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-short-text"></td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											16.02.2019
+											<ul>
+												<li>11:00 - 15:00</li>
+												<li>18:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Коммунарка</td>
+									<td class="js-cell-mobile cell-align-center">3 800 <i class="fas fa-ruble-sign"></i></td>
+									<td class="js-cell-mobile cell-align-center">1 / 200 <i class="fas fa-ruble-sign"></i></td>
+									<td class="js-cell-mobile cell-align-center">0 / 0 <i class="fas fa-ruble-sign"></i></td>
+									<td class="js-cell-mobile cell-short-text"></td>
+									<td class="js-cell-mobile"><a href="#" class="btn btn-default" title="Сохраненный расчет по филиалу Коммунарка за 16.02.2019"><i class="fas fa-file-alt"></i></a></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											14.02.2019
+											<ul>
+												<li>11:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Удалённо</td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-short-text">
+										<div class="js-short-text">Стратегия предоставления скидок и бонусов, на первый взгляд, восстанавливающая положение в обществе</div>
+									</td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											12.02.2019
+											<ul>
+												<li>11:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Удалённо</td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-short-text">
+										<div class="js-short-text">Воздействие на потребителя, отбрасывая подробности, концентрирует коллективный CTR, работая над проектом.</div>
+									</td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											10.02.2019
+											<ul>
+												<li>11:00 - 15:00</li>
+												<li>18:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Удалённо</td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-short-text">
+										<div class="js-short-text">Стратегия предоставления скидок и бонусов, на первый взгляд, восстанавливавливает репутацию</div>
+									</td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											08.02.2019
+											<ul>
+												<li>11:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Коммунарка</td>
+									<td class="js-cell-mobile cell-align-center">4 000 <i class="fas fa-ruble-sign"></i></td>
+									<td class="js-cell-mobile cell-align-center">0 / 0 <i class="fas fa-ruble-sign"></i></td>
+									<td class="js-cell-mobile cell-align-center">1 / 200 <i class="fas fa-ruble-sign"></i></td>
+									<td class="js-cell-mobile cell-short-text"></td>
+									<td class="js-cell-mobile"><a href="#" class="btn btn-default" title="Сохраненный расчет по филиалу Коммунарка за 08.02.2019"><i class="fas fa-file-alt"></i></a></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											06.02.2019
+											<ul>
+												<li>11:00 - 15:00</li>
+												<li>18:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Офис</td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-short-text"></td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											04.02.2019
+											<ul>
+												<li>11:00 - 23:00</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Офис</td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-short-text"></td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+								<tr>
+									<td class="js-cell-mobile">
+										<div class="time-work">
+											02.02.2019
+											<ul>
+												<li>
+													11:00 - 23:00
+												</li>
+											</ul>
+										</div>
+									</td>
+									<td class="js-cell-mobile">Офис</td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-align-center"></td>
+									<td class="js-cell-mobile cell-short-text"></td>
+									<td class="js-cell-mobile"></td>
+								</tr>
+							</tbody>
+							<tfoot>
+								<tr>
+									<td colspan="9">
+										<div class="hatimakiSpinnerLoader">
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+											<div></div>
+										</div>
+									</td>
+								</tr>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+
+				<nav aria-label="Page navigation" class="pagination-container hidden-xs">
+					<ul class="pagination">
+						<li>
+							<a href="#" aria-label="Предыдущая">
+								<span aria-hidden="true">«</span>
+							</a>
+						</li>
+						<li class="active"><a href="#">1</a></li>
+						<li><a href="#">2</a></li>
+						<li><a href="#">3</a></li>
+						<li><a href="#">4</a></li>
+						<li><a href="#">5</a></li>
+						<li><a href="#">...</a></li>
+						<li><a href="#">9</a></li>
+						<li>
+							<a href="#" aria-label="Следующая">
+								<span aria-hidden="true">»</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+				
+				<!-- удалить тестовую кнопку для показа лоадера -->
+				<button class="toogleLoader" style="margin-top: 20px;">Toggle Loader</button>
+    			
+				<ul class="nav nav-tabs-lk-xs">
+                    <li><a href="#">Штрафы и поощрения</a></li>
+                    <li><a href="#">Анкета</a></li>
+                    <li><a href="#">Депозит</a></li>
+                    <li><a href="#">Личный счет</a></li>
+                    <li><a href="#">Документы</a></li>
+                    <li><a href="#">Форма</a></li>
+                </ul>
+    		</div>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div class="modal fade mangen-modal" id="addTime-modal" tabindex="-1" role="dialog" aria-labelledby="positionModalLabel">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                	<form action="" method="post" class="mangen-modal-form">
+						<div class="mangen-times has-error">
+							<div class="form-group">
+								<label for="timebeg" class="mangen-label">Начало работы</label>
+								<input type="text" class="form-control js-timework" value="" name="" id="timebeg" maxlength="5" placeholder="00:00">
+							</div>
+							<div class="form-group-dash">&dash;</div>
+							<div class="form-group">
+								<label for="timeend" class="mangen-label">Конец работы</label>
+								<input type="text" class="form-control js-timework" value="" name="" id="timeend" maxlength="5" placeholder="00:00">
+							</div>
+							<div class="help-block">Указан некорректный интервал рабочих часов</div>
+						</div>
+                		<div class="form-group">
+							<label for="comment" class="mangen-label">Комментарий</label>
+							<textarea class="form-control mangen-textarea" name="" id="comment"></textarea>
+							<div class="form-btns">
+								<button type="button" class="btn btn-primary btn-p25" data-dismiss="modal">Отправить</button>
+							</div>
+						</div>
+                	</form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	@@include('include/_js.html')
+	
+    <!-- https://github.com/LucasLazaro/bootstrap-nav-tab-scrollable -->
+    <script type="text/javascript" src="js/scrolling-tabs/jquery.scrolling-tabs.js"></script>
+
+	<!-- http://viralpatel.net/blogs/dynamically-shortened-text-show-more-link-jquery/ -->
+	<script type="text/javascript" src="js/shorten.js"></script>
+
+    <script type="text/javascript">
+    $(function () {
+        initNavbar();
+
+        $('.datepicker').datetimepicker({
+            language: 'ru',
+            pickTime: false
+        });
+		
+        $('.js-timework').datetimepicker({
+            language: 'ru',
+            format: 'LT',
+            pickDate: false
+        });		
+
+        $('.nav-tabs-lk').scrollingTabs({
+            cssClassLeftArrow: 'fa fa-chevron-left',
+            cssClassRightArrow: 'fa fa-chevron-right'
+        });
+        
+    	$(document).on( 'click', '.js-short-text a', function() {
+			if ( $(window).width() < 768 ) {
+				var thisTable = $(this).closest('table');
+				var thisTd = $(this).closest('td');
+				var thisText_h = thisTd.find('.allcontent').height() + 20;
+				var cellShortText = thisTable.find('.cell-short-text');//th и td
+				var th_h = thisTable.find('thead > tr > th.cell-short-text').height();
+				var maxHeight = (thisText_h > th_h) ? thisText_h : th_h;
+				console.log("thistext - " + thisText_h + "; th - " + th_h + "; maxHeight - " + maxHeight);
+				cellShortText.height(maxHeight);
+			}
+            return false;
+        });
+    	
+        $(window).on('load resize', function() {
+            var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            resetDefaultHeight($('.js-table-mangen-worktime'));
+            if (winWidth > 991) {
+                $(".js-short-text").shorten({
+					"showChars" : 60,
+					"moreText"	: "Развернуть",
+					"lessText"	: "Свернуть",
+				});
+            } else if (winWidth < 992 && winWidth > 767){
+            	$(".js-short-text").shorten({
+					"showChars" : 40,
+					"moreText"	: "Развернуть",
+					"lessText"	: "Свернуть",
+				});
+            } else {
+            	$(".js-short-text").shorten({
+					"showChars" : 0,
+					"moreText"	: "Развернуть",
+					"lessText"	: "Свернуть",
+				});
+            }
+        });
+        //чтобы заново запустился скрипт shorten и текст смотрелся хорошо
+        $(window).on('resize', function() {
+        	window.location.reload();
+        });
+        
+        // изменение высоты ячеек в таблице для моб. версии (w < 768px)
+        $(window).on('load resize', function() {
+            var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            if (winWidth < 768) {
+                changeHeightCellMobile($('.js-table-mangen-worktime'));
+            } else {
+                var reserHeight = $('.js-cell-mobile');
+                $(reserHeight).removeAttr('style');
+            }
+        });
+        
+        $('.toogleLoader').on('click', function() {
+            var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            if (winWidth < 768) {
+                $('.js-table-mangen-worktime tfoot').toggle();
+            }
+        });
+        
+        $(document).on('change', '.js-emplsurcharge-period', function() {
+	        var select = $(document).find('.js-emplsurcharge-period'),
+	            now = select.val(),
+	            block = select.closest('.js-surcharge'),
+	            types = block.find('.js-types');
+	        if (now === 'arbitrary') {
+	            types.show();
+	            block.removeClass('days');
+	        } else {
+	            block.addClass('days');
+	            types.hide();
+	        }
+	    });
+	            
+    });
+    
+    </script>
+</body>
+</html>

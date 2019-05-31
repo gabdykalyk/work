@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Выписать штраф/премию</title>
+    
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content empl-fine">
+        <div class="clearfix head-with-btn">
+            <a href="hatimaki-empl-fine-list.html" class="btn btn-default btn-p25">К списку штрафов/премий</a>
+            <h1>Выписать штраф/премию</h1>
+        </div>
+        <hr class="hidden-sm hidden-xs">
+        <form action="" method="post" class="empl-fine__filter">
+            <div class="row">
+                <div class="col-md-2 form-group no-label">
+                    <div class="btn-group" role="group" aria-label="radiogroup">
+                        <button type="button" class="btn btn-default btn-fine active">Штраф</button>
+                        <button type="button" class="btn btn-default btn-premium">Премия</button>
+                    </div>
+                </div>
+                <div class="col-md-4 form-group has-error">
+                    <label for="fine-cause">Причина</label>
+                    <select class="js-select2 form-control" name="fine-cause" id="fine-cause">
+                        <option value="-1"></option>
+                        <option value="0">Опоздание на 10 мин.</option>
+                        <option value="1">Опоздание на 15 мин.</option>
+                    </select>
+                </div>
+                <div class="col-md-2 form-group has-error">
+                    <label for="fine-sum">Сумма штрафа, <i class="far fa-ruble-sign"></i></label>
+                    <input type="text" class="form-control form-control-sm" value="" name="fine-sum" id="fine-sum" />
+                </div>
+                <div class="col-md-2 form-group has-error">
+                    <label for="fine-date">Дата штрафа</label>
+                    <div class="clearfix">
+                        <div class="input-group datepicker">
+                            <input type="text" class="form-control" value="01.05.2017" name="fine-date" id="fine-date"
+                                placeholder="00.00.0000" maxlength="10">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><i
+                                        class="fas fa-calendar-alt"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-md-3 form-group">
+                    <label for="fine-empl">Кто выписывает</label>
+                    <select class="js-select2 form-control" name="fine-empl" id="fine-empl">
+                        <option value="-1"></option>
+                        <option value="0">Кузнецов Евгений</option>
+                        <option value="1">Соколова Елена</option>
+                    </select>
+                </div>
+                <div class="col-md-2 form-group">
+                    <label for="fine-branches">Филиал</label>
+                    <select class="js-select2 form-control" name="fine-branches" id="fine-branches">
+                        <option value="-1"></option>
+                        <option value="1">Щербинка</option>
+                        <option value="2">Бутово</option>
+                        <option value="3">Ясенево</option>
+                        <option value="4">Коммунарка</option>
+                        <option value="5">Подольск</option>
+                        <option value="6">Московский</option>
+                    </select>
+                </div>
+                <div class="col-md-2 form-group has-error">
+                    <label for="fine-post">Должность</label>
+                    <select class="js-select2 form-control" name="fine-post[]" id="fine-post" multiple="multiple">
+                        <option value="1">Администратор филиал</option>
+                        <option value="2">Директор IT</option>
+                        <option value="3">Водитель</option>
+                    </select>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label for="fine-empl-whom">Сотрудник</label>
+                    <select class="js-select2 form-control" name="fine-empl-whom" id="fine-empl-whom">
+                        <option value="-1"></option>
+                        <option value="0">Кузнецов Евгений</option>
+                        <option value="1">Соколова Елена</option>
+                    </select>
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-md-4 margintop form-group form-group-checkbox">
+                    <div class="checkbox-nice">
+                        <label>
+                            <input type="checkbox" checked="">
+                            <span class="fa fa-check"></span>
+                            Обязательно заполнение объяснительной
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3 margintop form-group form-group-flex">
+                    <label for="fine-date">Заполнить до</label>
+                    <div class="input-group datepicker">
+                        <input type="text" class="form-control" value="01.05.2017" name="end-date" id="end-date"
+                            placeholder="00.00.0000" maxlength="10">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-3 margintop form-btns">
+                    <button type="submit" class="btn btn-primary btn-p25">Выписать штраф</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    @@include('include/_js.html')
+
+    <script type="text/javascript">
+        $(function () {
+            initNavbar();
+
+            $('.js-select2').select2({
+                width: '100%'
+            });
+
+            $('#fine-cause').select2({
+                tags: true,
+                placeholder: {
+                    id: '-1',
+                    text: 'Причина'
+                },
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#fine-branches').select2({
+                tags: true,
+                placeholder: {
+                    id: '-1',
+                    text: 'Филиал'
+                },
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#fine-empl').select2({
+                tags: true,
+                placeholder: {
+                    id: '-1',
+                    text: 'Кто выписывает'
+                },
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#fine-empl-whom').select2({
+                tags: true,
+                placeholder: {
+                    id: '-1',
+                    text: 'Сотрудник'
+                },
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('.datepicker').datetimepicker({
+                language: 'ru',
+                pickTime: false
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Заказы на карте за 18.01.2019</title>
+  <!-- Bootstrap -->
+  <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Icons -->
+  <link href="fonts/fontawesome-pro-5.1.0-web/css/all.css" rel="stylesheet">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" />
+
+  <link href="css/styles.css" rel="stylesheet">
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<nav class="navbar navbar-fixed-top navbar-lk">
+  <div class="container-fluid">
+    <div class="navbar-collapse collapse" id="navbar-collapse-block">
+      <ul class="nav navbar-nav navbar-nav-main">
+        <li class="item-menu-manper active"><a href="#">Расчёты<span class="count">1</span></a></li>
+        <li class="item-menu-messages"><a href="#">Новый расчёт<span class="count">5</span></a></li>
+        <li class="item-menu-alerts"><a href="#">Штрафы/Премии<span class="count">2</span></a></li>
+        <li class="item-menu-schedule"><a href="#">Приказы/Инструкции</a></li>
+        <li class="item-menu-index"><a href="#">Кадры<span class="count">3</span></a></li>
+        <li class="item-menu-docs"><a href="#">Отчёты<span class="count">1</span></a></li>
+        <li class="item-menu-discus"><a href="#">Обсуждения<span class="count">4</span></a></li>
+        <li class="item-menu-complaints"><a href="#">Жалобы и предложения<span class="count">1</span></a></li>
+        <li class="item-menu-friends"><a href="#">Друзья</a></li>
+        <li class="item-menu-groups"><a href="#">Группы</a></li>
+        <li class="item-menu-settings"><a href="#">Настройки</a></li>
+        <li class="item-menu-help"><a href="#">Помощь</a></li>
+      </ul>
+    </div>
+    <button type="button" class="navbar-toggle collapsed" id="navbar-toggle">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <i class="fa fa-chevron-left" aria-hidden="true"></i>
+    </button>
+    <div class="navbar-right navbar-login">
+      <a href="#" class="btn"><span>Александр Константиновский</span> <i class="fa fa-sign-out hidden-sm hidden-xs" aria-hidden="true"></i></a>
+    </div>
+    <ul class="nav navbar-nav navbar-right navbar-nav-social">
+      <li><a href="#" title="Вконтакте"><i class="fab fa-vk" aria-hidden="true"></i></a></li>
+      <li><a href="#" title="Есть непросмотренные сообщения"><i class="fa fa-envelope" aria-hidden="true"></i><span class="badge"></span></a></li>
+      <li class="item-bell" title="Есть непросмотренные уведомления"><a href="#"><i class="fa fa-bell" aria-hidden="true"></i><span class="badge"></span></a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container-fluid content">
+
+    <h1>
+        Заказы на карте за 18.01.2019
+    </h1>
+    <hr class="visible-lg visible-md">
+    <form action="" method="post">
+         <div class="row">
+            <div class="form-group col-md-3 col-sm-5 col-xs-12">
+                <label for="branch" class="hidden-xs">Филиал</label>
+                <select class="form-control" name="branch" id="branch">
+                    <option value="1">Щербинка</option>
+                    <option value="2">Бутово</option>
+                    <option value="3">Ясенево</option>
+                    <option value="4">Коммунарка</option>
+                    <option value="5">Подольск</option>
+                    <option value="6">Московский</option>
+                </select>
+            </div>
+         </div>
+    </form>
+    
+    <div class="container-map-orders">
+        <!-- beg: Loading -->
+        <div class="loader" title="Пожалуйста, подождите ...">
+            <i class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
+        </div>
+        <!-- end: Loading -->
+        <div class="map-orders" id="map"></div>
+		<script src="https://api-maps.yandex.ru/2.1/?lang=ru-RU" type="text/javascript"></script>
+		<script type="text/javascript">
+			ymaps.ready(init);
+			function init() {
+				var myMap = new ymaps.Map("map", {
+					center: [55.5042099,37.5596213],
+					zoom: 11
+				}, {
+					searchControlProvider: 'yandex#search'
+				});
+
+				var myCollection = new ymaps.GeoObjectCollection(); 
+
+				var myPlacemark;
+				myPlacemark = new ymaps.Placemark([
+					55.5042099,37.5596213        ], {
+					balloonContent: 'Филиал: 1. Щербинка'
+				}, {
+					preset: 'islands#icon',
+					iconColor: '#4682B4'
+				});
+				myCollection.add(myPlacemark);
+
+
+				/*myPlacemark = new ymaps.Placemark([
+					55.5344,37.5853            ], {
+					balloonContent: 'Статус: Готово<br>Сумма: 1895.25 р.<br>Адрес: поселок Новодрожжино, 5<br>Время доставки: 16:03'
+				}, {
+					preset: 'islands#icon',
+					iconColor: '#006400'
+				});
+				myCollection.add(myPlacemark);
+
+
+				myPlacemark = new ymaps.Placemark([
+					55.5344,37.6053            ], {
+					balloonContent: 'Статус: Готово<br>Сумма: 1895.25 р.<br>Адрес: поселок Новодрожжино, 5<br>Время доставки: 16:03'
+				}, {
+					preset: 'islands#icon',
+					iconColor: '#ffd319'
+				});
+				myCollection.add(myPlacemark);*/
+				
+				myPlacemark = new ymaps.Placemark([55.5344,37.7053], {
+					balloonContent: '<div><b>#775566</b> <b>20:45</b> 11 мин Готовится</div><div>дер. Боброво, д. 35А</div><b>1420.50 р.</b>',
+					iconContent: '<b>#775566</b> <b>20:45</b> <b>11 мин.</b> дер. Боброво, д. 35А'
+				}, {
+					preset: 'islands#orangeStretchyIcon'
+				});
+				myMap.geoObjects.add(myPlacemark); 
+
+				myPlacemark = new ymaps.Placemark([
+					55.4344,37.5853            ], {
+					balloonContent: '<div><b>#775566</b> <b>21:00</b> 18 мин Готово</div><div>Щербинка, ул. Почтовая, д. 9, кв. 1</div><b>2420.50 р.</b>',
+					iconContent: '<b>#775566</b> <b>21:00</b> <b>18 мин.</b> ул. Почтовая, д. 9'
+				}, {
+					preset: 'islands#darkgreenStretchyIcon'
+				});
+				myCollection.add(myPlacemark);
+						
+
+				myMap.geoObjects.add(myCollection);
+			}
+		</script>
+    </div>
+</div>
+
+
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="bootstrap-3.3.7/js/bootstrap.min.js"></script>
+
+<!-- Bootstrap DateTimepicker, https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+<script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+
+<!-- Select2, https://select2.org/getting-started/basic-usage -->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.min.js"></script>-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.full.min.js"></script>
+
+<script type="text/javascript" src="js/js-gl.js"></script>
+
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

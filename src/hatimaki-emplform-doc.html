@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Анкета кандидата</title>
+    
+    @@include('include/_css.html')
+
+    <link href="css/emplform.css" rel="stylesheet">
+
+    @@include('include/_ie8.html')
+
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content">
+        <h1>Анкета кандидата</h1>
+        <hr class="hidden-xs">
+        <div class="btn-group btn-group-radio" role="group">
+            <a href="hatimaki-emplform-lk.html" type="button" class="btn btn-default">Личная информация</a>
+            <a href="hatimaki-emplform-doc.html" type="button" class="btn btn-default active">Документы</a>
+        </div>
+
+        <form action="" method="post" class="form-respons form-cand form-cand-st2">
+            <section class="form-block">
+                <h2>Основной документ</h2>
+                <div class="form-group block-radio-inline">
+                    <label class="radio-inline">
+                        <input type="radio" name="doc" id="doc-passport" value="1" checked> паспорт
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="doc" id="doc-driver" value="2"> водительские права
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="form-group form-group-serial col-md-2 col-sm-3 col-xs-6">
+                        <label for="passport-serial">Серия</label>
+                        <input type="text" class="form-control" value="" name="passport-serial" id="passport-serial">
+                    </div>
+                    <div class="form-group form-group-number col-md-2 col-sm-3 col-xs-6">
+                        <label for="passport-number">Номер</label>
+                        <input type="text" class="form-control" value="" name="passport-number" id="passport-number">
+                    </div>
+                    <div class="clearfix visible-xs"></div>
+                    <div class="form-group form-group-date col-md-4 col-sm-4 col-xs-6">
+                        <label for="passport-date-start">Дата выдачи</label>
+                        <div class="input-group datepicker">
+                            <input type="text" class="form-control" value="01.01.2010" name="passport-date-start" id="passport-date-start" placeholder="00.00.0000" maxlength="10">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group form-group-date col-md-4 col-sm-4 col-xs-6">
+                        <label for="passport-date-end">Действителен до</label>
+                        <div class="input-group datepicker">
+                            <input type="text" class="form-control" value="01.01.2020" name="passport-date-end" id="passport-date-end" placeholder="00.00.0000" maxlength="10">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-12 col-sm-12 col-xs-12">
+                        <label for="passport-issued">Кем выдан</label>
+                        <textarea class="form-control" name="passport-issued" id="passport-issued"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-block">
+                <div class="row">
+                    <div class="form-group col-md-4 col-sm-4 col-xs-6">
+                        <label for="snails">СНИЛС</label>
+                        <input type="text" class="form-control" value="" name="snails" id="snails">
+                    </div>
+                    <div class="form-group col-md-4 col-sm-4 col-xs-6">
+                        <label for="inn">ИНН</label>
+                        <input type="text" class="form-control" value="" name="inn" id="inn">
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-block">
+                <h2>Сканы документов</h2>
+                <table class="table table-docs" id="docs-cand">
+                    <tbody>
+                        <tr>
+                            <td class="cell-name">
+                                <a href="images/test-doc.jpg" target="_blank">СНИЛС.pdf</a>
+                                <!-- Добавлена скрытая картинка, чтобы она подгрузилась. Нужно для просмотра документа. -->
+                                <img src="images/test-doc.jpg" alt="" class="hide">
+                            </td>
+                            <td>
+                                <a class="btn btn-download" href="#" role="button" title="Скачать документ"><i class="fa fa-download" aria-hidden="true"></i></a>
+                            </td>
+                            <td>
+                                <button class="btn btn-remove" type="button" title="Удалить документ"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <label class="file-upload" data-toggle="tooltip" data-placement="top" title="doc, pdf, txt, не более 5Мб">
+                    <input type="file" name="file-doc">
+                    Добавить файл
+                </label>
+            </section>
+
+            <div class="clearfix form-block form-btns">
+				<button type="button" class="btn btn-default">Вернуться</button>
+                <button type="submit" class="btn btn-success">Сохранить</button>
+            </div>
+        </form>
+    </div>
+    
+    @@include('include/_js.html')
+
+    <script type="text/javascript">
+    $(function () {
+        initNavbar();
+
+        $('.datepicker').datetimepicker({
+            dateFormat: 'dd.mm.yyyy',
+            language: 'ru'
+        });
+
+        initShowDoc();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Выписать штраф/премию</title>
+    
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content empl-fine">
+        <div class="clearfix head-with-btn">
+            <a href="hatimaki-empl-fine-add.html" class="btn btn-success btn-p25">Выписать штраф/премию</a>
+            <h1>Штрафы и премии</h1>
+        </div>
+        <hr class="hidden-sm hidden-xs">
+        
+        <!-- beg: form-fine-premium -->
+        <form action="" method="post" class="empl-fine__filter">
+            <div class="row">
+                <div class="form-group col-md-4 col-sm-3 col-xs-6">
+                    <label for="period">За период</label>
+                    <div class="input-groups-periods">
+                        <div class="input-group datepicker">
+                            <input type="text" class="form-control periodDateInput" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                            </span>
+                        </div>
+                        <span class="input-group-dash">&dash;</span>
+                        <div class="input-group datepicker">
+                            <input type="text" class="form-control periodDateInput" value="01.01.1995" name="todate" placeholder="00.00.0000" maxlength="10">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-4 col-sm-3 col-xs-6">
+                    <label for="branches" class="hidden-xs">Филиал</label>
+                    <select class="form-control" placeholder="Филиал" name="branches" id="branches">
+                        <option value="-1"></option>
+                        <option value="1">Щербинка</option>
+                        <option value="2">Бутово</option>
+                        <option value="3">Ясенево</option>
+                        <option value="4">Коммунарка</option>
+                        <option value="5">Подольск</option>
+                        <option value="6">Московский</option>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4 col-md-4 hidden-sm hidden-xs">
+                    <label for="post">Должность</label>
+                    <select class="form-control js-select2" name="post[]" id="post" multiple="multiple">
+                        <option value="1">Администратор филиал</option>
+                        <option value="2">Директор IT</option>
+                        <option value="3">Водитель</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-3 col-xs-6 visible-sm visible-xs">
+                    <label for="" class="hidden-xs">Должность</label>
+                    <div class="btn-group-post">
+                        <button type="button" class="btn btn-default btn-post" title="Повар-пиццмейкер, Повар-сушист"><i class="fas fa-utensils"></i></button>
+                        <button type="button" class="btn btn-default btn-post active" title="Администратор"><i class="fas fa-comments"></i></button>
+                        <button type="button" class="btn btn-default btn-post" title="Водитель"><i class="fas fa-car"></i></button>
+                        <button type="button" class="btn btn-default btn-post" title="Сборщик"><i class="fas fa-child"></i></button>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                    <label for="nationality" class="hidden-xs">Кто выписал</label>
+                    <select class="js-select2 form-control" name="empl" id="empl">
+                        <option value="-1"></option>
+                        <option value="0">Кузнецов Евгений</option>
+                        <option value="1">Соколова Елена</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                    <label for="cause" class="hidden-xs">Причины премий/штрафов</label>
+                    <select class="js-select2 form-control" name="cause" id="cause">
+                        <option value="-1"></option>
+                        <option value="0">Опоздание на 5 минут</option>
+                        <option value="1">Опоздание на 10 минут</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                    <label for="fines" class="hidden-xs">Штрафы</label>
+                    <select class="js-select2 form-control" name="fines" id="fines">
+                        <option value="0">Все</option>
+                        <option value="1">С объяснительными</option>
+                        <option value="2">С объяснительными и увеличенным штрафом</option>
+                        <option value="3">С объяснительными и ответом от сотрудника</option>
+                    </select>
+                </div>
+                <div class="form-btns margintop col-md-12 col-sm-12 col-xs-12">
+                    <button type="submit" class="btn btn-primary btn-p25">Применить</button>
+                </div>
+            </div>
+        </form>
+        <!-- end: form-fine-premium -->
+
+        <div class="clearfix table-responsive">
+            <table class="table table-hover table-valign-middle empl-fine__table">
+                <thead>
+                    <tr>
+                        <th>Филиал</th>
+                        <th>
+                            <span class="hidden-sm hidden-xs">Должность</span>
+                            <span class="visible-sm visible-xs">&nbsp;</span>
+                        </th>
+                        <th>ФИО</th>
+                        <th class="cell-align-center">Дата</th>
+                        <th>Причина</th>
+                        <th>Выписал</th>
+                        <th class="cell-align-center">Сумма</th>
+                        <th class="cell-align-center">Ответ к дате</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="danger">
+                        <td data-label="Филиал">
+                            <span class="hidden-sm">Коммунарка</span>
+                            <span class="visible-sm">Коммун.</span>
+                        </td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Администратор</span>
+                            <span class="visible-sm name-post" title="Администратор"><i class="fa fa-comments"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Петренко Юлия
+                            <span class="visible-xs name-post" title="Администратор"><i class="fa fa-comments"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">01.02.2018</td>
+                        <td data-label="Причина">Опоздание от 25 до 30 мин</td>
+                        <td data-label="Выписал">Кузнецов Евгений</td>
+                        <td data-label="Сумма" class="cell-fine">
+                            <span class="sum">500</span>
+                        </td>
+                        <td class="cell-align-center" data-label="Ответ к дате">
+                            20.05.2019
+                        </td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil-alt"></i></button>
+                            <button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fa fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="Филиал">Бутово</td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Повар-пиццмейкер</span>
+                            <span class="visible-sm name-post" title="Повар-пиццмейкер"><i class="fa fa-cutlery"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Трофимова Ирина 
+                            <span class="visible-xs name-post" title="Повар-пиццмейкер"><i class="fa fa-cutlery"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">01.02.2018</td>
+                        <td data-label="Причина">Фальсификация данных, введение в заблуждение и обман вышестоящего руководства</td>
+                        <td data-label="Выписал">Соколова Елена</td>
+                        <td data-label="Сумма" class="cell-fine">
+                            <span class="sum">1000</span>
+                        </td>
+                        <td class="cell-align-center" data-label="Ответ к дате">
+                            20.05.2019
+                        </td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title=""><i class="far fa-file-exclamation"></i></button>
+                            <button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil-alt"></i></button>
+                            <button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fa fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="Филиал">
+                            <span class="hidden-sm">Московский</span>
+                            <span class="visible-sm">Москов.</span>
+                        </td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Сборщик</span>
+                            <span class="visible-sm name-post" title="Сборщик"><i class="fa fa-child"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Нишанова Майя
+                            <span class="visible-xs name-post" title="Сборщик"><i class="fa fa-child"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">01.02.2018</td>
+                        <td data-label="Причина">Доплата за выходные</td>
+                        <td data-label="Выписал">Андрейченко Константин</td>
+                        <td data-label="Сумма" class="cell-premium">
+                            <span class="sum">200</span>
+                        </td>
+                        <td></td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil-alt"></i></button>
+                            <button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fa fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="Филиал">Ясенево</td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Повар-сушист</span>
+                            <span class="visible-sm name-post" title="Повар-сушист"><i class="fa fa-cutlery"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Колосова Надежда
+                            <span class="visible-xs name-post" title="Повар-сушист"><i class="fa fa-cutlery"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">01.02.2018</td>
+                        <td data-label="Причина">Доплата за выходные</td>
+                        <td data-label="Выписал">Солдатова Анна</td>
+                        <td data-label="Сумма" class="cell-premium">
+                            <span class="sum">200</span>
+                        </td>
+                        <td></td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title="Редактировать"><i class="fas fa-pencil-alt"></i></button>
+                            <button type="button" class="btn btn-sm btn-default" title="Удалить"><i class="fa fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="Филиал">
+                            <span class="hidden-sm">Щербинка</span>
+                            <span class="visible-sm">Щербин.</span>
+                        </td>
+                        <td data-label="Должность">
+                            <span class="hidden-sm">Администратор</span>
+                            <span class="visible-sm name-post" title="Администратор"><i class="fa fa-comments"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Нематова Асалпошша
+                            <span class="visible-xs name-post" title="Администратор"><i class="fa fa-comments"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">31.01.2018</td>
+                        <td data-label="Причина">Образцовое исполнение обязанностей</td>
+                        <td data-label="Выписал">Соколова Елена</td>
+                        <td data-label="Сумма" class="cell-premium">
+                            <span class="sum">2500</span>
+                        </td>
+                        <td></td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title=""><i class="fas fa-list"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="Филиал">Бутово</td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Повар-сушист</span>
+                            <span class="visible-sm name-post" title="Повар-сушист"><i class="fa fa-cutlery"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Тровимова Ирина
+                            <span class="visible-xs name-post" title="Повар-сушист"><i class="fa fa-cutlery"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">31.01.2018</td>
+                        <td data-label="Причина">Несоблюдение субординации; отказ от выполнения должностных обязанностей</td>
+                        <td data-label="Выписал">Соколова Елена</td>
+                        <td data-label="Сумма" class="cell-fine">
+                            <span class="sum">1000</span>
+                        </td>
+                        <td class="cell-align-center" data-label="Ответ к дате">
+                            16.05.2019
+                        </td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title=""><i class="far fa-file-exclamation"></i></button>
+                            <button type="button" class="btn btn-sm btn-default" title=""><i class="fas fa-list"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="Филиал">Подольск</td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Сборщик</span>
+                            <span class="visible-sm name-post" title="Сборщик"><i class="fa fa-child"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Эргашева Шахи
+                            <span class="visible-xs name-post" title="Сборщик"><i class="fa fa-child"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">31.01.2018</td>
+                        <td data-label="Причина">Зарплата уборщицы</td>
+                        <td data-label="Выписал">Солдатова Анна</td>
+                        <td data-label="Сумма" class="cell-premium">
+                            <span class="sum">1800</span>
+                        </td>
+                        <td></td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title=""><i class="fas fa-list"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="Филиал">
+                            <span class="hidden-sm">Коммунарка</span>
+                            <span class="visible-sm">Коммун.</span>
+                        </td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Водитель</span>
+                            <span class="visible-sm name-post" title="Водитель"><i class="fas fa-car-alt"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Илхамжан Кызы Гулшада
+                            <span class="visible-xs name-post" title="Водитель"><i class="fas fa-car-alt"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">31.01.2018</td>
+                        <td data-label="Причина">Образцовое исполнение обязанностей</td>
+                        <td data-label="Выписал">Кузнецов Евгений</td>
+                        <td data-label="Сумма" class="cell-premium">
+                            <span class="sum">2500</span>
+                        </td>
+                        <td></td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title=""><i class="fas fa-list"></i></button>
+                        </td>
+                    </tr>
+                    <tr class="danger">
+                        <td data-label="Филиал">Подольск</td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Сборщик</span>
+                            <span class="visible-sm name-post" title="Сборщик"><i class="fa fa-child"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Эргашева Шахи
+                            <span class="visible-xs name-post" title="Сборщик"><i class="fa fa-child"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">31.01.2018</td>
+                        <td data-label="Причина">Опоздание от 25 до 30 мин</td>
+                        <td data-label="Выписал">Солдатова Анна</td>
+                        <td data-label="Сумма" class="cell-fine">
+                            <span class="sum">500</span>
+                            <span title="Увеличен штраф"><i class="fas fa-arrow-up"></i></span>
+                        </td>
+                        <td class="cell-align-center" data-label="Ответ к дате">
+                            13.05.2019
+                        </td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title=""><i class="fas fa-list"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td data-label="Филиал">
+                            <span class="hidden-sm">Коммунарка</span>
+                            <span class="visible-sm">Коммун.</span>
+                        </td>
+                        <td data-label="Должность" class="cell-post">
+                            <span class="hidden-sm">Водитель</span>
+                            <span class="visible-sm name-post" title="Водитель"><i class="fas fa-car-alt"></i></span>
+                        </td>
+                        <td data-label="ФИО" class="cell-name">
+                            Илхамжан Кызы Гулшада
+                            <span class="visible-xs name-post" title="Водитель"><i class="fas fa-car-alt"></i></span>
+                        </td>
+                        <td data-label="Дата" class="cell-align-center cell-date">31.01.2018</td>
+                        <td data-label="Причина">Опоздание от 16 до 20 мин</td>
+                        <td data-label="Выписал">Кузнецов Евгений</td>
+                        <td data-label="Сумма" class="cell-fine">
+                            <span class="sum">300</span>
+                        </td>
+                        <td></td>
+                        <td class="cell-btns">
+                            <button type="button" class="btn btn-sm btn-default" title=""><i class="fas fa-list"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        @@include('include/pagination.html')
+    </div>
+
+    @@include('include/_js.html')
+
+    <script type="text/javascript">
+    $(function () {
+        initNavbar();
+
+        $('.js-select2').select2({
+            width: '100%'
+        });
+
+        $('#branches').select2({
+            tags: true,
+            placeholder: {
+                id: '-1',
+                text: 'Филиал'
+            },
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#empl').select2({
+            tags: true,
+            placeholder: {
+                id: '-1',
+                text: 'Кто выписал'
+            },
+            allowClear: true,
+            width: '100%'
+        });
+        
+        $('#cause').select2({
+            tags: true,
+            placeholder: {
+                id: '-1',
+                text: 'Причины штрафов/премий'
+            },
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('.datepicker').datetimepicker({
+            language: 'ru',
+            pickTime: false
+        });
+    });
+    </script>
+</body>
+</html>

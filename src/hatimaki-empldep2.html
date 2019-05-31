@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Депозит</title>
+    
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+    <div class="container-fluid content">
+        <h1>Отчёт по депозитам</h1>
+        <hr>
+        <form action="" method="post" class="form-respons form-deposits">
+			<div class="row">
+				<div class="form-group col-md-4 col-sm-4">
+					<label for="branches">Филиал</label>
+					<select class="form-control js-select-multiple" name="branches[]" id="branches" multiple="multiple">
+						<option value="1">Щербинка</option>
+						<option value="2">Бутово</option>
+						<option value="3">Ясенево</option>
+						<option value="4">Коммунарка</option>
+						<option value="5">Подольск</option>
+						<option value="6">Московский</option>
+					</select>
+				</div>
+				<div class="form-group col-md-3 col-sm-3">
+					<label for="status">Статус</label>
+					<select class="form-control js-select-multiple" name="status[]" id="status" multiple="multiple">
+						<option value="1">Без депозита</option>
+						<option value="2">Внесён частично</option>
+						<option value="3">Внесён</option>
+						<option value="4">Не внесён</option>
+						<option value="5">Внесён излишне</option>
+					</select>
+				</div>
+				<div class="form-group col-md-2 col-sm-2 form-group-sum">
+					<label for="suminit">Сумма на депозите, <i class="fa fa-rub" aria-hidden="true"></i></label>
+					<div class="block-sum">
+						от
+						<input type="text" class="form-control" value="0" name="suminit" id="suminit" maxlength="5">
+						до
+						<input type="text" class="form-control" value="15 000" name="sumfin" id="sumfin" maxlength="5">
+					</div>
+				</div>
+				<div class="form-group col-md-2 col-sm-2 form-group-sum">
+					<label for="suminit">Недостаток/избыток, <i class="fa fa-rub" aria-hidden="true"></i></label>
+					<div class="block-sum">
+						от
+						<input type="text" class="form-control" value="-15 000" name="suminit2" id="suminit2" maxlength="5">
+						до
+						<input type="text" class="form-control" value="+15 000" name="sumfin2" id="sumfin2" maxlength="5">
+					</div>
+				</div>
+			</div>
+			<div class="row">
+                <div class="form-group col-md-4 col-sm-4">
+                    <label for="posts">Должность сотрудника</label>
+                    <select class="form-control js-select-multiple" name="posts[]" id="posts" multiple="multiple">
+                        <option value="1">Администратор филиал</option>
+                        <option value="2">Директор IT</option>
+                        <option value="3">Водитель</option>
+                    </select>
+                </div>
+				<div class="col-md-8 col-sm-8 form-btns">
+					<button type="submit" class="btn btn-primary">Показать</button>
+				</div>
+			</div>
+        </form>
+        
+        <div class="clearfix table-responsive">
+            <table class="table table-hover table-deposits">
+                <thead>
+                    <tr>
+                        <th>Филиал</th>
+                        <th>Сотрудник</th>
+                        <th>Должность</th>
+                        <th class="cell-dep">Статус</th>
+                        <th class="cell-align-center">Размер депозита</th>
+                        <th class="cell-align-center">Сумма на депозите</th>
+                        <th class="cell-align-center">Недостаток/избыток</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Коммунарка</td>
+                        <td>Константинопольский Анатолий</td>
+                        <td>Технический сотрудник</td>
+                        <td class="cell-dep stat-dep-without">Без депозита</td>
+                        <td class="cell-sum">0 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">0 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>Коммунарка</td>
+                        <td>Смирнова Евгения</td>
+                        <td>Администратор</td>
+                        <td class="cell-dep stat-dep-partly">Внесён частично</td>
+                        <td class="cell-sum">15 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">10 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">-5 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Бутово</td>
+                        <td>Загайная Светлана</td>
+                        <td>Администратор</td>
+                        <td class="cell-dep stat-dep-all">Внесён</td>
+                        <td class="cell-sum">15 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">15 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td>Коммунарка</td>
+                        <td>Кирилюк Сергей</td>
+                        <td>Официант</td>
+                        <td class="cell-dep stat-dep-not">Не внесён</td>
+                        <td class="cell-sum">10 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">0 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">-10 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                    </tr>
+                    <tr>
+                        <td>Коммунарка</td>
+                        <td>Нематов Аброр</td>
+                        <td>Повар-пиццмейкер</td>
+                        <td class="cell-dep stat-dep-more">Внесён излишне</td>
+                        <td class="cell-sum">10 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">11 000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                        <td class="cell-sum">+1000 <i class="fa fa-rub" aria-hidden="true"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @@include('include/_js.html')
+
+    <script type="text/javascript">
+    $(function () {
+        initNavbar();
+        
+        $('.js-select-multiple').select2({
+			width: '100%'
+		});
+    });
+    </script>
+</body>
+</html>
