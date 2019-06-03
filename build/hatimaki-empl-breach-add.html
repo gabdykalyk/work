@@ -1,23 +1,17 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Нарушения</title>
-    
-    <!-- Bootstrap -->
-<link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
 
+    <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet">
 <link href="fonts/fontawesome/css/all.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
-
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
-<link href="css/scrollbar.css" rel="stylesheet" />
-<link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
-
 <link href="css/main.min.css" rel="stylesheet">
-<link href="css/styles-lk.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -148,7 +142,7 @@
         </li>
     </ul>
 </div>
-    
+
     <div class="container-fluid content empl-fine">
         <div class="clearfix head-with-btn">
             <a href="hatimaki-empl-fine-list.html" class="btn btn-default btn-p25">К списку нарушений</a>
@@ -174,7 +168,8 @@
                 <div class="form-group form-group-date col-md-2 col-sm-3 col-xs-12">
                     <label for="fa-date" class="hidden-xs">Дата нарушения</label>
                     <div class="input-group datepicker">
-                        <input type="text" class="form-control" name="fa-date" id="fa-date" placeholder="00.00.0000" maxlength="10" value="">
+                        <input type="text" class="form-control" name="fa-date" id="fa-date" placeholder="00.00.0000"
+                            maxlength="10" value="">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
                         </span>
@@ -189,7 +184,7 @@
                         <option value="3">Опоздание свыше 1ч</option>
                     </select>
                 </div>
-                <div class="form-group col-md-4 col-sm-4 col-xs-12">
+                <div class="form-group col-md-4 col-sm-6 col-xs-12">
                     <label for="fa-employee" class="hidden-xs">Сотрудник</label>
                     <select class="js-select-employee" name="fa-employee" id="fa-employee">
                         <option></option>
@@ -198,17 +193,32 @@
                         <option value="3">Сидоров</option>
                     </select>
                 </div>
-                <div class="clearfix"></div>
-                <div class="col-md-4 margintop form-group form-group-checkbox">
-                    <div class="checkbox-nice">
-                        <label>
-                            <input type="checkbox" checked="">
-                            <span class="fa fa-check"></span>
-                            Обязательно заполнение объяснительной
-                        </label>
+                <div class="clearfix hidden-sm"></div>
+                <div class="col-md-4 col-sm-6 margintop sm-m25">
+                    <div class="row">
+                        <div class="col-sm-12 form-group-checkbox">
+                            <div class="checkbox-nice">
+                                <label>
+                                    <input type="checkbox" checked="">
+                                    <span class="fa fa-check"></span>
+                                    Обязательно заполнение объяснительной
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-10 hidden-lg hidden-md visible-sm-flex form-group-flex">
+                            <label for="fine-date">Заполнить до</label>
+                            <div class="input-group datepicker">
+                                <input type="text" class="form-control" value="01.05.2017" name="end-date"
+                                    id="end-date" placeholder="00.00.0000" maxlength="10">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button"><i
+                                            class="fas fa-calendar-alt"></i></button>
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3 margintop form-group form-group-flex">
+                <div class="col-md-3 hidden-sm margintop form-group form-group-flex">
                     <label for="fine-date">Заполнить до</label>
                     <div class="input-group datepicker">
                         <input type="text" class="form-control" value="01.05.2017" name="end-date" id="end-date"
@@ -218,7 +228,8 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-md-5 col-sm-8 col-xs-12 margintop form-btns">
+                <div class="clearfix visible-sm"></div>
+                <div class="col-md-5 col-sm-12 col-xs-12 margintop form-btns">
                     <button type="submit" class="btn btn-primary btn-p25">Выписать нарушение</button>
                 </div>
             </div>
@@ -244,81 +255,83 @@
 <script type="text/javascript" src="js/js-gl.js"></script>
 
     <script type="text/javascript">
-    // изменение высоты ячеек в таблице для моб. версии (w < 768px)
-    $(window).on('load resize', function() {
-        var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        // изменение высоты ячеек в таблице для моб. версии (w < 768px)
+        $(window).on('load resize', function () {
+            var winWidth = window.innerWidth || document.documentElement.clientWidth || document.body
+                .clientWidth;
 
-        if (winWidth < 768) {
-            changeHeightCellMobile($('.table-fines'));
-        }
-    });
-
-    $(function () {
-        initNavbar();
-
-        // инициализация календаря
-        $('.datepicker').datetimepicker({
-            language: 'ru',
-            pickTime: false
+            if (winWidth < 768) {
+                changeHeightCellMobile($('.table-fines'));
+            }
         });
 
-        // инициализация элементов формы для фильров: .form-fines
-        $('.js-select-branches').select2({
-            placeholder: 'Все филиалы',
-            width: '100%'
-        });
+        $(function () {
+            initNavbar();
 
-        $('.js-select-posts').select2({
-            placeholder: 'Все должности',
-            width: '100%'
-        });
+            // инициализация календаря
+            $('.datepicker').datetimepicker({
+                language: 'ru',
+                pickTime: false
+            });
 
-        $('.js-select-employees').select2({
-            placeholder: 'Все авторы',
-            width: '100%'
-        });
-        
-        $('.js-select-fines').select2({
-            placeholder: 'Все причины',
-            width: '100%'
-        });
+            // инициализация элементов формы для фильров: .form-fines
+            $('.js-select-branches').select2({
+                placeholder: 'Все филиалы',
+                width: '100%'
+            });
 
-        // вызов модального окна при клике на ячейку с классом .js-show-modal-fine
-        $('.js-show-modal-fine').click(function() {
-            $('#modalEditFine').modal('show');
-        });
+            $('.js-select-posts').select2({
+                placeholder: 'Все должности',
+                width: '100%'
+            });
 
-        // инициализация элементов формы добавления и редактирования нарушения: .form-addfine, .form-fine-edit
-        $('.js-select-employee').select2({
-            placeholder: 'Сотрудник',
-            width: '100%',
-            allowClear: true
-        });
+            $('.js-select-employees').select2({
+                placeholder: 'Все авторы',
+                width: '100%'
+            });
 
-        $('.js-select-branch').select2({
-            placeholder: 'Филиал',
-            width: '100%',
-            allowClear: true
-        });
+            $('.js-select-fines').select2({
+                placeholder: 'Все причины',
+                width: '100%'
+            });
 
-        $('.js-select-post').select2({
-            placeholder: 'Должность',
-            width: '100%',
-            allowClear: true
-        });
+            // вызов модального окна при клике на ячейку с классом .js-show-modal-fine
+            $('.js-show-modal-fine').click(function () {
+                $('#modalEditFine').modal('show');
+            });
 
-        $('.js-select-fine').select2({
-            placeholder: 'Тип нарушения',
-            width: '100%',
-            allowClear: true
-        });
+            // инициализация элементов формы добавления и редактирования нарушения: .form-addfine, .form-fine-edit
+            $('.js-select-employee').select2({
+                placeholder: 'Сотрудник',
+                width: '100%',
+                allowClear: true
+            });
 
-        $('.js-select-author').select2({
-            placeholder: 'Кто выписал',
-            width: '100%',
-            allowClear: true
+            $('.js-select-branch').select2({
+                placeholder: 'Филиал',
+                width: '100%',
+                allowClear: true
+            });
+
+            $('.js-select-post').select2({
+                placeholder: 'Должность',
+                width: '100%',
+                allowClear: true
+            });
+
+            $('.js-select-fine').select2({
+                placeholder: 'Тип нарушения',
+                width: '100%',
+                allowClear: true
+            });
+
+            $('.js-select-author').select2({
+                placeholder: 'Кто выписал',
+                width: '100%',
+                allowClear: true
+            });
         });
-    });
     </script>
 </body>
+
 </html>
