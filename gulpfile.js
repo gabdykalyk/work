@@ -16,9 +16,19 @@ gulp.task('browser-sync', function() {
       baseDir: './build'
     },
     open: true // do not automatically open browser
-  }, browserSyncReuseTab);
+  });
   browserSync.watch( 'build', browserSync.reload() );
 });
+/*gulp.task('browser-sync', function() {
+  browserSync.init({
+    port: 3009,
+    server: {
+      baseDir: './build'
+    },
+    open: true // do not automatically open browser
+  }, browserSyncReuseTab);
+  browserSync.watch( 'build', browserSync.reload() );
+});*/
 
 gulp.task('fileinclude', function() {
   return gulp.src('./src/*.html')
