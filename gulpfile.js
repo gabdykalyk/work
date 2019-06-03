@@ -15,7 +15,7 @@ gulp.task('browser-sync', function() {
     server: {
       baseDir: './build'
     },
-    open: false // do not automatically open browser
+    open: true // do not automatically open browser
   }, browserSyncReuseTab);
   browserSync.watch( 'build', browserSync.reload() );
 });
@@ -44,8 +44,8 @@ gulp.task('lessPack', async function() {
 gulp.task('watch', function(cb) {
   gulp.watch('./src/less/**/*.less', gulp.series('lessPack') );
   gulp.watch('./src/less/*.less', gulp.series('lessPack') );
-	gulp.watch('./src/**/*.html').on( 'change' ,gulp.series('fileinclude') );
-	gulp.watch('./build/index.html').on('change', browserSync.reload);
+	gulp.watch('./src/**/*.html').on( 'change',gulp.series('fileinclude') );
+	gulp.watch('./build/*.html').on( 'change', browserSync.reload);
 });
 
 gulp.task('default', gulp.series(
