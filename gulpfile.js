@@ -6,6 +6,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const rename = require('gulp-rename');
 const gulpinclude = require('gulp-file-include');
 const browserSync = require('browser-sync').create();
+var browserSyncReuseTab = require('browser-sync-reuse-tab')(browserSync)
 
 //server
 gulp.task('browser-sync', function() {
@@ -15,7 +16,7 @@ gulp.task('browser-sync', function() {
       baseDir: './build'
     },
     open: false // do not automatically open browser
-  });
+  }, browserSyncReuseTab);
   browserSync.watch( 'build', browserSync.reload() );
 });
 
