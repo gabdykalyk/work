@@ -2,7 +2,7 @@ function initStep1() {
 	initDatepicker();
 	initPhoneMask();
 	initTooltip();
-	initKladr();
+	//initKladr();
 	initSelect();
 	showBlockWork();
 }

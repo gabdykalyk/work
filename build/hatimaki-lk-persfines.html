@@ -153,25 +153,28 @@
 </div>
 
     <div class="container-fluid content">
-        <h1>Александр Константиновский</h1>
-
+        <div class="clearfix head-with-btn resp">
+            <h1>Александр Константиновский</h1>
+            <a href="#" class="btn btn-default hidden-xs btn-p25">К списку сотрудников</a>
+        </div>
         <div class="clearfix info-peracc">
             <ul class="list-unstyled list-posts">
                 <li>Повар-сушист / 9 / универсал</li>
-                <li>Сборщик / 3 / &mdash;</li>
+                <li>Сборщик / 3 / —</li>
             </ul>
+            <a href="#" class="btn btn-default visible-xs">К списку сотрудников</a>
             <ul class="list-unstyled list-accounts">
-                <li><span class="name">Депозит</span><span class="sum stat-dep-partly">10 000 <i class="fa fa-rub" aria-hidden="true"></i></span></li>
-                <li><span class="name"><span class="full">Премиальный фонд</span><span class="short">Прем. фонд</span></span><span class="sum sum-yes">3000 <i class="fa fa-rub" aria-hidden="true"></i></span></li>
-                <li><span class="name">Личный счёт</span><span class="sum sum-no">-500 <i class="fa fa-rub" aria-hidden="true"></i></span></li>
+                <li><span class="name">Депозит</span><span class="sum stat-dep-partly">10 000 <i class="fas fa-ruble-sign"></i></span></li>
+                <li><span class="name"><span class="full">Премиальный фонд</span><span class="short">Прем. фонд</span></span><span class="sum sum-yes">3000 <i class="fas fa-ruble-sign"></i></span></li>
+                <li><span class="name">Личный счёт</span><span class="sum sum-no">-500 <i class="fas fa-ruble-sign"></i></span></li>
             </ul>
         </div>
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs nav-tabs-lk">
             <li><a href="#" data-toggle="tab">Движение в компании</a></li>
-            <li class="active"><a href="#" data-toggle="tab">Основные показатели</a></li>
-            <li><a href="#" data-toggle="tab">Штрафы и поощрения</a></li>
+            <li><a href="#" data-toggle="tab">Основные показатели</a></li>
+            <li class="active"><a href="#" data-toggle="tab">Штрафы / поощрения / нарушения</a></li>
             <li><a href="#" data-toggle="tab">Анкета</a></li>
             <li><a href="#" data-toggle="tab">Депозит</a></li>
             <li><a href="#" data-toggle="tab">Личный счет</a></li>
@@ -185,72 +188,106 @@
                 <ul class="nav nav-tabs-lk-xs">
                     <li><a href="#">Движение в компании</a></li>
                     <li><a href="#">Основные показатели</a></li>
-                    <li class="active"><a href="#">Штрафы и поощрения</a></li>
+                    <li class="active"><a href="#">Штрафы / поощрения / нарушения</a></li>
                 </ul>
 
-                <form action="" method="post" class="form-inline form-filters-inline no-indents form-mangen">
-                    <div class="form-group">
-                        <label for="branches" class="hidden-xs">По филиалу</label>
-                        <select name="branches" id="branches" class="form-control">
-                            <option value="1" selected>Все филиалы</option>
-                            <option value="2">Щербинка</option>
-                            <option value="3">Бутово</option>
-                            <option value="4">Ясенево</option>
-                            <option value="5">Коммунарка</option>
-                            <option value="6">Подольск</option>
-                            <option value="7">Московский</option>
-                        </select>
-                    </div>
-                    <div class="form-group form-group-datepicker">
-                        <label for="period" class="hidden-xs">За период</label>
-                        <div class="input-group datepicker">
-                            <input type="text" class="form-control" value="01.05.2017" name="date-begin" id="date-begin" placeholder="00.00.0000" maxlength="10">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
-                            </span>
+                <form action="" method="post" class="form-respons manfines__form js-date">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-3 form-group">
+                            <div class="form-group-flex">
+                                <label for="branches" class="hidden-xs">По филиалу</label>
+                                <select name="branches" id="branches" class="form-control">
+                                    <option value="1" selected>Все филиалы</option>
+                                    <option value="2">Щербинка</option>
+                                    <option value="3">Бутово</option>
+                                    <option value="4">Ясенево</option>
+                                    <option value="5">Коммунарка</option>
+                                    <option value="6">Подольск</option>
+                                    <option value="7">Московский</option>
+                                </select>
+                            </div>
                         </div>
-                        <span class="input-group-dash">&ndash;</span>
-                        <div class="input-group datepicker">
-                            <input type="text" class="form-control" value="31.05.2017" name="date-end" id="date-end" placeholder="00.00.0000" maxlength="10">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default" type="button"><i class="glyphicon glyphicon-calendar"></i></button>
-                            </span>
+                        <div class="col-md-3 col-sm-3 form-group choosePeriod">
+                            <div class="form-group-flex">
+                                <label for="period">За период</label>
+                                <select class="form-control selectPeriod js-emplsurcharge-period" name="period">
+                                    <option value="days">Сегодня</option>
+                                    <option value="arbitrary" selected="">Произвольный</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-6 form-group periodDate js-types">
+                            <div class="input-groups-periods">
+                                <div class="input-group datepicker">
+                                    <input type="text" class="form-control periodDateInput" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                                    </span>
+                                </div>
+                                <span class="input-group-dash">–</span>
+                                <div class="input-group datepicker">
+                                    <input type="text" class="form-control periodDateInput" value="01.01.1995" name="todate" placeholder="00.00.0000" maxlength="10">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12 form-group blockBtn">
+                            <button type="submit" class="btn btn-primary btn-p25">Показать</button>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Применить</button>
                 </form>
 
                 <div class="row">
                     <div class="col-md-3 col-sm-12 col-manfines">
                         <div class="row">
                             <div class="col-md-12 col-sm-4">
-                                <table class="table table-manfines">
+                                <table class="table manfines__table">
                                     <tbody>
                                         <tr class="row-head">
                                             <td>Штрафы</td>
                                             <td>3</td>
                                         </tr>
                                         <tr>
-                                            <td>опоздание</td>
+                                            <td>Не отправлена объяснительная</td>
+                                            <td>1</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Опоздание от 5 до 10 мин.</td>
+                                            <td>2</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-12 col-sm-4">
+                                <table class="table manfines__table">
+                                    <tbody>
+                                        <tr class="row-head">
+                                            <td>Нарушения</td>
                                             <td>2</td>
                                         </tr>
                                         <tr>
-                                            <td>нарушение технологии</td>
+                                            <td>Не закрыта кассовая смена в iiko</td>
+                                            <td>1</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Повторное внесение</td>
                                             <td>1</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="col-md-12 col-sm-4">
-                                <table class="table table-manfines">
+                                <table class="table manfines__table">
                                     <tbody>
                                         <tr class="row-head">
-                                            <td>Премии</td>
-                                            <td>1</td>
+                                            <td>Премия</td>
+                                            <td>6</td>
                                         </tr>
                                         <tr>
-                                            <td>помощь по хозяйству</td>
-                                            <td>1</td>
+                                            <td>Компенсация за короткую смену</td>
+                                            <td>6</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -258,55 +295,163 @@
                         </div>
                     </div>
 
-                    <div class="col-md-7 col-md-offset-1 col-sm-12 col-manfines-detail">
+                    <div class="col-md-9 col-sm-12 col-manfines-detail">
                         <div class="table-responsive">
-                            <table class="table table-manfines-detail">
+                            <table class="table table-valign-middle manfines__detail">
                                 <thead>
                                     <tr>
-                                        <th style="width: 8%;">Филиал</th>
-                                        <th style="width: 120px;" class="cell-align-center">Дата</th>
-                                        <th style="width: 10%;">Мера</th>
-                                        <th style="width: 25%;">Причина</th>
-                                        <th style="width: 8%;" class="cell-summ">Сумма</th>
+                                        <th>Филиал</th>
+                                        <th class="cell-align-center">Дата</th>
+                                        <th>Мера</th>
+                                        <th>Причина</th>
+                                        <th class="cell-align-center">Сумма</th>
                                         <th>Кто выписал</th>
+                                        <th>Ответ к дате</th>
+                                        <th>Объяснит.-я</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td data-label="Филиал" class="cell-name">Щербинка</td>
-                                        <td data-label="Дата" class="cell-align-center">10.11.2017</td>
-                                        <td data-label="Мера">штраф</td>
-                                        <td data-label="Причина">опоздание</td>
-                                        <td data-label="Сумма" class="cell-summ">100 <i class="fa fa-rub txt-xs" aria-hidden="true"></i></td>
-                                        <td data-label="Кто выписал">Илья Константинопольский</td>
+                                    <tr class="danger">
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">19.05.2019</td>
+                                        <td data-label="Мера">Штраф</td>
+                                        <td data-label="Причина">Не отправлена объяснительная</td>
+                                        <td data-label="Сумма" class="cell-align-center">100</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center">19.05.2019</td>
+                                        <td data-label="Объяснительная" class="cell-btns">
+                                            <button type="button" class="btn btn-text btn-default" title="" data-toggle="modal" data-target="#modalAddExplanatory">Написать</button>
+                                        </td>
                                     </tr>
                                     <tr>
-                                        <td data-label="Филиал" class="cell-name">Щербинка</td>
-                                        <td data-label="Дата" class="cell-align-center">15.11.2017</td>
-                                        <td data-label="Мера">штраф</td>
-                                        <td data-label="Причина">нарушение технологии</td>
-                                        <td data-label="Сумма" class="cell-summ">500 <i class="fa fa-rub txt-xs" aria-hidden="true"></i></td>
-                                        <td data-label="Кто выписал">Евгений Петров</td>
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">11.05.2019</td>
+                                        <td data-label="Мера">Премия</td>
+                                        <td data-label="Причина">Компенсация за короткую смену</td>
+                                        <td data-label="Сумма" class="cell-align-center">100</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center"></td>
+                                        <td data-label="Объяснительная" class="cell-btns"></td>
+                                    </tr>
+                                    <tr class="danger">
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">10.05.2019</td>
+                                        <td data-label="Мера">Штраф</td>
+                                        <td data-label="Причина">Опоздание от 5 до 10 мин.</td>
+                                        <td data-label="Сумма" class="cell-align-center">350 <span title="Увеличен штраф"><i class="fas fa-arrow-up"></i></span></td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center">10.05.2019</td>
+                                        <td data-label="Объяснительная" class="cell-btns">Просрочено</td>
+                                    </tr>
+                                    <tr class="danger">
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">17.04.2019</td>
+                                        <td data-label="Мера">Нарушение</td>
+                                        <td data-label="Причина">Не закрыта кассовая смена в iiko</td>
+                                        <td data-label="Сумма" class="cell-align-center">100</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center">19.05.2019</td>
+                                        <td data-label="Объяснительная" class="cell-btns">
+                                            <button type="button" class="btn btn-text btn-default" title="" data-toggle="modal" data-target="#modalAddExplanatory">Написать</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="danger">
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">08.04.2019</td>
+                                        <td data-label="Мера">Нарушение</td>
+                                        <td data-label="Причина">Повторное внесение</td>
+                                        <td data-label="Сумма" class="cell-align-center">150</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center">08.04.2019</td>
+                                        <td data-label="Объяснительная" class="cell-btns">Выписан штраф</td>
                                     </tr>
                                     <tr>
-                                        <td data-label="Филиал" class="cell-name">Щербинка</td>
-                                        <td data-label="Дата" class="cell-align-center">20.11.2017</td>
-                                        <td data-label="Мера">премия</td>
-                                        <td data-label="Причина">помощь по хозяйству</td>
-                                        <td data-label="Сумма" class="cell-summ">500 <i class="fa fa-rub txt-xs" aria-hidden="true"></i></td>
-                                        <td data-label="Кто выписал">Анастасия Соколова</td>
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">19.03.2019</td>
+                                        <td data-label="Мера">Премия</td>
+                                        <td data-label="Причина">Компенсация за короткую смену</td>
+                                        <td data-label="Сумма" class="cell-align-center">100</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center"></td>
+                                        <td data-label="Объяснительная" class="cell-btns"></td>
                                     </tr>
                                     <tr>
-                                        <td data-label="Филиал" class="cell-name">Бутово</td>
-                                        <td data-label="Дата" class="cell-align-center">25.11.2017</td>
-                                        <td data-label="Мера">штраф</td>
-                                        <td data-label="Причина">опоздание</td>
-                                        <td data-label="Сумма" class="cell-summ">300 <i class="fa fa-rub txt-xs" aria-hidden="true"></i></td>
-                                        <td data-label="Кто выписал">Анастасия Соколова</td>
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">10.03.2019</td>
+                                        <td data-label="Мера">Премия</td>
+                                        <td data-label="Причина">Компенсация за короткую смену</td>
+                                        <td data-label="Сумма" class="cell-align-center">100</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center"></td>
+                                        <td data-label="Объяснительная" class="cell-btns"></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">28.02.2019</td>
+                                        <td data-label="Мера">Штраф</td>
+                                        <td data-label="Причина">Опоздание от 5 до 10 мин.</td>
+                                        <td data-label="Сумма" class="cell-align-center">250</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center">28.02.2019</td>
+                                        <td data-label="Объяснительная" class="cell-btns">
+                                            <button type="button" class="btn btn-sm btn-default" title="Просмотреть объяснительную" data-toggle="modal" data-target="#modalViewExplanatoryImg"><i class="far fa-file-exclamation"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">16.02.2019</td>
+                                        <td data-label="Мера">Премия</td>
+                                        <td data-label="Причина">Компенсация за короткую смену</td>
+                                        <td data-label="Сумма" class="cell-align-center">100</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center"></td>
+                                        <td data-label="Объяснительная" class="cell-btns"></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Филиал">Коммунарка</td>
+                                        <td data-label="Дата" class="cell-align-center">29.01.2019</td>
+                                        <td data-label="Мера">Премия</td>
+                                        <td data-label="Причина">Компенсация за короткую смену</td>
+                                        <td data-label="Сумма" class="cell-align-center">100</td>
+                                        <td data-label="Кто выписал">Горюшкина Олеся Олеговна</td>
+                                        <td data-label="Ответ к дате" class="cell-align-center"></td>
+                                        <td data-label="Объяснительная" class="cell-btns"></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
+
+                        <div class="row hidden-xs">
+    <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="showed-text">
+            Показаны записи <b>1-10</b> из <b>85</b>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6">
+        <nav aria-label="Page navigation" class="pagination-container">
+            <ul class="pagination">
+                <li>
+                    <a href="#" aria-label="Предыдущая">
+                        <span aria-hidden="true">«</span>
+                    </a>
+                </li>
+                <li class="active"><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><a href="#">...</a></li>
+                <li><a href="#">9</a></li>
+                <li>
+                    <a href="#" aria-label="Следующая">
+                        <span aria-hidden="true">»</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
                     </div>
                 </div>
 
@@ -320,6 +465,143 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal view explanatory -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="modalViewExplanatory">
+    <div class="modal-dialog empl-fine__modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="expl">
+                    <div class="expl__title">
+                        <b>Трофимова Ирина,</b> 20.05.2019
+                    </div>
+                    <div class="expl__breach">
+                        Фальсификация данных, введение в заблуждение и обман вышестоящего руководства
+                    </div>
+                    <div class="expl__reason">
+                        <p>Селекция бренда, как бы это ни казалось парадоксальным, наследует эмпирический Кодекс.
+                                Собственность
+                                добросовестно использует социальный статус. Воздействие на потребителя гарантирует популярный
+                                департамент маркетинга и продаж. Психология восприятия рекламы, как следует из теоретических
+                                исследований, ускоряет медийный канал.</p>
+                        <p>До недавнего времени считалось, что преступление концентрирует продвигаемый взаимозачет, именно
+                            такой позиции придерживается арбитражная практика. Товарный кредит пока плохо экспортирует
+                            гражданско-правовой нестандартный подход. Государственная регистрация неестественно своевременно
+                            исполняет гарант, размещаясь во всех медиа. Доверенность определяет Кодекс. Вексель гарантирует
+                            конституционный товарный кредит, делая этот вопрос чрезвычайно актуальным.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="empl-fine__modal-btns">
+                    <button class="btn btn-default btn-p25" type="button" data-dismiss="modal">Закрыть</button>
+                    <button class="btn btn-primary btn-p25" type="button" data-dismiss="modal">Просмотрено</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="modalViewExplanatoryImg">
+    <div class="modal-dialog empl-fine__modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="expl">
+                    <div class="expl__title">
+                        <b>Трофимова Ирина,</b> 20.05.2019
+                    </div>
+                    <div class="expl__breach">
+                        Фальсификация данных, введение в заблуждение и обман вышестоящего руководства
+                    </div>
+                    <div class="expl__reason">
+                        <p>Государственная регистрация неестественно своевременно исполняет гарант, размещаясь во всех
+                            медиа. Доверенность определяет Кодекс. Вексель гарантирует конституционный товарный кредит,
+                            делая этот вопрос чрезвычайно актуальным.</p>
+                        <img src="images/explanatory.jpg" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="empl-fine__modal-btns">
+                    <button class="btn btn-default btn-p25" type="button" data-dismiss="modal">Закрыть</button>
+                    <button class="btn btn-primary btn-p25" type="button" data-dismiss="modal">Просмотрено</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal add explanatory -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="modalAddExplanatory">
+    <div class="modal-dialog manfines__modal" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-title">Отправить объяснительную</div>
+                <div class="form-group">
+                    <textarea class="form-control form-control-inp-text" name="description" id="description"></textarea>
+                </div>
+                <div class="file">
+                    <div class="file__block">
+                        <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                        <div class="file__name">Поздравление.avi</div>
+                        <button class="file__delete js-del" type="button" title="Удалить файл"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="file__block">
+                        <div class="file__file" style="color: #337AB7;"><i class="far fa-file-word"></i></div>
+                        <div class="file__name">Стихи.docx</div>
+                        <button class="file__delete js-del" type="button" title="Удалить файл"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="file__block">
+                        <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                        <div class="file__name">Открытка.jpg</div>
+                        <button class="file__delete js-del" type="button" title="Удалить файл"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="file__block">
+                        <div class="file__file" style="color: #74b816;"><i class="far fa-file-excel"></i></div>
+                        <div class="file__name">Стихи.xls</div>
+                        <button class="file__delete js-del" type="button" title="Удалить файл"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="file__block">
+                        <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                        <div class="file__name">Открытка.jpg</div>
+                        <button class="file__delete js-del" type="button" title="Удалить файл"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="file__block">
+                        <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                        <div class="file__name">Открытка.jpg</div>
+                        <button class="file__delete js-del" type="button" title="Удалить файл"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                    <div class="file__block">
+                        <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                        <div class="file__name">Открытка.jpg</div>
+                        <button class="file__delete js-del" type="button" title="Удалить файл"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="manfines__modal-btns">
+                    <label class="file__upload">
+                        <input type="file" name="file-doc">
+                        <span class="btn btn-success btn-p25">Добавить файл</span>
+                    </label>
+                    <button class="btn btn-default btn-p25" type="button" data-dismiss="modal">Отмена</button>
+                    <button class="btn btn-primary btn-p25" type="button" data-dismiss="modal">Отправить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -343,6 +625,9 @@
     <!-- https://github.com/LucasLazaro/bootstrap-nav-tab-scrollable -->
     <script type="text/javascript" src="js/scrolling-tabs/jquery.scrolling-tabs.js"></script>
 
+	<!-- editor, https://www.tinymce.com/docs/demo/full-featured/ -->
+    <script type="text/javascript" src="js/tinymce/js/tinymce/tinymce.min.js"></script>
+
     <script type="text/javascript">
     $(function () {
         initNavbar();
@@ -360,6 +645,34 @@
             cssClassLeftArrow: 'fa fa-chevron-left',
             cssClassRightArrow: 'fa fa-chevron-right'
         });
+
+        $(document).on('change', '.js-emplsurcharge-period', function() {
+	        var select = $(document).find('.js-emplsurcharge-period'),
+	            now = select.val(),
+	            block = select.closest('.js-date'),
+	            types = block.find('.js-types');
+	        if (now === 'arbitrary') {
+	            types.show();
+	            block.removeClass('days');
+	        } else {
+	            block.addClass('days');
+	            types.hide();
+	        }
+        });
+        
+        // begin: Modal add explanatory
+        tinymce.init({
+            selector: '#description',
+            statusbar: false,
+            height: 180
+        });
+        
+        $(".js-del").click(function() {
+            $(this).parent().hide('middle', function(){
+                $(this).remove();
+            });
+        });
+        // end: Modal add explanatory
     });
     </script>
 </body>
