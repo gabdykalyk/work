@@ -1,5 +1,5 @@
-@import "components/variables.less";
-@import "components/mixins.less";
+@import "../components/variables.less";
+@import "../components/mixins.less";
 
 .head-with-btns {
 	&__right {
@@ -38,23 +38,25 @@
 		}
 	}
 	
-	.btn-fix-width {
-		width: 115px;
-	}
 	
 	.form-btns {
 		.flex();
-		justify-content: flex-end;
-		margin-top: 10px;
-		
-		.btn {
+		//justify-content: flex-end;
+		//margin-top: 10px;
+        .btn-fix-width {
+            width: 120px;
+            height: 34px;
+            padding: 0;
+        }
+		.btn:not(:first-child) {
 			margin-left: 10px;
 		}
 	}
 	
 	@media (max-width: 991px) {
 		.form-btns {
-			margin-top: 0;
+            margin-top: 0;
+            justify-content: flex-end;
 		}
 	}
 	
@@ -362,6 +364,11 @@
         .form-control {
             background-color: #ffffb2;
         }           
+    }
+
+    .cell-white {
+        background-color: #fff;
+        color: #337AB7;
     }
     
     .row-total {
@@ -1130,14 +1137,22 @@
                 > thead {
                     > tr {
                         &:first-child {
-                            display: none;
+                            //display: none;
+                            > th {
+                                display: none;
+                                &:first-child {
+                                    display: table-cell;
+                                }
+                            }
                         }
                         
                         > th {
                             display: none;
-                            
-                            &.cell-head-time {
+                            &.cell-all {
                                 display: table-cell;
+                            }
+                            &.cell-head-time {
+                                //display: table-cell;
                             }
                         }
                     }
@@ -1147,7 +1162,9 @@
                     > tr {
                         > td {
                             display: none;
-                            
+                            &.cell-all {
+                                display: table-cell;
+                            }
                             &.cell-time {
                                 display: table-cell;
                             }
@@ -1158,6 +1175,62 @@
         }
     }
     
+    // оператор
+    .table-responsive-wrapper-call {
+        .table-responsive2 { 
+            .table-late {
+                > thead {
+                    > tr {
+                        > th {
+                            &.cell-head-call,
+                            &.cell-call {
+                                display: table-cell;
+                            }
+                        }
+                    }
+                }
+                
+                > tbody {
+                    > tr {
+                        > td {
+                            &.cell-call {
+                                display: table-cell;
+                            }
+                        }
+                    }
+                }                
+            }
+        }
+    }
+
+    // администратор филиала
+    .table-responsive-wrapper-admin {
+        .table-responsive2 { 
+            .table-late {
+                > thead {
+                    > tr {
+                        > th {
+                            &.cell-head-admin,
+                            &.cell-admin {
+                                display: table-cell;
+                            }
+                        }
+                    }
+                }
+                
+                > tbody {
+                    > tr {
+                        > td {
+                            &.cell-admin {
+                                display: table-cell;
+                            }
+                        }
+                    }
+                }                
+            }
+        }
+    }
+
     // повар-сушист
     .table-responsive-wrapper-sushi {
         .table-responsive2 { 
@@ -1165,6 +1238,7 @@
                 > thead {
                     > tr {
                         > th {
+                            &.cell-head-sushi,
                             &.cell-sushi {
                                 display: table-cell;
                             }
@@ -1185,33 +1259,6 @@
         }
     }
     
-    // водитель
-    .table-responsive-wrapper-driver {
-        .table-responsive2 { 
-            .table-late {
-                > thead {
-                    > tr {
-                        > th {
-                            &.cell-driver {
-                                display: table-cell;
-                            }
-                        }
-                    }
-                }
-                
-                > tbody {
-                    > tr {
-                        > td {
-                            &.cell-driver {
-                                display: table-cell;
-                            }
-                        }
-                    }
-                }                
-            }
-        }
-    }    
-    
     // повар-пиццмейкер
     .table-responsive-wrapper-pizza {
         .table-responsive2 { 
@@ -1219,6 +1266,7 @@
                 > thead {
                     > tr {
                         > th {
+                            &.cell-head-pizza,
                             &.cell-pizza {
                                 display: table-cell;
                             }
@@ -1237,10 +1285,67 @@
                 }                
             }
         }
+    }
+        
+    // горячий цех
+    .table-responsive-wrapper-hot {
+        .table-responsive2 { 
+            .table-late {
+                > thead {
+                    > tr {
+                        > th {
+                            &.cell-head-hot,
+                            &.cell-hot {
+                                display: table-cell;
+                            }
+                        }
+                    }
+                }
+                
+                > tbody {
+                    > tr {
+                        > td {
+                            &.cell-hot {
+                                display: table-cell;
+                            }
+                        }
+                    }
+                }                
+            }
+        }
+    }
+
+    // водитель
+    .table-responsive-wrapper-driver {
+        .table-responsive2 { 
+            .table-late {
+                > thead {
+                    > tr {
+                        > th {
+                            &.cell-head-driver,
+                            &.cell-driver {
+                                display: table-cell;
+                            }
+                        }
+                    }
+                }
+                
+                > tbody {
+                    > tr {
+                        > td {
+                            &.cell-driver {
+                                display: table-cell;
+                            }
+                        }
+                    }
+                }                
+            }
+        }
     }    
     
+    
     // безнал
-    .table-responsive-wrapper-card {
+    /* .table-responsive-wrapper-card {
         .table-responsive2 { 
             .table-late {
                 > thead {
@@ -1264,7 +1369,7 @@
                 }                
             }
         }
-    }      
+    } */    
 }
 
 @media (max-width: 767px) {
