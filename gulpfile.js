@@ -18,7 +18,8 @@ const path = {
 	},
 	src: { //откуда брать исходники
 		html: 'src/*.html',
-		style: 'src/less/styles.less'
+		style: 'src/less/styles.less',
+		othercss: 'src/less/styles-form.less'
 	},
 	watch: { //за изменением каких файлов мы хотим наблюдать
 		html: 'src/**/*.html',
@@ -62,9 +63,19 @@ function lessPack() {
 		.pipe(gulp.dest(path.build.css));
 };
 
-function watch() {
-	gulp.watch(path.watch.html, gulp.series(fileinclude, reload));
-	gulp.watch(path.watch.style, gulp.series(lessPack, reload));
+function otherLessPack() {
+	return gulp.src(path.src.othercss)
+		.pipe(sourcemaps.init())
+		.pipe(less())
+		.pipe(concat('styles-form.css'))
+		.pipe(cleanCSS())
+		.pipe(sourcemaps.write())
+		.pipe(gulp.dest(path.build.css));
 };
 
-gulp.task('default', gulp.series(fileinclude, lessPack, serve, watch));
+function watch() {
+	gulp.watch(path.watch.html, gulp.series(fileinclude, reload));
+	gulp.watch(path.watch.style, gulp.series(otherLessPack, lessPack, reload));
+};
+
+gulp.task('default', gulp.series(fileinclude, otherLessPack, lessPack, serve, watch));
