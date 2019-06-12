@@ -281,21 +281,21 @@
                                 <label for="min">Min. значение, %</label>
                                 <div class="form-group-color">
                                     <input class="form-control js-color-input" type="text" name="min1" value="0">
-                                    <div class="color-preview js-color-sample js-min" style="background: #82FF97;"></div>
+                                    <input class="color-preview js-color-sample js-min" type="text" style="background-color: #82FF97;" value="#82FF97">
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 form-group js-fot-mid">
                                 <label for="min">Среднее значение, %</label>
                                 <div class="form-group-color">
                                     <input class="form-control js-color-input" type="text" name="mid1" value="50">
-                                    <div class="color-preview js-color-sample js-mid" style="background: #FFFFB2;"></div>
+                                    <input class="color-preview js-color-sample js-mid" type="text" style="background-color: #FFFFB2;" value="#FFFFB2">
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 form-group">
                                 <label for="min">Max. значение, %</label>
                                 <div class="form-group-color">
                                     <input class="form-control js-color-input" type="text" name="max1" value="100">
-                                    <div class="color-preview js-color-sample js-max" style="background: #FF8893;"></div>
+                                    <input class="color-preview js-color-sample js-max" type="text" style="background-color: #FF8893;" value="#FF8893">
                                 </div>
                             </div>
 
@@ -417,21 +417,21 @@
                                 <label for="min">Min. значение, %</label>
                                 <div class="form-group-color">
                                     <input class="form-control js-color-input" type="text" name="min2" value="0">
-                                    <div class="color-preview js-color-sample js-min" style="background: #82FF97;"></div>
+                                    <input class="color-preview js-color-sample js-min" type="text" style="background-color: #82FF97;">
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 form-group js-norm-mid">
                                 <label for="min">Среднее значение, %</label>
                                 <div class="form-group-color">
                                     <input class="form-control js-color-input" type="text" name="mid2" value="50">
-                                    <div class="color-preview js-color-sample js-mid" style="background: #FFFFB2;"></div>
+                                    <input class="color-preview js-color-sample js-mid" type="text" style="background-color: #FFFFB2;">
                                 </div>
                             </div>
                             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 form-group">
                                 <label for="min">Max. значение, %</label>
                                 <div class="form-group-color">
                                     <input class="form-control js-color-input" type="text" name="max2" value="100">
-                                    <div class="color-preview js-color-sample js-max" style="background: #FF8893;"></div>
+                                    <input class="color-preview js-color-sample js-max" type="text" style="background-color: #FF8893;">
                                 </div>
                             </div>
 
@@ -472,19 +472,19 @@
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 form-group">
                             <label>&lt;5 мин.</label>
                             <div class="form-group-color">
-                                <div class="color-preview js-color" style="background: #D9F6CB;"></div>
+                                <input class="color-preview js-color" type="text" style="background-color: #D9F6CB;">
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 form-group">
                             <label>5-10 мин.</label>
                             <div class="form-group-color">
-                                <div class="color-preview js-color" style="background: #FFFFB2;"></div>
+                                <input class="color-preview js-color" type="text" style="background-color: #FFFFB2;">
                             </div>
                         </div>
                         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-4 form-group">
                             <label>&gt;5 мин.</label>
                             <div class="form-group-color">
-                                <div class="color-preview js-color" style="background: #FFA9B1;"></div>
+                                <input class="color-preview js-color" type="text" style="background-color: #FFA9B1;">
                             </div>
                         </div>
 
@@ -613,46 +613,64 @@
         let colors = [];
 
         if (nomid) {
+
             //есть min, mid, max
+
             if (num == '3') {
                 colors = [min, mid, max];
             } else if (num > 3) {
+                for (i = 0; i < num; i++) {
+                    if (i == '0') { // min
+                        colors.push(min);
+                    } else if (i == num - 1) { // max
+                        colors.push(max);
+                    } else if (num % 2 == 1) { // для нечетных градаций
+                    
+                        let new_num = (num - 1) / 2;
+                        if (i == new_num) { // mid
+                            colors.push(mid);
+                        } else if (i < new_num) { // слева от середины
+                            colors.push(findNextColor(min, mid, new_num, i));
+                        } else { // справа от середины
+                            let new_i = i - new_num;
+                            colors.push(findNextColor(mid, max, new_num, new_i));
+                        }
 
+                    } else { // для четных градаций
+
+                        let new_num = num / 2;
+                        if (i < new_num) { // слева от середины
+                            colors.push(findNextColor(min, mid, new_num, i));
+                        } else { // справа от середины
+                            let new_i = i - new_num + 1;
+                            colors.push(findNextColor(mid, max, new_num, new_i));
+                        }
+
+                    }
+                }
             }
-            //console.log(colors);
+
         } else {
+
             //есть min, max
+
             if (num == '2') {
                 colors = [min, max];
             } else if (num > 2) {
-                
                 for (i = 0; i < num; i++) {
+                    let new_num = num - 2;
                     if (i == '0') {
                         colors.push(min);
                     } else if (i == num - 1) {
                         colors.push(max);
                     } else {
-                        colors.push(findNextColor(min, max, num, i));
-                        //console.log('i = '+ i + '; col[i - 1]' + colors[i-1]);
-                        //colors.push( findMidColor(min, max) );
+                        colors.push(findNextColor(min, max, new_num, i));
                     }
-                    console.log(colors);
                 }
             }
 
-            // console.log(parseRGB(min).blue);
-            // console.log(parseRGB(max).blue);
         }
 
-        // console.log(`
-        //     min = ${min}
-        //     min_p = ${min_p}
-        //     mid = ${mid}
-        //     mid_p = ${mid_p}
-        //     max = ${max}
-        //     max_p = ${max_p}
-        //     num = ${num}
-        // `);
         setColors(block, colors);
     };
     function setColors(block, colors){
@@ -675,32 +693,40 @@
             rgb = {red: red, green: green, blue: blue};
         return rgb;
     };
-    function findMidColor(start, end) {
-        let red = calcMid(parseRGB(start).red, parseRGB(end).red),
-            green = calcMid(parseRGB(start).green, parseRGB(end).green),
-            blue = calcMid(parseRGB(start).blue, parseRGB(end).blue);
-        rgb = `rgb(${red}, ${green}, ${blue})`;
-        return rgb;
-    };
-    function calcMid(start, end) {
-        //return Math.round((start - end) / 2 + end);
-        return Math.round(start + (end - start) / 2);
-    };
 
     function findNextColor(start, end, num, i) {
         let red = findNext(parseRGB(start).red, parseRGB(end).red, num, i),
             green = findNext(parseRGB(start).green, parseRGB(end).green, num, i),
             blue = findNext(parseRGB(start).blue, parseRGB(end).blue, num, i);
         rgb = `rgb(${red}, ${green}, ${blue})`;
+        console.log(rgb);
         return rgb;
     };
+    
     function findNext(start, end, num, i) {
-        // let st_ = Math.abs(start - end) / num * i,
-        //     end_ = Math.abs(start - end) / (num + 1) * (i + 1);
-        // return calcMid(st_, end_);
-        let st_ = (end - start) / num * i,
-            end_ = (end - start) / num * i + 1;
-        return calcMid(st_, end_);
+        let calc,
+            _start = parseInt(start),
+            _end = parseInt(end),
+            _num = parseInt(num),
+            _i = parseInt(i),
+            //n_num = _num - 2,
+            n_i = 2 * _i - 1;
+        if (_end - _start == 0) {
+            calc = _end;
+        } else if (_end - _start > 0) {
+            calc = _start + Math.round( ( (_end - _start) * n_i ) / (2 * _num) );
+        } else {
+            calc = _end + Math.round( ( (_start - _end) * (2 * _num - n_i) )/ (2 * _num) );
+        }
+        console.log(`
+            ${_start}
+            ${_end}
+            ${_num}
+            ${_i}, ${n_i}
+            end + ( (start - end) * (2 * _num - n_i) )/ _num = ${calc}
+            start + ( (end - start) * n_i ) / _num = ${calc}
+        `);
+        return calc;
     };
     </script>
 </body>
