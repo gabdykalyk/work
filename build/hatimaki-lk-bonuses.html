@@ -198,17 +198,39 @@
                     <li class="active"><a href="#">Приведенные сотрудники</a></li>
                 </ul>
                 <div class="header-bonuses row">
-                    <div class="col-md-4 col-sm-4 col-xs-12">
+                    <div class="col-md-3 col-sm-6 col-xs-12">
                         <p class="description">
                             <span class="amount">400</span> бонусов
                         </p>
                         <button type="submit" class="btn btn-primary" data-toggle="modal" data-target="#convertBonusesModal" data-bonuses="400">Конвертировать</button>
                     </div>
-                    <div class="col-md-8 col-sm-8 col-xs-12">
-                        <div class="row-right">
-                            <div class="description">Приведен сотрудником:
-                                <a class="text-bold" href="#">Анна Иванова</a>
+                    <div class="col-md-6 col-sm-12 col-xs-12">
+                        <div class="empl-name-block">
+                            <div class="empl-text">Приведен сотрудником:</div>
+                            <div class="name-text">
+                                <a class="text-bold empl-name" href="#" data-value="1">Анна Иванова</a>
+                                <!-- <a class="text-bold empl-name" href="#" data-value="0"></a> -->
+                                <button type="button" class="btn btn-edit" title="Редактировать"><i class="far fa-pencil"></i></button>
                             </div>
+                            <form action="" method="post" class="name-form">
+                                <select class="form-control js-select2 name-input" name="empl" id="empl" tabindex="-1" aria-hidden="true">
+                                    <option value="0"></option>
+                                    <option value="1" selected>Анна Иванова</option>
+                                    <option value="2">Иванова Ирина Олеговна</option>
+                                    <option value="3">Степанова Надежда</option>
+                                    <option value="4">Петерфельд Валентин</option>
+                                    <option value="5">Парамонова Дина</option>
+                                    <option value="6">Суворов Сергей</option>
+                                    <option value="7">Петерфельд Валентин</option>
+                                </select>
+                                <button class="btn btn-success name-edit-ok" type="button" title="Сохранить"><i class="fas fa-check"></i></button>
+                                <button class="btn btn-danger name-edit-cancel" type="button" title="Отменить"><i class="fas fa-times"></i></button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 col-sm-6 col-xs-12">
+                        <div class="row-right">
                             <!--<button type="button" class="btn btn-default" data-toggle="popover" data-placement="bottom" data-content="Ссылка скопирована в буфер обмена">Ссылка на заполнение анкеты</button>-->
 <div class="dropdown dropdown-quest" data-toggle="popover">
   <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuQuests" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -421,6 +443,10 @@
                 cssClassRightArrow: 'fa fa-chevron-right'
             });
 
+            $('.js-select2').select2({
+                width: '262px'
+            });
+
             $('#listPosts li a').click(function() {
                 var dropdown = $('#dropdownMenuQuests').parent();
                 dropdown.popover({
@@ -453,6 +479,27 @@
                         $(this).popover('destroy');
                     }
                 });
+            });
+
+            // редактирование имени (приведен сотрудником)
+            $('.empl-name-block').on('click', '.btn-edit', function () {
+                let title = $(this).closest('.empl-name-block'),
+                    value = title.find('.guest-name').attr('data-value'),
+                    select = title.find('.name-input');
+                select.val(value);
+                title.toggleClass('editing');
+            });
+            $('.empl-name-block').on('click', '.name-edit-ok', function () {
+                let title = $(this).closest('.empl-name-block'),
+                    input_val = title.find('.name-input').val(),
+                    name = title.find('.name-input').find('option[value='+ input_val +']').text(),
+                    str = title.find('.empl-name');
+                str.text(name);
+                title.toggleClass('editing');
+            });
+            $('.empl-name-block').on('click', '.name-edit-cancel', function () {
+                let title = $(this).closest('.empl-name-block');
+                title.toggleClass('editing');
             });
 
             // всплывающее окно при клике на ссылку в блоке инструкций
