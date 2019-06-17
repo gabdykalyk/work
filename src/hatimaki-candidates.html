@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Кандидаты</title>
+
+    <link rel="stylesheet" href="js/scrolling-tabs/jquery.scrolling-tabs.min.css" />
+
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    @@include('include/top-nav.html')
+
+    <div class="container-fluid content candidates">
+
+        <div class="clearfix head-with-btn candidates__head">
+            <h1>Кандидаты</h1>
+            <button type="button" class="btn btn-default btn-icon">
+                <i class="far fa-file-excel"></i>Выгрузить в Excel
+            </button>
+            <button type="button" class="btn btn-default">
+                Создать кандидата
+            </button>
+        </div>
+        <hr class="hidden-xs">
+
+        <div class="candidates__form row">
+            <div class="col-lg-2 col-md-3 col-sm-4 form-group">
+                <label for="choose">Выбор кандидатов</label>
+                <select class="form-control" name="choose">
+                    <option value="1">Открытые</option>
+                    <option value="2">Открытые2</option>
+                    <option value="3">Открытые3</option>
+                </select>
+            </div>
+            <div class="col-lg-10 col-md-9 col-sm-8 form-group no-label candidates__form-right">
+                <div class="dropdown dropdown-quest" data-toggle="popover">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="print" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="true">
+                        <i class="far fa-print"></i>
+                        Напечатать бланк
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" id="print">
+                        <li><a href="#">Напечатать бланк</a></li>
+                        <li><a href="#">Оператор</a></li>
+                        <li><a href="#">Официант</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="candidates__table">
+            <table class="table table-valign-middle table-hover">
+                <thead>
+                    <tr>
+                        <th class="cell-head-date">Дата создания</th>
+                        <th class="cell-head-name">ФИО / Адрес / Телефон</th>
+                        <th class="cell-head-exp">Опыт работы</th>
+                        <th class="cell-head-post">Должность</th>
+                        <th class="cell-head-branch">Филиал</th>
+                        <th class="cell-head-status">Статус / Изменение&nbsp;статуса</th>
+                        <th class="cell-head-country">Гражд.-во</th>
+                        <th class="cell-head-from">Привел</th>
+                        <th class="cell-head-btn">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>
+                            <select class="form-control js-select2-post" name="post[]" id="post" multiple=""
+                                tabindex="-1" aria-hidden="true">
+                                <option value="1">Администратор филиала</option>
+                                <option value="2">Курьер</option>
+                                <option value="3">Повар-сушист</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control js-select2-branch" name="branch[]" id="branch" multiple=""
+                                tabindex="-1" aria-hidden="true">
+                                <option value="1">Щербинка</option>
+                                <option value="2">Бутово</option>
+                                <option value="3">Ясенево</option>
+                                <option value="4">Коммунарка</option>
+                                <option value="5">Подольск</option>
+                                <option value="6">Московский</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-control js-select2-status" name="status[]" id="status" multiple=""
+                                tabindex="-1" aria-hidden="true">
+                                <option value="1">Назначено собеседование</option>
+                                <option value="2">Назначено собеседование2</option>
+                            </select>
+                        </td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr class="primary">
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Сидоров Иван Николаевич</div>
+                            Ул. Василия Ботылёва, д. 47, стр. 364<br />
+                            8 (900) 234-5678
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Коммунарка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>Молдавия</td>
+                        <td>-</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr class="primary">
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Семенова Анна Евгеньевна</div>
+                            ул. Космонавтов, д. 41, кв. 159<br />
+                            8 (905) 534-9078
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Щербинка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>РФ</td>
+                        <td>-</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Соколова Ирина Эльдаровна</div>
+                            ул. Спортивная, д. 128<br />
+                            8 (900) 234-5678
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Коммунарка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>Украина</td>
+                        <td>Андрей Смирнов</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Семенова Анна Евгеньевна</div>
+                            ул. Космонавтов, д. 41, кв. 159<br />
+                            8 (905) 534-9078
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Щербинка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>РФ</td>
+                        <td>Андрей Смирнов</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Соколова Ирина Эльдаровна</div>
+                            ул. Спортивная, д. 128<br />
+                            8 (900) 234-5678
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Коммунарка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>Украина</td>
+                        <td>Андрей Смирнов</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Семенова Анна Евгеньевна</div>
+                            ул. Космонавтов, д. 41, кв. 159<br />
+                            8 (905) 534-9078
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Щербинка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>РФ</td>
+                        <td>Андрей Смирнов</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Соколова Ирина Эльдаровна</div>
+                            ул. Спортивная, д. 128<br />
+                            8 (900) 234-5678
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Коммунарка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>Украина</td>
+                        <td>Андрей Смирнов</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Семенова Анна Евгеньевна</div>
+                            ул. Космонавтов, д. 41, кв. 159<br />
+                            8 (905) 534-9078
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Щербинка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>РФ</td>
+                        <td>Андрей Смирнов</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Соколова Ирина Эльдаровна</div>
+                            ул. Спортивная, д. 128<br />
+                            8 (900) 234-5678
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Коммунарка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>Украина</td>
+                        <td>Андрей Смирнов</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10.06.2019</td>
+                        <td>
+                            <div class="name">Семенова Анна Евгеньевна</div>
+                            ул. Космонавтов, д. 41, кв. 159<br />
+                            8 (905) 534-9078
+                        </td>
+                        <td>да</td>
+                        <td>Администратор филиала</td>
+                        <td>Щербинка</td>
+                        <td>
+                            Назначено собеседование
+                            <div class="date">10.06.2019</div>
+                        </td>
+                        <td>РФ</td>
+                        <td>Андрей Смирнов</td>
+                        <td class="cell-btn">
+                            <button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+                                    class="far fa-sync"></i></button>
+                            <button type="button" class="btn btn-default" title="Анкета кандидата"><i
+                                    class="far fa-id-badge"></i></button>
+                            <button type="button" class="btn btn-default" title="История кандидата"><i
+                                    class="far fa-history"></i></button>
+                            <button type="button" class="btn btn-default" title="Редактировать"><i
+                                    class="far fa-pencil"></i></button>
+                            <button type="button" class="btn btn-default" title="Удалить"><i
+                                    class="far fa-times"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        @@include('include/pagination.html')
+    </div>
+
+    @@include('include/_js.html')
+
+    <!-- https://github.com/LucasLazaro/bootstrap-nav-tab-scrollable -->
+    <script type="text/javascript" src="js/scrolling-tabs/jquery.scrolling-tabs.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            initNavbar();
+
+            $('.js-select2').select2({
+                width: '100%'
+            });
+
+            placeholderSelect2('.js-select2-post', 'Должность');
+            placeholderSelect2('.js-select2-branch', 'Филиал');
+            placeholderSelect2('.js-select2-status', 'Статус');
+
+            // скрывает поповеры при клике на боди 
+            $('body').on('click', function (e) {
+                $('[data-toggle="popover"]').each(function () {
+                    if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $(
+                            '.popover').has(e.target).length === 0) {
+                        $(this).popover('hide');
+                        $(this).popover('destroy');
+                    }
+                });
+            });
+
+        });
+
+    </script>
+</body>
+
+</html>
