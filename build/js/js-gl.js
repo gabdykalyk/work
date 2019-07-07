@@ -322,7 +322,7 @@ function setHeightCellReverse(table, h) {
 }
 
 // Вызов скролла внутри модалки
-$('#modalLaw, #modalRoleFines').on('shown.bs.modal', function (e) {
+$('#modalLaw, #modalRoleFines, .modal-report').on('shown.bs.modal', function (e) {
   	$(document).ready(function(){
 	    $('.scrollbar-inner').scrollbar();
 	});
