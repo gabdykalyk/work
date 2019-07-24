@@ -164,17 +164,17 @@
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="status-emploees">
                 <div class="row">
-                    <div class="col-md-7 col-sm-10 form-group">
+                    <div class="col-md-7 col-sm-9 form-group">
 <!--                        <input class="form-control" type="text" name="status-emploees-search" id="statusEmploeesSearch">-->
-                        <input class="form-control" id="status-emploees-search" type="text" placeholder="Поиск" onkeyup="searchStr('status-emploees-search', 'status-management-table');">
+                        <input class="form-control" id="status-emploees-search" type="text" placeholder="Поиск" onkeyup="searchStr('status-emploees-search', 'status-management__table--emploees');">
                     </div>
-                    <div class="col-md-2 col-sm-2 form-group pull-right btn-add-status">
+                    <div class="col-md-2 col-sm-3 form-group pull-right btn-add-status">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusEmploees">Создать статус</button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-7 col-sm-10">
-                        <table class="table status-management__table status-management__table--emploees table-valign-middle">
+                    <div class="col-md-7 col-sm-9">
+                        <table id="status-management__table--emploees" class="table status-management__table status-management__table--emploees table-valign-middle">
                             <thead>
                             <tr>
                                 <th>
@@ -232,15 +232,15 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="status-applicants">
                 <div class="row">
-                    <div class="col-md-7 col-sm-10 form-group">
+                    <div class="col-md-7 col-sm-9 form-group">
                         <input class="form-control" type="text" name="status-applicants-search" id="status-applicants-search">
                     </div>
-                    <div class="col-md-2 col-sm-2 form-group  pull-right btn-add-status">
+                    <div class="col-md-2 col-sm-3 form-group  pull-right btn-add-status">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusApplicants">Создать статус</button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-7 col-sm-10">
+                    <div class="col-md-7 col-sm-9">
                         <table class="table status-management__table status-management__table--applicants table-valign-middle" id="status-management-table">
                             <thead>
                             <tr>
@@ -315,15 +315,15 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="characteristic">
                 <div class="row">
-                    <div class="col-md-7 col-sm-10 form-group">
+                    <div class="col-md-7 col-sm-9 form-group">
                         <input class="form-control" type="text" name="characteristic-search" id="characteristic-search">
                     </div>
-                    <div class="col-md-2 col-sm-2 form-group pull-right  btn-add-status">
+                    <div class="col-md-2 col-sm-3 form-group pull-right  btn-add-status">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusCharacteristic">Создать статус</button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-7 col-sm-10">
+                    <div class="col-md-7 col-sm-9">
                         <table class="table status-management__table status-management__table--characteristic table-valign-middle">
                             <thead>
                             <tr>
@@ -363,15 +363,15 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="status-education">
                 <div class="row">
-                    <div class="col-md-7 col-sm-10 form-group">
+                    <div class="col-md-7 col-sm-9 form-group">
                         <input class="form-control" type="text" name="status-education-search" id="status-education-search">
                     </div>
-                    <div class="col-md-2 col-sm-2 form-group pull-right btn-add-status">
+                    <div class="col-md-2 col-sm-3 form-group pull-right btn-add-status">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusEducation">Создать статус</button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-7 col-sm-10">
+                    <div class="col-md-7 col-sm-9">
                         <table class="table status-management__table status-management__table--education table-valign-middle">
                             <thead>
                             <tr>
@@ -565,22 +565,19 @@
 
     //поиск по строкам
     function searchStr(inputId, tableId) {
-        //добавлен toLowerCase и поиск по ID только внутри поповера
-        let searchString = $('.tab-pane').find(`#${inputId}`).val().toLowerCase();
-        let labelArr = $('.tab-pane').find(`#${tableId} .olap-search-btns button`);
+        let searchString = $(`#${inputId}`).val().toLowerCase();
+            labelArr = $(`#${tableId} tbody tr td:first-child`);
         let labelText = '';
 
-        labelArr.addClass('hidden');
-
+        labelArr.parent().addClass('hidden');
         labelArr.each(function (i) {
             labelText = labelArr.eq(i).text().toLowerCase();
 
             if (labelText.indexOf(searchString) != -1) {
-                labelArr.eq(i).removeClass('hidden');
+                labelArr.eq(i).parent().removeClass('hidden');
             }
         })
-    };
-
+    }
 </script>
 </body>
 </html>

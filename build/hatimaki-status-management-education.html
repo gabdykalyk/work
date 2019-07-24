@@ -232,15 +232,15 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="status-applicants">
                 <div class="row">
-                    <div class="col-md-7 col-sm-10 form-group">
+                    <div class="col-md-7 col-sm-9 form-group">
                         <input class="form-control" type="text" name="status-applicants-search" id="status-applicants-search">
                     </div>
-                    <div class="col-md-2 col-sm-2 form-group  pull-right btn-add-status">
+                    <div class="col-md-2 col-sm-3 form-group  pull-right btn-add-status">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusApplicants">Создать статус</button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-7 col-sm-10">
+                    <div class="col-md-7 col-sm-9">
                         <table class="table status-management__table status-management__table--applicants table-valign-middle" id="status-management-table">
                             <thead>
                             <tr>
@@ -315,15 +315,15 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="characteristic">
                 <div class="row">
-                    <div class="col-md-7 col-sm-10 form-group">
+                    <div class="col-md-7 col-sm-9 form-group">
                         <input class="form-control" type="text" name="characteristic-search" id="characteristic-search">
                     </div>
-                    <div class="col-md-2 col-sm-2 form-group pull-right  btn-add-status">
+                    <div class="col-md-2 col-sm-3 form-group pull-right  btn-add-status">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusCharacteristic">Создать статус</button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-7 col-sm-10">
+                    <div class="col-md-7 col-sm-9">
                         <table class="table status-management__table status-management__table--characteristic table-valign-middle">
                             <thead>
                             <tr>
@@ -363,15 +363,15 @@
             </div>
             <div role="tabpanel" class="tab-pane active" id="status-education">
                 <div class="row">
-                    <div class="col-md-7 col-sm-10 form-group">
+                    <div class="col-md-7 col-sm-9 form-group">
                         <input class="form-control" type="text" name="status-education-search" id="status-education-search">
                     </div>
-                    <div class="col-md-2 col-sm-2 form-group pull-right btn-add-status">
+                    <div class="col-md-2 col-sm-3 form-group pull-right btn-add-status">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusEducation">Создать статус</button>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-7 col-sm-10">
+                    <div class="col-md-7 col-sm-9">
                         <table class="table status-management__table status-management__table--education table-valign-middle">
                             <thead>
                             <tr>
@@ -563,7 +563,21 @@
 
     });
 
+    //поиск по строкам
+    function searchStr(inputId, tableId) {
+        let searchString = $(`#${inputId}`).val().toLowerCase();
+        labelArr = $(`#${tableId} tbody tr td:first-child`);
+        let labelText = '';
 
+        labelArr.parent().addClass('hidden');
+        labelArr.each(function (i) {
+            labelText = labelArr.eq(i).text().toLowerCase();
+
+            if (labelText.indexOf(searchString) != -1) {
+                labelArr.eq(i).parent().removeClass('hidden');
+            }
+        })
+    }
 
 </script>
 </body>
