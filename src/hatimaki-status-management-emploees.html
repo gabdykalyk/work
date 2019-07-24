@@ -28,7 +28,8 @@
             <div role="tabpanel" class="tab-pane active" id="status-emploees">
                 <div class="row">
                     <div class="col-md-7 col-sm-11 form-group">
-                        <input class="form-control" type="text" name="status-emploees-search" id="status-emploees-search">
+<!--                        <input class="form-control" type="text" name="status-emploees-search" id="statusEmploeesSearch">-->
+                        <input class="form-control" id="status-emploees-search" type="text" placeholder="Поиск" onkeyup="searchStr('status-emploees-search', 'status-management-table');">
                     </div>
                     <div class="col-md-2 col-sm-2 form-group pull-right btn-add-status">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusEmploees">Создать статус</button>
@@ -36,7 +37,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-7 col-sm-11">
-                        <table class="table status-management__table table-valign-middle">
+                        <table class="table status-management__table status-management__table--emploees table-valign-middle">
                             <thead>
                             <tr>
                                 <th>
@@ -103,7 +104,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-7 col-sm-11">
-                        <table class="table status-management__table table-valign-middle">
+                        <table class="table status-management__table status-management__table--applicants table-valign-middle" id="status-management-table">
                             <thead>
                             <tr>
                                 <th>
@@ -186,7 +187,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-7 col-sm-11">
-                        <table class="table status-management__table table-valign-middle">
+                        <table class="table status-management__table status-management__table--characteristic table-valign-middle">
                             <thead>
                             <tr>
                                 <th>
@@ -234,7 +235,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-7 col-sm-11">
-                        <table class="table status-management__table table-valign-middle">
+                        <table class="table status-management__table status-management__table--education table-valign-middle">
                             <thead>
                             <tr>
                                 <th>
@@ -320,7 +321,7 @@
                         <input type="text" id="jsAddNewStatusApplicants" class="form-control" placeholder="">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group form-group--double">
                         <div class="checkbox-nice">
                             <label>
                                 <input type="checkbox" checked="" class="js-checkbox" name="check2">
@@ -403,8 +404,9 @@
 <script type="text/javascript" src="js/js-gl.js"></script>
 
 <script type="text/javascript">
+
     function dragElements() {
-        var grid = new Muuri('.status-management__table tbody', {
+        var grid = new Muuri('.status-management__table--emploees tbody', {
             dragEnabled: true,
             layout: {
                 fillGaps: true
@@ -420,8 +422,32 @@
         $('.js-status-management__del').on('click', function(){
             var elem = $(this).closest('tr');
             grid.remove(elem[0], {removeElements: true});
-        })
+        });
+
     });
+
+    //поиск по строкам
+    function searchStr(inputId, modalId, hasCategory) {
+        let searchString = $(`#${inputId}`).val().toLowerCase();
+        let labelArr;
+        let labelText = '';
+
+        // if (!hasCategory) {
+        //     labelArr = $(`#${modalId} .form-group__checbox label`);
+        // } else {
+        //     labelArr = $(`#${modalId} .form-group__category-inner .form-group__checbox label`);
+        // }
+
+        labelArr.parent().addClass('hidden');
+
+        labelArr.each(function (i) {
+            labelText = labelArr.eq(i).text().toLowerCase();
+
+            if (labelText.indexOf(searchString) != -1) {
+                labelArr.eq(i).parent().removeClass('hidden');
+            }
+        })
+    }
 
 </script>
 </body>
