@@ -253,7 +253,7 @@
         		<div class="col-md-4 col-sm-3">
         			<label>&nbsp;</label>
         			<div class="candidates__form-btn">
-        				<button class="btn btn-primary">Применить</button>
+        				<button class="btn btn-primary btn-p25">Применить</button>
         			</div>
         		</div>
         	</div>
@@ -973,8 +973,8 @@
                    		<!-- form row -->
 	                   	<div class="form-group">
 	                   		<label>Статус</label>
-	                   		<select class="form-control" name="choose">
-			                    <option value="waiting-call">Ждет звонка</option>
+	                   		<select class="form-control" id="editStatus">
+			                    <option value="waiting-call" selected>Ждет звонка</option>
 			                    <option value="internship">Принят на стажировку</option>
 			                    <option value="interview">Назначено собеседование</option>
 			                    <option value="fail">Отказано</option>
@@ -984,7 +984,7 @@
 	                   	<!-- form row END -->
 						
 						<!-- details for 'wait a call' -->
-	                   	<fieldset class="candidates__edit-detail" data-logic-type="call">
+	                   	<fieldset class="candidates__edit-detail" data-logic-type="waiting-call">
 	                   		<!-- form row -->
 		                   	<div class="form-group">
 		                   		<div class="row">
@@ -997,7 +997,7 @@
 						                    </span>
 						                </div>
 		                   			</div>
-		                   			<div class="col-md-2">
+		                   			<div class="col-md-3">
 		                   				<label>Время</label>
 				                   		<input type="text" class="form-control input-sm input-timework" placeholder="00:00" maxlength="5" value="11:00">
 		                   			</div>
@@ -1013,7 +1013,7 @@
 	                   		<!-- form row -->
 		                   	<div class="form-group">
 		                   		<div class="row">
-		                   			<div class="col-md-5">
+		                   			<div class="col-md-4">
 		                   				<label>Дата</label>
 				                   		<div class="input-group datepicker">
 						                    <input type="text" class="form-control" name="date" id="date-field" placeholder="00.00.0000" maxlength="10" value="15.02.2018">
@@ -1022,13 +1022,13 @@
 						                    </span>
 						                </div>
 		                   			</div>
-		                   			<div class="col-md-2">
+		                   			<div class="col-md-3">
 		                   				<label>Время</label>
 				                   		<input type="text" class="form-control input-sm input-timework" placeholder="00:00" maxlength="5" value="11:00">
 		                   			</div>
 		                   			<div class="col-md-5">
 		                   				<label>Место проведения</label>
-				                   		<select name="filiation" id="filiation-field" class="form-control">
+				                   		<select name="filiation" class="form-control">
 											<option value="0">Без филиала</option>
 											<option value="1">Бутово</option>
 											<option value="2" selected="">Коммунарка</option>
@@ -1045,7 +1045,15 @@
 		                   	<!-- form row -->
 		                   	<div class="form-group">
 		                   		<label>Ответственные</label>
-		                   		<input type="text" class="form-control">
+		                   		<select class="form-control js-select2" name="post[]" multiple="">
+									<option value="0">Ответственный 1</option>
+									<option value="1">Ответственный 2</option>
+									<option value="2">Ответственный 3</option>
+									<option value="3">Ответственный 4</option>
+									<option value="4">Ответственный 5</option>
+									<option value="5">Ответственный 6</option>
+									<option value="6">Ответственный 7</option>
+								</select>
 		                   	</div>
 		                   	<!-- form row END-->
 
@@ -1057,7 +1065,7 @@
 	                   		<!-- form row -->
 		                   	<div class="form-group">
 		                   		<div class="row">
-		                   			<div class="col-md-4">
+		                   			<div class="col-md-5">
 		                   				<label>Филиал</label>
 				                   		<select name="filiation" id="filiation-field" class="form-control">
 											<option value="0">Без филиала</option>
@@ -1076,7 +1084,7 @@
 		                   	<!-- form row -->
 		                   	<div class="form-group">
 		                   		<div class="row">
-		                   			<div class="col-md-10">
+		                   			<div class="col-md-8">
 		                   				<label>Должность</label>
 				                   		<select class="js-select-single form-control">
 			                                <option value="1">Должность 1</option>
@@ -1084,7 +1092,7 @@
 			                                <option value="3">Должность 3</option>
 			                            </select>
 		                   			</div>
-		                   			<div class="col-md-2">
+		                   			<div class="col-md-4">
 		                   				<label>Разряд</label>
 				                   		<select name="filiation" class="form-control">
 											<option value="0">1</option>
@@ -1115,7 +1123,7 @@
 		                   	<div class="form-group">
                                 <div class="checkbox-nice">
                                     <label>
-                                        <input type="checkbox" checked="">
+                                        <input type="checkbox" data-rel-logic="#email-row">
                                         <span class="fa fa-check"></span>
                                         Создать пользователя сервиса
                                     </label>
@@ -1124,7 +1132,7 @@
                             <!-- form row END-->
 
                             <!-- form row -->
-		                   	<div class="form-group">
+		                   	<div class="form-group candidates__hidden-elem" id="email-row">
 		                   		<label>Email</label>
 		                   		<input type="email" class="form-control">
 		                   	</div>
@@ -1139,17 +1147,17 @@
 		                   	<!-- form row -->
 		                   	<div class="form-group">
 		                   		<label>Причина</label>
-		                   		<select class="js-select-single form-control">
+		                   		<select class="js-select-single form-control" data-rel-logic="#reason-description">
 	                                <option value="1">Причина 1</option>
 	                                <option value="2">Причина 2</option>
 	                                <option value="3">Причина 3</option>
-	                                <option>Другое</option>
+	                                <option value="another">Другое</option>
 	                            </select>
 		                   	</div>
 		                   	<!-- form row END-->
 
                             <!-- form row -->
-		                   	<div class="form-group">
+		                   	<div class="form-group candidates__hidden-elem" id="reason-description">
 		                   		<input type="text" class="form-control">
 		                   	</div>
 		                   	<!-- form row END-->
@@ -1236,6 +1244,41 @@
 				})
 
 			}
+
+			$('[data-rel-logic]').on('change', function(){
+				var currentElem = $(this),
+					targetElem 	= $(currentElem.data('rel-logic'));
+
+				if (currentElem.is('select')){
+					var activeOption = currentElem.find('option:selected');
+
+					activeOption.val() == 'another' ? targetElem.fadeIn() : targetElem.hide();
+				}
+				else{
+					currentElem.prop('checked') ? targetElem.fadeIn() : targetElem.hide();
+				}
+			})
+
+
+			function editSwitcher(activeVal){
+				var editModal 		= $("#modalEditeCandidate"),
+					switchSelect 	= $("#editStatus"),
+					activeItem 		= switchSelect.find('option:selected'),
+					activeVal 		= activeItem.val();
+
+				$(".candidates__edit-detail").hide();
+
+				if (editModal.find('.candidates__edit-detail[data-logic-type="'+ activeVal +'"]').length){
+					editModal.find('.candidates__edit-detail[data-logic-type="'+ activeVal +'"]').fadeIn();
+				}
+
+			}
+
+			editSwitcher();
+
+			$('#editStatus').on('change', function(){
+				editSwitcher();
+			})
 
         });
 
