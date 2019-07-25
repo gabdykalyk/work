@@ -158,6 +158,18 @@
 
         <div class="clearfix head-with-btn candidates__head">
             <h1>Кандидаты</h1>
+            <div class="btn-group">
+            	<button type="button" class="btn btn-default btn-icon dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            	    <i class="far fa-print"></i>Напечатать бланк &nbsp;<span class="caret"></span>
+            	</button>
+            	<ul class="dropdown-menu">
+				    <li><a href="#">Action 1</a></li>
+				    <li><a href="#">Action 2</a></li>
+				    <li><a href="#">Action 3</a></li>
+				    <li><a href="#">Action 4</a></li>
+				    <li><a href="#">Action 5</a></li>
+				</ul>
+            </div>
             <button type="button" class="btn btn-default btn-icon">
                 <i class="far fa-file-excel"></i>Выгрузить в Excel
             </button>
@@ -166,371 +178,725 @@
             </button>
         </div>
         <hr class="hidden-xs">
+		
+		<!-- candidates filter -->
+        <div class="candidates__form">
+        	<!-- row -->
+        	<div class="row">
+        		<div class="col-md-4 col-sm-5">
+        			<div class="candidates__view">
+        				<div class="candidates__view-item">
+        					<label for="choose">&nbsp;</label>
+        					<div class="btn-group" data-toggle="buttons">
+								<label class="btn btn-default active">
+									<input type="radio" name="options" id="option1" checked="checked"> <i class="fas fa-th"></i>
+								</label>
+								<label class="btn btn-default">
+									<input type="radio" name="options" id="option2"> <i class="fas fa-bars"></i>
+								</label>
+							</div>
+        				</div>
 
-        <div class="candidates__form row">
-            <div class="col-lg-2 col-md-3 col-sm-4 form-group">
-                <label for="choose">Выбор кандидатов</label>
-                <select class="form-control" name="choose">
-                    <option value="1">Открытые</option>
-                    <option value="2">Открытые2</option>
-                    <option value="3">Открытые3</option>
-                </select>
-            </div>
-            <div class="col-lg-10 col-md-9 col-sm-8 form-group no-label candidates__form-right">
-                <div class="dropdown dropdown-quest" data-toggle="popover">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="print" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="true">
-                        <i class="far fa-print"></i>
-                        Напечатать бланк
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" id="print">
-                        <li><a href="#">Напечатать бланк</a></li>
-                        <li><a href="#">Оператор</a></li>
-                        <li><a href="#">Официант</a></li>
-                    </ul>
-                </div>
-            </div>
+        				<div class="candidates__view-item">
+        					<label for="choose">Выбор кандидатов</label>
+			                <select class="form-control" name="choose">
+			                    <option value="1">Открытые</option>
+			                    <option value="2">Открытые2</option>
+			                    <option value="3">Открытые3</option>
+			                </select>
+        				</div>
+
+        			</div>
+
+        		</div>
+        		<div class="col-md-4 col-sm-4">
+        			<label for="responsible">Ответственный</label>
+        		    <select class="form-control js-select2" name="post[]" id="post" multiple="" tabindex="-1">
+						<option value="1">Ответственный 1</option>
+						<option value="2">Ответственный 2</option>
+						<option value="3">Ответственный 3</option>
+					</select>
+        		</div>
+        		<div class="col-md-4 col-sm-3">
+        			<label for="position">Должность</label>
+        		    <select class="form-control js-select2" name="post[]" id="post" multiple="" tabindex="-1">
+						<option value="1">Оператор</option>
+						<option value="2">Водитель</option>
+						<option value="3">Технический сотрудник</option>
+					</select>
+        		</div>
+        	</div>
+			<!-- row END-->
+
+			<!-- row -->
+			<div class="row">
+        		<div class="col-md-4 col-sm-5">
+        			<label for="choose">Филиал</label>
+	                <select class="form-control js-select2" name="branch[]" id="branch" multiple="" tabindex="-1"
+						aria-hidden="true">
+						<option value="1">Щербинка</option>
+						<option value="2">Бутово</option>
+						<option value="3">Ясенево</option>
+						<option value="4">Коммунарка</option>
+						<option value="5">Подольск</option>
+						<option value="6">Московский</option>
+					</select>
+        		</div>
+        		<div class="col-md-4 col-sm-4">
+        			<label for="responsible">Статус</label>
+					<select class="form-control js-select2" name="post[]" id="post" multiple="" tabindex="-1">
+						<option value="1">Статус 1</option>
+						<option value="2">Статус 2</option>
+						<option value="3">Статус 3</option>
+					</select>
+        		</div>
+        		<div class="col-md-4 col-sm-3">
+        			<label>&nbsp;</label>
+        			<div class="candidates__form-btn">
+        				<button class="btn btn-primary">Применить</button>
+        			</div>
+        		</div>
+        	</div>
+        	<!-- row END -->
+
         </div>
+        <!-- candidates filter END -->
+
 
 		<div class="candidates__table">
 			<div class="table-responsive">
 				<table class="table table-valign-middle table-hover">
 					<thead>
 						<tr>
+							<th class="cell-head-status-icon">&nbsp;</th>
 							<th class="cell-head-date">Дата создания</th>
-							<th class="cell-head-name">ФИО / Адрес / Телефон</th>
-							<th class="cell-head-exp">Опыт работы</th>
-							<th class="cell-head-post">Должность</th>
+							<th class="cell-head-name">ФИО</th>
+							<th class="cell-head-source">Источник</th>
+							<th class="cell-head-phone">Телефон</th>
+							<th class="cell-head-experience">Опыт работы</th>
+							<th class="cell-head-position">Должность</th>
 							<th class="cell-head-branch">Филиал</th>
-							<th class="cell-head-status">Статус / Изменение&nbsp;статуса</th>
-							<th class="cell-head-country">Гражд.-во</th>
-							<th class="cell-head-from">Привел</th>
-							<th class="cell-head-btn">&nbsp;</th>
+							<th class="cell-head-status">Статус <br>(Дата изменения)</th>
+							<th class="cell-head-citizen">Гражд.-во</th>
+							<th class="cell-head-brought">Привел</th>
+							<th class="cell-head-settings">
+								<div class="btn-group" role="group">
+									<button class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Настройка столбцов" ><i class="fas fa-cog"></i></button>
+									<ul class="dropdown-menu dropdown-menu-right">
+								      	<li>
+			                                <div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Дата создания
+			                                    </label>
+			                                </div>
+				                        </li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        ФИО
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Адрес
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Источник
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Телефон
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Опыт работы
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Должность
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Филиал
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Статус (Дата изменения)
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Ответственный
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Гражданство
+			                                    </label>
+			                                </div>
+										</li>
+										<li>
+											<div class="checkbox-nice">
+			                                    <label>
+			                                        <input type="checkbox" checked />
+			                                        <span class="fa fa-check"></span>
+			                                        Привел
+			                                    </label>
+			                                </div>
+										</li>
+										<li class="dropdown-menu__btn-wrap">
+											<button class="btn btn-primary btn-p25">Применить</button>
+										</li>
+								    </ul>
+								</div>
+							</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
+							<td><div class="cell-inline-status cell-inline-status--new">new</div></td>
+							<td>15.07.2019</td>
 							<td>
-								<select class="form-control js-select2-post" name="post[]" id="post" multiple=""
-									tabindex="-1" aria-hidden="true">
-									<option value="1">Администратор филиала</option>
-									<option value="2">Курьер</option>
-									<option value="3">Повар-сушист</option>
-								</select>
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
 							</td>
-							<td>
-								<select class="form-control js-select2-branch" name="branch[]" id="branch" multiple=""
-									tabindex="-1" aria-hidden="true">
-									<option value="1">Щербинка</option>
-									<option value="2">Бутово</option>
-									<option value="3">Ясенево</option>
-									<option value="4">Коммунарка</option>
-									<option value="5">Подольск</option>
-									<option value="6">Московский</option>
-								</select>
-							</td>
-							<td>
-								<select class="form-control js-select2-status" name="status[]" id="status" multiple=""
-									tabindex="-1" aria-hidden="true">
-									<option value="1">Назначено собеседование</option>
-									<option value="2">Назначено собеседование2</option>
-								</select>
-							</td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-						</tr>
-						<tr>
-							<td>10.06.2019</td>
-							<td>
-								<div class="name">Сидоров Иван Николаевич</div>
-								Ул. Василия Ботылёва, д. 47, стр. 364<br />
-								8 (900) 234-5678
-							</td>
+							<td>Загружена <img src="images/hh-icon.svg" alt=""></td>
+							<td>8 (900) 234-5678</td>
 							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Коммунарка</td>
 							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
+								Администратор филилала
+							</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--new">
+								Ждет звонка <br>
+								<time>(15.07.2019)</time>
+								
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+				
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
 							</td>
 							<td>Молдавия</td>
+							<td>
+								<a href="#">Самойлова Мария Евгеньевна</a>
+							</td>
+							<td class="cell-btn">
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
+										class="far fa-sync"></i></button>
+								<button type="button" class="btn btn-default" title="История кандидата"><i
+										class="far fa-history"></i></button>
+								<button type="button" class="btn btn-default" title="Редактировать"><i
+										class="far fa-pencil"></i></button>
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
+										class="far fa-times"></i></button>
+							</td>
+						</tr>
+						<tr>
+							<td><div class="cell-inline-status cell-inline-status--progress"><i class="fas fa-spinner"></i></div></td>
+							<td>15.07.2019</td>
+							<td>
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
+							</td>
+							<td>Загружена</td>
+							<td>8 (900) 234-5678</td>
+							<td>да</td>
+							<td>
+								Администратор филилала
+							</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--wait">
+								Ждет звонка <br>
+								<time>(15.07.2019)</time>
+				
+								<div class="cell-target-date cell-target-date--phone">
+									<i class="fas fa-phone"></i> 16.07.2019 20:00
+								</div>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+									
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
+							</td>
+							<td>Молдавия</td>
+							<td>
+								<a href="#">Самойлова Мария Евгеньевна</a>
+							</td>
+							<td class="cell-btn">
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
+										class="far fa-sync"></i></button>
+								<button type="button" class="btn btn-default" title="История кандидата"><i
+										class="far fa-history"></i></button>
+								<button type="button" class="btn btn-default" title="Редактировать"><i
+										class="far fa-pencil"></i></button>
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
+										class="far fa-times"></i></button>
+							</td>
+						</tr>
+						<tr>
+							<td><div class="cell-inline-status cell-inline-status--dismiss"><i class="far fa-exclamation-circle"></i></div></td>
+							<td>15.07.2019</td>
+							<td>
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
+							</td>
+							<td>Загружена</td>
+							<td>8 (900) 234-5678</td>
+							<td>да</td>
+							<td>
+								Администратор филилала
+							</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--appoint-interview">
+								Ждет звонка <br>
+								<time>(15.07.2019)</time>
+								
+								<div class="cell-target-date">
+									<i class="fas fa-comments-alt"></i> 16.07.2019 11:15
+								</div>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+									
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
+							</td>
+							<td>Молдавия</td>
+							<td>
+								<a href="#">Самойлова Мария Евгеньевна</a>
+							</td>
+							<td class="cell-btn">
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
+										class="far fa-sync"></i></button>
+								<button type="button" class="btn btn-default" title="История кандидата"><i
+										class="far fa-history"></i></button>
+								<button type="button" class="btn btn-default" title="Редактировать"><i
+										class="far fa-pencil"></i></button>
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
+										class="far fa-times"></i></button>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>15.07.2019</td>
+							<td>
+								<div class="name"><a href="#">Копейкин Антон Александрович</a></div>
+							</td>
+							<td>Ссылка от сотрудника</td>
+							<td>8 (900) 234-5678</td>
+							<td>да</td>
+							<td>
+								Повар-сушист
+							</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--appoint-interview">
+								Назначено собеседование
+								<time>(15.07.2019)</time>
+								
+								<div class="cell-target-date">
+									<i class="fas fa-comments-alt"></i> 16.07.2019 11:15
+								</div>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+									
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
+							</td>
 							<td>-</td>
+							<td>
+								<a href="#">Медведчикова Наталия Александровна</a>
+							</td>
 							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
 										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
 								<button type="button" class="btn btn-default" title="История кандидата"><i
 										class="far fa-history"></i></button>
 								<button type="button" class="btn btn-default" title="Редактировать"><i
 										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
 										class="far fa-times"></i></button>
 							</td>
 						</tr>
 						<tr>
-							<td>10.06.2019</td>
+							<td>&nbsp;</td>
+							<td>15.07.2019</td>
 							<td>
-								<div class="name">Семенова Анна Евгеньевна</div>
-								ул. Космонавтов, д. 41, кв. 159<br />
-								8 (905) 534-9078
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
 							</td>
+							<td>Загружена</td>
+							<td>8 (900) 234-5678</td>
 							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Щербинка</td>
 							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
+								Администратор филилала
 							</td>
-							<td>РФ</td>
-							<td>-</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--appoint-test">
+								Назначено тестирование
+								<time>(15.07.2019)</time>
+								
+								<div class="cell-target-date">
+									<i class="fas fa-tasks"></i> 18.07.2019 20:00
+								</div>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+				
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
+							</td>
+							<td>Молдавия</td>
+							<td>
+								<a href="#">Самойлова Мария Евгеньевна</a>
+							</td>
 							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
 										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
 								<button type="button" class="btn btn-default" title="История кандидата"><i
 										class="far fa-history"></i></button>
 								<button type="button" class="btn btn-default" title="Редактировать"><i
 										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
 										class="far fa-times"></i></button>
 							</td>
 						</tr>
 						<tr>
-							<td>10.06.2019</td>
+							<td>&nbsp;</td>
+							<td>15.07.2019</td>
 							<td>
-								<div class="name">Соколова Ирина Эльдаровна</div>
-								ул. Спортивная, д. 128<br />
-								8 (900) 234-5678
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
 							</td>
+							<td>Загружена</td>
+							<td>8 (900) 234-5678</td>
 							<td>да</td>
-							<td>Администратор филиала</td>
+							<td>
+								Администратор филилала
+							</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--appoint-test">
+								Назначено тестирование
+								<time>(15.07.2019)</time>
+								
+								<div class="cell-target-date">
+									<i class="fas fa-tasks"></i> 18.07.2019 20:00
+								</div>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+									
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
+							</td>
+							<td>Молдавия</td>
+							<td>
+								<a href="#">Самойлова Мария Евгеньевна</a>
+							</td>
+							<td class="cell-btn">
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
+										class="far fa-sync"></i></button>
+								<button type="button" class="btn btn-default" title="История кандидата"><i
+										class="far fa-history"></i></button>
+								<button type="button" class="btn btn-default" title="Редактировать"><i
+										class="far fa-pencil"></i></button>
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
+										class="far fa-times"></i></button>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>15.07.2019</td>
+							<td>
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
+							</td>
+							<td>Загружена</td>
+							<td>8 (900) 234-5678</td>
+							<td>да</td>
+							<td>
+								Администратор филилала
+							</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--success">
+								Принят на старижровку
+								<time>(15.07.2019)</time>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+									
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
+							</td>
+							<td>Молдавия</td>
+							<td>
+								<a href="#">Самойлова Мария Евгеньевна</a>
+							</td>
+							<td class="cell-btn">
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
+										class="far fa-sync"></i></button>
+								<button type="button" class="btn btn-default" title="История кандидата"><i
+										class="far fa-history"></i></button>
+								<button type="button" class="btn btn-default" title="Редактировать"><i
+										class="far fa-pencil"></i></button>
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
+										class="far fa-times"></i></button>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>15.07.2019</td>
+							<td>
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
+							</td>
+							<td>Загружена</td>
+							<td>8 (900) 234-5678</td>
+							<td>да</td>
+							<td>
+								Администратор филилала
+							</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--fail">
+								Отказано
+								<time>(15.07.2019)</time>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+									
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
+							</td>
+							<td>Молдавия</td>
+							<td>
+								<a href="#">Самойлова Мария Евгеньевна</a>
+							</td>
+							<td class="cell-btn">
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
+										class="far fa-sync"></i></button>
+								<button type="button" class="btn btn-default" title="История кандидата"><i
+										class="far fa-history"></i></button>
+								<button type="button" class="btn btn-default" title="Редактировать"><i
+										class="far fa-pencil"></i></button>
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
+										class="far fa-times"></i></button>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>15.07.2019</td>
+							<td>
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
+							</td>
+							<td>Загружена</td>
+							<td>8 (900) 234-5678</td>
+							<td>да</td>
+							<td>
+								Администратор филилала
+							</td>
+							<td>Коммунарка</td>
+							<td class="cell-status--fail">
+								Отказано
+								<time>(15.07.2019)</time>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+									
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
+							</td>
+							<td>Молдавия</td>
+							<td>
+								<a href="#">Самойлова Мария Евгеньевна</a>
+							</td>
+							<td class="cell-btn">
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
+										class="far fa-sync"></i></button>
+								<button type="button" class="btn btn-default" title="История кандидата"><i
+										class="far fa-history"></i></button>
+								<button type="button" class="btn btn-default" title="Редактировать"><i
+										class="far fa-pencil"></i></button>
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
+										class="far fa-times"></i></button>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td>15.07.2019</td>
+							<td>
+								<div class="name"><a href="#">Сидоров Иван Николаевич</a></div>
+							</td>
+							<td>Загружена</td>
+							<td>8 (900) 234-5678</td>
+							<td>да</td>
+							<td>
+								Администратор филилала
+							</td>
 							<td>Коммунарка</td>
 							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
+								Резерв
+								<time>(15.07.2019)</time>
+				
+								<!-- tooltip info -->
+								<div class="candidates__tooltip">
+									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
+									
+									<h5 class="candidates__tooltip-title">Семенова Анстасия Ярославовна</h5>
+									<p>Принят на стажировку <br>Администратор филиала, Коммунарка</p>
+				
+									<ul class="candidates__tooltip-list">
+										<li><i class="fas fa-user-tie"></i> Волкова Марина Васильевна</li>
+										<li><i class="fas fa-comment-alt"></i> Перспективный молодой кандидат</li>
+									</ul>
+				
+								</div>
+								<!-- tooltip info END -->
+				
 							</td>
-							<td>Украина</td>
-							<td>Андрей Смирнов</td>
+							<td>Молдавия</td>
+							<td>
+								-
+							</td>
 							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
+								<button type="button" class="btn btn-default" title="Изменить статус кандидата" data-toggle="modal" data-target="#modalEditeCandidate"><i
 										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
 								<button type="button" class="btn btn-default" title="История кандидата"><i
 										class="far fa-history"></i></button>
 								<button type="button" class="btn btn-default" title="Редактировать"><i
 										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
-										class="far fa-times"></i></button>
-							</td>
-						</tr>
-						<tr>
-							<td>10.06.2019</td>
-							<td>
-								<div class="name">Семенова Анна Евгеньевна</div>
-								ул. Космонавтов, д. 41, кв. 159<br />
-								8 (905) 534-9078
-							</td>
-							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Щербинка</td>
-							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
-							</td>
-							<td>РФ</td>
-							<td>Андрей Смирнов</td>
-							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
-										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
-								<button type="button" class="btn btn-default" title="История кандидата"><i
-										class="far fa-history"></i></button>
-								<button type="button" class="btn btn-default" title="Редактировать"><i
-										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
-										class="far fa-times"></i></button>
-							</td>
-						</tr>
-						<tr>
-							<td>10.06.2019</td>
-							<td>
-								<div class="name">Соколова Ирина Эльдаровна</div>
-								ул. Спортивная, д. 128<br />
-								8 (900) 234-5678
-							</td>
-							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Коммунарка</td>
-							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
-							</td>
-							<td>Украина</td>
-							<td>Андрей Смирнов</td>
-							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
-										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
-								<button type="button" class="btn btn-default" title="История кандидата"><i
-										class="far fa-history"></i></button>
-								<button type="button" class="btn btn-default" title="Редактировать"><i
-										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
-										class="far fa-times"></i></button>
-							</td>
-						</tr>
-						<tr>
-							<td>10.06.2019</td>
-							<td>
-								<div class="name">Семенова Анна Евгеньевна</div>
-								ул. Космонавтов, д. 41, кв. 159<br />
-								8 (905) 534-9078
-							</td>
-							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Щербинка</td>
-							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
-							</td>
-							<td>РФ</td>
-							<td>Андрей Смирнов</td>
-							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
-										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
-								<button type="button" class="btn btn-default" title="История кандидата"><i
-										class="far fa-history"></i></button>
-								<button type="button" class="btn btn-default" title="Редактировать"><i
-										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
-										class="far fa-times"></i></button>
-							</td>
-						</tr>
-						<tr>
-							<td>10.06.2019</td>
-							<td>
-								<div class="name">Соколова Ирина Эльдаровна</div>
-								ул. Спортивная, д. 128<br />
-								8 (900) 234-5678
-							</td>
-							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Коммунарка</td>
-							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
-							</td>
-							<td>Украина</td>
-							<td>Андрей Смирнов</td>
-							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
-										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
-								<button type="button" class="btn btn-default" title="История кандидата"><i
-										class="far fa-history"></i></button>
-								<button type="button" class="btn btn-default" title="Редактировать"><i
-										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
-										class="far fa-times"></i></button>
-							</td>
-						</tr>
-						<tr>
-							<td>10.06.2019</td>
-							<td>
-								<div class="name">Семенова Анна Евгеньевна</div>
-								ул. Космонавтов, д. 41, кв. 159<br />
-								8 (905) 534-9078
-							</td>
-							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Щербинка</td>
-							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
-							</td>
-							<td>РФ</td>
-							<td>Андрей Смирнов</td>
-							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
-										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
-								<button type="button" class="btn btn-default" title="История кандидата"><i
-										class="far fa-history"></i></button>
-								<button type="button" class="btn btn-default" title="Редактировать"><i
-										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
-										class="far fa-times"></i></button>
-							</td>
-						</tr>
-						<tr>
-							<td>10.06.2019</td>
-							<td>
-								<div class="name">Соколова Ирина Эльдаровна</div>
-								ул. Спортивная, д. 128<br />
-								8 (900) 234-5678
-							</td>
-							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Коммунарка</td>
-							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
-							</td>
-							<td>Украина</td>
-							<td>Андрей Смирнов</td>
-							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
-										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
-								<button type="button" class="btn btn-default" title="История кандидата"><i
-										class="far fa-history"></i></button>
-								<button type="button" class="btn btn-default" title="Редактировать"><i
-										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
-										class="far fa-times"></i></button>
-							</td>
-						</tr>
-						<tr>
-							<td>10.06.2019</td>
-							<td>
-								<div class="name">Семенова Анна Евгеньевна</div>
-								ул. Космонавтов, д. 41, кв. 159<br />
-								8 (905) 534-9078
-							</td>
-							<td>да</td>
-							<td>Администратор филиала</td>
-							<td>Щербинка</td>
-							<td>
-								Назначено собеседование
-								<div class="date">10.06.2019</div>
-							</td>
-							<td>РФ</td>
-							<td>Андрей Смирнов</td>
-							<td class="cell-btn">
-								<button type="button" class="btn btn-default" title="Изменить статус кандидата"><i
-										class="far fa-sync"></i></button>
-								<button type="button" class="btn btn-default" title="Анкета кандидата"><i
-										class="far fa-id-badge"></i></button>
-								<button type="button" class="btn btn-default" title="История кандидата"><i
-										class="far fa-history"></i></button>
-								<button type="button" class="btn btn-default" title="Редактировать"><i
-										class="far fa-pencil"></i></button>
-								<button type="button" class="btn btn-default" title="Удалить"><i
+								<button type="button" class="btn btn-default js-remove-current-row" title="Удалить"><i
 										class="far fa-times"></i></button>
 							</td>
 						</tr>
@@ -590,16 +956,251 @@
 
 <script type="text/javascript" src="js/js-gl.js"></script>
 
-    <!-- https://github.com/LucasLazaro/bootstrap-nav-tab-scrollable -->
-    <script type="text/javascript" src="js/scrolling-tabs/jquery.scrolling-tabs.js"></script>
+    <!-- beg: Modal Fine Edit -->
+    <div class="modal fade edit-modal" tabindex="-1" role="dialog" id="modalEditeCandidate">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Изменить статус кандидата</h4>
+                </div>
+                <div class="modal-body">
+					
+					<!-- edit form -->
+                   	<div class="candidates__edit-form">
+                   		
+                   		<!-- form row -->
+	                   	<div class="form-group">
+	                   		<label>Статус</label>
+	                   		<select class="form-control" name="choose">
+			                    <option value="waiting-call">Ждет звонка</option>
+			                    <option value="internship">Принят на стажировку</option>
+			                    <option value="interview">Назначено собеседование</option>
+			                    <option value="fail">Отказано</option>
+			                    <option value="reserve">Резерв</option>
+			                </select>
+	                   	</div>
+	                   	<!-- form row END -->
+						
+						<!-- details for 'wait a call' -->
+	                   	<fieldset class="candidates__edit-detail" data-logic-type="call">
+	                   		<!-- form row -->
+		                   	<div class="form-group">
+		                   		<div class="row">
+		                   			<div class="col-md-5">
+		                   				<label>Дата</label>
+				                   		<div class="input-group datepicker">
+						                    <input type="text" class="form-control" name="date" id="date-field" placeholder="00.00.0000" maxlength="10" value="15.02.2018">
+						                    <span class="input-group-btn">
+						                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+						                    </span>
+						                </div>
+		                   			</div>
+		                   			<div class="col-md-2">
+		                   				<label>Время</label>
+				                   		<input type="text" class="form-control input-sm input-timework" placeholder="00:00" maxlength="5" value="11:00">
+		                   			</div>
+		                   		</div>
+		                   	</div>
+		                   	<!-- form row END-->
+	                   	</fieldset>
+	                   	<!-- details for 'wait a call' END-->
+
+	                   	<!-- details for 'interview' -->
+	                   	<fieldset class="candidates__edit-detail" data-logic-type="interview">
+	                   		
+	                   		<!-- form row -->
+		                   	<div class="form-group">
+		                   		<div class="row">
+		                   			<div class="col-md-5">
+		                   				<label>Дата</label>
+				                   		<div class="input-group datepicker">
+						                    <input type="text" class="form-control" name="date" id="date-field" placeholder="00.00.0000" maxlength="10" value="15.02.2018">
+						                    <span class="input-group-btn">
+						                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+						                    </span>
+						                </div>
+		                   			</div>
+		                   			<div class="col-md-2">
+		                   				<label>Время</label>
+				                   		<input type="text" class="form-control input-sm input-timework" placeholder="00:00" maxlength="5" value="11:00">
+		                   			</div>
+		                   			<div class="col-md-5">
+		                   				<label>Место проведения</label>
+				                   		<select name="filiation" id="filiation-field" class="form-control">
+											<option value="0">Без филиала</option>
+											<option value="1">Бутово</option>
+											<option value="2" selected="">Коммунарка</option>
+											<option value="3">Московский</option>
+											<option value="4">Подольск</option>
+											<option value="5">Щербинка</option>
+											<option value="6">Ясенево</option>
+										</select>
+		                   			</div>
+		                   		</div>
+		                   	</div>
+		                   	<!-- form row END-->
+
+		                   	<!-- form row -->
+		                   	<div class="form-group">
+		                   		<label>Ответственные</label>
+		                   		<input type="text" class="form-control">
+		                   	</div>
+		                   	<!-- form row END-->
+
+	                   	</fieldset>
+	                   	<!-- details for 'interview' END-->
+
+	                   	<!-- details for 'interview' -->
+	                   	<fieldset class="candidates__edit-detail" data-logic-type="internship">
+	                   		<!-- form row -->
+		                   	<div class="form-group">
+		                   		<div class="row">
+		                   			<div class="col-md-4">
+		                   				<label>Филиал</label>
+				                   		<select name="filiation" id="filiation-field" class="form-control">
+											<option value="0">Без филиала</option>
+											<option value="1">Бутово</option>
+											<option value="2" selected="">Коммунарка</option>
+											<option value="3">Московский</option>
+											<option value="4">Подольск</option>
+											<option value="5">Щербинка</option>
+											<option value="6">Ясенево</option>
+										</select>
+		                   			</div>
+		                   		</div>
+		                   	</div>
+		                   	<!-- form row END-->
+
+		                   	<!-- form row -->
+		                   	<div class="form-group">
+		                   		<div class="row">
+		                   			<div class="col-md-10">
+		                   				<label>Должность</label>
+				                   		<select class="js-select-single form-control">
+			                                <option value="1">Должность 1</option>
+			                                <option value="2">Должность 2</option>
+			                                <option value="3">Должность 3</option>
+			                            </select>
+		                   			</div>
+		                   			<div class="col-md-2">
+		                   				<label>Разряд</label>
+				                   		<select name="filiation" class="form-control">
+											<option value="0">1</option>
+											<option value="1">2</option>
+											<option value="2">3</option>
+											<option value="3">4</option>
+											<option value="4">5</option>
+											<option value="5">6</option>
+											<option value="6">7</option>
+										</select>
+		                   			</div>
+		                   		</div>
+		                   	</div>
+		                   	<!-- form row END-->
+
+		                   	<!-- form row -->
+		                   	<div class="form-group">
+		                   		<label>Наставник</label>
+		                   		<select class="js-select-single form-control">
+	                                <option value="1">Наставник 1</option>
+	                                <option value="2">Наставник 2</option>
+	                                <option value="3">Наставник 3</option>
+	                            </select>
+		                   	</div>
+		                   	<!-- form row END-->
+							
+							<!-- form row -->
+		                   	<div class="form-group">
+                                <div class="checkbox-nice">
+                                    <label>
+                                        <input type="checkbox" checked="">
+                                        <span class="fa fa-check"></span>
+                                        Создать пользователя сервиса
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- form row END-->
+
+                            <!-- form row -->
+		                   	<div class="form-group">
+		                   		<label>Email</label>
+		                   		<input type="email" class="form-control">
+		                   	</div>
+		                   	<!-- form row END-->
+
+	                   	</fieldset>
+	                   	<!-- details for 'interview' END-->
+
+	                   	<!-- details for 'interview' -->
+	                   	<fieldset class="candidates__edit-detail" data-logic-type="fail">
+
+		                   	<!-- form row -->
+		                   	<div class="form-group">
+		                   		<label>Причина</label>
+		                   		<select class="js-select-single form-control">
+	                                <option value="1">Причина 1</option>
+	                                <option value="2">Причина 2</option>
+	                                <option value="3">Причина 3</option>
+	                                <option>Другое</option>
+	                            </select>
+		                   	</div>
+		                   	<!-- form row END-->
+
+                            <!-- form row -->
+		                   	<div class="form-group">
+		                   		<input type="text" class="form-control">
+		                   	</div>
+		                   	<!-- form row END-->
+
+	                   	</fieldset>
+	                   	<!-- details for 'interview' END-->
+
+	                   	<!-- form row -->
+	                   	<div class="form-group">
+	                   		<label>Комментарий</label>
+	                   		<textarea class="form-control"></textarea>
+	                   	</div>
+	                   	<!-- form row END -->
+
+                   	</div>
+                   	<!-- edit form END -->
+
+                </div>
+                <div class="modal-footer">
+                	<button type="button" class="btn btn-primary">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end: Modal Fine Edit -->
+
 
     <script type="text/javascript">
         $(document).ready(function () {
             initNavbar();
 
-            $('.js-select2').select2({
+            $('.datepicker').datetimepicker({
+	            dateFormat: 'dd.mm.yyyy',
+	            language: 'ru',
+	            pickTime: false,
+	            daysOfWeekDisabled:[0,6]
+	        });
+
+	        $('.js-select2').select2({
                 width: '100%'
             });
+
+            $('.js-select-single').select2({
+                width: '100%'
+            });
+
+            $('.input-timework').datetimepicker({
+	            language: 'ru',
+	            format: 'LT',
+	            pickDate: false
+	        });
 
             placeholderSelect2('.js-select2-post', 'Должность');
             placeholderSelect2('.js-select2-branch', 'Филиал');
@@ -615,6 +1216,26 @@
                     }
                 });
             });
+
+            $(".js-remove-current-row").on('click', function(){
+            	$(this).closest('tr').fadeOut();
+            })
+
+            $('.cell-head-settings .dropdown-menu').on('click', function(e) {
+			  e.stopPropagation();
+			});
+
+			if ($(window).width() < 1100){
+				$('.candidates__table').on('click', 'td', function(){
+					var currentCell = $(this);
+
+					if (currentCell.find('.candidates__tooltip').length){
+						currentCell.toggleClass('showTooltip');
+					}
+
+				})
+
+			}
 
         });
 

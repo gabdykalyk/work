@@ -1,4 +1,13 @@
 .candidates {
+
+    .table-responsive{
+        overflow: visible;
+
+        @media only screen and (max-width: 1200px) {
+            overflow: auto;
+        }
+    }
+
     &__head {
         .flex();
         align-items: center;
@@ -16,78 +25,345 @@
         }
     }
     &__form {
-        &-right {
-            .flex();
-            justify-content: flex-end;
-            .dropdown-quest {
-                .dropdown-menu {
-                    right: 0;
-                    left: auto;
-                    min-width: 100%;
-                }
+        padding-bottom: 10px;
+        
+        > .row{
+            margin-bottom: 15px;
+        }
+
+        .btn-group{
+            display: block;
+
+            .btn{
+                padding-left: 11px;
+                padding-right: 11px;
             }
         }
+
+        &-btn{
+            text-align: right;
+        }
+        
     }
+
+    &__edit-form{
+
+    }
+
+    &__edit-row{
+        margin-bottom: 20px;
+    }
+
+    &__view-btns{
+        display: inline-block;
+        margin-right: 30px;
+    }
+
+    &__view{
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+
+
+        &-item:last-child{
+            width: calc(100% - 105px);
+        }
+    }
+
+    &__types{
+        display: inline-block;
+    }
+
+    &__tooltip{
+        background: #FFFFFF;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+        border-radius: 6px;
+        width: 345px;
+        z-index: 999;
+        font-size: 12px;
+        line-height: 20px;
+        padding: 15px 30px 25px;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        display: block;
+        opacity: 0;
+        visibility: hidden;
+        margin: 0px 0 0 -25px;
+        transition: all ease 300ms;
+
+        &-close-btn{
+            background: none;
+            border: none;
+            position: absolute;
+            display: none;
+            top: 18px;
+            right: 20px;
+            color: #979797;
+
+            @media only screen and (max-width: 1100px) {
+                display: block;
+            }
+
+        }
+
+        &-title{
+            font-weight: 700;
+        }
+
+        &-list{
+            padding: 0px;
+            margin: 0;
+            list-style-type: none;
+
+            li{
+                margin: 3px 0;
+            }
+
+            i{
+                margin-right: 5px;
+            }
+
+        }
+    }
+
     &__table {
         margin-bottom: 20px;
         table {
             min-width: 1140px;
             margin-bottom: 0;
+            color: #000;
+
             > thead {
                 > tr {
                     > th {
                         line-height: 1.20;
-                        padding: 12px 8px;
-                        &.cell-head-date {
-                            width: 80px;
+                        padding: 6px 8px 3px;
+
+                        &.cell-head-settings{
+
+                            .btn.dropdown-toggle{
+                                background: none;
+                                padding: 0;
+                                width: 45px;
+                                height: 45px;
+                                line-height: 45px;
+                                z-index: 20;
+
+                                &:hover{
+                                    color: #337AB7;
+                                    background-color: #fff;
+                                }
+
+                                &[aria-expanded="true"]{
+                                    color: #337AB7;
+                                    background-color: #fff;
+                                    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+                                }
+
+                            }
+
+                            .dropdown-menu{
+                                width: 250px;
+                                margin-top: 0px;
+                                border-color: transparent;
+                                background: #FFFFFF;
+                                box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+                                font-size: 14px;
+                                line-height: 30px;
+                                padding: 15px 25px 27px;
+                                color: #000;
+                                font-weight: 400;
+
+                                &::before{
+                                    width: 45px;
+                                    height: 10px;
+                                    background-color: #fff;
+                                    position: absolute;
+                                    display: block;
+                                    right: -1px;
+                                    top: -10px;
+                                    content: "";
+                                }
+
+                            }
+
+                            .dropdown-menu__btn-wrap{
+                                text-align: right;
+                                padding-top: 10px;
+                            }
+
                         }
-                        &.cell-head-name {
-                            width: 245px;
+                        
+                        &.cell-head-status-icon{
+                            width: 4%;
                         }
-                        &.cell-head-exp {
-                            width: 63px;
+
+                        &.cell-head-date{
+                            width: 7%;
                         }
-                        &.cell-head-post {
-                            min-width: 95px;
+
+                        &.cell-head-name{
+                            width: 10%;
                         }
-                        &.cell-head-branch {
-                            min-width: 85px;
+
+                        &.cell-head-source{
+                            width: 8%;
                         }
-                        &.cell-head-status {
-                            min-width: 146px;
+
+                        &.cell-head-phone{
+                            width: 10%;
                         }
-                        &.cell-head-country {
-                            width: 60px;
+
+                        &.cell-head-experience{
+                            width: 5%;
                         }
-                        &.cell-head-from {
-                            width: 60px;
+
+                        &.cell-head-position{
+                            width: 10%;
                         }
-                        &.cell-head-btn {
-                            width: 210px;
+
+                        &.cell-head-branch{
+                            width: 8%;
                         }
+
+                        &.cell-head-status{
+                            width: 12%;
+                        }
+
+                        &.cell-head-citizen{
+                            width: 8%;
+                        }
+
+                        &.cell-head-brought{
+                            width: 9%;
+                        }
+
+                        &.cell-head-settings{
+                            width: 9%;
+                            text-align: right;
+                            color: #337AB7;
+
+                            i{
+                                font-size: 16px;
+                            }
+                        }
+
                     }
                 }
             }
             > tbody > tr {
+
+                &:last-child,
+                &:nth-last-child(2){
+                    .candidates__tooltip{
+                        top: auto;
+                        bottom: 100%;
+                    }
+                }
+
                 > td {
                     line-height: 1.20;
-                    .select2-container .select2-search--inline .select2-search__field {
-                        margin-top: 9px;
+                    vertical-align: top;
+                    position: relative;
+                    padding-top: 11px;
+                    padding-bottom: 8px;
+
+                    time{
+                        display: block;
+                        color: #555555;
+                        margin: 5px 0 0;
                     }
-                    &.cell-btn {
-                        .btn {
-                            width: 36px;
-                            height: 34px;
+
+                    &.cell-btn{
+                        text-align: right;
+
+                        .btn{
+                            width: 30px;
+                            height: 30px;
+                            line-height: 30px;
+                            margin: 2.5px 1px;
                             padding: 0;
                         }
                     }
-                    .name {
-                        padding-bottom: 3px;
+
+                    &:hover .candidates__tooltip{
+                        @media only screen and (min-width: 1100px) {
+                            opacity: 1;
+                            visibility: visible;
+                        }
+                    }
+
+                    &.showTooltip .candidates__tooltip{
+                        opacity: 1;
+                        visibility: visible;
+                    }
+
+                    img{
+                        margin-top: 4px;
+                    }
+
+                    .name{
                         font-weight: 700;
                     }
-                    .date {
-                        padding-top: 6px;
+
+                    &.cell-status--new{
+                        background-color: #FFDDAB;
                     }
+
+                    &.cell-status--wait{
+                        background-color: #FFEBCF;
+                    }
+
+                    &.cell-status--appoint-interview{
+                        background-color: #FFFFC4;
+                    }
+
+                    &.cell-status--appoint-test{
+                        background-color: #ECF6FF;
+                    }
+
+                    &.cell-status--success{
+                        background-color: #E1F6CC;
+                    }
+
+                    &.cell-status--fail{
+                        background-color: #FFD4D4;
+                    }
+
+                    .cell-inline-status{
+                        font-size: 16px;
+                        text-align: center;
+
+                        &--new{
+                            font-size: 10px;
+                            font-weight: bold;
+                            color: #5CB85C;
+                            text-transform: uppercase;
+                        }
+
+                        &--progress{
+                            color: #000;
+                        }
+
+                        &--dismiss{
+                            color: #FF0000;
+                        }
+
+                    }
+
+                    .cell-target-date{
+                        font-size: 12px;
+                        color: #000;
+                        display: block;
+                        margin-top: 15px;
+
+                        i{
+                            margin-right: 5px;
+                        }
+
+                    }
+
                 }
                 &.primary > td {
                     background: #ECF6FF;
