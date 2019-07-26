@@ -148,9 +148,11 @@
         background-color: #fff;
         // height: 100%;
         width: calc(16.66% - 10px);
+        min-width: 136px;
         border-radius: 6px;
 
-        &.muuri-item-dragging{
+        &.muuri-item-dragging,
+        &:hover{
             z-index: 99;
         }
     }
@@ -249,8 +251,17 @@
             position: absolute;
             width: 100%;
 
-            &:hover{
-                z-index: 99;
+            &:hover,
+            &.muuri-item-dragging{
+                z-index: 100;
+            }
+
+            &:focus{
+                box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+            }
+
+            .candidates__tooltip{
+                margin-top: -35px;
             }
 
         }
@@ -275,6 +286,13 @@
             }
 
         }
+
+        &__board-item-location:hover ~ &__tooltip,
+        &__board-item-target-date:hover ~ &__tooltip{
+            opacity: 1;
+            visibility: visible;
+        }
+
 
         &__board-item-name{
             margin: 0 0 8px;
