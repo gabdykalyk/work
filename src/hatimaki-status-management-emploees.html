@@ -32,7 +32,7 @@
                         <input class="form-control" id="status-emploees-search" type="text" placeholder="Поиск" onkeyup="searchStr('status-emploees-search', 'status-management__table--emploees');">
                     </div>
                     <div class="col-md-2 col-sm-3 form-group pull-right btn-add-status">
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addNewStatusEmploees">Создать статус</button>
+                        <button type="button" class="btn btn-primary btn-p25" data-toggle="modal" data-target="#addNewStatusEmploees">Создать статус</button>
                     </div>
                 </div>
                 <div class="row">
@@ -95,7 +95,7 @@
             </div>
             <div role="tabpanel" class="tab-pane" id="status-applicants">
                 <div class="row">
-                    <div class="col-md-7 col-sm-9 form-group">
+                    <div class="col-md-7 col-sm-10 form-group">
                         <input class="form-control" type="text" name="status-applicants-search" id="status-applicants-search">
                     </div>
                     <div class="col-md-2 col-sm-3 form-group  pull-right btn-add-status">
@@ -428,11 +428,17 @@
 
     //поиск по строкам
     function searchStr(inputId, tableId) {
+        var grid = dragElements();
+
         let searchString = $(`#${inputId}`).val().toLowerCase();
             labelArr = $(`#${tableId} tbody tr td:first-child`);
         let labelText = '';
 
         labelArr.parent().addClass('hidden');
+        $('.status-management__table tbody').addClass('refresh');
+
+        grid.refreshSortData();
+
         labelArr.each(function (i) {
             labelText = labelArr.eq(i).text().toLowerCase();
 
