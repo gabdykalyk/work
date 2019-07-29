@@ -1761,6 +1761,8 @@
             // console.log(itemContainers);
 
             $(".candidates__board-column-content").each(function(){
+                var currentKey = $(this).parent().data('column-key');
+
                 var muuri = new Muuri($(this)[0], {
                     items: '.candidates__board-item',
                     layoutDuration: 400,
@@ -1801,27 +1803,35 @@
                         editSwitcher();
                     }
 
-                    if (currentBoardKey){
-                        console.log(boardGrid[currentBoardKey]);
-                        boardGrid[currentBoardKey].refreshItems().layout();
-                    }
-
 
                 })
                 .on('dragReleaseEnd', function (item) {
                     item.getElement().style.width = '';
                     item.getElement().style.height = '';
-                    columnGrids.forEach(function (muuri) {
-                        muuri.refreshItems();
-                    });
+
+                    var currentBoardKey = item._element.parentElement.parentElement.attributes[1].nodeValue;
+
+                    muuri.refreshItems();
+
+
                     refreshElementQty();
                 })
                 .on('layoutEnd', function (items) {
-                    
+                    var boards = $('.candidates__board');
+
+                    boards.each(function(){
+                        var currentBoardKey = $(this).data('board-key');
+
+                        boardGrid[currentBoardKey].refreshItems().layout(); 
+                    });
+
                 });
 
                 columnGrids.push(muuri);
+
             })
+
+
 
             if ($(".candidates__board-wrap").length){
                 var boardCounter = 0;
@@ -1835,6 +1845,7 @@
                     boardGrid[boardCounter] = new Muuri(currentBoard[0], {
                         layoutDuration: 400,
                         layoutEasing: 'ease',
+                        layoutOnResize: true,
                         dragEnabled: false,
                         dragSortHeuristics: {
                             sortInterval: 0,
