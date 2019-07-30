@@ -302,6 +302,10 @@
 			            			Коммунарка
 			            		</div>
 
+			            		<div class="candidates__board-item-target-date">
+			            			<i class="fas fa-phone"></i> 16.07.2019 20:00
+			            		</div>
+
 			            		<!-- tooltip info -->
 								<div class="candidates__tooltip">
 									<button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button>
@@ -325,9 +329,9 @@
 			            		<time class="candidates__board-item-date" data-placement="bottom" data-toggle="tooltip" title="Количество дней в статусе"><i class="fal fa-clock"></i> 2 дн.</time>
 
 			            		<div class="candidates__board-item-status" data-current-status="new">
-			            			<div class="candidates__inline-status candidates__inline-status--new">new</div>
+			            			<div class="candidates__inline-status candidates__inline-status--new" data-toggle="tooltip" data-placement="bottom" title="Новый">new</div>
 			            			<div class="candidates__inline-status candidates__inline-status--alert" data-toggle="tooltip" data-placement="bottom" title="Просрочен"><i class="far fa-exclamation-circle"></i></div>
-			            			<div class="candidates__inline-status candidates__inline-status--wait"><i class="fas fa-spinner"></i></div>
+			            			<div class="candidates__inline-status candidates__inline-status--wait" data-toggle="tooltip" data-placement="bottom" title="Ожидает"><i class="fas fa-spinner"></i></div>
 			            		</div>
 			            	</div>
 			            </div>
@@ -371,9 +375,9 @@
 			            		<time class="candidates__board-item-date" data-placement="bottom" data-toggle="tooltip" title="Количество дней в статусе"><i class="fal fa-clock"></i> 2 дн.</time>
 
 			            		<div class="candidates__board-item-status" data-current-status="wait">
-			            			<div class="candidates__inline-status candidates__inline-status--new">new</div>
+			            			<div class="candidates__inline-status candidates__inline-status--new" data-toggle="tooltip" data-placement="bottom" title="Новый">new</div>
 			            			<div class="candidates__inline-status candidates__inline-status--alert" data-toggle="tooltip" data-placement="bottom" title="Просрочен"><i class="far fa-exclamation-circle"></i></div>
-			            			<div class="candidates__inline-status candidates__inline-status--wait"><i class="fas fa-spinner"></i></div>
+			            			<div class="candidates__inline-status candidates__inline-status--wait" data-toggle="tooltip" data-placement="bottom" title="Ожидает"><i class="fas fa-spinner"></i></div>
 			            		</div>
 			            	</div>
 			            </div>
@@ -418,9 +422,9 @@
 			            		<time class="candidates__board-item-date" data-placement="bottom" data-toggle="tooltip" title="Количество дней в статусе"><i class="fal fa-clock"></i> 2 дн.</time>
 
 			            		<div class="candidates__board-item-status" data-current-status="alert">
-			            			<div class="candidates__inline-status candidates__inline-status--new">new</div>
+			            			<div class="candidates__inline-status candidates__inline-status--new" data-toggle="tooltip" data-placement="bottom" title="Новый">new</div>
 			            			<div class="candidates__inline-status candidates__inline-status--alert" data-toggle="tooltip" data-placement="bottom" title="Просрочен"><i class="far fa-exclamation-circle"></i></div>
-			            			<div class="candidates__inline-status candidates__inline-status--wait"><i class="fas fa-spinner"></i></div>
+			            			<div class="candidates__inline-status candidates__inline-status--wait" data-toggle="tooltip" data-placement="bottom" title="Ожидает"><i class="fas fa-spinner"></i></div>
 			            		</div>
 			            	</div>
 			            </div>
@@ -471,9 +475,9 @@
 			            		<time class="candidates__board-item-date" data-toggle="tooltip" data-placement="bottom" title="Количество дней в статусе"><i class="fal fa-clock"></i> 1 дн.</time>
 
 			            		<div class="candidates__board-item-status">
-			            			<div class="candidates__inline-status candidates__inline-status--new">new</div>
+			            			<div class="candidates__inline-status candidates__inline-status--new" data-toggle="tooltip" data-placement="bottom" title="Новый">new</div>
 			            			<div class="candidates__inline-status candidates__inline-status--alert" data-toggle="tooltip" data-placement="bottom" title="Просрочен"><i class="far fa-exclamation-circle"></i></div>
-			            			<div class="candidates__inline-status candidates__inline-status--wait"><i class="fas fa-spinner"></i></div>
+			            			<div class="candidates__inline-status candidates__inline-status--wait" data-toggle="tooltip" data-placement="bottom" title="Ожидает"><i class="fas fa-spinner"></i></div>
 			            		</div>
 			            	</div>
 			            </div>
@@ -517,9 +521,9 @@
 			            		<time class="candidates__board-item-date" data-placement="bottom" data-toggle="tooltip" title="Количество дней в статусе"><i class="fal fa-clock"></i> 2 дн.</time>
 
 			            		<div class="candidates__board-item-status" data-current-status="alert">
-			            			<div class="candidates__inline-status candidates__inline-status--new">new</div>
+			            			<div class="candidates__inline-status candidates__inline-status--new" data-toggle="tooltip" data-placement="bottom" title="Новый">new</div>
 			            			<div class="candidates__inline-status candidates__inline-status--alert" data-toggle="tooltip" data-placement="bottom" title="Просрочен"><i class="far fa-exclamation-circle"></i></div>
-			            			<div class="candidates__inline-status candidates__inline-status--wait"><i class="fas fa-spinner"></i></div>
+			            			<div class="candidates__inline-status candidates__inline-status--wait" data-toggle="tooltip" data-placement="bottom" title="Ожидает"><i class="fas fa-spinner"></i></div>
 			            		</div>
 			            	</div>
 			            </div>
@@ -801,6 +805,7 @@
 
                 </div>
                 <div class="modal-footer">
+                	<button type="button" data-return-card class="btn btn-danger" data-dismiss="modal" aria-label="Close">Отменить</button>
                 	<button type="button" class="btn btn-primary">Сохранить</button>
                 </div>
             </div>
@@ -929,70 +934,108 @@
 			var columnGrids = [];
 			var dragCounter = 0;
 			var boardGrid;
+			var muuri;
+			var activeStatus;
+
+			var lastAction = {};
+			var preventLastAction = false;
+
+
 			var phPool = [];
 			var phElem = document.createElement('div');
 
+
 			itemContainers.forEach(function (container) {
 
-			var muuri = new Muuri(container, {
-				items: '.candidates__board-item',
-				layoutDuration: 400,
-				layoutEasing: 'ease',
-				dragEnabled: true,
-				dragSort: function () {
-					return columnGrids;
-				},
-				dragSortHeuristics: {
-					sortInterval: 0,
-					minDragDistance: 0,
-					minBounceBackAngle: 0
-				},
-				dragContainer: document.body,
-				dragReleaseDuration: 400,
-				dragReleaseEasing: 'ease'
-			})
-			.on('dragStart', function (item) {
-				++dragCounter;
-				docElem.classList.add('dragging');
-				item.getElement().style.width = item.getWidth() + 'px';
-				item.getElement().style.height = item.getHeight() + 'px';
-			})
-			.on('dragEnd', function (item) {
-				if (--dragCounter < 1) {
-					docElem.classList.remove('dragging');
-				}
-			})
-			.on('send', function (data) {
-				
-				var activeStatus = data.toGrid._element.parentElement.attributes[1].nodeValue;
+				muuri = new Muuri(container, {
+					items: '.candidates__board-item',
+					layoutDuration: 400,
+					layoutEasing: 'ease',
+					dragEnabled: true,
+					dragSort: function () {
+						return columnGrids;
+					},
+					dragSortHeuristics: {
+						sortInterval: 50,
+						minDragDistance: 10,
+						minBounceBackAngle: 0
+					},
+					dragContainer: document.body,
+					dragPlaceholder: {
+				        enabled: true,
+				        duration: 400,
+				        createElement: function (item) {
+				        	console.log('dawdwa');
+				          return item.getElement().cloneNode(true);
+				        }
+				      },
+					dragReleaseDuration: 400,
+					dragReleaseEasing: 'ease'
 
+				})
+				.on('dragInit', function (item, event) {
+					var skinName = item._element.parentElement.offsetParent.attributes[1].nodeValue;
+					$(item._element).attr('data-temp-skin', skinName);
+				})
+				.on('dragStart', function (item, event) {
+					++dragCounter;
+					docElem.classList.add('dragging');
+					item.getElement().style.width = item.getWidth() + 'px';
+					item.getElement().style.height = item.getHeight() + 'px';
 
-				if (activeStatus.length){
-					$('#modalEditeCandidate').modal();
-					$("#editStatus").val(activeStatus);
-					editSwitcher();
-				}
+				})
+				.on('dragEnd', function (item) {
+					if (--dragCounter < 1) {
+						docElem.classList.remove('dragging');
+					}
+					$(".candidates__board-item").removeAttr('data-temp-skin');
+				})
+				.on('dragReleaseEnd', function (item) {
+					item.getElement().style.width = '';
+					item.getElement().style.height = '';
+					columnGrids.forEach(function (muuri) {
+						muuri.refreshItems();
+					});
 
-			})
-			.on('dragReleaseEnd', function (item) {
-				item.getElement().style.width = '';
-				item.getElement().style.height = '';
-				columnGrids.forEach(function (muuri) {
-					muuri.refreshItems();
+				})
+				.on('layoutStart', function () {
+					boardGrid.refreshItems().layout();
+				})
+				.on('beforeSend', function (data) {
+					
+					var item = data.item;
+						item.getElement().style.width = item.getWidth() + 'px';
+						item.getElement().style.height = item.getHeight() + 'px';
+
+				})
+				.on('send', function (data) {
+					
+					activeStatus = data.toGrid._element.parentElement.attributes[1].nodeValue;
+					lastAction = data;
+
+					if (activeStatus.length){
+						$('#modalEditeCandidate').modal();
+						$("#editStatus").val(activeStatus);
+						editSwitcher();
+					}
+					refreshElementQty();
+
 				});
-				refreshElementQty();
-			})
-			.on('layoutStart', function () {
-				boardGrid.refreshItems().layout();
-			});
 
-			columnGrids.push(muuri);
+				columnGrids.push(muuri);
 
 			});
 
 			boardGrid = new Muuri(board, {
 				layoutDuration: 400,
 				layoutEasing: 'ease',
+				layout: {
+				    fillGaps: false,
+				    horizontal: true,
+				    alignRight: false,
+				    alignBottom: false,
+				    rounding: false
+				},
 				dragEnabled: false,
 				dragSortHeuristics: {
 					sortInterval: 0,
@@ -1003,6 +1046,29 @@
 					handle: '.candidates__board-column-header'
 				}
 			});
+
+
+			function undoLastAction(){
+				var prevCol 		= lastAction.fromGrid,
+					prevIndexInCol	= lastAction.fromIndex,
+					currentItem 	= lastAction.item,
+					currentItemIndex = lastAction.toIndex,
+					currentCol 		= lastAction.toGrid,
+					activeIndex 	= $(lastAction.fromGrid._element).closest('.candidates__board-column').index(),
+					activeIndex 	= parseInt(activeIndex);
+
+				if (preventLastAction){
+					currentCol.send(currentItemIndex, prevCol, prevIndexInCol);
+					boardGrid.refreshItems().layout();
+					columnGrids.forEach(function (muuri) {
+						muuri.refreshItems();
+					});
+					refreshElementQty();
+				}
+
+				preventLastAction = false;
+
+			}
 
 			setTimeout(function(){
 				$('.candidates__board').addClass('create');
@@ -1016,6 +1082,11 @@
 			$('[data-toggle="tooltip"]').tooltip({
 				container: '.candidates'
 			});
+
+			$('[data-return-card]').on('click', function(){
+				preventLastAction = true;
+				undoLastAction();
+			})
 
         });
 
