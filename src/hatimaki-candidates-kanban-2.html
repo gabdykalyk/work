@@ -500,7 +500,7 @@
                 tooltipStatus : 'tooltipStatus',
             };
 
-            $('#candidates-kanban').jqxKanban({
+            var kanbanBoard = $('#candidates-kanban').jqxKanban({
                 resources: resourcesAdapterFunc(),
                 source: dataAdapter,
                 width : '100%',
@@ -577,6 +577,10 @@
 
                 }
             }); 
+
+            kanbanBoard.on('itemMoved', function(event){
+                console.log(event);
+            })
         });
 
     </script>
@@ -677,18 +681,18 @@
 				editSwitcher();
 			});
 
-			// function refreshElementQty(){
-			// 	$('.candidates__board').find('.candidates__board-column-content').each(function(){
-			// 		var currentColContent 	= $(this),
-			// 			currentСolHeader 	= currentColContent.prev(),
-			// 			currentItemsQty 	= currentColContent.find('.candidates__board-item').length;
+			function refreshElementQty(){
+				$('#candidates-kanban').find('.jqx-kanban-column-container').each(function(){
+					var currentColContent 	= $(this),
+						currentСolHeader 	= currentColContent.prev('.jqx-kanban-column-header'),
+						currentItemsQty 	= currentColContent.find('.candidates__board-item').length;
 
-			// 		currentСolHeader.attr('data-qty', currentItemsQty);
+					currentСolHeader.attr('data-qty', currentItemsQty);
 
-			// 	});
-			// }
+				});
+			}
 
-			// refreshElementQty();
+			refreshElementQty();
 
 
 
