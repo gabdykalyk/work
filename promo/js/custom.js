@@ -38,7 +38,7 @@ $(document).ready(function(){
 
 	// phone mask
 	if (phoneMask.length){
-		phoneMask.inputmask("99-999-999-99-99");  //static mask
+		phoneMask.inputmask("8(999) 999-9999");  //static mask
 	}
 
 	// init of jquery UI Slider
@@ -120,6 +120,7 @@ $(document).ready(function(){
 				parent 				= $(e.delegateTarget),
 				groupName 		= currentInp.attr('name');
 
+		currentInpVal.length ? parent.removeClass('form-input--state-error') : parent.addClass('form-input--state-error');
 
 		if (groupName){
 
@@ -190,6 +191,7 @@ $(document).ready(function(){
 		var testimonials = new Swiper(testimonialAuthors[0], {
 	      slidesPerView: 'auto',
 	      spaceBetween: 0,
+	      initialSlide : 2,
 	      centeredSlides: true,
 	      navigation: {
 	        nextEl: '#author-next',
@@ -226,8 +228,8 @@ $(document).ready(function(){
     spaceBetween: 0,
     loop:true,
     navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
+      nextEl: '#production-next',
+      prevEl: '#production-prev',
     },
     thumbs: {
       swiper: galleryThumbs,
