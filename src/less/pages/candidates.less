@@ -140,6 +140,7 @@
         display: flex;
         margin-left: -5px;
         margin-right: -5px;
+        // height: auto !important;
     }
 
     .jqx-kanban-column-header-collapsed{
@@ -191,18 +192,19 @@
     .jqx-kanban-column-container{
         margin: 0 5px;
         border: 1px solid #EDEDED;
-        z-index: 10;
         border-radius: 0 0 6px 6px;
         border-top: none;
         position: relative;
-        overflow: visible !important;
+        // overflow: visible !important;
 
         .jqx-kanban-item-placeholder{
             background: #EDEDED;
             border-radius: 6px;
             margin: 1px;
-            z-index: 2;
+            z-index: 5;
         }
+
+
 
     }
 
@@ -247,7 +249,6 @@
 
             &::before{
                 border-radius: 6px 6px 0 0;
-                z-index: 1;
                 position: absolute;
                 top: 0;
                 right: 0;
@@ -261,7 +262,6 @@
                 content: "";
             }
 
-            &--yellow::before,
             [data-column-data-field="intreview"] .jqx-kanban-column-header::before{
                 background: rgb(255,255,196); /* Old browsers */
                 background: -moz-linear-gradient(top,  rgba(255,255,196,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
@@ -271,7 +271,6 @@
 
             }
 
-            &--blue::before,
             [data-column-data-field="reserve"]::before,
             [data-column-data-field="reserve"] .jqx-kanban-column-header::before{
                 background: rgb(236,246,255); /* Old browsers */
@@ -282,7 +281,6 @@
 
             }
 
-            &--green::before,
             [data-column-data-field="internship"] .jqx-kanban-column-header::before{
                 background: rgb(225,246,204); /* Old browsers */
                 background: -moz-linear-gradient(top,  rgba(225,246,204,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
@@ -292,7 +290,6 @@
 
             }
 
-            &--red::before,
             [data-column-data-field="waiting-call"]::before,
             [data-column-data-field="fail"] .jqx-kanban-column-header::before{
                 background: rgb(255,212,212); /* Old browsers */
@@ -306,12 +303,14 @@
             &::after{
                 display: block;
                 content: attr(data-qty);
+                z-index: 10;
+                position: relative;
             }
 
         }
 
 
-        [data-column-data-field="intreview"] .jqx-kanban-column-header::before{
+        [data-column-data-field="interview"] .jqx-kanban-column-header::before{
             background: rgb(255,255,196); /* Old browsers */
             background: -moz-linear-gradient(top,  rgba(255,255,196,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
             background: -webkit-linear-gradient(top,  rgba(255,255,196,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10-25,Safari5.1-6 */
@@ -321,7 +320,8 @@
         }
 
         [data-column-data-field="reserve"]::before,
-        [data-column-data-field="test"] .jqx-kanban-column-header::before{
+        [data-column-data-field="test"] .jqx-kanban-column-header::before,
+        [data-column-data-field="reserve"] .jqx-kanban-column-header::before{
             background: rgb(236,246,255); /* Old browsers */
             background: -moz-linear-gradient(top,  rgba(236,246,255,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
             background: -webkit-linear-gradient(top,  rgba(236,246,255,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10-25,Safari5.1-6 */
@@ -357,16 +357,22 @@
             border-radius: 4px;
             padding: 8px 10px 8px 8px;
             font-size: 12px;
+            position: relative;
+            z-index: 10;
             line-height: 1.16;
-            position: absolute;
-            width: calc(100% - 2px);
 
             &:hover,
-            &.muuri-item-dragging{
+            &.muuri-item-dragging,
+            &.jqx-sortable-helper{
                 z-index: 100;
             }
 
-            &.muuri-item-dragging{
+            &.jqx-sortable-helper{
+                background-color: #fff;
+            }
+
+            &.muuri-item-dragging,
+            &.jqx-sortable-helper{
                 box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
             }
 
@@ -410,6 +416,25 @@
                 box-shadow: 0px 5px 15px #ffd4d4;
             }
 
+        }
+
+        .jqx-kanban-column[data-column-data-field="waiting-call"] .jqx-sortable-helper{
+            box-shadow: 0px 5px 15px #FFDDAB;
+        }
+
+        .jqx-kanban-column[data-column-data-field="interview"] .jqx-sortable-helper{
+            box-shadow: 0px 5px 15px #FFFFC4;
+        }
+
+        .jqx-kanban-column[data-column-data-field="reserve"] .jqx-sortable-helper{
+            box-shadow: 0px 5px 15px #ecf6ff;
+        }
+
+        .jqx-kanban-column[data-column-data-field="internship"] .jqx-sortable-helper{
+            box-shadow: 0px 5px 15px #E1F6CD;
+        }
+        .jqx-kanban-column[data-column-data-field="fail"] .jqx-sortable-helper{
+            box-shadow: 0px 5px 15px #ffd4d4;
         }
 
         &__board-item-target-date{
