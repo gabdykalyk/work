@@ -559,30 +559,6 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
-            var preventLastAction = false;
-            var lastAction;
-
-            function undoLastAction(){
-                var prevCol         = lastAction.fromGrid,
-                    prevIndexInCol  = lastAction.fromIndex,
-                    currentItem     = lastAction.item,
-                    currentItemIndex = lastAction.toIndex,
-                    currentCol      = lastAction.toGrid,
-                    activeIndex     = $(lastAction.fromGrid._element).closest('.candidates__board-column').index(),
-                    activeIndex     = parseInt(activeIndex);
-
-                if (preventLastAction){
-                    currentCol.send(currentItemIndex, prevCol, prevIndexInCol);
-                    boardGrid.refreshItems().layout();
-                    columnGrids.forEach(function (muuri) {
-                        muuri.refreshItems();
-                    });
-                    refreshElementQty();
-                }
-
-                preventLastAction = false;
-
-            }
 
             var fields = [
                 { name: "id", type: "string" },
@@ -878,28 +854,16 @@
                     resource.tooltipStatus ? tooltipStatus.text(resource.tooltipStatus) : '';
 
                 }
-            }); 
+            });
 
+
+            var actionArgs;
 
             kanbanBoard.on('itemMoved', function(event){
-                // console.log(event);
                 var args = event.args,
                     activeStatus = args.newColumn.dataField;
 
-
-                // lastAction = event;
-
-                // var items = kanbanBoard.jqxKanban('getItems');
-                // console.log(items);
-                // console.log(source)
-
-
-
-                // setTimeout(function(){
-                //     // kanbanBoard.jqxKanban('removeItem', args.itemData.id);
-                // }, 2000);
-
-                // console.log(event);
+                actionArgs = args;
 
                 if (args.oldColumn.dataField != args.newColumn.dataField) {
                     $('#modalEditeCandidate').modal();
@@ -909,6 +873,20 @@
                 }
 
             });
+
+            function undoLastAction(){
+                var oldStatus   = actionArgs.oldColumn.dataField,
+                    resourceId  = actionArgs.itemData.resourceId,
+                    itemId      = actionArgs.itemData.id,
+                    newItem     = { status: oldStatus, text: "text", tags: "undefined", color: "#000", resourceId: resourceId };;
+
+                if (actionArgs){
+                    kanbanBoard.jqxKanban('removeItem', itemId);
+                    kanbanBoard.jqxKanban('addItem', newItem);
+                    refreshElementQty();
+                }
+
+            }
 
 
             function refreshElementQty(){
@@ -1027,9 +1005,7 @@
 			});
 
 			$('[data-return-card]').on('click', function(){
-				preventLastAction = true;
 				undoLastAction();
-
 			})
 
         });
