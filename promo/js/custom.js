@@ -10,6 +10,7 @@ var uiSlider 	= $(".calc-slider"),
 
 if(uiSlider.length){
   include("js/jquery-ui.js");
+  include("js/jquery.ui.touch-punch.min.js");
 }
 
 if(phoneMask.length){
@@ -188,11 +189,18 @@ $(document).ready(function(){
 
 	// testimonials carousel
 	if (testimonialAuthors.length){
-		var testimonials = new Swiper(testimonialAuthors[0], {
+
+		var testimonials,
+				testimonialsAuthors;
+
+		testimonialsAuthors = new Swiper(testimonialAuthors[0], {
 	      slidesPerView: 'auto',
 	      spaceBetween: 0,
 	      initialSlide : 2,
 	      centeredSlides: true,
+	      freeMode: true,
+	      watchSlidesVisibility: true,
+	      watchSlidesProgress: true,
 	      navigation: {
 	        nextEl: '#author-next',
 	        prevEl: '#author-prev',
@@ -203,16 +211,36 @@ $(document).ready(function(){
 	        clickable: true,
 	      },
 	      on: {
-			    slideChangeTransitionEnd: function () {
+	      	slideChangeTransitionEnd: function () {
 			      var activeSlide 			= testimonialAuthors.find(".swiper-slide-active"),
-			      		activeSlideIndex 	= activeSlide.index(),
-			      		targetEl 					= $("#testimonials");
+			      		activeSlideIndex 	= activeSlide.index();
 
-			      targetEl.find('.testimonials__item').hide().eq(activeSlideIndex).fadeIn();
+			      testimonials.slideTo(activeSlideIndex);
 
-			    },
-			  }
+			    }
+	      }
 	    });
+
+		testimonials = new Swiper('#testimonials', {
+	      spaceBetween: 0,
+	      initialSlide : 2,
+	      navigation: false,
+	      speed : 1000,
+	      thumbs: {
+	        swiper: testimonialsAuthors
+	      },
+	      on: {
+		      	slideChangeTransitionEnd: function () {
+				      var activeSlide 			= $("#testimonials").find(".swiper-slide-active"),
+				      		activeSlideIndex 	= activeSlide.index();
+
+				      testimonialsAuthors.slideTo(activeSlideIndex);
+				     
+				    }
+		      }
+	    });
+
+		
 	}
 
 	// production gallery
