@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Управление статусами - статусы сотрудников</title>
+    @@include('include/_css.html')
+    @@include('include/_ie8.html')
+
+</head>
+<body>
+@@include('include/top-nav.html')
+
+<div class="container-fluid content status-management">
+    <h1>Управление статусами</h1>
+    <form class="form-respons" action="" method="post">
+
+        <ul class="nav nav-tabs worksheet__tabs">
+            <li><a href="#status-emploees" aria-controls="home" role="tab" data-toggle="tab">Статусы сотрудников</a></li>
+            <li><a href="#status-applicants" aria-controls="home" role="tab" data-toggle="tab">Статусы кандидатов</a></li>
+            <li class="active"><a href="#characteristic" aria-controls="home" role="tab" data-toggle="tab">Харатектеристики сотрудников</a></li>
+            <li><a href="#status-education" aria-controls="home" role="tab" data-toggle="tab">Статусы обучения</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane" id="status-emploees">
+                <div class="row">
+                    <div class="col-md-7 col-sm-9 form-group">
+                        <!--                        <input class="form-control" type="text" name="status-emploees-search" id="statusEmploeesSearch">-->
+                        <input class="form-control" id="status-emploees-search" type="text" placeholder="Поиск" onkeyup="searchStr('status-emploees-search', 'status-management-table');">
+                    </div>
+                    <div class="col-md-2 col-sm-3 form-group pull-right btn-add-status">
+                        <button type="button" class="btn btn-primary btn-p25" data-toggle="modal" data-target="#addNewStatusEmploees">Создать статус</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-7 col-sm-9">
+                        <table class="table status-management__table status-management__table--emploees table-valign-middle">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <span>Название</span>
+                                </th>
+                                <th>Уволен</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Отпуск</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Отстранен от работы</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Работает</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Уволен</td>
+                                <td>Да</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Стажировка</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__dell" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="status-applicants">
+                <div class="row">
+                    <div class="col-md-7 col-sm-9 form-group">
+                        <input class="form-control" type="text" name="status-applicants-search" id="status-applicants-search">
+                    </div>
+                    <div class="col-md-2 col-sm-3 form-group  pull-right btn-add-status">
+                        <button type="button" class="btn btn-primary btn-p25" data-toggle="modal" data-target="#addNewStatusApplicants">Создать статус</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-7 col-sm-10">
+                        <table class="table status-management__table status-management__table--applicants table-valign-middle" id="status-management-table">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <span>Название</span>
+                                </th>
+                                <th>Закрыт</th>
+                                <th>Принят на работу</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Ждет звонка</td>
+                                <td>Нет</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Резерв</td>
+                                <td>Нет</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Назначено собеседеование</td>
+                                <td>Нет</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Проведено собеседование</td>
+                                <td>Нет</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Отказано</td>
+                                <td>Да</td>
+                                <td>Нет</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__dell" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Принят на стажировку</td>
+                                <td>Да</td>
+                                <td>Да</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__dell" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane active" id="characteristic">
+                <div class="row">
+                    <div class="col-md-7 col-sm-9 form-group">
+                        <input class="form-control" type="text" name="characteristic-search" id="characteristic-search" onkeyup="searchStr('status-emploees-search', 'status-management__table--characteristic');">
+                    </div>
+                    <div class="col-md-2 col-sm-3 form-group pull-right  btn-add-status">
+                        <button type="button" class="btn btn-primary btn-p25" data-toggle="modal" data-target="#addNewStatusCharacteristic">Создать статус</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-7 col-sm-9">
+                        <table class="table status-management__table status-management__table--characteristic table-valign-middle">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <span>Название</span>
+                                </th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Есть замечания</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Нужно заменить</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Хороший сотрудник</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane" id="status-education">
+                <div class="row">
+                    <div class="col-md-7 col-sm-9 form-group">
+                        <input class="form-control" type="text" name="status-education-search" id="status-education-search">
+                    </div>
+                    <div class="col-md-2 col-sm-3 form-group pull-right btn-add-status">
+                        <button type="button" class="btn btn-primary btn-p25" data-toggle="modal" data-target="#addNewStatusEducation">Создать статус</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-7 col-sm-9">
+                        <table class="table status-management__table status-management__table--education table-valign-middle">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <span>Название</span>
+                                </th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>Обучение. Этап 1</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Обучение. Этап 2</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Обучение. Этап 3</td>
+                                <td class="cell-btns">
+                                    <button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+                                    <button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+
+<!-- Modals-->
+<div class="modal fade addNewStatusEmploees" id="addNewStatusEmploees" tabindex="-1" role="dialog" aria-labelledby=l">
+    <div class="modal-dialog status-management-popup" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Создать статус сотрудника</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/" method="post" class="status-management-popup__form">
+                    <div class="form-group">
+                        <label for="jsAddNewStatusEmploees">Название статуса</label>
+                        <input type="text" id="jsAddNewStatusEmploees" class="form-control" placeholder="">
+                    </div>
+                    <div class="checkbox-nice">
+                        <label>
+                            <input type="checkbox" class="js-checkbox" name="check2">
+                            <span class="fa fa-check"></span>
+                            Уволен
+                        </label>
+                    </div>
+                    <div class="form-group status-management-popup__footer clearfix">
+                        <button type="submit" class="btn btn-primary pull-right">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade addNewStatusApplicants" id="addNewStatusApplicants" tabindex="-1" role="dialog" aria-labelledby=l">
+    <div class="modal-dialog status-management-popup" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Создать статус кандидата</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/" method="post" class="status-management-popup__form">
+                    <div class="form-group">
+                        <label for="jsAddNewStatusApplicants">Название статуса</label>
+                        <input type="text" id="jsAddNewStatusApplicants" class="form-control" placeholder="">
+                    </div>
+
+                    <div class="form-group form-group--double">
+                        <div class="checkbox-nice">
+                            <label>
+                                <input type="checkbox" checked="" class="js-checkbox" name="check2">
+                                <span class="fa fa-check"></span>
+                                Закрыт
+                            </label>
+                        </div>
+                        <div class="checkbox-nice">
+                            <label>
+                                <input type="checkbox" class="js-checkbox" name="check2">
+                                <span class="fa fa-check"></span>
+                                Принят на работу
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group status-management-popup__footer clearfix">
+                        <button type="submit" class="btn btn-primary pull-right">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade addNewStatusCharacteristic" id="addNewStatusCharacteristic" tabindex="-1" role="dialog" aria-labelledby=l">
+    <div class="modal-dialog status-management-popup" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Создать характеристику</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/" method="post" class="status-management-popup__form">
+                    <div class="form-group">
+                        <label for="jsAddNewStatusCharacteristic">Название характеристики</label>
+                        <input type="text" id="jsAddNewStatusCharacteristic" class="form-control" placeholder="">
+                    </div>
+                    <div class="form-group status-management-popup__footer clearfix">
+                        <button type="submit" class="btn btn-primary pull-right">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade addNewStatusEducation" id="addNewStatusEducation" tabindex="-1" role="dialog" aria-labelledby=l">
+    <div class="modal-dialog status-management-popup" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Создать статус обучения</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/" method="post" class="status-management-popup__form">
+                    <div class="form-group">
+                        <label for="jsAddNewStatusEducation">Название статуса</label>
+                        <input type="text" id="jsAddNewStatusEducation" class="form-control" placeholder="">
+                    </div>
+                    <div class="form-group status-management-popup__footer clearfix">
+                        <button type="submit" class="btn btn-primary pull-right">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+</script>
+<script src="https://unpkg.com/web-animations-js@2.3.1/web-animations.min.js"></script>
+<script src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://unpkg.com/muuri@0.7.1/dist/muuri.min.js"></script>
+<script type="text/javascript" src="js/js-gl.js"></script>
+
+<script type="text/javascript">
+
+    function dragElements() {
+        var grid = new Muuri('.status-management__table--characteristic tbody', {
+            dragEnabled: true,
+            layout: {
+                fillGaps: true
+            }
+        });
+
+        return grid;
+    }
+
+    $(document).ready(function () {
+        var grid = dragElements();
+
+        $('.js-status-management__del').on('click', function(){
+            var elem = $(this).closest('tr');
+            grid.remove(elem[0], {removeElements: true});
+        });
+
+    });
+
+    //поиск по строкам
+    function searchStr(inputId, tableId) {
+        let searchString = $(`#${inputId}`).val().toLowerCase();
+        labelArr = $(`#${tableId} tbody tr td:first-child`);
+        let labelText = '';
+
+        labelArr.parent().addClass('hidden');
+        labelArr.each(function (i) {
+            labelText = labelArr.eq(i).text().toLowerCase();
+
+            if (labelText.indexOf(searchString) != -1) {
+                labelArr.eq(i).parent().removeClass('hidden');
+            }
+        })
+    }
+
+</script>
+</body>
+</html>
