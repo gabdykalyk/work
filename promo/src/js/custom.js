@@ -215,7 +215,9 @@ $(document).ready(function(){
 			      var activeSlide 			= testimonialAuthors.find(".swiper-slide-active"),
 			      		activeSlideIndex 	= activeSlide.index();
 
-			      testimonials.slideTo(activeSlideIndex);
+					if (testimonials) {
+					  testimonials.slideTo(activeSlideIndex);
+					}				  
 
 			    }
 	      }
