@@ -20,9 +20,9 @@ if(phoneMask.length){
 include("js/swiper.min.js");
 
 
-if (modalBtn.length){
-	include("js/jquery.arcticmodal.js");
-}
+// if (modalBtn.length){
+// 	// include("js/jquery.arcticmodal.js");
+// }
 
 function include(url){ 
   document.write('<script src="'+ url + '"></script>'); 
@@ -84,16 +84,16 @@ $(document).ready(function(){
 	}
 
 	// call a modal
-	modalBtn.on('click', function(e){
-		e.preventDefault();
+	// modalBtn.on('click', function(e){
+	// 	e.preventDefault();
 
-		var currentBtn 	= $(this),
-				targetModal = $(currentBtn.data('modal'));
+	// 	var currentBtn 	= $(this),
+	// 			targetModal = $(currentBtn.data('modal'));
 
-		if (targetModal.length) {
-			targetModal.arcticmodal();
-		}
-	})
+	// 	if (targetModal.length) {
+	// 		targetModal.arcticmodal();
+	// 	}
+	// })
 
 
 	// simulate focus
