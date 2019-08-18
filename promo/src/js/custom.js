@@ -271,5 +271,14 @@ $(document).ready(function(){
     },
   });
 
+$('#orderModal').on('show.bs.modal', function (event) {
+	$('body').addClass('body-fix-ios');
+	$(this).addClass('modal-fix-ios');
+});
+
+$('#orderModal').on('hide.bs.modal', function (event) {
+	$('body').removeClass('body-fix-ios');
+	$(this).removeClass('modal-fix-ios');
+});
 
 })
