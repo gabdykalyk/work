@@ -71,12 +71,12 @@ $.widget("custom.hatNavbarContentsSearchField", $.ui.autocomplete, {
             .appendTo(ul);
     },
 
-    _renderMenu: function( ul, items ) {
-        var that = this;
-        $.each( items, function( index, item ) {
-            that._renderItemData( ul, item );
+    _renderMenu: function (ul, items) {
+        const that = this;
+        $.each(items.slice(0, 5), function (index, item) {
+            that._renderItemData(ul, item);
         });
-        $( ul ).addClass('hat-navbar__contents-search-field-list');
+        $(ul).addClass('hat-navbar__contents-search-field-list');
     }
 });
 
@@ -109,7 +109,7 @@ class HatNavbar {
         this._$menuItems.each((index, menuItem) => {
             $(menuItem).on('click', () => {
                 if (index === this._selectedMenuItemIndex) {
-                    this.clearMenuItemSelection();
+                    this.closeDrawer();
                 } else {
                     this.selectMenuItem(index);
                 }
@@ -154,8 +154,11 @@ class HatNavbar {
         }
     }
 
-    selectMenuItem(index) {
-        this.clearMenuItemSelection();
+    async selectMenuItem(index) {
+        if (this._selectedMenuItemIndex !== null) {
+            await this.closeDrawer();
+        }
+
         this._$menuItems.eq(index).addClass('hat-navbar__menu-item--active');
         this._$drawerContents.eq(index).addClass('hat-navbar__drawer-content--active');
         this._$drawer.addClass('hat-navbar__drawer--open');
@@ -163,16 +166,23 @@ class HatNavbar {
         this._selectedMenuItemIndex = index;
     }
 
-    clearMenuItemSelection() {
+    async closeDrawer() {
         if (this._selectedMenuItemIndex !== null) {
-            this._$menuItems.eq(this._selectedMenuItemIndex).removeClass('hat-navbar__menu-item--active');
-            this._$drawerContents.eq(this._selectedMenuItemIndex).removeClass('hat-navbar__drawer-content--active');
+            this._$drawer.removeClass('hat-navbar__drawer--open');
+
+            const animationTiming = this._$drawer.hasClass('hat-navbar__drawer--extra') ? 446 : 200;
+
+            await new Promise(resolve => setTimeout(resolve, animationTiming));
+
+            if (this._selectedMenuItemIndex !== null) {
+                this._$menuItems.eq(this._selectedMenuItemIndex).removeClass('hat-navbar__menu-item--active');
+                this._$drawerContents.eq(this._selectedMenuItemIndex).removeClass('hat-navbar__drawer-content--active');
+            }
+
+            this._$drawer.removeClass('hat-navbar__drawer--extra');
+
+            this._selectedMenuItemIndex = null;
         }
-
-        this._$drawer.removeClass('hat-navbar__drawer--open');
-        this._$drawer.removeClass('hat-navbar__drawer--extra');
-
-        this._selectedMenuItemIndex = null;
     }
 }
 

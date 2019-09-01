@@ -58,32 +58,35 @@
     }
 
     &__drawer {
-        display: none;
+        display: block;
         width: 300px;
         height: 100%;
         position: absolute;
         top: 0;
         left: 200px;
+        transform: translateX(calc(-100% - 15px));
 
         z-index: 100;
+        overflow: auto;
         background: #FFF;
         box-shadow: 0 0 25px rgba(67, 100, 165, 0.3);
 
-        transition: left 200ms ease-in;
+        transition: left 200ms ease-in, transform 200ms ease-in;
 
         &--open {
-            display: block;
+            transform: translateX(0);
         }
 
         &--extra {
             width: 670px;
             max-width: calc(100% - 200px);
+
+            transition: left 200ms ease-in, transform 446ms ease-in;
         }
     }
 
     &__drawer-content {
         display: none;
-        max-height: 100%;
         padding: 30px 25px;
 
         &--active {
@@ -184,6 +187,7 @@
         left: 0 !important;;
 
         box-shadow: 0 0 25px rgba(67, 100, 165, 0.3);
+        border: none;
         border-radius: 3px;
     }
 
@@ -196,9 +200,12 @@
         font-size: 13px;
         color: #333333;
         text-decoration: none !important;
+        border: none !important;
+        line-height: 15px;
 
         &:hover {
             background: #F2F3F5;
+            color: #333333;
         }
     }
 
@@ -224,20 +231,21 @@
 
     &__contents-content {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         flex-wrap: wrap;
         max-height: calc(100% - 25px);
-        margin-top: 25px;
-        margin-left: -25px;
+        margin-top: 32px;
+        margin-left: -15px;
         margin-bottom: -17px;
 
-        & > * {
-            margin-left: 25px;
-        }
-
-        & > .hat-navbar__submenu {
+        .hat-navbar__submenu {
             margin-bottom: 17px;
         }
+    }
+
+    &__contents-content-column {
+        width: calc((100% - 45px) / 3);
+        margin-left: 15px;
     }
 
     &__toggle {
@@ -319,12 +327,22 @@
     }
 
     &__avatar {
+        width: 35px;
+        height: 35px;
         margin-left: 13px;
 
         cursor: pointer;
     }
 
+    &__avatar-img {
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+    }
+
     &__user-name {
+        width: 0;
         margin-left: 12px;
 
         color: #333333;
@@ -332,14 +350,6 @@
         font-size: 11px;
 
         transition: opacity 200ms ease-in;
-    }
-
-    &__user-first-name {
-        display: block;
-    }
-
-    &__user-last-name {
-        display: block;
     }
 
     &__avatar-img {
@@ -362,7 +372,7 @@
     &__notifications-counter {
         position: absolute;
         top: -4px;
-        right: -15px;
+        left: 9px;
         padding: 1px 5px;
 
         background: #FF3939;
@@ -426,7 +436,7 @@
     }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .hat-navbar {
         width: 100%;
         height: 50px;
@@ -446,25 +456,16 @@
             padding-bottom: unset;
         }
 
-        &__contents-content {
-            margin-left: -15px;
-
-            & > * {
-                margin-left: 15px;
-            }
-        }
-
         &__drawer {
             left: 0;
             top: 50px;
-            min-height: calc(100% - 50px);
-            height: unset;
+            height: calc(100% - 50px);
 
             &--extra {
                 width: 100%;
-                min-height: 639px;
                 max-width: unset;
-                height: calc(100% - 50px);
+                max-height: calc(100% - 50px);
+                height: unset;
             }
         }
 
@@ -550,17 +551,10 @@
     }
 }
 
-@media (max-width: 479px) {
+@media (max-width: 480px) {
     .hat-navbar {
-        &__drawer {
-            &--extra {
-                min-height: calc(100% - 50px);
-                height: unset;
-            }
-        }
-
-        &__contents-content {
-            flex-wrap: nowrap;
+        &__contents-content-column {
+            width: calc((100% - 45px) / 2);
         }
 
         &__actions {
@@ -571,6 +565,14 @@
             &--additional {
                 display: block;
             }
+        }
+    }
+}
+
+@media (max-width: 360px) {
+    .hat-navbar {
+        &__contents-content-column {
+            width: 100%;
         }
     }
 }
