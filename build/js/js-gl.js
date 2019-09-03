@@ -81,17 +81,9 @@ $.widget("custom.hatNavbarContentsSearchField", $.ui.autocomplete, {
 });
 
 class HatNavbar {
-    _isCollapsed = false;
-    _selectedMenuItemIndex = null;
-    _$element;
-    _$toggleElement;
-    _$menuItems;
-    _$drawer;
-    _$drawerContents;
-    _$contentsSearchField;
-    _$contentsSubmenuItems;
-
     constructor(element) {
+        this._isCollapsed = false;
+        this._selectedMenuItemIndex = null;
         this._$element = $(element);
         this._$toggleElement = this._$element.find('.hat-navbar__toggle');
         this._$menuItems = this._$element.find('.hat-navbar__menu-item');
