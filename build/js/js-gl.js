@@ -83,12 +83,28 @@ $.widget("custom.hatNavbarContentsSearchField", $.ui.autocomplete, {
 class HatNavbar {
     constructor(element) {
         this._isCollapsed = false;
+        this._isUserSelected = false;
+        this._isNotificationsSelected = false;
         this._selectedMenuItemIndex = null;
+        this._selectedDrawerContentName = null;
         this._$element = $(element);
         this._$toggleElement = this._$element.find('.hat-navbar__toggle');
         this._$menuItems = this._$element.find('.hat-navbar__menu-item');
+        this._$user = this._$element.find('.hat-navbar__user');
+        this._$notifications = this._$element.find('.hat-navbar__notifications');
         this._$drawer = this._$element.find('.hat-navbar__drawer');
-        this._$drawerContents = this._$element.find('.hat-navbar__drawer-content');
+        this._$additionalUserName = this._$element.find('.hat-navbar__additional-user-name');
+        this._$backdrop = this._$element.find('.hat-navbar__backdrop');
+
+        this._drawerContents = new Map(
+            this._$element.find('.hat-navbar__drawer-content')
+                .toArray()
+                .map(element => {
+                    const $element = $(element);
+                    return [$element.data('hat-navbar-drawer-content-name'), $element];
+                })
+        );
+
         this._$contentsSearchField = this._$element.find('.hat-navbar__contents-search-field');
         this._$contentsSubmenuItems = this._$element.find('.hat-navbar__contents .hat-navbar__submenu-item');
 
@@ -96,12 +112,34 @@ class HatNavbar {
     }
 
     _init() {
+        this._$element.find('.hat-navbar__user').on('click', async () => {
+            if (this._isUserSelected) {
+                this.clearSelection();
+            } else {
+                this.selectUser();
+            }
+        });
+
+        this._$element.find('.hat-navbar__drawer-content-wrapper').scrollbar();
+
+        this._$element.find('.hat-navbar__notifications').on('click', async () => {
+            if (this._isNotificationsSelected) {
+                this.clearSelection();
+            } else {
+                this.selectNotifications();
+            }
+        });
+
+        this._$backdrop.on('click', async () => {
+            this.clearSelection();
+        });
+
         this._$toggleElement.on('click', () => this.setCollapsed(!this._isCollapsed));
 
         this._$menuItems.each((index, menuItem) => {
             $(menuItem).on('click', () => {
-                if (index === this._selectedMenuItemIndex) {
-                    this.closeDrawer();
+                if (this._selectedMenuItemIndex === index) {
+                    this.clearSelection();
                 } else {
                     this.selectMenuItem(index);
                 }
@@ -135,6 +173,12 @@ class HatNavbar {
         this._isCollapsed = isCollapsed;
         this._$element.toggleClass('hat-navbar--collapsed', isCollapsed);
 
+        if (isCollapsed) {
+            this._$additionalUserName.show(200, 'easeInCubic');
+        } else {
+            this._$additionalUserName.hide(200, 'easeInCubic');
+        }
+
         const $toggleIcon = this._$toggleElement.find('i');
 
         if (isCollapsed) {
@@ -146,34 +190,84 @@ class HatNavbar {
         }
     }
 
-    async selectMenuItem(index) {
-        if (this._selectedMenuItemIndex !== null) {
-            await this.closeDrawer();
-        }
+    async selectUser() {
+        if (!this._isUserSelected) {
+            await this.clearSelection();
 
-        this._$menuItems.eq(index).addClass('hat-navbar__menu-item--active');
-        this._$drawerContents.eq(index).addClass('hat-navbar__drawer-content--active');
-        this._$drawer.addClass('hat-navbar__drawer--open');
-        this._$drawer.toggleClass('hat-navbar__drawer--extra', this._$drawerContents.eq(index).hasClass('hat-navbar__drawer-content--extra'));
-        this._selectedMenuItemIndex = index;
+            this._$user.addClass('hat-navbar__user--active');
+            this._isUserSelected = true;
+            await this._openDrawer('user');
+        }
     }
 
-    async closeDrawer() {
+    async selectNotifications() {
+        if (!this._isNotificationsSelected) {
+            await this.clearSelection();
+
+            this._$notifications.addClass('hat-navbar__notifications--active');
+            this._isNotificationsSelected = true;
+            await this._openDrawer('notifications');
+        }
+    }
+
+    async selectMenuItem(index) {
+        if (this._selectedMenuItemIndex !== index) {
+            await this.clearSelection();
+
+            this._$menuItems.eq(index).addClass('hat-navbar__menu-item--active');
+            this._selectedMenuItemIndex = index;
+            this._isUserSelected = false;
+            await this._openDrawer(this._$menuItems.eq(index).data('hat-navbar-drawer-content-name'));
+        }
+    }
+
+    async clearSelection() {
         if (this._selectedMenuItemIndex !== null) {
-            this._$drawer.removeClass('hat-navbar__drawer--open');
+            this._$menuItems.eq(this._selectedMenuItemIndex).removeClass('hat-navbar__menu-item--active');
+            this._selectedMenuItemIndex = null;
+        } else if (this._isUserSelected) {
+            this._$user.removeClass('hat-navbar__user--active');
+            this._isUserSelected = false;
+        } else if (this._isNotificationsSelected) {
+            this._$notifications.removeClass('hat-navbar__notifications--active');
+            this._isNotificationsSelected = false;
+        }
 
-            const animationTiming = this._$drawer.hasClass('hat-navbar__drawer--extra') ? 446 : 200;
+        await this._closeDrawer();
+    }
 
-            await new Promise(resolve => setTimeout(resolve, animationTiming));
+    async _openDrawer(contentName) {
+        if (this._selectedDrawerContentName !== contentName) {
+            await this._closeDrawer();
 
-            if (this._selectedMenuItemIndex !== null) {
-                this._$menuItems.eq(this._selectedMenuItemIndex).removeClass('hat-navbar__menu-item--active');
-                this._$drawerContents.eq(this._selectedMenuItemIndex).removeClass('hat-navbar__drawer-content--active');
+            const $drawerContent = this._drawerContents.get(contentName);
+
+            $drawerContent.addClass('hat-navbar__drawer-content--active');
+            this._$drawer.addClass('hat-navbar__drawer--open');
+            this._$backdrop.addClass('hat-navbar__backdrop--visible');
+
+            if ($drawerContent.data('drawer-class') !== undefined) {
+                this._$drawer.addClass($drawerContent.data('hat-navbar-drawer-class'));
             }
 
-            this._$drawer.removeClass('hat-navbar__drawer--extra');
+            this._selectedDrawerContentName = contentName;
+        }
+    }
 
-            this._selectedMenuItemIndex = null;
+    async _closeDrawer() {
+        if (this._selectedDrawerContentName !== null) {
+            this._$drawer.removeClass('hat-navbar__drawer--open');
+            this._$backdrop.removeClass('hat-navbar__backdrop--visible');
+
+            await new Promise(resolve => setTimeout(resolve, 200));
+
+            const $drawerContent = this._drawerContents.get(this._selectedDrawerContentName);
+
+            this._$drawer.removeClass($drawerContent.data('hat-navbar-drawer-class'));
+
+            $drawerContent.removeClass('hat-navbar__drawer-content--active');
+
+            this._selectedDrawerContentName = null;
         }
     }
 }
