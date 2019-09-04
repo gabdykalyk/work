@@ -183,6 +183,17 @@ function initHatNavbar(element) {
     new HatNavbar($navbar.get());
 }
 
+function initSearch(searchInputElement, items, valueExtractorFn) {
+    $(searchInputElement).on('input', event => {
+        const searchValue = event.target.value.toLowerCase();
+
+        $(items).each((_, item) => {
+            const value = valueExtractorFn(item).toLowerCase();
+            $(item).toggle(value.indexOf(searchValue) !== -1);
+        });
+    });
+}
+
 function switchPayments(lnk) {
     $('.nav-pay li').removeClass('active');
     lnk.parent().addClass('active');
