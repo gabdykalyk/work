@@ -391,8 +391,13 @@
                     </div>
 
                     <div class="law-statuses__sub-header">
-                        <div class="form-group law-statuses__search">
+                        <div class="form-group law-statuses__search law-statuses__search--empty">
                             <input class="form-control" placeholder="Поиск">
+
+                            <button type="button" class="btn btn-default law-statuses__search-clear-button"
+                                    title="Удалить">
+                                <i class="far fa-times"></i>
+                            </button>
                         </div>
 
                         <button class="btn btn-primary btn-p25 law-statuses__add-button">Добавить статус</button>
@@ -496,7 +501,7 @@
         </div>
     </div>
 
-    <div class="modal fade modal-wide law-statuses__modal" tabindex="-1" role="dialog" id="law-statuses__modal">
+    <div class="modal fade law-statuses__modal modal-global" tabindex="-1" role="dialog" id="law-statuses__modal">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
 
@@ -543,6 +548,9 @@
         integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
         crossorigin="anonymous"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"
+        integrity="sha256-AAhU14J4Gv8bFupUUcHaPQfvrdNauRHMt+S4UVcaJb0=" crossorigin="anonymous"></script>
+
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
     integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
@@ -574,6 +582,8 @@
             const $tableRows = $('.law-statuses__table-row');
             const $modal = $('.law-statuses__modal');
             const $modalNameFormGroup = $('.law-statuses__modal-name-form-group');
+            const $search = $('.law-statuses__search');
+            const $searchInput = $search.find('.form-control');
 
             $('.law-statuses__table-body').sortable();
 
@@ -608,8 +618,18 @@
                 });
             });
 
+            $search.find('.law-statuses__search-clear-button').on('click', () => {
+                $searchInput.val('');
+                $search.addClass('law-statuses__search--empty');
+            });
+
+            $searchInput.on('input', event => {
+                const value = event.target.value;
+                $search.toggleClass('law-statuses__search--empty', value.length === 0);
+            });
+
             initSearch(
-                $('.law-statuses__search').get()[0],
+                $search.get()[0],
                 $tableRows.toArray(),
                 item => $(item).find('.law-statuses__table-name-cell').text()
             );
