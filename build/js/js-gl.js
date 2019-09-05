@@ -262,7 +262,7 @@ class HatNavbar {
             this._$drawer.addClass('hat-navbar__drawer--open');
             this._$backdrop.addClass('hat-navbar__backdrop--visible');
 
-            if ($drawerContent.data('drawer-class') !== undefined) {
+            if ($drawerContent.data('hat-navbar-drawer-class') !== undefined) {
                 this._$drawer.addClass($drawerContent.data('hat-navbar-drawer-class'));
             }
 
