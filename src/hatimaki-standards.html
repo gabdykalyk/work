@@ -198,7 +198,8 @@
                 </tr>
                 <tr class="standards__table-additional-row standards__table-row--mode_view standards__table-row--calculation_completed"
                     style="display: none">
-                    <td colspan="6">
+                    <td></td>
+                    <td colspan="4">
                         <div class="standards__table-additional-row-content">
                             <table class="table standards__branch-table">
                                 <tbody>
@@ -314,6 +315,7 @@
                             </div>
                         </div>
                     </td>
+                    <td></td>
                 </tr>
 
                 <tr class="standards__table-row standards__table-row--mode_view standards__table-row--calculation_empty">
@@ -457,7 +459,8 @@
                 </tr>
                 <tr class="standards__table-additional-row standards__table-row--mode_view standards__table-row--calculation_empty"
                     style="display: none">
-                    <td colspan="6">
+                    <td></td>
+                    <td colspan="4">
                         <div class="standards__table-additional-row-content">
                             <table class="table standards__branch-table">
                                 <tbody>
@@ -573,6 +576,7 @@
                             </div>
                         </div>
                     </td>
+                    <td></td>
                 </tr>
 
                 <tr class="standards__table-row standards__table-row--mode_edit standards__table-row--calculation_completed">
@@ -715,7 +719,8 @@
                     </td>
                 </tr>
                 <tr class="standards__table-additional-row standards__table-row--mode_edit standards__table-row--calculation_completed">
-                    <td colspan="6">
+                    <td></td>
+                    <td colspan="4">
                         <div class="standards__table-additional-row-content">
                             <table class="table standards__branch-table">
                                 <tbody>
@@ -833,6 +838,7 @@
                             </div>
                         </div>
                     </td>
+                    <td></td>
                 </tr>
                 </tbody>
             </table>
@@ -874,7 +880,6 @@
 <script type="text/javascript">
     $(document).ready(function () {
         initHatNavbar(document);
-
 
         const tableRows = $('.standards__table-row').toArray().map(rowElement => {
             return {
@@ -1110,7 +1115,8 @@
 
                     const additionalRowElement = $.parseHTML(`
                     <tr class="standards__table-additional-row standards__table-row--mode_edit standards__table-row--calculation_empty" style="display: none">
-                    <td colspan="6">
+                    <td></td>
+                    <td colspan="4">
                         <div class="standards__table-additional-row-content">
                             <table class="table standards__branch-table">
                                 <tbody>
@@ -1219,6 +1225,7 @@
                             </div>
                         </div>
                     </td>
+                    <td></td>
                 </tr>
                 `.trim());
 
@@ -1244,9 +1251,26 @@
                             scrollTop: offset
                         }, 1000);
                     }
+
+                    onResize();
                 }
             });
         });
+
+        function onResize() {
+            const isTablet = $(document).width() <= 991;
+
+            $('.standards__table-additional-row').each((_, row) => {
+                const $row = $(row);
+
+                $row.find('> td:first-child').attr('colspan', isTablet ? '1' : '4');
+                $row.find('> td:nth-child(2)').attr('colspan', isTablet ? '4' : '1');
+            });
+        }
+
+        $(window).resize(onResize);
+
+        onResize();
     });
 </script>
 </body>
