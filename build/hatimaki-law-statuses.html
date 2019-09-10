@@ -691,14 +691,21 @@
                 doNotClear: true,
                 maxLevels: 2,
                 disableNestingClass: 'law-statuses__table-document-row',
-
                 tabSize: 10,
                 isAllowed: ($placeholder, $placeholderParent, $currentItem) => {
                     return $currentItem.hasClass('law-statuses__table-document-row') || !$placeholderParent;
                 },
-                change: () => {
+                change: function(mouseEvent, event) {
+                    const $placeholder = event.placeholder;
+
+                    if ($placeholder.hasClass('law-statuses__table-document-row')) {
+                        $placeholder.toggle($placeholder.nextAll().filter('.law-statuses__table-status-row').length === 0);
+                    } else {
+                        $placeholder.toggle($placeholder.prevAll().filter('.law-statuses__table-document-row').length === 0);
+                    }
+
                     $tableStatusRows.each((_, row) => {
-                        $(row).trigger('nestedSortableChange');
+                        $(row).trigger('nestedSortableChange', [event.helper]);
                     });
                 },
                 update: function() {
@@ -776,9 +783,11 @@
                     $icon.toggleClass('fa-chevron-circle-up', isOpen);
                 });
 
-                $row.on('nestedSortableChange', () => {
-                    if (isOpen) {
+                $row.on('nestedSortableChange', (_, $helperRow) => {
+                    if (isOpen || ((!$helperRow || $helperRow.hasClass('law-statuses__table-document-row')) && isEmpty && $content.children().length > 0)) {
                         $row.height($header.height() + $content.height());
+                    } else {
+                        $row.height($header.height());
                     }
                 });
 
