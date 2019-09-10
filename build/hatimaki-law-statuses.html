@@ -685,7 +685,7 @@
             const $search = $('.search-global');
             const $searchInput = $search.find('.form-control');
 
-            $('.law-statuses__table-body').nestedSortable({
+            $tableBody.nestedSortable({
                 items: '.law-statuses__table-row',
                 listType: 'ul',
                 doNotClear: true,
@@ -715,6 +715,12 @@
                         $(row).trigger('nestedSortableUpdate');
                     });
                 }
+            });
+
+            $tableBody.on('sortrevert', () => {
+                $tableStatusRows.each((_, row) => {
+                    $(row).trigger('nestedSortableChange');
+                });
             });
 
             $modal.modal({
@@ -802,7 +808,7 @@
             });
 
             $search.find('.search-global__search-clear-button').on('click', () => {
-                $searchInput.val('');
+                $searchInput.val('').trigger('input');
                 $search.addClass('search-global--empty');
             });
 
