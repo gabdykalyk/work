@@ -691,6 +691,8 @@
                 doNotClear: true,
                 maxLevels: 2,
                 disableNestingClass: 'law-statuses__table-document-row',
+
+                tabSize: 0,
                 isAllowed: ($placeholder, $placeholderParent, $currentItem) => {
                     return $currentItem.hasClass('law-statuses__table-document-row') || !$placeholderParent;
                 },
@@ -784,11 +786,15 @@
                     const isBeforeEmpty = isEmpty;
                     isEmpty = $content.children().length === 0;
 
-                    if (isEmpty && isOpen) {
-                        isOpen = false;
-                        $row.height($header.height());
-                        $icon.addClass('fa-chevron-circle-down');
-                        $icon.removeClass('fa-chevron-circle-up');
+                    if (isOpen) {
+                        if (isEmpty) {
+                            isOpen = false;
+                            $row.height($header.height());
+                            $icon.addClass('fa-chevron-circle-down');
+                            $icon.removeClass('fa-chevron-circle-up');
+                        } else {
+                            $row.height($header.height() + $content.height());
+                        }
                     }
 
                     $row.toggleClass('law-statuses__table-status-row--empty', isEmpty);
