@@ -293,6 +293,21 @@ function initHatNavbar(element) {
     new HatNavbar($navbar.get());
 }
 
+function initSearchGlobal(element) {
+    const $element = $(element);
+    const $input = $element.find('.form-control');
+
+    $element.find('.search-global__search-clear-button').on('click', () => {
+        $input.val('').trigger('input');
+        $element.addClass('search-global--empty');
+    });
+
+    $input.on('input', event => {
+        const value = event.target.value;
+        $element.toggleClass('search-global--empty', value.length === 0);
+    });
+}
+
 function initSearch(searchInputElement, items, valueExtractorFn) {
     $(searchInputElement).on('input', event => {
         const searchValue = event.target.value.toLowerCase();

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Документы</title>
+
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    <div class="hat-scaffold">
+        <div class="hat-scaffold__navbar">
+            @@include('include/hat-navbar.html')
+        </div>
+
+        <div class="hat-scaffold__body">
+            <div class="hat-scaffold__content-wrapper">
+                <div class="documents__content" data-bind="childrenComplete: onInit">
+                    <div class="documents__header">
+                        <h1>Документы</h1>
+                    </div>
+
+                    <div class="documents__sub-header">
+                        <div class="form-group documents__search search-global search-global--empty">
+                            <input class="form-control" placeholder="Поиск" data-bind="textInput: searchValue">
+
+                            <button type="button" class="btn btn-default search-global__search-clear-button"
+                                    title="Удалить">
+                                <i class="far fa-times"></i>
+                            </button>
+                        </div>
+
+                        <button class="btn btn-primary btn-p25 documents__add-type-button" data-bind="click: function() {addType();}">
+                            Новый тип
+                        </button>
+                        <button class="btn btn-primary btn-p25 documents__add-document-button">Новый документ</button>
+                    </div>
+
+                    <div class="table documents__table">
+                        <div class="documents__table-head">
+                            <div class="documents__table-head-row">
+                                <div class="documents__table-head-cell documents__table-name-head-cell">
+                                    Название
+                                </div>
+
+                                <div class="documents__table-head-cell documents__table-description-head-cell">
+                                    Описание
+                                </div>
+
+                                <div class="documents__table-head-cell documents__table-actions-head-cell"></div>
+                            </div>
+                        </div>
+
+                        <ul class="documents__table-body" data-bind="documentsSortable: true, documentsSortableTypeSort: typeSort, documentsSortableDocumentSort: documentSort">
+                            <!-- ko foreach: { data: types, beforeRemove: tableRowBeforeRemove } -->
+                                <!-- ko if: $root.isTypeVisible($data.id) -->
+                                    <li class="documents__table-row documents__table-type-row" data-bind="css: { 'documents__table-type-row--editing': $root.editingTypeId() === $data.id, 'documents__table-type-row--empty': !$root.hasDocuments($data.id) }, attr: { 'data-documents-type-id': id }">
+                                        <div class="documents__table-row-header">
+                                            <div class="documents__table-cell documents__table-name-cell">
+                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                    <div class="documents__table-type-row-toggle" data-bind="click: function() { $root.toggleType($data.id); }">
+                                                        <!-- ko if: $root.hasDocuments($data.id) -->
+                                                            <!-- ko if: $root.isTypeOpen($data.id) -->
+                                                                <i class="fa fa-chevron-circle-up"></i>
+                                                            <!-- /ko -->
+
+                                                            <!-- ko if: !$root.isTypeOpen($data.id) -->
+                                                                <i class="fa fa-chevron-circle-down"></i>
+                                                            <!-- /ko -->
+                                                        <!-- /ko -->
+                                                        <span class="documents__table-name" data-bind="text: name()"></span>
+                                                    </div>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                    <div class="form-group">
+                                                        <input class="form-control" data-bind="{textInput: $root.newTypeName}">
+                                                    </div>
+                                                <!-- /ko -->
+                                            </div>
+
+                                            <div class="documents__table-cell documents__table-description-cell">
+                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                    <!-- ko text: description().length > 0 ? description() : '-' -->
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                    <div class="form-group">
+                                                        <input class="form-control" data-bind="{value: $root.newTypeDescription}">
+                                                    </div>
+                                                <!-- /ko -->
+                                            </div>
+
+                                            <div class="documents__table-cell documents__table-actions-cell">
+                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-edit-button"
+                                                            title="Редактировать" data-bind="click: function() {$root.editType($data.id);}">
+                                                        <i class="far fa-pencil"></i>
+                                                    </button>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                    <button type="button" class="btn btn-default documents__table-row-reset-button"
+                                                            title="Сбросить значения" data-bind="click: function() { $root.resetEditingType(); }, attr: {disabled: $root.newTypeName().length === 0}">
+                                                        <i class="far fa-broom"></i>
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-default documents__table-row-save-button"
+                                                            title="Сохранить" data-bind="click: function() {$root.saveEditingType();}, attr: {disabled: $root.newTypeName().length === 0}">
+                                                        <i class="far fa-check"></i>
+                                                    </button>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: !$data.isSystem -->
+                                                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-remove-button"
+                                                            title="Удалить" data-bind="click: function() {$root.removeType($data.id);}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                <!-- /ko -->
+                                            </div>
+                                        </div>
+
+                                        <ul class="documents__table-row-content" data-bind="documentsTypeOpen: $root.isTypeDocumentsVisible($data.id)">
+                                            <!-- ko foreach: { data: $root.getDocuments($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
+                                                <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                                   <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                                <!-- /ko -->
+                                            <!-- /ko -->
+                                        </ul>
+                                    </li>
+                                <!-- /ko -->
+                            <!-- /ko -->
+
+                            <!-- ko foreach: { data: getDocuments(null), beforeRemove: $root.tableRowBeforeRemove } -->
+                                <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                    <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                <!-- /ko -->
+                            <!-- /ko -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/html" id="table-document-row-template">
+        <li class="documents__table-row documents__table-document-row" data-bind="attr: { 'data-documents-document-id': id }">
+            <div class="documents__table-row-header">
+                <div class="documents__table-cell documents__table-name-cell">
+                    <span class="documents__table-name" data-bind="text: name"></span>
+                </div>
+
+                <div class="documents__table-cell documents__table-description-cell"></div>
+
+                <div class="documents__table-cell documents__table-actions-cell">
+                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-edit-button" title="Редактировать">
+                        <i class="far fa-pencil"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-remove-button"
+                            title="Удалить" data-bind="click: function() {$root.removeDocument($data.id);}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </li>
+    </script>
+
+    @@include('include/_js.html')
+
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            initHatNavbar(document);
+
+            ko.bindingHandlers.documentsTypeOpen = {
+                init: function(element, valueAccessor) {
+                    const value = ko.unwrap(valueAccessor());
+
+                    if (value) {
+                        $(element).css('height', '');
+                        $(element).css('display', 'none');
+
+                        $(element).slideDown(0);
+                    } else {
+                        $(element).slideUp(0, () => {
+                            $(element).css('height', '0');
+                            $(element).css('display', 'block');
+                        });
+                    }
+
+                    $(element).data('documents-type-open-open', value);
+                },
+                update: function(element, valueAccessor, allBindings) {
+                    const value = ko.unwrap(valueAccessor());
+                    const duration = allBindings.get('slideDuration') || 200;
+
+                    if ($(element).data('documents-type-open-open') !== value) {
+                        if (value) {
+                            $(element).css('height', '');
+                            $(element).css('display', 'none');
+
+                            $(element).slideDown(duration);
+                        } else {
+                            $(element).slideUp(duration, () => {
+                                $(element).css('height', '0');
+                                $(element).css('display', 'block');
+                            });
+                        }
+
+                        $(element).data('documents-type-open-open', value);
+                    }
+                }
+            };
+
+            ko.bindingHandlers.documentsSortable = {
+                init: function(element, valueAccessor, allBindings, viewModel) {
+                    $(element).nestedSortable({
+                        items: '.documents__table-row:not(.documents__table-type-row--editing)',
+                        listType: 'ul',
+                        doNotClear: true,
+                        maxLevels: 2,
+                        disableNestingClass: 'documents__table-document-row',
+                        tabSize: 10,
+                        isAllowed: ($placeholder, $placeholderParent, $currentItem) => {
+                            return $currentItem.hasClass('documents__table-document-row') || !$placeholderParent;
+                        },
+                        change: function(mouseEvent, event) {
+                            const $placeholder = event.placeholder;
+
+                            if ($placeholder.hasClass('documents__table-document-row')) {
+                                $placeholder.toggle($placeholder.nextAll().filter('.documents__table-type-row').length === 0);
+                            } else {
+                                $placeholder.toggle($placeholder.prevAll().filter('.documents__table-document-row').length === 0);
+                            }
+                        },
+                        update: function(mouseEvent, event) {
+                            const typeId = event.item.data('documents-type-id');
+
+                            if (typeId !== undefined) {
+                                const index = $('.documents__table-type-row').toArray().indexOf(event.item.get()[0]);
+
+                                if (allBindings()['documentsSortableTypeSort']) {
+                                    allBindings()['documentsSortableTypeSort'].bind(viewModel)(typeId, index);
+                                }
+                            } else {
+                                const documentId = event.item.data('documents-document-id');
+                                const typeId = event.item.parent().hasClass('documents__table-body') ? null : event.item.closest('.documents__table-type-row').data('documents-type-id');
+                                const index = event.item.parent().children('.documents__table-document-row').toArray().indexOf(event.item.get()[0]);
+
+                                if (allBindings()['documentsSortableDocumentSort']) {
+                                    allBindings()['documentsSortableDocumentSort'].bind(viewModel)(documentId, typeId, index);
+                                }
+                            }
+
+                            event.item.remove();
+                        }
+                    });
+                }
+            };
+
+            const ViewModel = function(types, documents) {
+                this.types = ko.observableArray(types.map(t => ({
+                    id: t.id,
+                    name: ko.observable(t.name),
+                    description: ko.observable(t.description),
+                    isSystem: t.isSystem
+                })));
+                this.documents = ko.observableArray(documents.map(d => ({
+                    id: d.id,
+                    typeId: ko.observable(d.typeId),
+                    name: d.name,
+                    index: ko.observable(d.index)
+                })));
+                this.openTypes = ko.observableArray([]);
+                this.searchValue = ko.observable('');
+
+                this.editingTypeId = ko.observable(null);
+                this.newTypeName = ko.observable('');
+                this.newTypeDescription = ko.observable('');
+
+                this.nextNewTypeId = -1;
+
+                this.getDocuments = function(typeId) {
+                    return this.documents()
+                        .filter(d => d.typeId() === typeId)
+                        .sort((a, b) => {
+                            if (a.index() > b.index()) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        });
+                };
+
+                this.getType = function(typeId) {
+                    return this.types().find(t => t.id === typeId);
+                };
+
+                this.getDocument = function(documentId) {
+                    return this.documents().find(d => d.id === documentId);
+                };
+
+                this.isTypeOpen = function(typeId) {
+                    return this.openTypes().findIndex(id => id === typeId) !== -1;
+                };
+
+                this.isTypeVisible = function(typeId) {
+                    const searchValue = this.searchValue().toLowerCase();
+                    return searchValue === '' ||
+                        (
+                            this.getType(typeId).name().toLowerCase().includes(searchValue) ||
+                            this.getDocuments(typeId).some(d => d.name.toLowerCase().includes(searchValue))
+                        );
+                };
+
+                this.isTypeDocumentsVisible = function(typeId) {
+                    const searchValue = this.searchValue().toLowerCase();
+                    return this.editingTypeId() !== typeId &&
+                        (
+                            this.isTypeOpen(typeId) ||
+                            (
+                                searchValue !== '' &&
+                                (
+                                    this.getType(typeId).name().toLowerCase().includes(searchValue) ||
+                                    this.getDocuments(typeId).some(d => d.name.toLowerCase().includes(searchValue))
+                                )
+                            )
+                        );
+                };
+
+                this.isDocumentVisible = function(documentId) {
+                    const searchValue = this.searchValue().toLowerCase();
+                    const document = this.getDocument(documentId);
+                    return searchValue === '' ||
+                        document.name.toLowerCase().includes(searchValue) ||
+                        (document.typeId() !== null && this.getType(document.typeId()).name().toLowerCase().includes(searchValue));
+                };
+
+                this.hasDocuments = function(typeId) {
+                    return this.getDocuments(typeId).length;
+                };
+
+                this.toggleType = function(typeId) {
+                    if (this.hasDocuments(typeId)) {
+                        if (this.isTypeOpen(typeId)) {
+                            this.openTypes.remove(typeId)
+                        } else {
+                            this.openTypes.push(typeId);
+                        }
+                    }
+                };
+
+                this.openType = function(typeId) {
+                    if (this.hasDocuments(typeId)) {
+                        if (!this.isTypeOpen(typeId)) {
+                            this.openTypes.push(typeId);
+                        }
+                    }
+                };
+
+                this.removeType = function(typeId) {
+                    this.documents.remove(this.getDocuments(typeId));
+                    this.types.remove(this.getType(typeId));
+                    this.openTypes.remove(typeId);
+                    if (this.editingTypeId() === typeId) {
+                        this.editingTypeId(null);
+                        this.newTypeName('');
+                        this.newTypeDescription('');
+                    }
+                };
+
+                this.removeDocument = function(documentId) {
+                    this.documents.remove(this.getDocument(documentId));
+                };
+
+                this.tableRowBeforeRemove = function(element) {
+                    $(element).hide(200, () => $(element).remove());
+                };
+
+                this.typeSort = function(typeId, index) {
+                    const type = this.types.remove(this.getType(typeId))[0];
+                    this.types.splice(index, 0, type);
+                };
+
+                this.documentSort = function(documentId, typeId, index) {
+                    const document = this.getDocument(documentId);
+                    const previousTypeId = document.typeId;
+
+                    this.documents.remove(document);
+
+                    this.getDocuments(previousTypeId()).forEach((d, i) => d.index(i));
+                    this.getDocuments(typeId).filter(d => d.index() >= index).forEach((d, i) => d.index(index + i + 1));
+
+                    document.typeId(typeId);
+                    document.index(index);
+                    this.documents.push(document);
+
+                    this.openType(typeId);
+                };
+
+                this.editType = function(typeId) {
+                    if (this.editingTypeId() === null) {
+                        const type = this.getType(typeId);
+                        this.newTypeName(type.name());
+                        this.newTypeDescription(type.description());
+                        this.editingTypeId(typeId);
+                    }
+                };
+
+                this.resetEditingType = function() {
+                    const type = this.getType(this.editingTypeId());
+                    this.newTypeName(type.name());
+                    this.newTypeDescription(type.description());
+                };
+
+                this.saveEditingType = function() {
+                    const type = this.getType(this.editingTypeId());
+                    type.name(this.newTypeName());
+                    type.description(this.newTypeDescription());
+                    this.editingTypeId(null);
+                    this.newTypeName('');
+                    this.newTypeDescription('');
+                };
+
+                this.addType = function() {
+                    if (this.editingTypeId() === null) {
+                        const type = {
+                            id: this.nextNewTypeId--,
+                            name: ko.observable(''),
+                            description: ko.observable(''),
+                            isSystem: false
+                        };
+
+                        this.types.splice(0, 0, type);
+
+                        this.editingTypeId(type.id);
+                    }
+                }
+            };
+
+            const viewModel = new ViewModel(
+                [
+                    {id: 0, name: 'Регистрация', description: '', isSystem: false},
+                    {id: 1, name: 'Документы для устройства на работу', description: '', isSystem: false},
+                    {id: 2, name: 'Специальные', description: '', isSystem: true},
+                    {id: 3, name: 'Обязательные для всех', description: '', isSystem: true}
+                ],
+                [
+                    {id: 0, name: 'Миграционная карта', typeId: 0, index: 0},
+                    {id: 1, name: 'РВП', typeId: 0, index: 1},
+                    {id: 2, name: 'Договор о материальной ответственности', typeId: 0, index: 2},
+                    {id: 3, name: 'Патент', typeId: 1, index: 0},
+                    {id: 4, name: 'Вид на жительство', typeId: null, index: 0}
+                ]
+            );
+
+            const $documentsContent = $('.documents__content');
+
+            viewModel.onInit = function() {
+                initSearchGlobal($documentsContent.find('.documents__search').get()[0]);
+            };
+
+            ko.applyBindings(
+                viewModel,
+                $documentsContent.get()[0]
+            );
+        });
+    </script>
+
+    <!-- TODO: удалить после перехода всех страниц на новое меню -->
+    @@include('include/_hat-navbar-fix.html')
+</body>
+</html>

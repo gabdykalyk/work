@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Правовые статусы</title>
+    <title>Документы</title>
 
     <!-- <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet"> -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -385,13 +385,13 @@
 
         <div class="hat-scaffold__body">
             <div class="hat-scaffold__content-wrapper">
-                <div class="law-statuses__content" data-bind="childrenComplete: onInit">
-                    <div class="law-statuses__header">
-                        <h1>Правовые статусы</h1>
+                <div class="documents__content" data-bind="childrenComplete: onInit">
+                    <div class="documents__header">
+                        <h1>Документы</h1>
                     </div>
 
-                    <div class="law-statuses__sub-header">
-                        <div class="form-group law-statuses__search search-global search-global--empty">
+                    <div class="documents__sub-header">
+                        <div class="form-group documents__search search-global search-global--empty">
                             <input class="form-control" placeholder="Поиск" data-bind="textInput: searchValue">
 
                             <button type="button" class="btn btn-default search-global__search-clear-button"
@@ -400,70 +400,105 @@
                             </button>
                         </div>
 
-                        <button class="btn btn-primary btn-p25 law-statuses__add-button">Добавить статус</button>
+                        <button class="btn btn-primary btn-p25 documents__add-type-button" data-bind="click: function() {addType();}">
+                            Новый тип
+                        </button>
+                        <button class="btn btn-primary btn-p25 documents__add-document-button">Новый документ</button>
                     </div>
 
-                    <div class="table law-statuses__table">
-                        <div class="law-statuses__table-head">
-                            <div class="law-statuses__table-head-row">
-                                <div class="law-statuses__table-head-cell law-statuses__table-name-head-cell">
+                    <div class="table documents__table">
+                        <div class="documents__table-head">
+                            <div class="documents__table-head-row">
+                                <div class="documents__table-head-cell documents__table-name-head-cell">
                                     Название
                                 </div>
 
-                                <div class="law-statuses__table-head-cell law-statuses__table-citizenship-head-cell">
-                                    Гражданство
+                                <div class="documents__table-head-cell documents__table-description-head-cell">
+                                    Описание
                                 </div>
 
-                                <div class="law-statuses__table-head-cell law-statuses__table-actions-head-cell"></div>
+                                <div class="documents__table-head-cell documents__table-actions-head-cell"></div>
                             </div>
                         </div>
 
-                        <ul class="law-statuses__table-body" data-bind="documentsSortable: true, documentsSortableStatusSort: statusSort, documentsSortableDocumentSort: documentSort">
-                            <!-- ko foreach: { data: statuses, beforeRemove: tableRowBeforeRemove } -->
-                                <!-- ko if: $root.isStatusVisible($data.id) -->
-                                <li class="law-statuses__table-row law-statuses__table-status-row" data-bind="css: { 'law-statuses__table-status-row--empty': !$root.hasDocuments($data.id) }, attr: { 'data-documents-status-id': id }">
-                                    <div class="law-statuses__table-row-header">
-                                        <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                            <div class="law-statuses__table-status-row-toggle" data-bind="click: function() { $root.toggleStatus($data.id); }">
-                                                <!-- ko if: $root.hasDocuments($data.id) -->
-                                                    <!-- ko if: $root.isStatusOpen($data.id) -->
-                                                    <i class="fa fa-chevron-circle-up"></i>
-                                                    <!-- /ko -->
+                        <ul class="documents__table-body" data-bind="documentsSortable: true, documentsSortableTypeSort: typeSort, documentsSortableDocumentSort: documentSort">
+                            <!-- ko foreach: { data: types, beforeRemove: tableRowBeforeRemove } -->
+                                <!-- ko if: $root.isTypeVisible($data.id) -->
+                                    <li class="documents__table-row documents__table-type-row" data-bind="css: { 'documents__table-type-row--editing': $root.editingTypeId() === $data.id, 'documents__table-type-row--empty': !$root.hasDocuments($data.id) }, attr: { 'data-documents-type-id': id }">
+                                        <div class="documents__table-row-header">
+                                            <div class="documents__table-cell documents__table-name-cell">
+                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                    <div class="documents__table-type-row-toggle" data-bind="click: function() { $root.toggleType($data.id); }">
+                                                        <!-- ko if: $root.hasDocuments($data.id) -->
+                                                            <!-- ko if: $root.isTypeOpen($data.id) -->
+                                                                <i class="fa fa-chevron-circle-up"></i>
+                                                            <!-- /ko -->
 
-                                                    <!-- ko if: !$root.isStatusOpen($data.id) -->
-                                                    <i class="fa fa-chevron-circle-down"></i>
+                                                            <!-- ko if: !$root.isTypeOpen($data.id) -->
+                                                                <i class="fa fa-chevron-circle-down"></i>
+                                                            <!-- /ko -->
+                                                        <!-- /ko -->
+                                                        <span class="documents__table-name" data-bind="text: name()"></span>
+                                                    </div>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                    <div class="form-group">
+                                                        <input class="form-control" data-bind="{textInput: $root.newTypeName}">
+                                                    </div>
+                                                <!-- /ko -->
+                                            </div>
+
+                                            <div class="documents__table-cell documents__table-description-cell">
+                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                    <!-- ko text: description().length > 0 ? description() : '-' -->
                                                     <!-- /ko -->
                                                 <!-- /ko -->
-                                                <span class="law-statuses__table-name" data-bind="text: name()"></span>
+
+                                                <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                    <div class="form-group">
+                                                        <input class="form-control" data-bind="{value: $root.newTypeDescription}">
+                                                    </div>
+                                                <!-- /ko -->
+                                            </div>
+
+                                            <div class="documents__table-cell documents__table-actions-cell">
+                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-edit-button"
+                                                            title="Редактировать" data-bind="click: function() {$root.editType($data.id);}">
+                                                        <i class="far fa-pencil"></i>
+                                                    </button>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                    <button type="button" class="btn btn-default documents__table-row-reset-button"
+                                                            title="Сбросить значения" data-bind="click: function() { $root.resetEditingType(); }, attr: {disabled: $root.newTypeName().length === 0}">
+                                                        <i class="far fa-broom"></i>
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-default documents__table-row-save-button"
+                                                            title="Сохранить" data-bind="click: function() {$root.saveEditingType();}, attr: {disabled: $root.newTypeName().length === 0}">
+                                                        <i class="far fa-check"></i>
+                                                    </button>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: !$data.isSystem -->
+                                                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-remove-button"
+                                                            title="Удалить" data-bind="click: function() {$root.removeType($data.id);}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                <!-- /ko -->
                                             </div>
                                         </div>
 
-                                        <div class="law-statuses__table-cell law-statuses__table-citizenship-cell">
-                                            <!-- ko text: citizenship().length > 0 ? citizenship() : '-' -->
+                                        <ul class="documents__table-row-content" data-bind="documentsTypeOpen: $root.isTypeDocumentsVisible($data.id)">
+                                            <!-- ko foreach: { data: $root.getDocuments($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
+                                                <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                                   <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                                <!-- /ko -->
                                             <!-- /ko -->
-                                        </div>
-
-                                        <div class="law-statuses__table-cell law-statuses__table-actions-cell">
-                                            <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-edit-button"
-                                                    title="Редактировать">
-                                                <i class="far fa-pencil"></i>
-                                            </button>
-
-                                            <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-remove-button"
-                                                    title="Удалить" data-bind="click: function() {$root.removeStatus($data.id);}">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <ul class="law-statuses__table-row-content" data-bind="documentsTypeOpen: $root.isStatusDocumentsVisible($data.id)">
-                                        <!-- ko foreach: { data: $root.getDocuments($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
-                                            <!-- ko if: $root.isDocumentVisible($data.id) -->
-                                                <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
-                                            <!-- /ko -->
-                                        <!-- /ko -->
-                                    </ul>
-                                </li>
+                                        </ul>
+                                    </li>
                                 <!-- /ko -->
                             <!-- /ko -->
 
@@ -480,58 +515,27 @@
     </div>
 
     <script type="text/html" id="table-document-row-template">
-        <li class="law-statuses__table-row law-statuses__table-document-row" data-bind="attr: { 'data-documents-document-id': id }">
-            <div class="law-statuses__table-row-header">
-                <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                    <span class="law-statuses__table-name" data-bind="text: name"></span>
+        <li class="documents__table-row documents__table-document-row" data-bind="attr: { 'data-documents-document-id': id }">
+            <div class="documents__table-row-header">
+                <div class="documents__table-cell documents__table-name-cell">
+                    <span class="documents__table-name" data-bind="text: name"></span>
                 </div>
 
-                <div class="law-statuses__table-cell law-statuses__table-citizenship-cell"></div>
+                <div class="documents__table-cell documents__table-description-cell"></div>
 
-                <div class="law-statuses__table-cell law-statuses__table-actions-cell"></div>
+                <div class="documents__table-cell documents__table-actions-cell">
+                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-edit-button" title="Редактировать">
+                        <i class="far fa-pencil"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-remove-button"
+                            title="Удалить" data-bind="click: function() {$root.removeDocument($data.id);}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
         </li>
     </script>
-
-    <div class="modal fade law-statuses__modal modal-global" tabindex="-1" role="dialog" id="law-statuses__modal">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-
-                    <h4 class="modal-title">Создать правовой статус</h4>
-                </div>
-
-                <div class="modal-body">
-                    <form action="" method="post" class="form-respons">
-                        <div class="form-group required law-statuses__modal-name-form-group">
-                            <label for="law-statuses__modal-name">Название статуса</label>
-                            <input type="text" class="form-control" value="" name="law-statuses__modal-name"
-                                   id="law-statuses__modal-name">
-                            <span class="help-block" style="display: none">Должно быть не меньше 2 символов</span>
-                        </div>
-
-                        <div class="form-group law-statuses__modal-citizenship-form-group">
-                            <label for="law-statuses__modal-citizenship">Гражданство</label>
-                            <select class="form-control" name="law-statuses__modal-citizenship[]" id="law-statuses__modal-citizenship" multiple="multiple">
-                                <option value="1">Россия</option>
-                                <option value="2">Украина</option>
-                                <option value="3">Белоруссия</option>
-                                <option value="4">Казахстан</option>
-                            </select>
-                        </div>
-
-                        <div class="form-btns clearfix law-statuses__modal-save-button">
-                            <button type="button" class="btn btn-primary">Сохранить</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -587,13 +591,13 @@
                         });
                     }
 
-                    $(element).data('documents-status-open-open', value);
+                    $(element).data('documents-type-open-open', value);
                 },
                 update: function(element, valueAccessor, allBindings) {
                     const value = ko.unwrap(valueAccessor());
                     const duration = allBindings.get('slideDuration') || 200;
 
-                    if ($(element).data('documents-status-open-open') !== value) {
+                    if ($(element).data('documents-type-open-open') !== value) {
                         if (value) {
                             $(element).css('height', '');
                             $(element).css('display', 'none');
@@ -606,7 +610,7 @@
                             });
                         }
 
-                        $(element).data('documents-status-open-open', value);
+                        $(element).data('documents-type-open-open', value);
                     }
                 }
             };
@@ -614,40 +618,40 @@
             ko.bindingHandlers.documentsSortable = {
                 init: function(element, valueAccessor, allBindings, viewModel) {
                     $(element).nestedSortable({
-                        items: '.law-statuses__table-row',
+                        items: '.documents__table-row:not(.documents__table-type-row--editing)',
                         listType: 'ul',
                         doNotClear: true,
                         maxLevels: 2,
-                        disableNestingClass: 'law-statuses__table-document-row',
+                        disableNestingClass: 'documents__table-document-row',
                         tabSize: 10,
                         isAllowed: ($placeholder, $placeholderParent, $currentItem) => {
-                            return $currentItem.hasClass('law-statuses__table-document-row') || !$placeholderParent;
+                            return $currentItem.hasClass('documents__table-document-row') || !$placeholderParent;
                         },
                         change: function(mouseEvent, event) {
                             const $placeholder = event.placeholder;
 
-                            if ($placeholder.hasClass('law-statuses__table-document-row')) {
-                                $placeholder.toggle($placeholder.nextAll().filter('.law-statuses__table-status-row').length === 0);
+                            if ($placeholder.hasClass('documents__table-document-row')) {
+                                $placeholder.toggle($placeholder.nextAll().filter('.documents__table-type-row').length === 0);
                             } else {
-                                $placeholder.toggle($placeholder.prevAll().filter('.law-statuses__table-document-row').length === 0);
+                                $placeholder.toggle($placeholder.prevAll().filter('.documents__table-document-row').length === 0);
                             }
                         },
                         update: function(mouseEvent, event) {
-                            const statusId = event.item.data('documents-status-id');
+                            const typeId = event.item.data('documents-type-id');
 
-                            if (statusId !== undefined) {
-                                const index = $('.law-statuses__table-status-row').toArray().indexOf(event.item.get()[0]);
+                            if (typeId !== undefined) {
+                                const index = $('.documents__table-type-row').toArray().indexOf(event.item.get()[0]);
 
-                                if (allBindings()['documentsSortableStatusSort']) {
-                                    allBindings()['documentsSortableStatusSort'].bind(viewModel)(statusId, index);
+                                if (allBindings()['documentsSortableTypeSort']) {
+                                    allBindings()['documentsSortableTypeSort'].bind(viewModel)(typeId, index);
                                 }
                             } else {
                                 const documentId = event.item.data('documents-document-id');
-                                const statusId = event.item.parent().hasClass('law-statuses__table-body') ? null : event.item.closest('.law-statuses__table-status-row').data('documents-status-id');
-                                const index = event.item.parent().children('.law-statuses__table-document-row').toArray().indexOf(event.item.get()[0]);
+                                const typeId = event.item.parent().hasClass('documents__table-body') ? null : event.item.closest('.documents__table-type-row').data('documents-type-id');
+                                const index = event.item.parent().children('.documents__table-document-row').toArray().indexOf(event.item.get()[0]);
 
                                 if (allBindings()['documentsSortableDocumentSort']) {
-                                    allBindings()['documentsSortableDocumentSort'].bind(viewModel)(documentId, statusId, index);
+                                    allBindings()['documentsSortableDocumentSort'].bind(viewModel)(documentId, typeId, index);
                                 }
                             }
 
@@ -657,24 +661,31 @@
                 }
             };
 
-            const ViewModel = function(statuses, documents) {
-                this.statuses = ko.observableArray(statuses.map(t => ({
+            const ViewModel = function(types, documents) {
+                this.types = ko.observableArray(types.map(t => ({
                     id: t.id,
                     name: ko.observable(t.name),
-                    citizenship: ko.observable(t.citizenship)
+                    description: ko.observable(t.description),
+                    isSystem: t.isSystem
                 })));
                 this.documents = ko.observableArray(documents.map(d => ({
                     id: d.id,
-                    statusId: ko.observable(d.statusId),
+                    typeId: ko.observable(d.typeId),
                     name: d.name,
                     index: ko.observable(d.index)
                 })));
-                this.openStatuses = ko.observableArray([]);
+                this.openTypes = ko.observableArray([]);
                 this.searchValue = ko.observable('');
 
-                this.getDocuments = function(statusId) {
+                this.editingTypeId = ko.observable(null);
+                this.newTypeName = ko.observable('');
+                this.newTypeDescription = ko.observable('');
+
+                this.nextNewTypeId = -1;
+
+                this.getDocuments = function(typeId) {
                     return this.documents()
-                        .filter(d => d.statusId() === statusId)
+                        .filter(d => d.typeId() === typeId)
                         .sort((a, b) => {
                             if (a.index() > b.index()) {
                                 return 1;
@@ -684,37 +695,40 @@
                         });
                 };
 
-                this.getStatus = function(statusId) {
-                    return this.statuses().find(t => t.id === statusId);
+                this.getType = function(typeId) {
+                    return this.types().find(t => t.id === typeId);
                 };
 
                 this.getDocument = function(documentId) {
                     return this.documents().find(d => d.id === documentId);
                 };
 
-                this.isStatusOpen = function(statusId) {
-                    return this.openStatuses().findIndex(id => id === statusId) !== -1;
+                this.isTypeOpen = function(typeId) {
+                    return this.openTypes().findIndex(id => id === typeId) !== -1;
                 };
 
-                this.isStatusVisible = function(statusId) {
+                this.isTypeVisible = function(typeId) {
                     const searchValue = this.searchValue().toLowerCase();
                     return searchValue === '' ||
                         (
-                            this.getStatus(statusId).name().toLowerCase().includes(searchValue) ||
-                            this.getDocuments(statusId).some(d => d.name.toLowerCase().includes(searchValue))
+                            this.getType(typeId).name().toLowerCase().includes(searchValue) ||
+                            this.getDocuments(typeId).some(d => d.name.toLowerCase().includes(searchValue))
                         );
                 };
 
-                this.isStatusDocumentsVisible = function(statusId) {
+                this.isTypeDocumentsVisible = function(typeId) {
                     const searchValue = this.searchValue().toLowerCase();
-                    return this.isStatusOpen(statusId) ||
+                    return this.editingTypeId() !== typeId &&
+                        (
+                            this.isTypeOpen(typeId) ||
                             (
                                 searchValue !== '' &&
                                 (
-                                    this.getStatus(statusId).name().toLowerCase().includes(searchValue) ||
-                                    this.getDocuments(statusId).some(d => d.name.toLowerCase().includes(searchValue))
+                                    this.getType(typeId).name().toLowerCase().includes(searchValue) ||
+                                    this.getDocuments(typeId).some(d => d.name.toLowerCase().includes(searchValue))
                                 )
-                            );
+                            )
+                        );
                 };
 
                 this.isDocumentVisible = function(documentId) {
@@ -722,107 +736,131 @@
                     const document = this.getDocument(documentId);
                     return searchValue === '' ||
                         document.name.toLowerCase().includes(searchValue) ||
-                        (document.statusId() !== null && this.getStatus(document.statusId()).name().toLowerCase().includes(searchValue));
+                        (document.typeId() !== null && this.getType(document.typeId()).name().toLowerCase().includes(searchValue));
                 };
 
-                this.hasDocuments = function(statusId) {
-                    return this.getDocuments(statusId).length;
+                this.hasDocuments = function(typeId) {
+                    return this.getDocuments(typeId).length;
                 };
 
-                this.toggleStatus = function(statusId) {
-                    if (this.hasDocuments(statusId)) {
-                        if (this.isStatusOpen(statusId)) {
-                            this.openStatuses.remove(statusId)
+                this.toggleType = function(typeId) {
+                    if (this.hasDocuments(typeId)) {
+                        if (this.isTypeOpen(typeId)) {
+                            this.openTypes.remove(typeId)
                         } else {
-                            this.openStatuses.push(statusId);
+                            this.openTypes.push(typeId);
                         }
                     }
                 };
 
-                this.openStatus = function(statusId) {
-                    if (this.hasDocuments(statusId)) {
-                        if (!this.isStatusOpen(statusId)) {
-                            this.openStatuses.push(statusId);
+                this.openType = function(typeId) {
+                    if (this.hasDocuments(typeId)) {
+                        if (!this.isTypeOpen(typeId)) {
+                            this.openTypes.push(typeId);
                         }
                     }
                 };
 
-                this.removeStatus = function(statusId) {
-                    this.documents.remove(this.getDocuments(statusId));
-                    this.statuses.remove(this.getStatus(statusId));
-                    this.openStatuses.remove(statusId);
+                this.removeType = function(typeId) {
+                    this.documents.remove(this.getDocuments(typeId));
+                    this.types.remove(this.getType(typeId));
+                    this.openTypes.remove(typeId);
+                    if (this.editingTypeId() === typeId) {
+                        this.editingTypeId(null);
+                        this.newTypeName('');
+                        this.newTypeDescription('');
+                    }
+                };
+
+                this.removeDocument = function(documentId) {
+                    this.documents.remove(this.getDocument(documentId));
                 };
 
                 this.tableRowBeforeRemove = function(element) {
                     $(element).hide(200, () => $(element).remove());
                 };
 
-                this.statusSort = function(statusId, index) {
-                    const type = this.statuses.remove(this.getStatus(statusId))[0];
-                    this.statuses.splice(index, 0, type);
+                this.typeSort = function(typeId, index) {
+                    const type = this.types.remove(this.getType(typeId))[0];
+                    this.types.splice(index, 0, type);
                 };
 
-                this.documentSort = function(documentId, statusId, index) {
+                this.documentSort = function(documentId, typeId, index) {
                     const document = this.getDocument(documentId);
-                    const previousStatusId = document.statusId;
+                    const previousTypeId = document.typeId;
 
                     this.documents.remove(document);
 
-                    this.getDocuments(previousStatusId()).forEach((d, i) => d.index(i));
-                    this.getDocuments(statusId).filter(d => d.index() >= index).forEach((d, i) => d.index(index + i + 1));
+                    this.getDocuments(previousTypeId()).forEach((d, i) => d.index(i));
+                    this.getDocuments(typeId).filter(d => d.index() >= index).forEach((d, i) => d.index(index + i + 1));
 
-                    document.statusId(statusId);
+                    document.typeId(typeId);
                     document.index(index);
                     this.documents.push(document);
 
-                    this.openStatus(statusId);
+                    this.openType(typeId);
                 };
+
+                this.editType = function(typeId) {
+                    if (this.editingTypeId() === null) {
+                        const type = this.getType(typeId);
+                        this.newTypeName(type.name());
+                        this.newTypeDescription(type.description());
+                        this.editingTypeId(typeId);
+                    }
+                };
+
+                this.resetEditingType = function() {
+                    const type = this.getType(this.editingTypeId());
+                    this.newTypeName(type.name());
+                    this.newTypeDescription(type.description());
+                };
+
+                this.saveEditingType = function() {
+                    const type = this.getType(this.editingTypeId());
+                    type.name(this.newTypeName());
+                    type.description(this.newTypeDescription());
+                    this.editingTypeId(null);
+                    this.newTypeName('');
+                    this.newTypeDescription('');
+                };
+
+                this.addType = function() {
+                    if (this.editingTypeId() === null) {
+                        const type = {
+                            id: this.nextNewTypeId--,
+                            name: ko.observable(''),
+                            description: ko.observable(''),
+                            isSystem: false
+                        };
+
+                        this.types.splice(0, 0, type);
+
+                        this.editingTypeId(type.id);
+                    }
+                }
             };
 
             const viewModel = new ViewModel(
                 [
-                    {id: 0, name: 'Резидент РФ', citizenship: ''},
-                    {id: 1, name: 'Граждане ЕС', citizenship: ''},
-                    {id: 2, name: 'Высококвалифицированные специалисты', citizenship: 'Украина, Белоруссия, Казахстан'}
+                    {id: 0, name: 'Регистрация', description: '', isSystem: false},
+                    {id: 1, name: 'Документы для устройства на работу', description: '', isSystem: false},
+                    {id: 2, name: 'Специальные', description: '', isSystem: true},
+                    {id: 3, name: 'Обязательные для всех', description: '', isSystem: true}
                 ],
                 [
-                    {id: 0, name: 'Миграционная карта', statusId: 0, index: 0},
-                    {id: 1, name: 'РВП', statusId: 0, index: 1},
-                    {id: 2, name: 'Договор о материальной ответственности', statusId: 0, index: 2},
-                    {id: 3, name: 'Патент', statusId: 1, index: 0},
-                    {id: 4, name: 'Вид на жительство', statusId: null, index: 0}
+                    {id: 0, name: 'Миграционная карта', typeId: 0, index: 0},
+                    {id: 1, name: 'РВП', typeId: 0, index: 1},
+                    {id: 2, name: 'Договор о материальной ответственности', typeId: 0, index: 2},
+                    {id: 3, name: 'Патент', typeId: 1, index: 0},
+                    {id: 4, name: 'Вид на жительство', typeId: null, index: 0}
                 ]
             );
 
-            const $documentsContent = $('.law-statuses__content');
+            const $documentsContent = $('.documents__content');
 
             viewModel.onInit = function() {
-                initSearchGlobal($documentsContent.find('.law-statuses__search').get()[0]);
-
-                const $modal = $('.law-statuses__modal');
-                const $modalNameFormGroup = $('.law-statuses__modal-name-form-group');
-                $modal.modal({
-                    show: false
-                });
-
-                $('.law-statuses__add-button').on('click', () => {
-                    $modal.modal('show');
-                });
-
-                $('.law-statuses__modal-save-button').on('click', () => {
-                    const value = $modalNameFormGroup.find('.form-control').val();
-                    const hasError = value.length < 2;
-                    $modalNameFormGroup.toggleClass('has-error', hasError);
-                    $modalNameFormGroup.find('.help-block').toggle(hasError);
-
-                    if (!hasError) {
-                        $modal.modal('hide');
-                    }
-                });
-
-                $('.law-statuses__modal-citizenship-form-group .form-control').select2({
-                    width: '100%'
-                });
+                initSearchGlobal($documentsContent.find('.documents__search').get()[0]);
             };
 
             ko.applyBindings(

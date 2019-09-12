@@ -20,14 +20,14 @@
 
         <div class="hat-scaffold__body">
             <div class="hat-scaffold__content-wrapper">
-                <div class="law-statuses__content">
+                <div class="law-statuses__content" data-bind="childrenComplete: onInit">
                     <div class="law-statuses__header">
                         <h1>Правовые статусы</h1>
                     </div>
 
                     <div class="law-statuses__sub-header">
-                        <div class="form-group search-global search-global--empty">
-                            <input class="form-control" placeholder="Поиск">
+                        <div class="form-group law-statuses__search search-global search-global--empty">
+                            <input class="form-control" placeholder="Поиск" data-bind="textInput: searchValue">
 
                             <button type="button" class="btn btn-default search-global__search-clear-button"
                                     title="Удалить">
@@ -53,186 +53,80 @@
                             </div>
                         </div>
 
-                        <ul class="law-statuses__table-body">
-                            <li class="law-statuses__table-row law-statuses__table-status-row law-statuses__table-status-row--empty">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <div class="law-statuses__table-status-row-toggle">
-                                            <i class="fa fa-chevron-circle-down"></i>
-                                            <span class="law-statuses__table-name">
-                                                Резидент РФ
-                                            </span>
+                        <ul class="law-statuses__table-body" data-bind="documentsSortable: true, documentsSortableStatusSort: statusSort, documentsSortableDocumentSort: documentSort">
+                            <!-- ko foreach: { data: statuses, beforeRemove: tableRowBeforeRemove } -->
+                                <!-- ko if: $root.isStatusVisible($data.id) -->
+                                <li class="law-statuses__table-row law-statuses__table-status-row" data-bind="css: { 'law-statuses__table-status-row--empty': !$root.hasDocuments($data.id) }, attr: { 'data-documents-status-id': id }">
+                                    <div class="law-statuses__table-row-header">
+                                        <div class="law-statuses__table-cell law-statuses__table-name-cell">
+                                            <div class="law-statuses__table-status-row-toggle" data-bind="click: function() { $root.toggleStatus($data.id); }">
+                                                <!-- ko if: $root.hasDocuments($data.id) -->
+                                                    <!-- ko if: $root.isStatusOpen($data.id) -->
+                                                    <i class="fa fa-chevron-circle-up"></i>
+                                                    <!-- /ko -->
+
+                                                    <!-- ko if: !$root.isStatusOpen($data.id) -->
+                                                    <i class="fa fa-chevron-circle-down"></i>
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+                                                <span class="law-statuses__table-name" data-bind="text: name()"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="law-statuses__table-cell law-statuses__table-citizenship-cell">
+                                            <!-- ko text: citizenship().length > 0 ? citizenship() : '-' -->
+                                            <!-- /ko -->
+                                        </div>
+
+                                        <div class="law-statuses__table-cell law-statuses__table-actions-cell">
+                                            <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-edit-button"
+                                                    title="Редактировать">
+                                                <i class="far fa-pencil"></i>
+                                            </button>
+
+                                            <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-remove-button"
+                                                    title="Удалить" data-bind="click: function() {$root.removeStatus($data.id);}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <div class="law-statuses__table-cell law-statuses__table-citizenship-cell">Россия</div>
+                                    <ul class="law-statuses__table-row-content" data-bind="documentsTypeOpen: $root.isStatusDocumentsVisible($data.id)">
+                                        <!-- ko foreach: { data: $root.getDocuments($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
+                                            <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                                <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                            <!-- /ko -->
+                                        <!-- /ko -->
+                                    </ul>
+                                </li>
+                                <!-- /ko -->
+                            <!-- /ko -->
 
-                                    <div class="law-statuses__table-cell law-statuses__table-actions-cell">
-                                        <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-edit-button" title="Редактировать">
-                                            <i class="far fa-pencil"></i>
-                                        </button>
-
-                                        <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-remove-button"
-                                                title="Удалить">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <ul class="law-statuses__table-row-content"></ul>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-status-row law-statuses__table-status-row--empty">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <div class="law-statuses__table-status-row-toggle">
-                                            <i class="fa fa-chevron-circle-down"></i>
-                                            <span class="law-statuses__table-name">
-                                                Временно пребывающий (по регистрации, с визой или без визы)
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="law-statuses__table-cell law-statuses__table-citizenship-cell">-</div>
-
-                                    <div class="law-statuses__table-cell law-statuses__table-actions-cell">
-                                        <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-edit-button" title="Редактировать">
-                                            <i class="far fa-pencil"></i>
-                                        </button>
-
-                                        <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-remove-button"
-                                                title="Удалить">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <ul class="law-statuses__table-row-content"></ul>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-status-row law-statuses__table-status-row--empty">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <div class="law-statuses__table-status-row-toggle">
-                                            <i class="fa fa-chevron-circle-down"></i>
-                                            <span class="law-statuses__table-name">
-                                                Временно проживающий (РВП)
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="law-statuses__table-cell law-statuses__table-citizenship-cell">
-                                        Украина, Белоруссия, Казахстан
-                                    </div>
-
-                                    <div class="law-statuses__table-cell law-statuses__table-actions-cell">
-                                        <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-edit-button" title="Редактировать">
-                                            <i class="far fa-pencil"></i>
-                                        </button>
-
-                                        <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-remove-button"
-                                                title="Удалить">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <ul class="law-statuses__table-row-content"></ul>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-status-row law-statuses__table-status-row--empty">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <div class="law-statuses__table-status-row-toggle">
-                                            <i class="fa fa-chevron-circle-down"></i>
-                                            <span class="law-statuses__table-name">
-                                                Постоянно проживающий (ВНЖ)
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="law-statuses__table-cell law-statuses__table-citizenship-cell">-</div>
-
-                                    <div class="law-statuses__table-cell law-statuses__table-actions-cell">
-                                        <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-edit-button" title="Редактировать">
-                                            <i class="far fa-pencil"></i>
-                                        </button>
-
-                                        <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-remove-button"
-                                                title="Удалить">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <ul class="law-statuses__table-row-content"></ul>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-document-row">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <span class="law-statuses__table-name">
-                                            Миграционная карта
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-document-row">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <span class="law-statuses__table-name">
-                                            Патент
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-document-row">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <span class="law-statuses__table-name">
-                                            Вид на жительство
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-document-row">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <span class="law-statuses__table-name">
-                                            РВП
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-document-row">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <span class="law-statuses__table-name">
-                                            Справка об отсутствии судимости
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-
-                            <li class="law-statuses__table-row law-statuses__table-document-row">
-                                <div class="law-statuses__table-row-header">
-                                    <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                        <span class="law-statuses__table-name">
-                                            Пенсионное страховое свидетельство
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
+                            <!-- ko foreach: { data: getDocuments(null), beforeRemove: $root.tableRowBeforeRemove } -->
+                                <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                    <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                <!-- /ko -->
+                            <!-- /ko -->
                         </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script type="text/html" id="table-document-row-template">
+        <li class="law-statuses__table-row law-statuses__table-document-row" data-bind="attr: { 'data-documents-document-id': id }">
+            <div class="law-statuses__table-row-header">
+                <div class="law-statuses__table-cell law-statuses__table-name-cell">
+                    <span class="law-statuses__table-name" data-bind="text: name"></span>
+                </div>
+
+                <div class="law-statuses__table-cell law-statuses__table-citizenship-cell"></div>
+
+                <div class="law-statuses__table-cell law-statuses__table-actions-cell"></div>
+            </div>
+        </li>
+    </script>
 
     <div class="modal fade law-statuses__modal modal-global" tabindex="-1" role="dialog" id="law-statuses__modal">
         <div class="modal-dialog" role="document">
@@ -276,172 +170,270 @@
 
     @@include('include/_js.html')
 
-    <script src="https://unpkg.com/web-animations-js@2.3.1/web-animations.min.js"></script>
-    <script src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
-    <script src="https://unpkg.com/muuri@0.7.1/dist/muuri.min.js"></script>
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
             initHatNavbar(document);
 
-            const $tableBody = $('.law-statuses__table-body');
-            const $tableStatusRows = $('.law-statuses__table-status-row');
-            const $modal = $('.law-statuses__modal');
-            const $modalNameFormGroup = $('.law-statuses__modal-name-form-group');
-            const $search = $('.search-global');
-            const $searchInput = $search.find('.form-control');
+            ko.bindingHandlers.documentsTypeOpen = {
+                init: function(element, valueAccessor) {
+                    const value = ko.unwrap(valueAccessor());
 
-            $tableBody.nestedSortable({
-                items: '.law-statuses__table-row',
-                listType: 'ul',
-                doNotClear: true,
-                maxLevels: 2,
-                disableNestingClass: 'law-statuses__table-document-row',
-                tabSize: 10,
-                isAllowed: ($placeholder, $placeholderParent, $currentItem) => {
-                    return $currentItem.hasClass('law-statuses__table-document-row') || !$placeholderParent;
+                    if (value) {
+                        $(element).css('height', '');
+                        $(element).css('display', 'none');
+
+                        $(element).slideDown(0);
+                    } else {
+                        $(element).slideUp(0, () => {
+                            $(element).css('height', '0');
+                            $(element).css('display', 'block');
+                        });
+                    }
+
+                    $(element).data('documents-status-open-open', value);
                 },
-                change: function(mouseEvent, event) {
-                    const $placeholder = event.placeholder;
+                update: function(element, valueAccessor, allBindings) {
+                    const value = ko.unwrap(valueAccessor());
+                    const duration = allBindings.get('slideDuration') || 200;
 
-                    if ($placeholder.hasClass('law-statuses__table-document-row')) {
-                        $placeholder.toggle($placeholder.nextAll().filter('.law-statuses__table-status-row').length === 0);
-                    } else {
-                        $placeholder.toggle($placeholder.prevAll().filter('.law-statuses__table-document-row').length === 0);
-                    }
+                    if ($(element).data('documents-status-open-open') !== value) {
+                        if (value) {
+                            $(element).css('height', '');
+                            $(element).css('display', 'none');
 
-                    $tableStatusRows.each((_, row) => {
-                        $(row).trigger('nestedSortableChange', [event.helper]);
-                    });
-                },
-                update: function() {
-                    const $tableBodyChildren = $tableBody.children();
-
-                    $tableBodyChildren.sort((a, b) => {
-                        const aValue = $(a).hasClass('law-statuses__table-status-row') ? 1 : 0;
-                        const bValue = $(b).hasClass('law-statuses__table-status-row') ? 1 : 0;
-
-                        return bValue - aValue;
-                    });
-
-                    $tableBody.append($tableBodyChildren);
-
-                    $tableStatusRows.each((_, row) => {
-                        $(row).trigger('nestedSortableUpdate');
-                    });
-                }
-            });
-
-            $tableBody.on('sortrevert', () => {
-                $tableStatusRows.each((_, row) => {
-                    $(row).trigger('nestedSortableChange');
-                });
-            });
-
-            $modal.modal({
-                show: false
-            });
-
-            $('.law-statuses__add-button').on('click', () => {
-                $modal.modal('show');
-            });
-
-            $('.law-statuses__modal-save-button').on('click', () => {
-                const value = $modalNameFormGroup.find('.form-control').val();
-                const hasError = value.length < 2;
-                $modalNameFormGroup.toggleClass('has-error', hasError);
-                $modalNameFormGroup.find('.help-block').toggle(hasError);
-
-                if (!hasError) {
-                    $modal.modal('hide');
-                }
-            });
-
-            $('.law-statuses__modal-citizenship-form-group .form-control').select2({
-                width: '100%'
-            });
-
-            $tableStatusRows.each((_, row) => {
-                const $row = $(row);
-                const $header = $row.find('.law-statuses__table-row-header');
-                const $content = $row.find('.law-statuses__table-row-content');
-                const $toggle = $row.find('.law-statuses__table-status-row-toggle');
-                const $icon = $toggle.find('i');
-                let isOpen = false;
-                let isEmpty = $content.children().length === 0;
-
-                $row.height($header.height());
-
-                $toggle.on('click', () => {
-                    if (isEmpty) {
-                        return;
-                    }
-
-                    isOpen = !isOpen;
-
-                    if (isOpen) {
-                        $row.animate({height: $header.height() + $content.height()}, 200);
-                    } else {
-                        $row.animate({height: $header.height()}, 200);
-                    }
-
-                    $icon.toggleClass('fa-chevron-circle-down', !isOpen);
-                    $icon.toggleClass('fa-chevron-circle-up', isOpen);
-                });
-
-                $row.on('nestedSortableChange', (_, $helperRow) => {
-                    if (isOpen || ((!$helperRow || $helperRow.hasClass('law-statuses__table-document-row')) && isEmpty && $content.children().length > 0)) {
-                        $row.height($header.height() + $content.height());
-                    } else {
-                        $row.height($header.height());
-                    }
-                });
-
-                $row.on('nestedSortableUpdate', () => {
-                    const isBeforeEmpty = isEmpty;
-                    isEmpty = $content.children().length === 0;
-
-                    if (isOpen) {
-                        if (isEmpty) {
-                            isOpen = false;
-                            $row.height($header.height());
-                            $icon.addClass('fa-chevron-circle-down');
-                            $icon.removeClass('fa-chevron-circle-up');
+                            $(element).slideDown(duration);
                         } else {
-                            $row.height($header.height() + $content.height());
+                            $(element).slideUp(duration, () => {
+                                $(element).css('height', '0');
+                                $(element).css('display', 'block');
+                            });
+                        }
+
+                        $(element).data('documents-status-open-open', value);
+                    }
+                }
+            };
+
+            ko.bindingHandlers.documentsSortable = {
+                init: function(element, valueAccessor, allBindings, viewModel) {
+                    $(element).nestedSortable({
+                        items: '.law-statuses__table-row',
+                        listType: 'ul',
+                        doNotClear: true,
+                        maxLevels: 2,
+                        disableNestingClass: 'law-statuses__table-document-row',
+                        tabSize: 10,
+                        isAllowed: ($placeholder, $placeholderParent, $currentItem) => {
+                            return $currentItem.hasClass('law-statuses__table-document-row') || !$placeholderParent;
+                        },
+                        change: function(mouseEvent, event) {
+                            const $placeholder = event.placeholder;
+
+                            if ($placeholder.hasClass('law-statuses__table-document-row')) {
+                                $placeholder.toggle($placeholder.nextAll().filter('.law-statuses__table-status-row').length === 0);
+                            } else {
+                                $placeholder.toggle($placeholder.prevAll().filter('.law-statuses__table-document-row').length === 0);
+                            }
+                        },
+                        update: function(mouseEvent, event) {
+                            const statusId = event.item.data('documents-status-id');
+
+                            if (statusId !== undefined) {
+                                const index = $('.law-statuses__table-status-row').toArray().indexOf(event.item.get()[0]);
+
+                                if (allBindings()['documentsSortableStatusSort']) {
+                                    allBindings()['documentsSortableStatusSort'].bind(viewModel)(statusId, index);
+                                }
+                            } else {
+                                const documentId = event.item.data('documents-document-id');
+                                const statusId = event.item.parent().hasClass('law-statuses__table-body') ? null : event.item.closest('.law-statuses__table-status-row').data('documents-status-id');
+                                const index = event.item.parent().children('.law-statuses__table-document-row').toArray().indexOf(event.item.get()[0]);
+
+                                if (allBindings()['documentsSortableDocumentSort']) {
+                                    allBindings()['documentsSortableDocumentSort'].bind(viewModel)(documentId, statusId, index);
+                                }
+                            }
+
+                            event.item.remove();
+                        }
+                    });
+                }
+            };
+
+            const ViewModel = function(statuses, documents) {
+                this.statuses = ko.observableArray(statuses.map(t => ({
+                    id: t.id,
+                    name: ko.observable(t.name),
+                    citizenship: ko.observable(t.citizenship)
+                })));
+                this.documents = ko.observableArray(documents.map(d => ({
+                    id: d.id,
+                    statusId: ko.observable(d.statusId),
+                    name: d.name,
+                    index: ko.observable(d.index)
+                })));
+                this.openStatuses = ko.observableArray([]);
+                this.searchValue = ko.observable('');
+
+                this.getDocuments = function(statusId) {
+                    return this.documents()
+                        .filter(d => d.statusId() === statusId)
+                        .sort((a, b) => {
+                            if (a.index() > b.index()) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        });
+                };
+
+                this.getStatus = function(statusId) {
+                    return this.statuses().find(t => t.id === statusId);
+                };
+
+                this.getDocument = function(documentId) {
+                    return this.documents().find(d => d.id === documentId);
+                };
+
+                this.isStatusOpen = function(statusId) {
+                    return this.openStatuses().findIndex(id => id === statusId) !== -1;
+                };
+
+                this.isStatusVisible = function(statusId) {
+                    const searchValue = this.searchValue().toLowerCase();
+                    return searchValue === '' ||
+                        (
+                            this.getStatus(statusId).name().toLowerCase().includes(searchValue) ||
+                            this.getDocuments(statusId).some(d => d.name.toLowerCase().includes(searchValue))
+                        );
+                };
+
+                this.isStatusDocumentsVisible = function(statusId) {
+                    const searchValue = this.searchValue().toLowerCase();
+                    return this.isStatusOpen(statusId) ||
+                            (
+                                searchValue !== '' &&
+                                (
+                                    this.getStatus(statusId).name().toLowerCase().includes(searchValue) ||
+                                    this.getDocuments(statusId).some(d => d.name.toLowerCase().includes(searchValue))
+                                )
+                            );
+                };
+
+                this.isDocumentVisible = function(documentId) {
+                    const searchValue = this.searchValue().toLowerCase();
+                    const document = this.getDocument(documentId);
+                    return searchValue === '' ||
+                        document.name.toLowerCase().includes(searchValue) ||
+                        (document.statusId() !== null && this.getStatus(document.statusId()).name().toLowerCase().includes(searchValue));
+                };
+
+                this.hasDocuments = function(statusId) {
+                    return this.getDocuments(statusId).length;
+                };
+
+                this.toggleStatus = function(statusId) {
+                    if (this.hasDocuments(statusId)) {
+                        if (this.isStatusOpen(statusId)) {
+                            this.openStatuses.remove(statusId)
+                        } else {
+                            this.openStatuses.push(statusId);
                         }
                     }
+                };
 
-                    $row.toggleClass('law-statuses__table-status-row--empty', isEmpty);
+                this.openStatus = function(statusId) {
+                    if (this.hasDocuments(statusId)) {
+                        if (!this.isStatusOpen(statusId)) {
+                            this.openStatuses.push(statusId);
+                        }
+                    }
+                };
 
-                    if (isBeforeEmpty !== isEmpty && !isOpen) {
-                        $row.height($header.height());
+                this.removeStatus = function(statusId) {
+                    this.documents.remove(this.getDocuments(statusId));
+                    this.statuses.remove(this.getStatus(statusId));
+                    this.openStatuses.remove(statusId);
+                };
+
+                this.tableRowBeforeRemove = function(element) {
+                    $(element).hide(200, () => $(element).remove());
+                };
+
+                this.statusSort = function(statusId, index) {
+                    const type = this.statuses.remove(this.getStatus(statusId))[0];
+                    this.statuses.splice(index, 0, type);
+                };
+
+                this.documentSort = function(documentId, statusId, index) {
+                    const document = this.getDocument(documentId);
+                    const previousStatusId = document.statusId;
+
+                    this.documents.remove(document);
+
+                    this.getDocuments(previousStatusId()).forEach((d, i) => d.index(i));
+                    this.getDocuments(statusId).filter(d => d.index() >= index).forEach((d, i) => d.index(index + i + 1));
+
+                    document.statusId(statusId);
+                    document.index(index);
+                    this.documents.push(document);
+
+                    this.openStatus(statusId);
+                };
+            };
+
+            const viewModel = new ViewModel(
+                [
+                    {id: 0, name: 'Резидент РФ', citizenship: ''},
+                    {id: 1, name: 'Граждане ЕС', citizenship: ''},
+                    {id: 2, name: 'Высококвалифицированные специалисты', citizenship: 'Украина, Белоруссия, Казахстан'}
+                ],
+                [
+                    {id: 0, name: 'Миграционная карта', statusId: 0, index: 0},
+                    {id: 1, name: 'РВП', statusId: 0, index: 1},
+                    {id: 2, name: 'Договор о материальной ответственности', statusId: 0, index: 2},
+                    {id: 3, name: 'Патент', statusId: 1, index: 0},
+                    {id: 4, name: 'Вид на жительство', statusId: null, index: 0}
+                ]
+            );
+
+            const $documentsContent = $('.law-statuses__content');
+
+            viewModel.onInit = function() {
+                initSearchGlobal($documentsContent.find('.law-statuses__search').get()[0]);
+
+                const $modal = $('.law-statuses__modal');
+                const $modalNameFormGroup = $('.law-statuses__modal-name-form-group');
+                $modal.modal({
+                    show: false
+                });
+
+                $('.law-statuses__add-button').on('click', () => {
+                    $modal.modal('show');
+                });
+
+                $('.law-statuses__modal-save-button').on('click', () => {
+                    const value = $modalNameFormGroup.find('.form-control').val();
+                    const hasError = value.length < 2;
+                    $modalNameFormGroup.toggleClass('has-error', hasError);
+                    $modalNameFormGroup.find('.help-block').toggle(hasError);
+
+                    if (!hasError) {
+                        $modal.modal('hide');
                     }
                 });
-            });
 
-            $tableStatusRows.each((_, row) => {
-                const $row = $(row);
-
-                $row.find('.law-statuses__table-row-remove-button').on('click', () => {
-                    $row.hide(200, () => $row.remove());
+                $('.law-statuses__modal-citizenship-form-group .form-control').select2({
+                    width: '100%'
                 });
-            });
+            };
 
-            $search.find('.search-global__search-clear-button').on('click', () => {
-                $searchInput.val('').trigger('input');
-                $search.addClass('search-global--empty');
-            });
-
-            $searchInput.on('input', event => {
-                const value = event.target.value;
-                $search.toggleClass('search-global--empty', value.length === 0);
-            });
-
-            initSearch(
-                $search.get()[0],
-                $tableStatusRows.toArray(),
-                item => $(item).find('> .law-statuses__table-row-header .law-statuses__table-name').text()
+            ko.applyBindings(
+                viewModel,
+                $documentsContent.get()[0]
             );
         });
     </script>
