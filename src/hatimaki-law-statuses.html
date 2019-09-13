@@ -38,7 +38,7 @@
                         <button class="btn btn-primary btn-p25 law-statuses__add-button">Добавить статус</button>
                     </div>
 
-                    <div class="table law-statuses__table">
+                    <div class="law-statuses__table">
                         <div class="law-statuses__table-head">
                             <div class="law-statuses__table-head-row">
                                 <div class="law-statuses__table-head-cell law-statuses__table-name-head-cell">
@@ -56,7 +56,18 @@
                         <ul class="law-statuses__table-body" data-bind="documentsSortable: true, documentsSortableStatusSort: statusSort, documentsSortableDocumentSort: documentSort">
                             <!-- ko foreach: { data: statuses, beforeRemove: tableRowBeforeRemove } -->
                                 <!-- ko if: $root.isStatusVisible($data.id) -->
-                                <li class="law-statuses__table-row law-statuses__table-status-row" data-bind="css: { 'law-statuses__table-status-row--empty': !$root.hasDocuments($data.id) }, attr: { 'data-documents-status-id': id }">
+                                  <li
+                                      class="law-statuses__table-row law-statuses__table-status-row"
+                                      data-bind="
+                                          css: {
+                                              'law-statuses__table-status-row--empty': !$root.hasDocuments($data.id),
+                                              'law-statuses__table-status-row--last': $index() === $root.statuses().length - 1 && $root.getDocuments(null).length > 0
+                                          },
+                                          attr: {
+                                              'data-documents-status-id': id
+                                          }
+                                      "
+                                  >
                                     <div class="law-statuses__table-row-header">
                                         <div class="law-statuses__table-cell law-statuses__table-name-cell">
                                             <div class="law-statuses__table-status-row-toggle" data-bind="click: function() { $root.toggleStatus($data.id); }">

@@ -41,7 +41,7 @@
                         <button class="btn btn-primary btn-p25 documents__add-document-button">Новый документ</button>
                     </div>
 
-                    <div class="table documents__table">
+                    <div class="documents__table">
                         <div class="documents__table-head">
                             <div class="documents__table-head-row">
                                 <div class="documents__table-head-cell documents__table-name-head-cell">
@@ -59,7 +59,17 @@
                         <ul class="documents__table-body" data-bind="documentsSortable: true, documentsSortableTypeSort: typeSort, documentsSortableDocumentSort: documentSort">
                             <!-- ko foreach: { data: types, beforeRemove: tableRowBeforeRemove } -->
                                 <!-- ko if: $root.isTypeVisible($data.id) -->
-                                    <li class="documents__table-row documents__table-type-row" data-bind="css: { 'documents__table-type-row--editing': $root.editingTypeId() === $data.id, 'documents__table-type-row--empty': !$root.hasDocuments($data.id) }, attr: { 'data-documents-type-id': id }">
+                                    <li
+                                        class="documents__table-row documents__table-type-row"
+                                        data-bind="
+                                            css: {
+                                                'documents__table-type-row--editing': $root.editingTypeId() === $data.id,
+                                                'documents__table-type-row--empty': !$root.hasDocuments($data.id),
+                                                'documents__table-type-row--last': $index() === $root.types().length - 1 && $root.getDocuments(null).length > 0
+                                            },
+                                            attr: { 'data-documents-type-id': id }
+                                        "
+                                    >
                                         <div class="documents__table-row-header">
                                             <div class="documents__table-cell documents__table-name-cell">
                                                 <!-- ko if: $root.editingTypeId() !== $data.id -->
