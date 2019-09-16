@@ -395,9 +395,17 @@
             </div>
 
             <div class="standards__header standards__sub-header">
-                <div class="form-group standards__search standards__sub-header-search">
-                    <input class="form-control" placeholder="Поиск">
-                </div>
+				<form action="/" method="post" class="form-respons standards__search standards__sub-header-search">
+					<div class="form-group search-global search-global--empty">
+						<input class="form-control" placeholder="Поиск">
+
+						<button type="button" class="btn btn-default search-global__search-clear-button"
+								title="Очистить">
+							<i class="far fa-times"></i>
+						</button>
+					</div>
+				</form>				
+				
 
                 <button type="button" class="btn btn-default standards__add-button standards__sub-header-add-button"
                         title="Добавить позицию">
@@ -937,7 +945,7 @@
                             </table>
 
                             <div class="standards__table-additional-row-progress-indicator">
-                                <img src="images/spinner.png">
+                                <i class="fas fa-spinner fa-pulse fa-4x fa-fw"></i>
                             </div>
                         </div>
                     </td>
@@ -1274,6 +1282,19 @@
 <script type="text/javascript">
     $(document).ready(function () {
         initHatNavbar(document);
+		
+		const $search = $('.search-global');
+		const $searchInput = $search.find('.form-control');	
+
+		$search.find('.search-global__search-clear-button').on('click', () => {
+			$searchInput.val('');
+			$search.addClass('search-global--empty');			
+		});
+
+		$searchInput.on('input', event => {
+			const value = event.target.value;
+			$search.toggleClass('search-global--empty', value.length === 0);
+		});			
 
         const tableRows = $('.standards__table-row').toArray().map(rowElement => {
             return {
@@ -1615,7 +1636,7 @@
                             </table>
 
                             <div class="standards__table-additional-row-progress-indicator">
-                                <img src="images/spinner.png">
+                                <i class="fas fa-spinner fa-pulse fa-4x fa-fw"></i>
                             </div>
                         </div>
                     </td>
