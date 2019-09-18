@@ -60,7 +60,93 @@
                         <li><a href="#tab2" role="tab" data-toggle="tab">Депозит</a></li>
                     </ul>
                     <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="tab1">Остальные настройки должности...</div>
+                        <div role="tabpanel" class="tab-pane active" id="tab1">
+							<div class="form-group">...</div>
+							<h3 class="position__head">Основная нагрузка</h3>
+							<div class="form-group">
+								<label class="control-label" for="settingsform-type_load">Тип нагрузки</label>
+								<select id="settingsform-type_load" class="form-control" name="SettingsForm[type_load]">
+									<option value="orders_employee">Количество заказов, закрепленных за сотрудником</option>
+									<option value="orders_office">Количество заказов, произведенных в филиале</option>
+									<option value="payday">Оплата за смену</option>
+									<option value="payhour">Оплата за час</option>
+									<option value="proceeds_category">Сумма выручки филиала по одной категории товара</option>
+									<option value="proceeds_employee">Сумма выручки по товарам (заказам), закрепленным за конкретным сотрудником</option>
+									<option value="proceeds_office">Сумма выручки всего филиала</option>
+									<option value="proceeds_order_type">Сумма выручки филиала по типу заказа</option>
+									<option value="proceeds_product">Сумма выручки филиала по отдельным товарам</option>
+									<option value="products_employee">Количество товаров, закрепленных за сотрудником</option>		
+								</select>					
+							</div>
+							
+							<h3 class="position__head">Дополнительная нагрузка</h3>
+							<div class="form-group position__loads">
+							   <table class="table position__loads--table">
+									<thead>
+										<tr>
+											<th>Тип заказа</th>
+											<th>Доп. нагрузка, %</th>
+											<th class="cell-btns">
+												<button type="button" class="btn btn-xs btn-default jsAddNewItem" title="Добавить нагрузку">
+													<i class="fas fa-plus"></i>
+												</button>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td class="cell-types">
+												<select class="js-select2-types form-control" name="types_order[]">
+													<option value="-1"></option>
+													<option value="0">Зал</option>
+													<option value="1">Доставка</option>
+													<option value="2">Самовывоз</option>
+												</select>
+											</td>
+											<td class="cell-load">
+												<input type="text" class="form-control numbersOnly" name="loads[]" placeholder="Нагрузка, %" maxlength="10">
+											</td>
+											<td class="cell-btns">
+												<button type="button" class="btn btn-xs btn-danger jsRemoveItem" title="Удалить нагрузку">
+													<i class="fas fa-minus"></i>
+												</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+								<!-- template for row -->
+								<script id="rowTemplate" type="text/template">
+								<tr>
+									<td class="cell-types">
+										<select class="js-select2-types form-control" name="types_order[]">
+											<option value="-1"></option>
+											<option value="0">Зал</option>
+											<option value="1">Доставка</option>
+											<option value="2">Самовывоз</option>
+										</select>
+									</td>
+									<td class="cell-load">
+										<input type="text" class="form-control numbersOnly" name="loads[]" placeholder="Нагрузка, %" maxlength="10">
+									</td>
+									<td class="cell-btns">
+										<button type="button" class="btn btn-xs btn-danger jsRemoveItem" title="Удалить нагрузку">
+											<i class="fas fa-minus"></i>
+										</button>
+									</td>
+								</tr>
+								</script>
+								<!-- / template of Row -->
+							</div>
+							
+							<h3 class="position__head">Расчет ЗП</h3>
+							<div class="form-group field-settingsform-norm">
+								<label class="control-label" for="settingsform-norm">Норматив выработки</label>
+								<input type="text" id="settingsform-norm" class="form-control" name="SettingsForm[norm]">
+
+								<div class="help-block"></div>
+							</div>
+						</div>
+						
                         <div role="tabpanel" class="tab-pane" id="tab2">
                             <div class="position__form-row">
                                 <div class="form-group required">
@@ -173,6 +259,69 @@
 					block.show(300);
 				}
 			});
+			
+            $('.js-select2-types').select2({
+                tags: true,
+                placeholder: {
+                    id: '-1',
+                    text: 'Тип заказа'
+                },
+                allowClear: true,
+                width: '100%'
+            });				
+			
+			
+            var formLoads = (function() {
+                var me = {};
+                me.formLoads = $('.position__loads');
+                me.init = function() {
+                    // для добавления нового item на страницу
+                    me.formLoads.on('click', '.jsAddNewItem', me.addNewItem);
+                    // для удаления item
+                    me.formLoads.on('click', '.jsRemoveItem', me.removeItem);
+
+                    // Restrict input to digits by using a regular expression filter.
+                    $(".numbersOnly").inputFilter(me.numbersOnly);
+                }
+                me.numbersOnly = function(value) {
+                    return /^\d*[.,]?\d*$/.test(value);
+                }
+                me.addNewItem = function() {
+                    var table = $(this).closest('table'),
+                        rowTemplate = $('#rowTemplate'),
+                        tbody = table.find('> tbody'),
+                        tr = tbody.find('tr');
+
+                    if (!rowTemplate) return false;
+					
+                    rowTemplate = $(rowTemplate.html());
+
+                    var input = rowTemplate.find('.numbersOnly');
+					input.inputFilter(me.numbersOnly);	
+
+					var select2 = rowTemplate.find('.js-select2-types');
+					select2.select2({
+						tags: true,
+						placeholder: {
+							id: '-1',
+							text: 'Тип заказа'
+						},
+						allowClear: true,
+						width: '100%'
+					});
+					
+                    rowTemplate.appendTo(tbody);				
+                }
+                me.removeItem = function() {
+                    var tr = $(this).closest('tr');
+
+                    tr.remove();
+                }
+                return me;
+            }());
+
+            formLoads.init();
+			
 		});
 	</script>
 </body>
