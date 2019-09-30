@@ -308,7 +308,7 @@ function initSearchGlobal(element) {
     });
 }
 
-function initSearch(searchInputElement, items, valueExtractorFn) {
+function initSearch(searchInputElement, items, valueExtractorFn = item => $(item).text()) {
     $(searchInputElement).on('input', event => {
         const searchValue = event.target.value.toLowerCase();
 
