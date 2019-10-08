@@ -1,124 +1,155 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Создать тип документа</title>
-    
+    <title>Сотрудники</title>
+
     @@include('include/_css.html')
 
     @@include('include/_ie8.html')
 </head>
-
 <body>
-    @@include('include/top-nav.html')
+    <div class="hat-scaffold">
+        <div class="hat-scaffold__navbar">
+            @@include('include/hat-navbar.html')
+        </div>
 
-    <div class="container-fluid content">
-        <h1>
-            Создать тип документа
-        </h1>
-        <hr class="hr-margin hr-xs-100 hidden-xs">
+        <div class="hat-scaffold__body">
+            <div class="hat-scaffold__content-wrapper">
+                <div class="clearfix head-with-btn">
+                    <h1>Создать документ</h1>
+                </div>
+
+                <hr>
         
-        <form class="doctype-form" action="" method="post">
-        	<div class="row">
-                <div class="col-xs-12 form-group">
-					<label for="name">Название</label>
-					<input type="text" class="form-control" value="" name="name" id="name">
-				</div>
-                <div class="col-sm-6 col-xs-12 form-group">
-					<label for="post">Должности</label>
-					<select class="form-control js-select-multiple js-select-post" name="post[]" id="post" multiple="multiple" tabindex="-1" aria-hidden="true">
-						<option></option>
-						<option value="1">Администратор филиал</option>
-						<option value="2">Директор IT</option>
-						<option value="3">Водитель</option>
-					</select>
-				</div>
-                <div class="col-sm-6 col-xs-12 form-group">
-					<label for="nationality">Гражданство</label>
-					<select class="form-control js-select-multiple js-select-nationality" name="nationality[]" id="nationality" multiple="multiple" tabindex="-1" aria-hidden="true">
-						<option value="1">Россия</option>
-						<option value="2">Украина</option>
-						<option value="3">Белоруссия</option>
-					</select>
-				</div>
-                <div class="col-xs-12 form-group form-group-chbxs">
-					<div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="required-doc"> Обязательный документ
-                        </label>
-                    </div>
-				</div>
-			</div>
+				<form class="doctype-form" action="" method="post">
+					<div class="row">
+						<div class="col-xs-12 form-group">
+							<label for="name">Название</label>
+							<input type="text" class="form-control" value="" name="name" id="name">
+						</div>
+						<div class="col-sm-6 col-xs-12 form-group">
+							<label for="post">Тип документа</label>
+							<select class="form-control js-select-multiple js-select-type" name="" id="" tabindex="-1" aria-hidden="true">
+								<option></option>
+								<option value="1">Специальные</option>
+								<option value="2">Обязательные для всех</option>
+							</select>
+						</div>
+						<div class="col-sm-6 col-xs-12 form-group">
+							<label for="post">Правовой статус</label>
+							<select class="form-control js-select-multiple js-select-status" name="statuses[]" id="" multiple="multiple" tabindex="-1" aria-hidden="true">
+								<option></option>
+								<option value="1">Резидент РФ</option>
+								<option value="2">Беженцы</option>
+								<option value="3">Граждане ЕС</option>
+							</select>
+						</div>		
+						<div class="col-sm-6 col-xs-12 form-group">
+							<label for="nationality">Гражданство</label>
+							<select class="form-control js-select-multiple js-select-nationality" name="nationality[]" id="nationality" multiple="multiple" tabindex="-1" aria-hidden="true">
+								<option value="1">Россия</option>
+								<option value="2">Украина</option>
+								<option value="3">Белоруссия</option>
+							</select>
+						</div>						
+						<div class="col-sm-6 col-xs-12 form-group">
+							<label for="post">Должности</label>
+							<select class="form-control js-select-multiple js-select-post" name="post[]" id="post" multiple="multiple" tabindex="-1" aria-hidden="true">
+								<option></option>
+								<option value="1">Администратор филиал</option>
+								<option value="2">Директор IT</option>
+								<option value="3">Водитель</option>
+							</select>
+						</div>
+						
+						<div class="col-sm-6 col-xs-12 form-group form-group-chbxs">
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" id="required-date"> Документ имеет срок годности
+								</label>
+							</div>
+						</div>						
 
-	        <div class="table-doctype-block">
-	            <div class="table-responsive">
-                    <table class="table table-hover table-doctype">
-                        <thead>
-                            <tr>
-                                <th class="cell-head">
-                                    <div class="cell-head_name">Ответственный</div>
-                                </th>
-                                <th class="cell-head">
-                                    <div class="cell-head_name">Филиал</div>
-                                </th>
-                                <th class="cell-head">
-                                    <div class="cell-head_name">Типы нотификаций</div>
-                                </th>
-                                <th class="cell-head-btns">
-                                    <button type="button" class="btn btn-xs btn-default btn-add-row jsAddNewItem" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td data-label="Ответственный" class="cell-info">
-			                        <select class="form-control" name="responsible_1">
-			                            <option value="admin_butovo">admin_butovo</option>
-			                            <option value="admin_yuzhnaya">admin_yuzhnaya</option>
-			                        </select>
-                                </td>
-                                <td data-label="Филиал" class="cell-info">
-	                                <select class="form-control js-select-branch" name="branch[]" multiple="" tabindex="-1" aria-hidden="true">
-				                        <option value="1">Щербинка</option>
-				                        <option value="2">Бутово</option>
-				                        <option value="3">Ясенево</option>
-				                        <option value="4">Коммунарка</option>
-				                        <option value="5">Подольск</option>
-				                        <option value="6">Московский</option>
-				                    </select>
-                                </td>
-                                <td data-label="Типы нотификаций" class="cell-info">
-                                	<div class="form-group form-group-chbxs">
-										<div class="checkbox">
-					                        <label>
-					                            <input type="checkbox"> Email
-					                        </label>
-					                    </div>
-										<div class="checkbox">
-					                        <label>
-					                            <input type="checkbox"> SMS
-					                        </label>
-					                    </div>
-				                	</div>
-                                </td>
-                                <td class="cell-btn">
-                                	<button type="button" class="btn btn-xs btn-danger btn-remove-row jsRemoveItem" title="Удалить"><i class="fa fa-minus" aria-hidden="true"></i></button>
-                                    <button type="button" class="btn btn-xs btn-default btn-add-row jsAddNewItem" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-	            </div>
-	        </div>
-			<div class="form-group form-btns">
-				<a href="#" class="btn btn-default" type="button">Вернуться</a>
-				<a href="#" class="btn btn-primary" type="button">Сохранить</a>
+						<div class="col-sm-6 col-xs-12 form-group form-group-chbxs">
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" id="required-doc"> Обязательный документ
+								</label>
+							</div>
+						</div>
+					</div>
+
+					<div class="table-doctype-block">
+						<div class="table-responsive">
+							<table class="table table-hover table-doctype">
+								<thead>
+									<tr>
+										<th class="cell-head">
+											<div class="cell-head_name">Ответственный</div>
+										</th>
+										<th class="cell-head">
+											<div class="cell-head_name">Филиал</div>
+										</th>
+										<th class="cell-head">
+											<div class="cell-head_name">Типы нотификаций</div>
+										</th>
+										<th class="cell-head-btns">
+											<button type="button" class="btn btn-xs btn-default btn-add-row jsAddNewItem" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td data-label="Ответственный" class="cell-info">
+											<select class="form-control" name="responsible_1">
+												<option value="admin_butovo">admin_butovo</option>
+												<option value="admin_yuzhnaya">admin_yuzhnaya</option>
+											</select>
+										</td>
+										<td data-label="Филиал" class="cell-info">
+											<select class="form-control js-select-branch" name="branch[]" multiple="" tabindex="-1" aria-hidden="true">
+												<option value="1">Щербинка</option>
+												<option value="2">Бутово</option>
+												<option value="3">Ясенево</option>
+												<option value="4">Коммунарка</option>
+												<option value="5">Подольск</option>
+												<option value="6">Московский</option>
+											</select>
+										</td>
+										<td data-label="Типы нотификаций" class="cell-info">
+											<div class="form-group form-group-chbxs">
+												<div class="checkbox">
+													<label>
+														<input type="checkbox"> Email
+													</label>
+												</div>
+												<div class="checkbox">
+													<label>
+														<input type="checkbox"> SMS
+													</label>
+												</div>
+											</div>
+										</td>
+										<td class="cell-btn">
+											<button type="button" class="btn btn-xs btn-danger btn-remove-row jsRemoveItem" title="Удалить"><i class="fa fa-minus" aria-hidden="true"></i></button>
+											<button type="button" class="btn btn-xs btn-default btn-add-row jsAddNewItem" title="Добавить"><i class="fa fa-plus" aria-hidden="true"></i></button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="form-group form-btns">
+						<a href="#" class="btn btn-default" type="button">Вернуться</a>
+						<a href="#" class="btn btn-primary" type="button">Сохранить</a>
+					</div>
+				</form>
 			</div>
-        </form>
-    </div>
+		</div>
+	</div>
     <script id="rowTemplate" type="text/template">
         <tr class="added-row" style="display:none;">
             <td data-label="Ответственный" class="cell-info">
@@ -167,6 +198,17 @@
             $('.js-select-multiple').select2({
                 width: '100%'
             });
+			
+            $('.js-select-type').select2({
+                width: '100%',
+                placeholder: 'Выберите тип документа',
+				allowClear: true
+            });	
+
+            $('.js-select-status').select2({
+                width: '100%',
+                placeholder: 'Выберите правовой статус'
+            });				
 
             $('.js-select-post').select2({
                 width: '100%',
