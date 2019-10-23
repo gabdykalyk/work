@@ -200,9 +200,11 @@ class HatNavbar {
         if (isCollapsed) {
             $toggleIcon.addClass('fa-chevron-right');
             $toggleIcon.removeClass('fa-chevron-left');
+			$('body').addClass('is-hat-navbar--collapsed');
         } else {
             $toggleIcon.addClass('fa-chevron-left');
             $toggleIcon.removeClass('fa-chevron-right');
+			$('body').removeClass('is-hat-navbar--collapsed');
         }
     }
 

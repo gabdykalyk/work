@@ -422,7 +422,7 @@
                                             <option value="3">Есть замечания</option>
                                         </select>
                                     </div>
-                                    <div class="clearfix visible-sm"></div>
+                                    <div class="clearfix hidden-lg"></div>
                                     <div class="form-group col-lg-3 col-sm-4">
                                         <label for="nationality">Гражданство</label>
                                         <select class="form-control js-select-multiple" name="nationality[]" id="nationality"
@@ -450,6 +450,7 @@
                                         <label for="full-name">ФИО или телефон</label>
                                         <input type="text" class="form-control" value="" name="full-name" id="full-name">
                                     </div>
+									<div class="clearfix hidden-lg"></div>
                                     <div class="form-group col-lg-2 col-sm-4">
                                         <label for="branches">Филиал</label>
                                         <select class="form-control js-select-multiple" name="branches[]" id="branches"
@@ -478,6 +479,7 @@
                                             <option value="3">6</option>
                                         </select>
                                     </div>
+									<div class="clearfix hidden-lg"></div>
                                     <div class="form-group col-lg-2 col-sm-4">
                                         <label for="work-schedule">Рабочий график</label>
                                         <select class="form-control js-select-multiple" name="work-schedule[]" id="work-schedule"
@@ -488,6 +490,7 @@
                                             <option value="4">2/2</option>
                                         </select>
                                     </div>
+									<div class="clearfix visible-lg"></div>
                                     <div class="form-group col-lg-2 col-sm-3">
                                         <label for="deposits">Депозит</label>
                                         <select class="form-control js-select-multiple" name="deposits[]" id="deposits"
@@ -525,6 +528,7 @@
                                             <option value="3">Испанский</option>
                                         </select>
                                     </div>
+									<div class="clearfix hidden-lg"></div>
                                     <div class="form-group col-lg-4 col-sm-6">
                                         <label for="programs">Владение программами</label>
                                         <select class="form-control js-select-multiple" name="programs[]" id="programs"
@@ -542,6 +546,7 @@
                                             <option value="3">Водитель</option>
                                         </select>
                                     </div>
+									<div class="clearfix hidden-lg"></div>
                                     <div class="form-group col-lg-4 col-sm-6">
                                         <label for="posts">Должности за время работы компании</label>
                                         <select class="form-control js-select-multiple" name="posts[]" id="posts" multiple="multiple">
@@ -551,9 +556,9 @@
                                         </select>
                                     </div>
                                     <div class="col-lg-4 col-sm-6 form-btns">
+                                        <button class="btn btn-link" type="button" data-show-more value="1">Меньше фильтров <i class="fa fa-caret-up"
+                                                aria-hidden="true"></i></button>									
                                         <button type="submit" class="btn btn-primary">Применить</button>
-                                        <button class="btn btn-link" type="button">Меньше фильтров <i class="fa fa-caret-up"
-                                                aria-hidden="true"></i></button>
                                     </div>
                                 </div>
                             </form>
@@ -958,6 +963,27 @@
     <script src="js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
 
     <script type="text/javascript">
+    function fixedFilters() {
+        const PADDING_TOP_DEFAULT = 29;
+        var btn = $('#btn-filter-empllist');
+        var is_fixed = btn.attr('class').indexOf('is-fixed');
+        var body = $('body');
+        var block_fix = $('#filter-fixed-empllist');
+        var padding_top = PADDING_TOP_DEFAULT;
+
+        if (is_fixed == -1) {
+            block_fix.removeClass('filter-fixed-empllist');
+        } else {
+            block_fix.addClass('filter-fixed-empllist');
+            padding_top = PADDING_TOP_DEFAULT + block_fix.height();
+        }
+        //body.css('padding-top', padding_top + 'px');            
+    }
+	
+	$(window).on('load resize', function () {
+		fixedFilters();
+	});
+	
         $(function () {
             initHatNavbar(document);
 
@@ -977,6 +1003,40 @@
             // $('#btn-filter-empllist').click(function() {
             //     fixedFiltersEmpllist(true);
             // });
+			
+        $(document).on('click', '#btn-filter-empllist', function (event) {
+
+            var is_change = true;
+            const PADDING_TOP_DEFAULT = 29;
+
+            var btn = $('#btn-filter-empllist');
+            var is_fixed = btn.attr('class').indexOf('is-fixed');
+
+            var body = $('body');
+            var block_fix = $('#filter-fixed-empllist');
+            var padding_top = PADDING_TOP_DEFAULT;
+
+            if (is_change) {
+                if (is_fixed == -1) {
+                    //document.cookie = cookiePrefix+"fixed=1";
+
+                    btn.addClass('is-fixed');
+                    block_fix.addClass('filter-fixed-empllist');
+                    padding_top = PADDING_TOP_DEFAULT + block_fix.height();
+                } else {
+                    //document.cookie = cookiePrefix+"fixed=0";
+
+                    btn.removeClass('is-fixed');
+                    block_fix.removeClass('filter-fixed-empllist');
+                }
+                body.css('padding-top', padding_top + 'px');
+            } else {
+                if (is_fixed > -1) {
+                    padding_top = PADDING_TOP_DEFAULT + block_fix.height();
+                    body.css('padding-top', padding_top + 'px');
+                }
+            }
+        });		
 
             let def_chart = {
                     type: 'pie',
