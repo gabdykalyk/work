@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Юридические лица</title>
+
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    <div class="hat-scaffold">
+        <div class="hat-scaffold__navbar">
+            @@include('include/hat-navbar.html')
+        </div>
+
+        <div class="hat-scaffold__body">
+            <div class="hat-scaffold__content-wrapper">
+                <div class="legal-entities__content" data-bind="childrenComplete: onInit">
+                    <div class="hat-scaffold__head">
+                        <h1>Юридические лица</h1>
+                    </div>
+
+                    <div class="legal-entities__sub-header">
+                        <div class="form-group legal-entities__search search-global search-global--empty">
+                            <input class="form-control" placeholder="Поиск по названию" data-bind="textInput: searchValue">
+
+                            <button type="button" class="btn btn-default search-global__search-clear-button"
+                                    title="Удалить">
+                                <i class="far fa-times"></i>
+                            </button>
+                        </div>
+
+                        <button class="btn btn-success btn-p25 legal-entities__add-button">
+                            Добавить юр. лицо
+                        </button>
+                    </div>
+
+                    <div class="legal-entities__page-size-selector">
+                        Показать на странице:
+                        <a class="legal-entities__page-size-selector-item legal-entities__page-size-selector-item--active" href="#">20</a>
+                        <a class="legal-entities__page-size-selector-item" href="#">40</a>
+                        <a class="legal-entities__page-size-selector-item" href="#">60</a>
+                        <a class="legal-entities__page-size-selector-item" href="#">Все</a>
+                    </div>
+
+                    <div class="legal-entities__table">
+                        <div class="legal-entities__table-head">
+                            <div class="legal-entities__table-head-row">
+                                <div class="legal-entities__table-head-cell legal-entities__table-name-head-cell">
+                                    Наименование юр. лица
+                                </div>
+
+                                <div class="legal-entities__table-head-cell legal-entities__table-actions-head-cell"></div>
+                            </div>
+                        </div>
+
+                        <div class="legal-entities__table-body">
+                            <!-- ko foreach: { data: legalEntities, beforeRemove: tableRowBeforeRemove } -->
+                                <!-- ko if: $root.isVisible($data.id) -->
+                                    <div class="legal-entities__table-row">
+                                        <div class="legal-entities__table-cell legal-entities__table-name-cell">
+                                            <span class="legal-entities__table-name" data-bind="text: name"></span>
+                                        </div>
+
+                                        <div class="legal-entities__table-cell legal-entities__table-actions-cell">
+                                            <a type="button" class="btn btn-default btn-w-30 legal-entities__table-row-edit-button"
+                                                    title="Редактировать" href="#">
+                                                <i class="far fa-pencil"></i>
+                                            </a>
+
+                                            <button type="button" class="btn btn-default btn-w-30 legal-entities__table-row-remove-button"
+                                                    title="Удалить" data-bind="click: function() { $root.remove($data.id); }">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                <!-- /ko -->
+                            <!-- /ko -->
+                        </div>
+                    </div>
+
+                    <div class="legal-entities__pagination-wrapper">
+                        @@include('include/pagination.html')
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @@include('include/_js.html')
+
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            initHatNavbar(document);
+
+            const ViewModel = function(legalEntities) {
+                this.legalEntities = ko.observableArray(legalEntities);
+                this.searchValue = ko.observable('');
+
+                this.getLegalEntity = function(id) {
+                    return this.legalEntities().find(l => l.id === id);
+                };
+
+                this.isVisible = function(id) {
+                    const searchValue = this.searchValue().toLowerCase();
+                    return searchValue === '' || this.getLegalEntity(id).name.toLowerCase().includes(searchValue);
+                };
+
+                this.remove = function(id) {
+                    this.legalEntities.remove(this.getLegalEntity(id));
+                };
+
+                this.tableRowBeforeRemove = function(element) {
+                    $(element).hide(200, () => $(element).remove());
+                };
+            };
+
+            const viewModel = new ViewModel(
+                [
+                    {id: 0, name: 'ИП Антонов А. М.'},
+                    {id: 1, name: 'ИП Белорецкая E. Д.'},
+                    {id: 2, name: 'ООО «Верзауберг»'},
+                    {id: 3, name: 'ООО «Морская история»'},
+                    {id: 4, name: 'ООО «Морской каприз»'},
+                    {id: 5, name: 'ООО «ПЭТ Тара»'},
+                    {id: 6, name: 'ООО «Солонь»'},
+                    {id: 7, name: 'ООО «Фабрика-Смирнов»'},
+                    {id: 8, name: 'ООО «Экария»'},
+                    {id: 9, name: 'ООО «Эллада»'}
+                ]
+            );
+
+            const $content = $('.legal-entities__content');
+
+            viewModel.onInit = function() {
+                initSearchGlobal($content.find('.legal-entities__search').get()[0]);
+            };
+
+            ko.applyBindings(
+                viewModel,
+                $content.get()[0]
+            );
+        });
+    </script>
+</body>
+</html>

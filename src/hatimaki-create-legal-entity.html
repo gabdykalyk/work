@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Юридические лица</title>
+
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    <div class="hat-scaffold">
+        <div class="hat-scaffold__navbar">
+            @@include('include/hat-navbar.html')
+        </div>
+
+        <div class="hat-scaffold__body">
+            <div class="hat-scaffold__content-wrapper">
+                <div class="create-legal-entity__content" data-bind="childrenComplete: onInit">
+                    <div class="hat-scaffold__head">
+                        <h1>Создание юр. лица</h1>
+
+                        <div class="spacer"></div>
+
+                        <button class="btn btn-default btn-p25">
+                            К списку юр. лиц
+                        </button>
+                    </div>
+
+
+                    <div class="create-legal-entity__tab-group">
+                        <ul class="nav nav-tabs" role="tablist" data-bind="element: navElement">
+                            <li role="presentation" class="active">
+                                <a href="#contacts" aria-controls="contacts" role="tab" data-toggle="tab">
+                                    1. Контакты и реквизиты
+                                </a>
+                            </li>
+                            <li role="presentation" data-bind="css: { 'disabled': !contactsFormModel.isValid() }">
+                                <a href="#bills" aria-controls="bills" role="tab"
+                                   data-bind="attr: { 'data-toggle': contactsFormModel.isValid() ? 'tab' : undefined }">
+                                    2. Счета
+                                </a>
+                            </li>
+                            <li role="presentation" data-bind="css: { 'disabled': !(contactsFormModel.isValid() && billsFormModel.isValid()) }">
+                                <a href="#persons-in-charge" aria-controls="persons-in-charge" role="tab"
+                                    data-bind="attr: { 'data-toggle': contactsFormModel.isValid() && billsFormModel.isValid() ? 'tab' : undefined }">
+                                    3. Ответственные лица
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane fade in active" id="contacts"
+                                 data-bind="using: contactsFormModel()">
+                                <div class="row create-legal-entity__row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <div class="btn-group " role="group">
+                                                <button type="button" class="btn btn-default"
+                                                    data-bind="click: function () { $root.type(0); }, css: { 'active': $root.type() === 0 }">
+                                                    ИП
+                                                </button>
+                                                <button type="button" class="btn btn-default"
+                                                    data-bind="click: function () { $root.type(1); }, css: { 'active': $root.type() === 1 }">
+                                                    ООО
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- ko if: $root.type() === 0 -->
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label for="shortName">Краткое наименование</label>
+                                                <div class="input-group create-legal-entity__name-input-group create-legal-entity__individual-name-input-group">
+                                                    <div class="input-group-addon">ИП</div>
+                                                    <input class="form-control" id="shortName" data-bind="value: shortName">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label for="fullName">Полное наименование</label>
+                                                <div class="input-group create-legal-entity__name-input-group create-legal-entity__individual-name-input-group">
+                                                    <div class="input-group-addon">ИП</div>
+                                                    <input class="form-control" id="fullName" data-bind="value: fullName">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label for="placeOfRegistration">Место регистрации</label>
+                                                <input class="form-control" id="placeOfRegistration" data-bind="value: placeOfRegistration">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="phone">Телефон</label>
+                                                <input class="form-control" id="phone" data-bind="value: phone, mask, maskPattern: '8 (999) 9999-99-99'">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="fax">Факс</label>
+                                                <input class="form-control" id="fax" data-bind="value: fax">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="email">Email</label>
+                                                <input class="form-control" id="email" data-bind="value: email">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="individualInn">ИНН физ. лица</label>
+                                                <input class="form-control" id="individualInn" data-bind="value: individualInn, mask, maskPattern: '9', maskRepeat: '*'">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-5">
+                                            <div class="form-group">
+                                                <label for="ogrnip">ОГРНИП</label>
+                                                <input class="form-control" id="ogrnip" data-bind="value: ogrnip, mask, maskPattern: '9', maskRepeat: '*'">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="birthday">Дата рождения</label>
+                                                <div class="input-group create-legal-entity__datepicker datepicker" data-bind="datetimepicker">
+                                                    <input type="text" class="form-control periodDateInput" id="birthday" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10"
+                                                        data-bind="value: birthday">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-8">
+                                            <div class="form-group">
+                                                <label for="placeOfBirth">Место рождения</label>
+                                                <input class="form-control" id="placeOfBirth" data-bind="value: placeOfBirth">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="passport">Паспорт</label>
+                                                <input class="form-control" id="passport" data-bind="value: passport, mask, maskPattern: '9999 999999'">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="passportIssuedAt">Дата выдачи паспорта</label>
+                                                <div class="input-group create-legal-entity__datepicker datepicker" data-bind="datetimepicker">
+                                                    <input type="text" class="form-control periodDateInput" id="passportIssuedAt" value="01.01.2002" name="fromdate" placeholder="00.00.0000" maxlength="10"
+                                                        data-bind="value: passportIssuedAt">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-8">
+                                            <div class="form-group">
+                                                <label for="passportIssuedByName">Орган, выдавший паспорт</label>
+                                                <input class="form-control" id="passportIssuedByName" data-bind="value: passportIssuedByName">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="passportIssuedByCode">Код подразделения</label>
+                                                <input class="form-control" id="passportIssuedByCode" data-bind="value: passportIssuedByCode">
+                                            </div>
+                                        </div>
+                                    <!-- /ko -->
+
+                                    <!-- ko if: $root.type() === 1 -->
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label for="shortName">Краткое наименование организации</label>
+                                                <div class="input-group create-legal-entity__name-input-group create-legal-entity__ltd-name-input-group">
+                                                    <div class="input-group-addon">ООО</div>
+                                                    <input class="form-control" id="shortName" data-bind="value: shortName">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label for="fullName">Полное наименование организации</label>
+                                                <div class="input-group create-legal-entity__name-input-group create-legal-entity__ltd-name-input-group">
+                                                    <div class="input-group-addon">ООО</div>
+                                                    <input class="form-control" id="fullName" data-bind="value: fullName">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label for="legalAddress">Юридический адрес</label>
+                                                <input class="form-control" id="legalAddress" data-bind="value: legalAddress">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <label for="mailingAddress">Почтовый адрес</label>
+                                                <input class="form-control" id="mailingAddress" data-bind="value: mailingAddress">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="phone">Телефон</label>
+                                                <input class="form-control" id="phone" data-bind="value: phone">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="fax">Факс</label>
+                                                <input class="form-control" id="fax" data-bind="value: fax">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="email">Email</label>
+                                                <input class="form-control" id="email" data-bind="value: email">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="ltdInn">ИНН юр. лица</label>
+                                                <input class="form-control" id="ltdInn" data-bind="value: ltdInn, mask, maskPattern: '9', maskRepeat: '*'">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="kpp">КПП</label>
+                                                <input class="form-control" id="kpp" data-bind="value: kpp, mask, maskPattern: '9', maskRepeat: '*'">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-xs-4">
+                                            <div class="form-group">
+                                                <label for="ogrn">ОГРН</label>
+                                                <input class="form-control" id="ogrn" data-bind="value: ogrn, mask, maskPattern: '9', maskRepeat: '*'">
+                                            </div>
+                                        </div>
+                                    <!-- /ko -->
+
+                                    <div class="col-xs-12">
+                                        <div class="create-legal-entity__actions">
+                                            <button class="btn btn-success btn-p25" data-bind="click: function () { $root.openTab('bills'); }, attr: { disabled: !$root.contactsFormModel.isValid() }">
+                                                Сохранить и перейти далее
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade" id="bills" data-bind="using: billsFormModel()">
+                                <div class="row create-legal-entity__row">
+                                    <div class="col-xs-5">
+                                        <div class="form-group">
+                                            <label for="paymentAccount">Р/с</label>
+                                            <input class="form-control" id="paymentAccount" data-bind="value: paymentAccount, mask, maskPattern: '9', maskRepeat: '*'">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-7">
+                                        <div class="form-group">
+                                            <label for="bank">Банк</label>
+                                            <input class="form-control" id="bank" data-bind="value: bank">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-5">
+                                        <div class="form-group">
+                                            <label for="correspondentAccount">К/с</label>
+                                            <input class="form-control" id="correspondentAccount" data-bind="value: correspondentAccount, mask, maskPattern: '9', maskRepeat: '*'">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-3">
+                                        <div class="form-group">
+                                            <label for="bic">БИК</label>
+                                            <input class="form-control" id="bic" data-bind="value: bic, mask, maskPattern: '9', maskRepeat: '*'">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-12">
+                                        <div class="create-legal-entity__actions">
+                                            <button class="btn btn-default btn-p25" data-bind="click: function () { $root.openTab('contacts'); }">
+                                                Назад
+                                            </button>
+
+                                            <button class="btn btn-success btn-p25" data-bind="click: function () { $root.openTab('persons-in-charge'); }, attr: { disabled: !$root.billsFormModel.isValid() }">
+                                                Сохранить и перейти далее
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane fade" id="persons-in-charge"
+                                data-bind="using: personsInChargeFormModel()">
+                                <div class="row create-legal-entity__row">
+                                    <div class="col-xs-6 col-md-5">
+                                        <div class="form-group">
+                                            <label for="authorizedPersonPosition">Должность уполномоченного лица</label>
+                                            <input class="form-control" id="authorizedPersonPosition" data-bind="value: authorizedPersonPosition">
+                                        </div>
+                                    </div>
+
+                                    <div class="clearfix"></div>
+
+                                    <div class="col-xs-6 col-md-5">
+                                        <div class="form-group">
+                                            <label for="nominativeName">ФИО в именительном падеже</label>
+                                            <input class="form-control" id="nominativeName" data-bind="value: nominativeName">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6 col-md-7">
+                                        <div class="form-group">
+                                            <label for="genitiveName">ФИО в родительном падеже</label>
+                                            <input class="form-control" id="genitiveName" data-bind="value: genitiveName">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-12">
+                                        <div class="form-group">
+                                            <label for="signatoryAuthority">Основание полномочий подписанта</label>
+                                            <input class="form-control" id="signatoryAuthority" data-bind="value: signatoryAuthority">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-12">
+                                        <div class="create-legal-entity__actions">
+                                            <button class="btn btn-default btn-p25" data-bind="click: function () { $root.openTab('bills'); }">
+                                                Назад
+                                            </button>
+
+                                            <button class="btn btn-success btn-p25" data-bind="attr: { disabled: !$root.personsInChargeFormModel.isValid() }">
+                                                Сохранить и завершить
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @@include('include/_js.html')
+
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
+
+    <!-- Phone Mask, https://github.com/RobinHerbots/Inputmask -->
+    <script type="text/javascript" src="js/jquery.inputmask.bundle.js"></script>
+    <script type="text/javascript" src="js/inputmask.date.extensions.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            initHatNavbar(document);
+
+            ko.validation.init({ insertMessages: false });
+
+            ko.bindingHandlers.datetimepicker = {
+                init: function(element) {
+                    $(element).datetimepicker({
+                        language: 'ru',
+                        pickTime: false
+                    });
+
+                    $(element).on('dp.change', function () {
+                        $(element).find('input').trigger('change');
+                    });
+                }
+            };
+
+            ko.bindingHandlers.mask = {
+                init: function(element, valueAccessor, allBindings) {
+                    const pattern = allBindings()['maskPattern'];
+                    const repeat = allBindings()['maskRepeat'];
+
+                    $(element).inputmask(pattern, {
+                        clearMaskOnLostFocus: false,
+                        repeat
+                    });
+                }
+            };
+
+            ko.bindingHandlers.element = {
+                init: function(element, valueAccessor) {
+                    valueAccessor()(element);
+                }
+            };
+
+            const ViewModel = function() {
+                this.navElement = ko.observable();
+
+                this.type = ko.observable(0);
+
+                this.contactsFormModel = ko.validatedObservable({
+                    shortName: ko.observable('').extend({required: true}),
+                    fullName: ko.observable(''),
+                    placeOfRegistration: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0
+                            }
+                        }
+                    }),
+                    phone: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    fax: ko.observable(''),
+                    email: ko.observable('').extend({email: true}),
+                    individualInn: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    ogrnip: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    birthday: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    placeOfBirth: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    passport: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    passportIssuedAt: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    passportIssuedByName: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    passportIssuedByCode: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 0;
+                            }
+                        }
+                    }),
+                    legalAddress: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 1
+                            }
+                        }
+                    }),
+                    mailingAddress: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 1
+                            }
+                        }
+                    }),
+                    ltdInn: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 1
+                            }
+                        }
+                    }),
+                    kpp: ko.observable('').extend({
+                        required: {
+                            onlyIf: () => {
+                                return this.type() === 1
+                            }
+                        }
+                    }),
+                    ogrn: ko.observable('').extend({
+                        required:{
+                            onlyIf: () => {
+                                return this.type() === 1
+                            }
+                        }
+                    })
+                });
+
+                this.billsFormModel = ko.validatedObservable({
+                    paymentAccount: ko.observable('').extend({required: true}),
+                    bank: ko.observable('').extend({required: true}),
+                    correspondentAccount: ko.observable('').extend({required: true}),
+                    bic: ko.observable('').extend({required: true})
+                });
+
+                this.personsInChargeFormModel = ko.validatedObservable({
+                    authorizedPersonPosition: ko.observable('').extend({required: true}),
+                    nominativeName: ko.observable('').extend({required: true}),
+                    genitiveName: ko.observable('').extend({required: true}),
+                    signatoryAuthority: ko.observable('').extend({required: true})
+                });
+
+                this.openTab = function (name) {
+                    $(this.navElement).find('a[href="#' + name + '"]').tab('show');
+                }
+            };
+
+            const viewModel = new ViewModel();
+
+            const $content = $('.create-legal-entity__content');
+
+            viewModel.onInit = function() {};
+
+            ko.applyBindings(
+                viewModel,
+                $content.get()[0]
+            );
+        });
+    </script>
+</body>
+</html>
