@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Договоры</title>
+
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    <div class="hat-scaffold">
+        <div class="hat-scaffold__navbar">
+            @@include('include/hat-navbar.html')
+        </div>
+
+        <div class="hat-scaffold__body">
+            <div class="hat-scaffold__content-wrapper">
+                <div class="contract-list__content" data-bind="childrenComplete: onInit">
+                    <div class="hat-scaffold__head contract-list__head">
+                        <h1>Договоры</h1>
+
+                        <div class="spacer"></div>
+
+                        <button class="btn btn-success btn-p25">Новый договор</button>
+                    </div>
+
+                    <form action="" method="post" class="contract-list__filters">
+                        <div class="row">
+                            <div class="form-group col-md-4 col-xs-6">
+                                <label for="branches">Филиал</label>
+                                <select class="form-control js-select-multiple" name="branches[]" id="branches"
+                                        multiple="multiple">
+                                    <option value="1">Щербинка</option>
+                                    <option value="2">Бутово</option>
+                                    <option value="3">Ясенево</option>
+                                    <option value="4">Коммунарка</option>
+                                    <option value="5">Подольск</option>
+                                    <option value="6">Московский</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-4 col-xs-6">
+                                <label for="legalEntities">Юр. лицо</label>
+                                <select class="form-control js-select-multiple" name="legalEntities[]" id="legalEntities"
+                                        multiple="multiple">
+                                    <option value="1">ИП Дмитриева А. А.</option>
+                                    <option value="2">ИП Агафонов В. В.</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-4 col-xs-6">
+                                <label for="categories">Категория</label>
+                                <select class="form-control js-select-multiple" name="categories[]" id="categories"
+                                        multiple="multiple">
+                                    <option value="1">Коммерческая тайна</option>
+                                    <option value="2">Трудовой договор</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-md-4 col-xs-6">
+                                <label for="searchTerm">Поиск</label>
+                                <input type="text" class="form-control" name="searchTerm" id="searchTerm">
+                            </div>
+
+                            <div class="form-group col-md-4 col-xs-6 contract-list__filter--dense-hidden">
+                                <label for="post">Должность</label>
+                                <select class="form-control js-select-multiple" name="post[]" id="post" multiple="multiple">
+                                    <option value="1">Администратор филиал</option>
+                                    <option value="2">Директор IT</option>
+                                    <option value="3">Водитель</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group contract-list__form-group-checkboxes col-md-4 col-xs-6 contract-list__filter--dense-hidden">
+                                <div class="checkbox-nice">
+                                    <label>
+                                        <input type="checkbox" name="">
+                                        <span class="fa fa-check"></span>
+                                        Показать удалённые
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="contract-list__filters-actions col-md-8 col-xs-12">
+                                <div class="contract-list__filters-actions-content">
+                                    <button class="btn btn-link contract-list__filters-expand-button" type="button">
+                                        Меньше фильтров <i class="fa fa-chevron-up" aria-hidden="true"></i>
+                                    </button>
+
+                                    <button class="btn btn-default btn-p25 contract-list__filters-clear-button" type="button">
+                                        Очистить
+                                    </button>
+
+                                    <button class="btn btn-primary btn-p25 contract-list__filters-apply-button" type="button">
+                                        Применить
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="contract-list__table">
+                        <div class="contract-list__table-head">
+                            <div class="contract-list__table-head-row">
+                                <div class="contract-list__table-head-cell contract-list__table-name-head-cell">
+                                    Название
+                                </div>
+
+                                <div class="contract-list__table-head-cell contract-list__table-branches-head-cell">
+                                    Филиалы
+                                </div>
+
+                                <div class="contract-list__table-head-cell contract-list__table-positions-head-cell">
+                                    Должности
+                                </div>
+
+                                <div class="contract-list__table-head-cell contract-list__table-actions-head-cell">
+                                    <button class="btn btn-default btn-p25 contract-list__table-add-category-button" type="button"
+                                        data-bind="click: openCreateCategoryModal">
+                                        Добавить категорию
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul class="contract-list__table-body" data-bind="contractsSortable: true, contractsSortableCategorySort: categorySort, contractsSortableContractSort: contractSort">
+                            <!-- ko foreach: { data: categories, beforeRemove: tableRowBeforeRemove } -->
+                                <li
+                                    class="contract-list__table-row contract-list__table-category-row"
+                                    data-bind="
+                                        css: {
+                                            'contract-list__table-category-row--empty': !$root.hasContracts($data.id),
+                                            'contract-list__table-category-row--last': $index() === $root.categories().length - 1 && $root.getContracts(null).length > 0
+                                        },
+                                        attr: {
+                                            'data-contracts-category-id': id
+                                        }
+                                    "
+                                >
+                                    <div class="contract-list__table-row-header">
+                                        <div class="contract-list__table-cell contract-list__table-name-cell">
+                                            <div class="contract-list__table-category-row-toggle" data-bind="click: function() { $root.toggleCategory($data.id); }">
+                                                <!-- ko if: $root.hasContracts($data.id) -->
+                                                    <!-- ko if: $root.isCategoryOpen($data.id) -->
+                                                        <i class="fa fa-chevron-circle-up"></i>
+                                                    <!-- /ko -->
+
+                                                    <!-- ko if: !$root.isCategoryOpen($data.id) -->
+                                                        <i class="fa fa-chevron-circle-down"></i>
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+                                                <span class="contract-list__table-name" data-bind="text: name"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="contract-list__table-cell contract-list__table-branches-cell">
+                                        </div>
+
+                                        <div class="contract-list__table-cell contract-list__table-positions-cell">
+                                        </div>
+
+                                        <div class="contract-list__table-cell contract-list__table-actions-cell">
+                                            <a class="btn btn-default btn-w-30 contract-list__table-row-edit-button"
+                                                title="Редактировать" href="#" data-bind="click: function () { $root.openCreateCategoryModal(); } ">
+                                                <i class="far fa-pencil"></i>
+                                            </a>
+
+                                            <button type="button" class="btn btn-default btn-w-30 contract-list__table-row-remove-button"
+                                                    title="Удалить" data-bind="click: function() { $root.removeCategory($data.id); }">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <ul class="contract-list__table-row-content" data-bind="contractsCategoryOpen: $root.isCategoryOpen($data.id)">
+                                        <!-- ko foreach: { data: $root.getContracts($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
+                                            <!-- ko template: { name: 'table-contract-row-template', data: $data } --><!-- /ko -->
+                                        <!-- /ko -->
+                                    </ul>
+                                </li>
+                            <!-- /ko -->
+
+                            <!-- ko foreach: { data: getContracts(null), beforeRemove: $root.tableRowBeforeRemove } -->
+                                <!-- ko template: { name: 'table-contract-row-template', data: $data } --><!-- /ko -->
+                            <!-- /ko -->
+                        </ul>
+                    </div>
+
+                    <!-- ko component: { name: 'modal-container', params: { opens: modalOpens } } --><!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/html" id="table-contract-row-template">
+        <li class="contract-list__table-row contract-list__table-contract-row"
+            data-bind="
+                attr: { 'data-contracts-contract-id': id },
+                css: { 'contract-list__table-contract-row--deleted': deleted }
+            "
+        >
+            <div class="contract-list__table-row-header">
+                <div class="contract-list__table-cell contract-list__table-name-cell">
+                    <span class="contract-list__table-name" data-bind="text: name"></span>
+                </div>
+
+                <div class="contract-list__table-cell contract-list__table-branches-cell"
+                     data-bind="text: branches !== null ? branches.join(', ') : 'Для всех'">
+                </div>
+
+                <div class="contract-list__table-cell contract-list__table-positions-cell"
+                     data-bind="text: positions !== null ? positions.join(', ') : 'Для всех'">
+                </div>
+
+                <div class="contract-list__table-cell contract-list__table-actions-cell">
+                    <!-- ko if: !deleted -->
+                        <button type="button" class="btn btn-default btn-w-30 contract-list__table-row-print-button"
+                                title="Печатать">
+                            <i class="far fa-print"></i>
+                        </button>
+
+                        <a class="btn btn-default btn-w-30 contract-list__table-row-edit-button"
+                            title="Редактировать" href="#">
+                            <i class="far fa-pencil"></i>
+                        </a>
+
+                        <button type="button" class="btn btn-default btn-w-30 contract-list__table-row-remove-button"
+                                title="Удалить" data-bind="click: function() { $root.removeContract($data.id); }">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    <!-- /ko -->
+
+                    <!-- ko if: deleted -->
+                        <div class="contract-list__table-deletion-indicator">
+                            <i class="far fa-file-times"></i>
+                            Удалён
+                        </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </li>
+    </script>
+
+    <script type="text/html" id="contract-list-create-category-modal-content-template">
+        <div data-bind="component: { name: 'contract-list-create-category-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function () { close(true); } } }" role="document"></div>
+    </script>
+
+    <template id="contract-list-create-category-modal-dialog-template">
+        <!-- ko template: { afterRender: onInit } -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-bind="click: cancel">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                    <h4 class="modal-title">Создать категорию</h4>
+                </div>
+
+                <div class="modal-body">
+                    <form action="" method="post" class="form-respons">
+                        <div class="form-group required" data-bind="css: { 'has-error': !name.isValid() && isSubmitted() }">
+                            <label for="name">Название категории</label>
+                            <input type="text" class="form-control" value="" name="name" id="name" data-bind="value: name">
+                            <!-- ko if: !name.isValid() && isSubmitted() -->
+                                <span class="help-block">Должно быть не меньше 2 символов</span>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="form-group">
+                            <label for="documents">Документы</label>
+                            <select class="form-control" name="documents[]" id="documents" multiple="multiple" data-bind="select2: { minimumResultsForSearch: 0 }">
+                                <optgroup label="Без категории">
+                                    <option value="1">Трудовой договор ИП Платонов Е.В.</option>
+                                    <option value="2">Договор о коммерческой тайне ИП Платонов Е.В.</option>
+                                    <option value="3">Договор о материальной ответственности ИП Платонов Е.В.</option>
+                                    <option value="4">Договор о материальной ответственности ИП Демина Е. В.</option>
+                                    <option value="5">Договор о коммерческой тайне ИП Демина Е. В.</option>
+                                </optgroup>
+                                <optgroup label="Трудовой договор">
+                                    <option value="6">Трудовой договор ИП Демина Е. В.</option>
+                                </optgroup>
+                                <optgroup label="Коммерческая тайна">
+                                    <option value="7">Трудовой договор ИП Агафонов И. В.</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="form-btns clearfix">
+                            <button type="submit" class="btn btn-primary" data-bind="click: submit">Сохранить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        <!-- /ko -->
+    </template>
+
+    @@include('include/_js.html')
+
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            initHatNavbar(document);
+
+            ko.validation.init({ insertMessages: false });
+
+            ko.bindingHandlers.contractsCategoryOpen = {
+                init: function(element, valueAccessor) {
+                    const value = ko.unwrap(valueAccessor());
+
+                    if (value) {
+                        $(element).css('height', '');
+                        $(element).css('display', 'none');
+
+                        $(element).slideDown(0);
+                    } else {
+                        $(element).slideUp(0, () => {
+                            $(element).css('height', '0');
+                            $(element).css('display', 'block');
+                        });
+                    }
+
+                    $(element).data('contracts-category-open-open', value);
+                },
+                update: function(element, valueAccessor, allBindings) {
+                    const value = ko.unwrap(valueAccessor());
+                    const duration = allBindings.get('slideDuration') || 200;
+
+                    if ($(element).data('contracts-category-open-open') !== value) {
+                        if (value) {
+                            $(element).css('height', '');
+                            $(element).css('display', 'none');
+
+                            $(element).slideDown(duration);
+                        } else {
+                            $(element).slideUp(duration, () => {
+                                $(element).css('height', '0');
+                                $(element).css('display', 'block');
+                            });
+                        }
+
+                        $(element).data('contracts-category-open-open', value);
+                    }
+                }
+            };
+
+            ko.bindingHandlers.contractsSortable = {
+                init: function(element, valueAccessor, allBindings, viewModel) {
+                    $(element).nestedSortable({
+                        items: '.contract-list__table-row:not(.contract-list__table-contract-row--deleted)',
+                        listType: 'ul',
+                        doNotClear: true,
+                        maxLevels: 2,
+                        disableNestingClass: 'contract-list__table-contract-row',
+                        tabSize: 10,
+                        isAllowed: ($placeholder, $placeholderParent, $currentItem) => {
+                            return $currentItem.hasClass('contract-list__table-contract-row') || !$placeholderParent;
+                        },
+                        change: function(mouseEvent, event) {
+                            const $placeholder = event.placeholder;
+
+                            if ($placeholder.hasClass('contract-list__table-contract-row')) {
+                                $placeholder.toggle($placeholder.nextAll().filter('.contract-list__table-category-row').length === 0);
+                            } else {
+                                $placeholder.toggle($placeholder.prevAll().filter('.contract-list__table-contract-row').length === 0);
+                            }
+                        },
+                        update: function(mouseEvent, event) {
+                            const categoryId = event.item.data('contracts-category-id');
+
+                            if (categoryId !== undefined) {
+                                const index = $('.contract-list__table-category-row').toArray().indexOf(event.item.get()[0]);
+
+                                if (allBindings()['contractsSortableCategorySort']) {
+                                    allBindings()['contractsSortableCategorySort'].bind(viewModel)(categoryId, index);
+                                }
+                            } else {
+                                const contractId = event.item.data('contracts-contract-id');
+                                const categoryId = event.item.parent().hasClass('contract-list__table-body') ? null : event.item.closest('.contract-list__table-category-row').data('contracts-category-id');
+                                const index = event.item.parent().children('.contract-list__table-contract-row').toArray().indexOf(event.item.get()[0]);
+
+                                if (allBindings()['contractsSortableContractSort']) {
+                                    allBindings()['contractsSortableContractSort'].bind(viewModel)(contractId, categoryId, index);
+                                }
+                            }
+
+                            event.item.remove();
+                        }
+                    });
+                }
+            };
+
+            ko.bindingHandlers.modalContainerModalWrapper = {
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    const options = $.extend(
+                        {
+                            closeOnBackdropClick: true,
+                            closeOnEscape: true
+                        },
+                        allBindings()['modalContainerModalWrapperOptions']
+                    );
+
+                    const close = allBindings()['modalContainerModalWrapperClose'];
+
+                    const $element = $(element);
+                    const $modal = $element.find('.modal');
+
+                    $modal.appendTo('body');
+
+                    $modal.modal({
+                        backdrop: false,
+                        keyboard: false,
+                        focus: true
+                    });
+
+                    if ('modalClass' in options) {
+                        $modal.addClass(options.modalClass);
+                    }
+
+                    if (options.closeOnEscape) {
+                        $modal.keyup(event => {
+                            if (event.keyCode === 27) {
+                                close.call(viewModel);
+                            }
+                        });
+                    }
+
+                    if (options.closeOnBackdropClick) {
+                        $modal.on('click', event => {
+                            if (event.target === $modal.get()[0]) {
+                                close.call(viewModel);
+                            }
+                        });
+                    }
+
+                    const innerBindingContext = ko.bindingEvent.startPossiblyAsyncContentBinding($modal.get()[0], bindingContext);
+                    ko.applyBindings(innerBindingContext, $modal.get()[0]);
+
+                    ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                        $modal.modal('hide').remove();
+                    });
+                }
+            };
+
+            ko.components.register('modal-container', {
+                viewModel: {
+                    createViewModel: function (params) {
+                        const viewModel = new (function () {
+                            this.opens = params.opens;
+
+                            this.close = function (open, value) {
+                                this.opens.remove(open);
+
+                                if ('close' in open) {
+                                    open.close(value);
+                                }
+                            };
+                        });
+
+                        viewModel.initializing = ko.observable(true);
+
+                        viewModel.onInit = function () {
+                            viewModel.initializing(false);
+                        };
+
+                        return viewModel;
+                    }
+                },
+                template: `
+                    <!-- ko template: { afterRender: onInit } -->
+                        <!-- ko foreach: opens -->
+                            <!-- ko let: { modalElement: ko.observable() } -->
+                                <div data-bind="modalContainerModalWrapper, modalContainerModalWrapperOptions: $data.options, modalContainerModalWrapperClose: function (value) { $component.close($data, value); }">
+                                    <div class="modal modal-with-base-backdrop" role="dialog" tabindex="1" data-bind="element: modalElement">
+                                        <!-- ko template: { name: dialogTemplateName, data: { data: $data.data, modalElement: modalElement(), close: function (value) { $component.close($data, value); } } } -->
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+                        <!-- /ko -->
+                    <!-- /ko -->
+                `
+            });
+
+            ko.bindingHandlers.select2 = {
+                init: function (element, valueAccessor, allBindings) {
+                    const $element = $(element);
+                    const isMultiple = $element.prop('multiple');
+                    const valueObservable = allBindings()[!isMultiple ? 'value' : 'selectedOptions'];
+
+                    const customOptionNames = ['wrapperCssClass'];
+
+                    const defaultOptions = {
+                        minimumResultsForSearch: Infinity,
+                        language: 'ru',
+                        width: 'element',
+                        dropdownAutoWidth: true
+                    };
+
+                    if (valueObservable) {
+                        $element.val(ko.utils.unwrapObservable(valueObservable));
+                    }
+
+                    const options = ko.utils.unwrapObservable(valueAccessor());
+
+                    const customOptions = _.pick(options, customOptionNames);
+
+                    const originalRenderFn = $.fn.select2.amd.require('jquery.select2').prototype.render;
+
+                    $.fn.select2.amd.require('jquery.select2').prototype.render = function () {
+                        const $container = originalRenderFn.call(this, ...arguments);
+
+                        if ('wrapperCssClass' in customOptions) {
+                            $container.addClass(customOptions.wrapperCssClass);
+                        }
+
+                        return $container;
+                    };
+
+                    $element.select2($.extend(defaultOptions, _.omit(options, customOptionNames)));
+
+                    $.fn.select2.amd.require('jquery.select2').prototype.render = originalRenderFn;
+
+                    if ('wrapperCssClass' in customOptions) {
+                        const $wrapper = $element.data('select2').$container;
+                        $wrapper.addClass(customOptions.wrapperCssClass);
+                    }
+
+                    $element.data('select2').$results.addClass('scrollbar-inner').scrollbar();
+
+                    if (valueObservable) {
+                        if (ko.isObservable(valueObservable)) {
+                            $element.on('change', () => {
+                                const value = $element.val();
+                                valueObservable(value);
+                            });
+                        }
+                    }
+                },
+                update: function (element, valueAccessor, allBindings) {
+                    const $element = $(element);
+                    const isMultiple = $element.prop('multiple');
+
+                    if (!isMultiple) {
+                        const valueObservable = allBindings()['value'];
+
+                        if (valueObservable && ko.isObservable(valueObservable)) {
+                            valueObservable.subscribe(v => {
+                                $element.val(v).trigger('change');
+                            });
+                        }
+                    }
+                }
+            };
+
+            ko.components.register('contract-list-create-category-modal-dialog', {
+                viewModel: {
+                    createViewModel: function (params, componentInfo) {
+                        const $element = $(componentInfo.element);
+
+                        $element.addClass('modal-dialog');
+                        $element.addClass('contract-list__create-category-modal-dialog');
+                        $element.addClass('contract-list__create-category-modal-dialog--initializing');
+
+                        const viewModel = new (function () {
+                            this.isSubmitted = ko.observable(false);
+
+                            this.name = ko.observable('').extend({
+                                required: true,
+                                minLength: 2
+                            });
+
+                            this.cancel = function () {
+                                if ('cancel' in params) {
+                                    params.cancel();
+                                }
+                            };
+
+                            this.submit = function () {
+                                this.isSubmitted(true);
+
+                                if (this.name.isValid()) {
+                                    if ('submit' in params) {
+                                        params.submit();
+                                    }
+                                }
+                            };
+                        });
+
+                        viewModel.initializing = ko.observable(true);
+
+                        viewModel.onInit = function () {
+                            $element.removeClass('contract-list__create-category-modal-dialog--initializing');
+                            viewModel.initializing(false);
+                        };
+
+                        return viewModel;
+                    }
+                },
+                template: { element: 'contract-list-create-category-modal-dialog-template' }
+            });
+
+            const ViewModel = function(categories, contracts) {
+                this.modalOpens = ko.observableArray([]);
+
+                this.categories = ko.observableArray(categories.map(t => ({
+                    id: t.id,
+                    name: t.name
+                })));
+
+                this.contracts = ko.observableArray(contracts.map(d => ({
+                    id: d.id,
+                    categoryId: ko.observable(d.categoryId),
+                    name: d.name,
+                    index: ko.observable(d.index),
+                    branches: d.branches,
+                    positions: d.positions,
+                    deleted: d.deleted
+                })));
+
+                this.openCategories = ko.observableArray([]);
+
+                this.getContracts = function(categoryId) {
+                    return this.contracts()
+                        .filter(d => d.categoryId() === categoryId)
+                        .sort((a, b) => {
+                            if (a.index() > b.index()) {
+                                return 1;
+                            } else {
+                                return -1;
+                            }
+                        });
+                };
+
+                this.getCategory = function(categoryId) {
+                    return this.categories().find(t => t.id === categoryId);
+                };
+
+                this.getContract = function(contractId) {
+                    return this.contracts().find(d => d.id === contractId);
+                };
+
+                this.isCategoryOpen = function(categoryId) {
+                    return this.openCategories().findIndex(id => id === categoryId) !== -1;
+                };
+
+                this.hasContracts = function(categoryId) {
+                    return this.getContracts(categoryId).length;
+                };
+
+                this.toggleCategory = function(categoryId) {
+                    if (this.hasContracts(categoryId)) {
+                        if (this.isCategoryOpen(categoryId)) {
+                            this.openCategories.remove(categoryId)
+                        } else {
+                            this.openCategories.push(categoryId);
+                        }
+                    }
+                };
+
+                this.openCategory = function(categoryId) {
+                    if (this.hasContracts(categoryId)) {
+                        if (!this.isCategoryOpen(categoryId)) {
+                            this.openCategories.push(categoryId);
+                        }
+                    }
+                };
+
+                this.removeCategory = function(categoryId) {
+                    this.contracts.remove(this.getContracts(categoryId));
+                    this.categories.remove(this.getCategory(categoryId));
+                    this.openCategories.remove(categoryId);
+                };
+
+                this.removeContract = function(contractId) {
+                    this.contracts.remove(this.getContract(contractId));
+                };
+
+                this.tableRowBeforeRemove = function(element) {
+                    $(element).hide(200, () => $(element).remove());
+                };
+
+                this.categorySort = function(categoryId, index) {
+                    const type = this.categories.remove(this.getCategory(categoryId))[0];
+                    this.categories.splice(index, 0, type);
+                };
+
+                this.contractSort = function(contractId, categoryId, index) {
+                    const contract = this.getContract(contractId);
+                    const previousCategoryId = contract.categoryId;
+
+                    this.contracts.remove(contract);
+
+                    this.getContracts(previousCategoryId()).forEach((d, i) => d.index(i));
+                    this.getContracts(categoryId).filter(d => d.index() >= index).forEach((d, i) => d.index(index + i + 1));
+
+                    contract.categoryId(categoryId);
+                    contract.index(index);
+                    this.contracts.push(contract);
+
+                    this.openCategory(categoryId);
+                };
+
+                this.openCreateCategoryModal = function () {
+                    this.modalOpens.push({
+                        dialogTemplateName: 'contract-list-create-category-modal-content-template',
+                        options: {
+                            modalClass: 'modal-global fade'
+                        }
+                    });
+                };
+            };
+
+            const viewModel = new ViewModel(
+                [
+                    {id: 0, name: 'Коммерческая тайна'},
+                    {id: 1, name: 'Трудовой договор'}
+                ],
+                [
+                    {id: 0, name: 'Договор о коммерческой тайне ИП Дмитриев А. А.', categoryId: 0, index: 0, branches: ['Южная'], positions: ['Администратор филиала', 'оператор', 'бухгалтер'], deleted: false},
+                    {id: 1, name: 'Договор о коммерческой тайне ООО «За обе щёки»', categoryId: 0, index: 1, branches: null, positions: null, deleted: false},
+                    {id: 2, name: 'Договор о материальной ответственности', categoryId: 0, index: 2, branches: null, positions: null, deleted: false},
+                    {id: 3, name: 'Заявление о приеме на работу ООО «За обе щёки»', categoryId: 1, index: 0, branches: null, positions: null, deleted: false},
+                    {id: 4, name: 'Договор о материальной ответственности', categoryId: null, index: 0, branches: null, positions: null, deleted: false},
+                    {id: 5, name: 'Заявление на увольнение', categoryId: null, index: 1, branches: null, positions: null, deleted: true}
+                ]
+            );
+
+            const $content = $('.contract-list__content');
+
+            viewModel.onInit = function() {
+                $content.find('.js-select-multiple').select2({
+                    width: '100%'
+                });
+
+                let isFiltersDense = true;
+
+                const $filters = $('.contract-list__filters');
+                const $denseHiddenFilters = $filters.find('.contract-list__filter--dense-hidden');
+                const $expandButton = $filters.find('.contract-list__filters-expand-button');
+
+                $('.contract-list__filters-clear-button').on('click', () => {
+                    $filters.find('input, select').val('').trigger('change');
+                    $filters.find('input[type="checkbox"]').prop("checked", false);
+                });
+
+                $expandButton.on('click', () => {
+                    setFiltersState(!isFiltersDense);
+                    isFiltersDense = !isFiltersDense;
+                });
+
+                function setFiltersState(isDense, isInit = false) {
+                    if (isDense) {
+                        $denseHiddenFilters.fadeOut(!isInit ? 200 : 0, () => {
+                            $filters.addClass('contract-list__filters--dense');
+                        });
+                        $expandButton.html($('<span>Больше фильтров <i class="fa fa-chevron-down" aria-hidden="true"></i></span>'))
+                    } else {
+                        $filters.removeClass('contract-list__filters--dense');
+                        $denseHiddenFilters.fadeIn(!isInit ? 200 : 0);
+                        $expandButton.html($('<span>Меньше фильтров <i class="fa fa-chevron-up" aria-hidden="true"></i></span>'));
+                    }
+                }
+
+                setFiltersState(isFiltersDense, true);
+            };
+
+            ko.applyBindings(
+                viewModel,
+                $content.get()[0]
+            );
+        });
+    </script>
+</body>
+</html>

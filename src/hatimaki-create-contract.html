@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Новый договор</title>
+
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    <div class="hat-scaffold">
+        <div class="hat-scaffold__navbar">
+            @@include('include/hat-navbar.html')
+        </div>
+
+        <div class="hat-scaffold__body">
+            <div class="hat-scaffold__content-wrapper">
+                <div class="create-contract__content" data-bind="childrenComplete: onInit">
+                    <div class="hat-scaffold__head create-contract__head">
+                        <h1>Новый договор</h1>
+
+                        <div class="spacer"></div>
+
+                        <button class="btn btn-default btn-p25">К списку договоров</button>
+                    </div>
+
+                    <div class="row create-contract__row">
+                        <div class="col-xs-6 col-md-4">
+                            <div class="form-group required">
+                                <label for="type">Типа документа</label>
+                                <select class="form-control" name="type" id="type" data-bind="value: type, select2">
+                                    <option value="1">Тип #1</option>
+                                    <option value="2">Тип #2</option>
+                                    <option value="3">Тип #3</option>
+                                    <option value="4">Тип #4</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-6 col-md-4">
+                            <div class="form-group">
+                                <label for="category">Категория</label>
+                                <select class="form-control" name="category" id="category" data-bind="value: category, select2">
+                                    <option value="1">Категория #1</option>
+                                    <option value="2">Категория #2</option>
+                                    <option value="3">Категория #3</option>
+                                    <option value="4">Категория #4</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-8">
+                            <div class="form-group">
+                                <label for="branches">Филиалы для договора</label>
+
+                                <div class="create-contract__branches-form-control">
+                                    <div class="btn-group" role="group">
+                                        <a href="#" type="button" class="btn btn-default" title="Только для"
+                                            data-bind="css: { 'active': branchesMode() }, click: function () { branchesMode(true); }">
+                                            <i class="far fa-layer-plus"></i>
+                                        </a>
+                                        <a href="#" type="button" class="btn btn-default" title="Для всех, кроме"
+                                           data-bind="css: { 'active': !branchesMode() }, click: function () { branchesMode(false); }">
+                                            <i class="far fa-layer-minus"></i>
+                                        </a>
+                                    </div>
+
+                                    <select class="form-control" name="branches[]" id="branches" multiple data-bind="element: branchesFormControlElement, select2">
+                                        <option value="1">Филиал #1</option>
+                                        <option value="2">Филиал #2</option>
+                                        <option value="3">Филиал #3</option>
+                                        <option value="4">Филиал #4</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-8">
+                            <div class="form-group">
+                                <label for="positions">Должности для договора</label>
+
+                                <div class="create-contract__branches-form-control">
+                                    <div class="btn-group" role="group">
+                                        <a href="#" type="button" class="btn btn-default" title="Только для"
+                                           data-bind="css: { 'active': positionsMode() }, click: function () { positionsMode(true); }">
+                                            <i class="far fa-layer-plus"></i>
+                                        </a>
+                                        <a href="#" type="button" class="btn btn-default" title="Для всех, кроме"
+                                           data-bind="css: { 'active': !positionsMode() }, click: function () { positionsMode(false); }">
+                                            <i class="far fa-layer-minus"></i>
+                                        </a>
+                                    </div>
+
+                                    <select class="form-control" name="positions[]" id="positions" multiple data-bind="element: positionsFormControlElement, select2">
+                                        <option value="1">Должность #1</option>
+                                        <option value="2">Должность #2</option>
+                                        <option value="3">Должность #3</option>
+                                        <option value="4">Должность #4</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-8">
+                            <div class="form-group required">
+                                <label for="text">Текст договора</label>
+
+                                <textarea class="form-control form-control-inp-text" name="text" id="text"
+                                    data-bind="element: textFormControlElement">
+                                </textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-md-4">
+                            <div class="create-contract__editor-shortcuts">
+                                <span class="create-contract__editor-shortcuts-header">Доступные поля</span>
+
+                                <div class="form-group search-global search-global--empty create-contract__editor-shortcuts-search">
+                                    <input class="form-control" placeholder="Поиск">
+
+                                    <button type="button" class="btn btn-default search-global__search-clear-button"
+                                            title="Очистить">
+                                        <i class="far fa-times"></i>
+                                    </button>
+                                </div>
+
+                                <div class="create-contract__editor-shortcuts-list" data-bind="scrollbar">
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#ORDER_ID#</a> — ID в системе заказа Битрикс<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#ORDER_DATE#</a> — Дата и время заказа<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#PS_NAME#</a> — Тип оплаты<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#PHONE#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#POST_ID#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#CONTRACT_DATE#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#POST_CODE#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#COMPANY_SHORT_NAME#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#COMPANY_FULL_NAME#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#REQUISITES#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#ADDRESS#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#ADDRESS2#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#FIO#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                    <div class="create-contract__editor-shortcut"><button type="button" class="btn create-contract__editor-shortcut-copy-button" title="Скопировать в буфер обмена"><i class="far fa-clone"></i></button><a href="#">#INN#</a> — Номер телефона клиента<br></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12">
+                            <div class="create-contract__actions">
+                                <button class="btn btn-default btn-p25" data-bind="click: reset">
+                                    Сбросить изменения
+                                </button>
+
+                                <button class="btn btn-primary btn-p25" data-bind="click: submit">
+                                    Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @@include('include/_js.html')
+
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript" src="js/tinymce/js/tinymce/tinymce.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            initHatNavbar(document);
+
+            ko.bindingHandlers.element = {
+                init: function (element, valueAccessor) {
+                    valueAccessor()(element);
+                }
+            };
+
+            ko.validation.init({ insertMessages: false });
+
+            ko.bindingHandlers.contractsCategoryOpen = {
+                init: function(element, valueAccessor) {
+                    const value = ko.unwrap(valueAccessor());
+
+                    if (value) {
+                        $(element).css('height', '');
+                        $(element).css('display', 'none');
+
+                        $(element).slideDown(0);
+                    } else {
+                        $(element).slideUp(0, () => {
+                            $(element).css('height', '0');
+                            $(element).css('display', 'block');
+                        });
+                    }
+
+                    $(element).data('contracts-category-open-open', value);
+                },
+                update: function(element, valueAccessor, allBindings) {
+                    const value = ko.unwrap(valueAccessor());
+                    const duration = allBindings.get('slideDuration') || 200;
+
+                    if ($(element).data('contracts-category-open-open') !== value) {
+                        if (value) {
+                            $(element).css('height', '');
+                            $(element).css('display', 'none');
+
+                            $(element).slideDown(duration);
+                        } else {
+                            $(element).slideUp(duration, () => {
+                                $(element).css('height', '0');
+                                $(element).css('display', 'block');
+                            });
+                        }
+
+                        $(element).data('contracts-category-open-open', value);
+                    }
+                }
+            };
+
+            ko.bindingHandlers.contractsSortable = {
+                init: function(element, valueAccessor, allBindings, viewModel) {
+                    $(element).nestedSortable({
+                        items: '.create-contract__table-row:not(.create-contract__table-contract-row--deleted)',
+                        listType: 'ul',
+                        doNotClear: true,
+                        maxLevels: 2,
+                        disableNestingClass: 'create-contract__table-contract-row',
+                        tabSize: 10,
+                        isAllowed: ($placeholder, $placeholderParent, $currentItem) => {
+                            return $currentItem.hasClass('create-contract__table-contract-row') || !$placeholderParent;
+                        },
+                        change: function(mouseEvent, event) {
+                            const $placeholder = event.placeholder;
+
+                            if ($placeholder.hasClass('create-contract__table-contract-row')) {
+                                $placeholder.toggle($placeholder.nextAll().filter('.create-contract__table-category-row').length === 0);
+                            } else {
+                                $placeholder.toggle($placeholder.prevAll().filter('.create-contract__table-contract-row').length === 0);
+                            }
+                        },
+                        update: function(mouseEvent, event) {
+                            const categoryId = event.item.data('contracts-category-id');
+
+                            if (categoryId !== undefined) {
+                                const index = $('.create-contract__table-category-row').toArray().indexOf(event.item.get()[0]);
+
+                                if (allBindings()['contractsSortableCategorySort']) {
+                                    allBindings()['contractsSortableCategorySort'].bind(viewModel)(categoryId, index);
+                                }
+                            } else {
+                                const contractId = event.item.data('contracts-contract-id');
+                                const categoryId = event.item.parent().hasClass('create-contract__table-body') ? null : event.item.closest('.create-contract__table-category-row').data('contracts-category-id');
+                                const index = event.item.parent().children('.create-contract__table-contract-row').toArray().indexOf(event.item.get()[0]);
+
+                                if (allBindings()['contractsSortableContractSort']) {
+                                    allBindings()['contractsSortableContractSort'].bind(viewModel)(contractId, categoryId, index);
+                                }
+                            }
+
+                            event.item.remove();
+                        }
+                    });
+                }
+            };
+
+            ko.bindingHandlers.select2 = {
+                init: function (element, valueAccessor, allBindings) {
+                    const $element = $(element);
+                    const isMultiple = $element.prop('multiple');
+                    const valueObservable = allBindings()[!isMultiple ? 'value' : 'selectedOptions'];
+
+                    const customOptionNames = ['wrapperCssClass'];
+
+                    const defaultOptions = {
+                        minimumResultsForSearch: Infinity,
+                        language: 'ru',
+                        width: 'element',
+                        dropdownAutoWidth: true
+                    };
+
+                    if (valueObservable) {
+                        $element.val(ko.utils.unwrapObservable(valueObservable));
+                    }
+
+                    const options = ko.utils.unwrapObservable(valueAccessor());
+
+                    const customOptions = _.pick(options, customOptionNames);
+
+                    const originalRenderFn = $.fn.select2.amd.require('jquery.select2').prototype.render;
+
+                    $.fn.select2.amd.require('jquery.select2').prototype.render = function () {
+                        const $container = originalRenderFn.call(this, ...arguments);
+
+                        if ('wrapperCssClass' in customOptions) {
+                            $container.addClass(customOptions.wrapperCssClass);
+                        }
+
+                        return $container;
+                    };
+
+                    $element.select2($.extend(defaultOptions, _.omit(options, customOptionNames)));
+
+                    $.fn.select2.amd.require('jquery.select2').prototype.render = originalRenderFn;
+
+                    if ('wrapperCssClass' in customOptions) {
+                        const $wrapper = $element.data('select2').$container;
+                        $wrapper.addClass(customOptions.wrapperCssClass);
+                    }
+
+                    $element.data('select2').$results.addClass('scrollbar-inner').scrollbar();
+
+                    if (valueObservable) {
+                        if (ko.isObservable(valueObservable)) {
+                            $element.on('change', () => {
+                                const value = $element.val();
+                                valueObservable(value);
+                            });
+                        }
+                    }
+                },
+                update: function (element, valueAccessor, allBindings) {
+                    const $element = $(element);
+                    const isMultiple = $element.prop('multiple');
+
+                    if (!isMultiple) {
+                        const valueObservable = allBindings()['value'];
+
+                        if (valueObservable && ko.isObservable(valueObservable)) {
+                            valueObservable.subscribe(v => {
+                                $element.val(v).trigger('change');
+                            });
+                        }
+                    }
+                }
+            };
+
+            ko.bindingHandlers.scrollbar = {
+                init: function (element) {
+                    $(element).addClass('scrollbar-inner').scrollbar();
+                }
+            };
+
+            const ViewModel = function() {
+                this.branchesFormControlElement = ko.observable();
+                this.positionsFormControlElement = ko.observable();
+                this.textFormControlElement = ko.observable();
+
+                this.isSubmitted = ko.observable(false);
+
+                this.type = ko.observable(1).extend({required: true});
+                this.cateogory = ko.observable(1);
+                this.branchesMode = ko.observable(true);
+                this.positionsMode = ko.observable(true);
+
+                this.submit = function () {
+                    this.isSubmitted(true);
+                };
+
+                this.reset = function () {
+                    this.type(1);
+                    this.cateogory(1);
+                    this.branchesMode(true);
+                    this.positionsMode(true);
+
+                    $(this.branchesFormControlElement()).val('').trigger('change');
+                    $(this.positionsFormControlElement()).val('').trigger('change');
+                    tinymce.get(this.textFormControlElement().getAttribute('id')).setContent('');
+                };
+            };
+
+            const viewModel = new ViewModel();
+
+            const $content = $('.create-contract__content');
+
+            viewModel.onInit = function() {
+                tinymce.init({
+                    selector: '#text',
+                    statusbar: false,
+                    height: 500,
+                    language: 'ru',
+                    language_url : '/tinymce-languages/ru.js'
+                });
+
+                const $shortcuts = $content.find('.create-contract__editor-shortcut');
+
+                initSearchGlobal($content.find('.create-contract__editor-shortcuts-search').get()[0]);
+                initSearch($content.find('.create-contract__editor-shortcuts-search').get()[0], $shortcuts);
+
+                $shortcuts.each((index, element) => {
+                    const $variable = $(element).find('a');
+
+                    $(element).find('.create-contract__editor-shortcut-copy-button').on('click', () => {
+                        navigator.clipboard.writeText($variable.text());
+                        $(element).addClass('bounceIn');
+                        setTimeout(() => {
+                            $(element).removeClass('bounceIn');
+                        }, 750);
+                    });
+
+                    $variable.on('click', e => {
+                        const editor = tinymce.get('text');
+                        editor.focus();
+                        editor.selection.setContent($(e.target).text());
+                        editor.focus();
+                        return false;
+                    });
+                });
+
+                $shortcuts.on('click', 'a', function(e){
+                    const editor = tinymce.get('text');
+                    editor.focus();
+                    editor.selection.setContent($(e.target).text());
+                    editor.focus();
+                    return false;
+                });
+            };
+
+            ko.applyBindings(
+                viewModel,
+                $content.get()[0]
+            );
+        });
+    </script>
+</body>
+</html>
