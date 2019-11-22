@@ -33,7 +33,8 @@
                         <div class="col-xs-6 col-md-4">
                             <div class="form-group required">
                                 <label for="type">Типа документа</label>
-                                <select class="form-control" name="type" id="type" data-bind="value: type, select2">
+                                <select class="form-control" name="type" id="type" data-bind="value: type, select2: { minimumResultsForSearch: 0, allowClear: true, placeholder: '' }">
+                                    <option></option>
                                     <option value="1">Тип #1</option>
                                     <option value="2">Тип #2</option>
                                     <option value="3">Тип #3</option>
@@ -45,7 +46,8 @@
                         <div class="col-xs-6 col-md-4">
                             <div class="form-group">
                                 <label for="category">Категория</label>
-                                <select class="form-control" name="category" id="category" data-bind="value: category, select2">
+                                <select class="form-control" name="category" id="category" data-bind="value: category, select2: { minimumResultsForSearch: 0, allowClear: true, placeholder: '' }">
+                                    <option></option>
                                     <option value="1">Категория #1</option>
                                     <option value="2">Категория #2</option>
                                     <option value="3">Категория #3</option>
@@ -368,8 +370,8 @@
 
                 this.isSubmitted = ko.observable(false);
 
-                this.type = ko.observable(1).extend({required: true});
-                this.cateogory = ko.observable(1);
+                this.type = ko.observable('').extend({required: true});
+                this.category = ko.observable('');
                 this.branchesMode = ko.observable(true);
                 this.positionsMode = ko.observable(true);
 
@@ -378,8 +380,8 @@
                 };
 
                 this.reset = function () {
-                    this.type(1);
-                    this.cateogory(1);
+                    this.type('');
+                    this.category('');
                     this.branchesMode(true);
                     this.positionsMode(true);
 
@@ -410,11 +412,11 @@
                 $shortcuts.each((index, element) => {
                     const $variable = $(element).find('a');
 
-                    $(element).find('.create-contract__editor-shortcut-copy-button').on('click', () => {
+                    $(element).find('.create-contract__editor-shortcut-copy-button').on('click', function () {
                         navigator.clipboard.writeText($variable.text());
-                        $(element).addClass('bounceIn');
+                        $(this).addClass('bounceIn');
                         setTimeout(() => {
-                            $(element).removeClass('bounceIn');
+                            $(this).removeClass('bounceIn');
                         }, 750);
                     });
 
