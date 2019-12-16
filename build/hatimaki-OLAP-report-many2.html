@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OLAP-отчёт</title>
+
+    <link href="js/scrollbar/jquery.mCustomScrollbar.min.css" rel="stylesheet">
+
+    <!-- <link href="bootstrap-3.3.7/css/bootstrap.min.css" rel="stylesheet"> -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link href="fonts/fontawesome/css/all.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+<link href="css/main.min.css" rel="stylesheet">
+    
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+</head>
+<body class="popover-select2">
+    <div class="hat-scaffold">
+        <div class="hat-scaffold__navbar">
+            <nav class="hat-navbar">
+    <div class="hat-navbar__content-wrapper">
+        <div class="hat-navbar__content">
+            <div class="hat-navbar__header">
+                <div class="hat-navbar__user">
+                    <div class="hat-navbar__avatar">
+                        <img class="hat-navbar__avatar-img" src="images/avatar.jpg">
+                    </div>
+
+                    <div class="hat-navbar__user-name">
+                        Анастасия Соколова
+                    </div>
+                </div>
+
+                <div class="hat-navbar__notifications">
+                    <div class="hat-navbar__notifications-icon">
+                        <div class="hat-navbar__notifications-icon-counter">28</div>
+                        <i class="far fa-bell"></i>
+                    </div>
+                </div>
+            </div>
+
+            <ul class="nav hat-navbar__menu">
+                <li class="hat-navbar__menu-item" data-hat-navbar-drawer-content-name="calculations">
+                    <i class="far fa-calculator hat-navbar__menu-item-icon"></i>
+                    <span class="hat-navbar__menu-item-name">Расчёты</span>
+                </li>
+
+                <li class="hat-navbar__menu-item" data-hat-navbar-drawer-content-name="hr">
+                    <i class="far fa-user-tie hat-navbar__menu-item-icon"></i>
+                    <span class="hat-navbar__menu-item-name">Кадры</span>
+                </li>
+
+                <li class="hat-navbar__menu-item" data-hat-navbar-drawer-content-name="documents">
+                    <i class="far fa-chart-bar hat-navbar__menu-item-icon"></i>
+                    <span class="hat-navbar__menu-item-name">Отчёты</span>
+                </li>
+
+                <li class="hat-navbar__menu-item" data-hat-navbar-drawer-content-name="reference">
+                    <i class="far fa-book hat-navbar__menu-item-icon"></i>
+                    <span class="hat-navbar__menu-item-name">Справочники</span>
+                </li>
+
+                <li class="hat-navbar__menu-item" data-hat-navbar-drawer-content-name="search">
+                    <i class="far fa-bars hat-navbar__menu-item-icon"></i>
+                    <span class="hat-navbar__menu-item-name">Все разделы</span>
+                </li>
+            </ul>
+
+            <div class="hat-navbar__spacer"></div>
+
+            <div class="hat-navbar__actions hat-navbar__actions--main">
+                <a href="#" class="hat-navbar__action">
+                    <i class="far fa-cog hat-navbar__action-icon"></i>
+                    <span class="hat-navbar__action-name">Настройки</span>
+                </a>
+
+                <a href="#" class="hat-navbar__action">
+                    <i class="far fa-life-ring hat-navbar__action-icon"></i>
+                    <span class="hat-navbar__action-name">Помощь</span>
+                </a>
+            </div>
+
+            <button class="btn hat-navbar__toggle">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="hat-navbar__drawer">
+        <div class="hat-navbar__drawer-content-wrapper scrollbar-inner">
+            <div class="hat-navbar__drawer-content" data-hat-navbar-drawer-content-name="user" data-hat-navbar-drawer-class="hat-navbar__drawer-user">
+                <div class="hat-navbar__submenu">
+                    <div class="hat-navbar__submenu-header hat-navbar__additional-user-name" style="display: none">
+                        Анастасия Соколова
+                    </div>
+
+                    <div class="hat-navbar__submenu-content">
+                        <a class="hat-navbar__submenu-item" href="#">Профиль</a>
+                        <a class="hat-navbar__submenu-item" href="#">Настройки</a>
+                    </div>
+                </div>
+
+                <a class="hat-navbar__logout-button" href="#">
+                    <i class="far fa-sign-out"></i>
+                    Выход
+                </a>
+            </div>
+
+            <div class="hat-navbar__drawer-content" data-hat-navbar-drawer-content-name="notifications" data-hat-navbar-drawer-class="hat-navbar__drawer-notifications">
+                <ul class="notice-list">
+                    <li>
+                        <p>16.05.2019 <span class="danger">Выписан штраф с объяснительной</span></p>
+                        <a href="#" class="btn btn-default btn-go">Перейти к просмотру</a>
+                    </li>
+                    <li>
+                        <p>16.05.2019 <span class="danger">Выписано нарушение с объяснительной</span></p>
+                        <a href="#" class="btn btn-default btn-go">Перейти к просмотру</a>
+                    </li>
+                    <li>
+                        <p>28.04.2019 собрание для операторов, водителей, тех. сотрудников и администраторов филиалов
+                            Бутово, Щербинка, Эталон, Коммунарка</p>
+                    </li>
+                    <li>
+                        <p>28.04.2019 собрание для операторов, водителей, тех. сотрудников и администраторов филиалов
+                            Бутово, Щербинка, Эталон, Коммунарка</p>
+                        <div class="file">
+                            <a class="file__block" href="#">
+                                <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                            </a>
+                            <a class="file__block" href="#">
+                                <div class="file__file" style="color: #337AB7;"><i class="far fa-file-word"></i></div>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="file">
+                            <a class="file__block" href="#">
+                                <div class="file__file" style="color: #337AB7;"><i class="far fa-file-word"></i></div>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <p>28.04.2019 собрание для операторов, водителей, тех. сотрудников и администраторов филиалов
+                            Бутово, Щербинка, Эталон, Коммунарка</p>
+                    </li>
+                    <li>
+                        <p>28.04.2019 собрание для операторов, водителей, тех. сотрудников и администраторов филиалов
+                            Бутово, Щербинка, Эталон, Коммунарка</p>
+                        <div class="file">
+                            <a class="file__block" href="#">
+                                <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                            </a>
+                            <a class="file__block" href="#">
+                                <div class="file__file" style="color: #337AB7;"><i class="far fa-file-word"></i></div>
+                            </a>
+                            <a class="file__block" href="#">
+                                <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                            </a>
+                            <a class="file__block" href="#">
+                                <div class="file__file" style="color: #337AB7;"><i class="far fa-file-word"></i></div>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="file">
+                            <a class="file__block" href="#">
+                                <div class="file__file" style="color: #337AB7;"><i class="far fa-file-word"></i></div>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <p>28.04.2019 собрание для операторов, водителей, тех. сотрудников и администраторов филиалов
+                            Бутово, Щербинка, Эталон, Коммунарка</p>
+                    </li>
+                    <li>
+                        <p>28.04.2019 собрание для операторов, водителей, тех. сотрудников и администраторов филиалов
+                            Бутово, Щербинка, Эталон, Коммунарка</p>
+                        <div class="file">
+                            <a class="file__block" href="#">
+                                <div class="file__img" style="background-image: url(images/img1.jpg);"></div>
+                            </a>
+                            <a class="file__block" href="#">
+                                <div class="file__file" style="color: #337AB7;"><i class="far fa-file-word"></i></div>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="file">
+                            <a class="file__block" href="#">
+                                <div class="file__file" style="color: #337AB7;"><i class="far fa-file-word"></i></div>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="hat-navbar__drawer-content" data-hat-navbar-drawer-content-name="calculations" data-hat-navbar-drawer-class="hat-navbar__drawer-menu-base">
+                <div class="hat-navbar__submenu">
+                    <div class="hat-navbar__submenu-header">Расчёты</div>
+                    <div class="hat-navbar__submenu-content">
+                        <a class="hat-navbar__submenu-item" href="#">Сотрудники</a>
+                        <a class="hat-navbar__submenu-item" href="#">Штатная численность</a>
+                        <a class="hat-navbar__submenu-item" href="#">Потребность в персонале</a>
+                        <a class="hat-navbar__submenu-item" href="#">Кандидаты</a>
+                        <a class="hat-navbar__submenu-item hat-navbar__submenu-item--active" href="#">Жалобы и
+                            предложения</a>
+                        <a class="hat-navbar__submenu-item" href="#">Приказы/инструкции</a>
+                        <a class="hat-navbar__submenu-item" href="#">Анкеты водителей</a>
+                        <a class="hat-navbar__submenu-item" href="#">Праздничные надбавки</a>
+                        <a class="hat-navbar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                        <a class="hat-navbar__submenu-item" href="#">Договоры</a>
+                        <a class="hat-navbar__submenu-item" href="#">Управление уведомлениями</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hat-navbar__drawer-content" data-hat-navbar-drawer-content-name="hr" data-hat-navbar-drawer-class="hat-navbar__drawer-menu-base">
+                <div class="hat-navbar__submenu">
+                    <div class="hat-navbar__submenu-header">Кадры</div>
+                    <div class="hat-navbar__submenu-content">
+                        <a class="hat-navbar__submenu-item" href="#">Сотрудники</a>
+                        <a class="hat-navbar__submenu-item" href="#">Штатная численность</a>
+                        <a class="hat-navbar__submenu-item" href="#">Потребность в персонале</a>
+                        <a class="hat-navbar__submenu-item" href="#">Кандидаты</a>
+                        <a class="hat-navbar__submenu-item hat-navbar__submenu-item--active" href="#">Жалобы и
+                            предложения</a>
+                        <a class="hat-navbar__submenu-item" href="#">Приказы/инструкции</a>
+                        <a class="hat-navbar__submenu-item" href="#">Анкеты водителей</a>
+                        <a class="hat-navbar__submenu-item" href="#">Праздничные надбавки</a>
+                        <a class="hat-navbar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                        <a class="hat-navbar__submenu-item" href="#">Договоры</a>
+                        <a class="hat-navbar__submenu-item" href="#">Управление уведомлениями</a>
+                    </div>
+                </div>
+            </div >
+
+            <div class="hat-navbar__drawer-content" data-hat-navbar-drawer-content-name="documents" data-hat-navbar-drawer-class="hat-navbar__drawer-menu-base">
+                <div class="hat-navbar__submenu">
+                    <div class="hat-navbar__submenu-header">Документы</div>
+                    <div class="hat-navbar__submenu-content">
+                        <a class="hat-navbar__submenu-item" href="#">Сотрудники</a>
+                        <a class="hat-navbar__submenu-item" href="#">Штатная численность</a>
+                        <a class="hat-navbar__submenu-item" href="#">Потребность в персонале</a>
+                        <a class="hat-navbar__submenu-item" href="#">Кандидаты</a>
+                        <a class="hat-navbar__submenu-item hat-navbar__submenu-item--active" href="#">Жалобы и
+                            предложения</a>
+                        <a class="hat-navbar__submenu-item" href="#">Приказы/инструкции</a>
+                        <a class="hat-navbar__submenu-item" href="#">Анкеты водителей</a>
+                        <a class="hat-navbar__submenu-item" href="#">Праздничные надбавки</a>
+                        <a class="hat-navbar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                        <a class="hat-navbar__submenu-item" href="#">Договоры</a>
+                        <a class="hat-navbar__submenu-item" href="#">Управление уведомлениями</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hat-navbar__drawer-content" data-hat-navbar-drawer-content-name="reference" data-hat-navbar-drawer-class="hat-navbar__drawer-menu-base">
+                <div class="hat-navbar__submenu">
+                    <div class="hat-navbar__submenu-header">Справочники</div>
+                    <div class="hat-navbar__submenu-content">
+                        <a class="hat-navbar__submenu-item" href="#">Сотрудники</a>
+                        <a class="hat-navbar__submenu-item" href="#">Штатная численность</a>
+                        <a class="hat-navbar__submenu-item" href="#">Потребность в персонале</a>
+                        <a class="hat-navbar__submenu-item" href="#">Кандидаты</a>
+                        <a class="hat-navbar__submenu-item hat-navbar__submenu-item--active" href="#">Жалобы и
+                            предложения</a>
+                        <a class="hat-navbar__submenu-item" href="#">Приказы/инструкции</a>
+                        <a class="hat-navbar__submenu-item" href="#">Анкеты водителей</a>
+                        <a class="hat-navbar__submenu-item" href="#">Праздничные надбавки</a>
+                        <a class="hat-navbar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                        <a class="hat-navbar__submenu-item" href="#">Договоры</a>
+                        <a class="hat-navbar__submenu-item" href="#">Управление уведомлениями</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hat-navbar__drawer-content" data-hat-navbar-drawer-content-name="search" data-hat-navbar-drawer-class="hat-navbar__drawer-menu-search">
+                <div class="hat-navbar__contents">
+                    <div class="hat-navbar__contents-search-field  hat-navbar__contents-search-field--empty">
+                        <input class="hat-navbar__contents-search-field-input" placeholder="Поиск">
+                        <button class="btn hat-navbar__contents-search-field-clear-button">
+                            <i class="fal fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div class="hat-navbar__contents-content">
+                        <div class="hat-navbar__contents-content-column">
+                            <div class="hat-navbar__submenu">
+                                <div class="hat-navbar__submenu-header">Отчёты</div>
+                                <div class="hat-navbar__submenu-content">
+                                    <a class="hat-navbar__submenu-item" href="#">Свободный отчёт</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Доставка свободный</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Оплата труда</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Доставка по сотрудникам</a>
+                                    <a class="hat-navbar__submenu-item" href="#">КОРФ/Нагрузка/Опоздания</a>
+                                    <a class="hat-navbar__submenu-item" href="#">КОРФ/Нагрузка/Опоздания по должностям</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Свободный — таблица</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Опоздания</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Депозиты</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Рекомендации по смене разрядов</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Штрафы и премии</a>
+                                    <a class="hat-navbar__submenu-item" href="#">KPI и отзывы водителей</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Водители, не добравшиеся до минималки</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Внешние заказы</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Сводный по нарушениям</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hat-navbar__contents-content-column">
+                            <div class="hat-navbar__submenu">
+                                <div class="hat-navbar__submenu-header">Пользователи</div>
+                                <div class="hat-navbar__submenu-content">
+                                    <a class="hat-navbar__submenu-item" href="#">Список пользователей</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Роли пользователей</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Ответственные за карьеру</a>
+                                </div>
+                            </div>
+
+                            <div class="hat-navbar__submenu">
+                                <div class="hat-navbar__submenu-header">Графики</div>
+                                <div class="hat-navbar__submenu-content">
+                                    <a class="hat-navbar__submenu-item" href="#">Мероприятия</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Рабочие графики</a>
+                                </div>
+                            </div>
+
+                            <div class="hat-navbar__submenu">
+                                <div class="hat-navbar__submenu-header">Листовки</div>
+                                <div class="hat-navbar__submenu-content">
+                                    <a class="hat-navbar__submenu-item" href="#">Статистика по листовкам</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Отработанные адреса</a>
+                                </div>
+                            </div>
+
+                            <div class="hat-navbar__submenu">
+                                <div class="hat-navbar__submenu-header">Маркетинг</div>
+                                <div class="hat-navbar__submenu-content">
+                                    <a class="hat-navbar__submenu-item" href="#">Маркетинг</a>
+                                    <a class="hat-navbar__submenu-item" href="#">Акции</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hat-navbar__contents-content-column">
+                            <a class="hat-navbar__submenu-item hat-navbar__submenu-item--single" href="#">Штрафы/Премии</a>
+                            <a class="hat-navbar__submenu-item hat-navbar__submenu-item--single" href="#">Нарушения</a>
+                            <a class="hat-navbar__submenu-item hat-navbar__submenu-item--single" href="#">Плохие отзывы</a>
+                            <a class="hat-navbar__submenu-item hat-navbar__submenu-item--single" href="#">Жалобы и
+                                предложения</a>
+                            <a class="hat-navbar__submenu-item hat-navbar__submenu-item--single" href="#">Зоны доставки</a>
+                            <a class="hat-navbar__submenu-item hat-navbar__submenu-item--single" href="#">Инструкция</a>
+                        </div>
+                    </div>
+
+                    <div class="hat-navbar__actions hat-navbar__actions--additional">
+                        <a href="#" class="hat-navbar__action">
+                            <i class="far fa-cog hat-navbar__action-icon"></i>
+                            <span class="hat-navbar__action-name">Настройки</span>
+                        </a>
+
+                        <a href="#" class="hat-navbar__action">
+                            <i class="far fa-life-ring hat-navbar__action-icon"></i>
+                            <span class="hat-navbar__action-name">Помощь</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hat-navbar__backdrop"></div>
+</nav>
+
+        </div>
+
+        <div class="hat-scaffold__body">
+            <div class="hat-scaffold__content-wrapper">
+
+<div class="olap-report-content">
+    <div class="clearfix head-with-toolbar">
+        <h1>OLAP-отчёт</h1>
+        <div class="head-toolbar">
+            <div class="btn-group" role="group">
+                <a href="#" type="button" class="btn btn-default active" data-mode="setup" onclick="toggleFilterMode(this)">Настройка</a>
+                <a href="#" type="button" class="btn btn-default" data-mode="view" onclick="toggleFilterMode(this)">Просмотр</a>
+            </div>
+            <a href="#" class="btn btn-default btn-with-icon">
+                <i class="fas fa-file-excel"></i>Экспорт в Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- begin: Form -->
+    <form action="" method="post" class="form-respons form-olap-report">
+        <div class="row">
+            <div class="col-md-6 col-sm-12 col-xs-12" id="olap-filter-1">
+
+                <div class="form-group">
+                    <label for="reportformat" class="hidden-xs">Формат отчета</label>
+                    <select class="form-control" name="reportformat" id="reportformat">
+                        <option value="1">Отчет по продажам</option>
+                        <option value="2">Отчет по продажам 1</option>
+                        <option value="3">Отчет по продажам 2</option>
+                        <option value="4">Отчет по продажам 3</option>
+                    </select>
+                </div>
+
+                <div class="form-btns form-btns--save">
+                    <button type="button" class="btn  btn-default btn-default--dangerlabel">Удалить</button>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalMessage">Сохранить</button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modalChangeReportname">Сохранить как...</button>
+                </div>
+
+            </div>
+            <div class="col-md-6 col-sm-12 col-xs-12" id="olap-filter-2">
+
+                <div class="row">
+
+                    <div class="form-group col-md-4 col-sm-3 col-xs-12" id="olap-filter-period-select">
+                        <label for="period-select" class="hidden-xs">За период</label>
+                        <select class="form-control" name="period-select" id="period-select">
+                            <option value="any">Произвольный</option>
+                            <option value="today">Сегодня</option>
+                            <option value="yesterday">Вчера</option>
+                            <option value="fromstart">С начала недели</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-8 col-sm-6 col-xs-10 form-group-datepicker" id="olap-filter-period-datepicker">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 col-xs-6 period-start">
+                                <div class="input-group datepicker">
+                                    <input type="text" class="form-control" value="" name="date-begin" id="date-begin" placeholder="00.00.0000" maxlength="10">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt" aria-hidden="true"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="input-group-dash">-</span>
+                            <div class="col-md-6 col-sm-6 col-xs-6 period-end">
+                                <div class="input-group datepicker">
+                                    <input type="text" class="form-control" value="" name="date-end" id="date-end" placeholder="00.00.0000" maxlength="10">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt" aria-hidden="true"></i></button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-3 col-xs-12" id="olap-filter-apply-btn">
+                        <div class="form-btns form-btns--apply form-btns--setup-period">
+                            <button type="submit" class="btn btn-primary">Обновить отчет</button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </form>
+    <!-- end: Form -->
+
+    <!-- begin: Groups -->
+    <div class="olap-report-groups">
+        <div class="group-btns">
+            <button class="btn btn-default" id="btn-toggle-all-groups">Все</button>
+            <button class="btn btn-default">Время</button>
+            <button class="btn btn-default">Доставка</button>
+            <button class="btn btn-default">НДС</button>
+            <button class="btn btn-default">Отзывы клиентов</button>
+            <button class="btn btn-default">Себестоимость</button>
+            <button class="btn btn-default">Скидки</button>
+            <button class="btn btn-default">Доставка</button>
+            <button class="btn btn-default">НДС</button>
+            <button class="btn btn-default">Отзывы клиентов</button>
+            <button class="btn btn-default">Себестоимость</button>
+            <button class="btn btn-default">Скидки</button>
+            <button class="btn btn-default">Доставка</button>
+            <button class="btn btn-default">НДС</button>
+            <button class="btn btn-default">Отзывы клиентов</button>
+            <button class="btn btn-default">Себестоимость</button>
+            <button class="btn btn-default">Скидки</button>
+            <button class="btn btn-default">Сотрудники</button>
+        </div>
+        <div class="highlight-data">
+            <button class="btn btn-default" title="Подсветка данных OLAP-отчёта" data-toggle="modal" data-target="#modalReportDataHighlight">
+                <i class="fas fa-fill-drip"></i>
+            </button>
+        </div>
+    </div>
+    <!-- end: Groups -->
+
+    <!-- begin: Table -->
+    <div class="olap-report-table-builder">
+
+        <div class="group-list-container">
+            <div class="group-list-search">
+                <input class="form-control" placeholder="Поиск"/>
+            </div>
+            <div class="group-list-scroll">
+                <div class="group-list">
+                    <div class="ui-dropzone dropzone-in-grouplist">
+
+                    </div>
+
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Год</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable non-numeric">
+                        <label>Дата</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>День недели</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Сумма со скидкой</label>
+                        <span class="group">Другое</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Квартал</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Месяц</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Неделя года</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Учетный день</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Год</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Дата</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>День недели</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+
+                    <div class="draggable-olap-item ui-draggable">
+                        <label>Квартал</label>
+                        <span class="group">Время</span>
+                        <span class="sort-btn sort-btn-up"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="olap-report-table-container">
+            <div class="ui-dropzone dropzone-data">
+
+            </div>
+            <div class="table-responsive2 olap-report-table">
+                <table class="table olap-table-head">
+                    <thead>
+                    <tr>
+                        <th colspan="2" rowspan="3" class="th-dropzone-row">
+                            <div class="ui-dropzone dropzone-row">
+                                <div class="draggable-olap-item">
+                                    <label>Филиал</label>
+                                    <span class="sort-btn sort-btn-up"></span>
+                                </div>
+                                <div class="draggable-olap-item">
+                                    <label>Сотрудник</label>
+                                    <button class="filter-btn" type="button" data-target="#popover-filter-tags"><i class="fas fa-filter"></i></button>
+                                    <span class="sort-btn sort-btn-up"></span>
+                                </div>
+                            </div>
+                        </th>
+                        <th colspan="10" class="th-dropzone-column">
+                            <div class="ui-dropzone dropzone-column">
+                                <div class="draggable-olap-item">
+                                    <label>Месяц</label>
+                                    <button class="filter-btn big-popover" type="button" data-target="#popover-filter-form"><i class="fas fa-filter"></i></button>
+                                    <span class="sort-btn sort-btn-down"></span>
+                                </div>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Октябрь (1)</th>
+                        <th colspan="2">Ноябрь (2)</th>
+                        <th colspan="2">Декабрь (3)</th>
+                        <th colspan="2">Январь (4)</th>
+                        <th colspan="2">Февраль (5)</th>
+                    </tr>
+                    <tr>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 1</th>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 2</th>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 3</th>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 4</th>
+                        <th>Сумма со скидкой</th>
+                        <th>Чеков 5</th>
+                    </tr>
+                    </thead>
+                </table>
+
+                <div class="olap-table-data-vscroll">
+                    <table class="table olap-table-data">
+                        <tbody>
+                        <!-- group 1 -->
+                        <tr class="tr-visible-480">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">1.Бутово<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 1)"></span></td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr data-wrappable-set-id="1">
+                            <td class="fix-hdr-cell td-rowspan">1.Бутово<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 1)"></span></td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">11.Агапова Ю.</td>
+                            <td>11 350</td>
+                            <td>11</td>
+                            <td>11 350</td>
+                            <td>11</td>
+                            <td>11 350</td>
+                            <td>11</td>
+                            <td>11 350</td>
+                            <td>11</td>
+                            <td>11 350</td>
+                            <td>11</td>
+                        </tr>
+                        <tr data-wrappable-set-id="1">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">12.Богма Д.</td>
+                            <td>12 350</td>
+                            <td>12</td>
+                            <td>12 350</td>
+                            <td>12</td>
+                            <td>12 350</td>
+                            <td>12</td>
+                            <td>12 350</td>
+                            <td>12</td>
+                            <td>12 350</td>
+                            <td>12</td>
+                        </tr>
+                        <tr data-wrappable-set-id="1">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">13.Вахненко Е.</td>
+                            <td>13 350</td>
+                            <td>13</td>
+                            <td>13 350</td>
+                            <td>13</td>
+                            <td>13 350</td>
+                            <td>13</td>
+                            <td>13 350</td>
+                            <td>13</td>
+                            <td>13 350</td>
+                            <td>13</td>
+                        </tr>
+                        <tr data-wrappable-set-id="1">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">14.Волков И.</td>
+                            <td>14 350</td>
+                            <td>14</td>
+                            <td>14 350</td>
+                            <td>14</td>
+                            <td>14 350</td>
+                            <td>14</td>
+                            <td>14 350</td>
+                            <td>14</td>
+                            <td>14 350</td>
+                            <td>14</td>
+                        </tr>
+
+                        <!-- group 2 -->
+                        <tr class="tr-visible-480">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">2.Коммунарка<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 2)"></span></td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr data-wrappable-set-id="2">
+                            <td class="fix-hdr-cell td-rowspan">2.Коммунарка<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 2)"></span></td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">21.Агапова Ю.</td>
+                            <td>21 350</td>
+                            <td>21</td>
+                            <td>21 350</td>
+                            <td>21</td>
+                            <td>21 350</td>
+                            <td>21</td>
+                            <td>21 350</td>
+                            <td>21</td>
+                            <td>21 350</td>
+                            <td>21</td>
+                        </tr>
+                        <tr data-wrappable-set-id="2">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">22.Богма Д.</td>
+                            <td>22 350</td>
+                            <td>22</td>
+                            <td>22 350</td>
+                            <td>22</td>
+                            <td>22 350</td>
+                            <td>22</td>
+                            <td>22 350</td>
+                            <td>22</td>
+                            <td>22 350</td>
+                            <td>22</td>
+                        </tr>
+                        <tr data-wrappable-set-id="2">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">23.Вахненко Е.</td>
+                            <td>23 350</td>
+                            <td>23</td>
+                            <td>23 350</td>
+                            <td>23</td>
+                            <td>23 350</td>
+                            <td>23</td>
+                            <td>23 350</td>
+                            <td>23</td>
+                            <td>23 350</td>
+                            <td>23</td>
+                        </tr>
+                        <tr data-wrappable-set-id="2">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">24.Волков И.</td>
+                            <td>24 350</td>
+                            <td>24</td>
+                            <td>24 350</td>
+                            <td>24</td>
+                            <td>24 350</td>
+                            <td>24</td>
+                            <td>24 350</td>
+                            <td>24</td>
+                            <td>24 350</td>
+                            <td>24</td>
+                        </tr>
+
+                        <!-- group 3 -->
+                        <tr class="tr-visible-480">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">3.Московский<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 3)"></span></td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr data-wrappable-set-id="3">
+                            <td class="fix-hdr-cell td-rowspan">3.Московский<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 3)"></span></td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">31.Агапова Ю.</td>
+                            <td>31 350</td>
+                            <td>31</td>
+                            <td>31 350</td>
+                            <td>31</td>
+                            <td>31 350</td>
+                            <td>31</td>
+                            <td>31 350</td>
+                            <td>31</td>
+                            <td>31 350</td>
+                            <td>31</td>
+                        </tr>
+                        <tr data-wrappable-set-id="3">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">32.Богма Д.</td>
+                            <td>32 350</td>
+                            <td>32</td>
+                            <td>32 350</td>
+                            <td>32</td>
+                            <td>32 350</td>
+                            <td>32</td>
+                            <td>32 350</td>
+                            <td>32</td>
+                            <td>32 350</td>
+                            <td>32</td>
+                        </tr>
+                        <tr data-wrappable-set-id="3">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">33.Вахненко Е.</td>
+                            <td>33 350</td>
+                            <td>33</td>
+                            <td>33 350</td>
+                            <td>33</td>
+                            <td>33 350</td>
+                            <td>33</td>
+                            <td>33 350</td>
+                            <td>33</td>
+                            <td>33 350</td>
+                            <td>33</td>
+                        </tr>
+                        <tr data-wrappable-set-id="3">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">34.Волков И.</td>
+                            <td>34 350</td>
+                            <td>34</td>
+                            <td>34 350</td>
+                            <td>34</td>
+                            <td>34 350</td>
+                            <td>34</td>
+                            <td>34 350</td>
+                            <td>34</td>
+                            <td>34 350</td>
+                            <td>34</td>
+                        </tr>
+
+                        <!-- group 4 -->
+                        <tr class="tr-visible-480">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">4.Коммунарка<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 4)"></span></td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr data-wrappable-set-id="4">
+                            <td class="fix-hdr-cell td-rowspan">4.Коммунарка<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 4)"></span></td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">41.Агапова Ю.</td>
+                            <td>41 350</td>
+                            <td>41</td>
+                            <td>41 350</td>
+                            <td>41</td>
+                            <td>41 350</td>
+                            <td>41</td>
+                            <td>41 350</td>
+                            <td>41</td>
+                            <td>41 350</td>
+                            <td>41</td>
+                        </tr>
+                        <tr data-wrappable-set-id="4">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">42.Богма Д.</td>
+                            <td>42 350</td>
+                            <td>42</td>
+                            <td>42 350</td>
+                            <td>42</td>
+                            <td>42 350</td>
+                            <td>42</td>
+                            <td>42 350</td>
+                            <td>42</td>
+                            <td>42 350</td>
+                            <td>42</td>
+                        </tr>
+                        <tr data-wrappable-set-id="4">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">43.Вахненко Е.</td>
+                            <td>43 350</td>
+                            <td>43</td>
+                            <td>43 350</td>
+                            <td>43</td>
+                            <td>43 350</td>
+                            <td>43</td>
+                            <td>43 350</td>
+                            <td>43</td>
+                            <td>43 350</td>
+                            <td>43</td>
+                        </tr>
+                        <tr data-wrappable-set-id="4">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">44.Волков И.</td>
+                            <td>44 350</td>
+                            <td>44</td>
+                            <td>44 350</td>
+                            <td>44</td>
+                            <td>44 350</td>
+                            <td>44</td>
+                            <td>44 350</td>
+                            <td>44</td>
+                            <td>44 350</td>
+                            <td>44</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- фиксированная первая колонка для мобильной версии -->
+            <div class="table-first-column">
+                <!-- beg:  -->
+                <table class="table table-first-column-head">
+                    <thead>
+                    <tr>
+                        <th>
+
+                            <div class="ui-dropzone dropzone-row">
+                                <div class="draggable-olap-item">
+                                    <label>Филиал</label>
+                                    <span class="sort-btn sort-btn-up"></span>
+                                </div>
+                                <div class="draggable-olap-item">
+                                    <label>Сотрудник</label>
+                                    <span class="sort-btn sort-btn-up"></span>
+                                </div>
+                            </div>
+
+                        </th>
+                    </tr>
+                    </thead>
+                </table>
+                <!-- end:  -->
+
+                <!-- beg:  -->
+                <div class="table-first-column-data-vscroll">
+                    <table class="table table-first-column-data">
+                        <tbody>
+                        <tr class="tr-visible-480">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">1.Бутово<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 1, true)"></span></td>
+                        </tr>
+                        <tr data-wrappable-set-id="1">
+                            <td class="fix-hdr-cell td-rowspan">1.Бутово<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 1)"></span></td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">11.Агапова Ю.</td>
+                        </tr>
+                        <tr  data-wrappable-set-id="1">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">12.Богма Д.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="1">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">13.Вахненко Е.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="1">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">14.Волков И.</td>
+                        </tr>
+
+                        <tr class="tr-visible-480">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">2.Коммунарка<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 2, true)"></span></td>
+                        </tr>
+                        <tr data-wrappable-set-id="2">
+                            <td class="fix-hdr-cell td-rowspan">2.Коммунарка<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 2)"></span></td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">21.Агапова Ю.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="2">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">22.Богма Д.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="2">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">23.Вахненко Е.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="2">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">24.Волков И.</td>
+                        </tr>
+
+                        <tr class="tr-visible-480">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">3.Московский<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 3, true)"></span></td>
+                        </tr>
+                        <tr data-wrappable-set-id="3">
+                            <td class="fix-hdr-cell td-rowspan">3.Московский<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 3)"></span></td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">31.Агапова Ю.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="3">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">32.Богма Д.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="3">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">33.Вахненко Е.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="3">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">34.Волков И.</td>
+                        </tr>
+
+                        <tr class="tr-visible-480">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">4.Коммунарка<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 4, true)"></span></td>
+                        </tr>
+                        <tr data-wrappable-set-id="4">
+                            <td class="fix-hdr-cell td-rowspan">4.Коммунарка<span class="wrap-btn wrap-btn-down" onclick="toggleWrappableRow(this, 4)"></span></td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">41.Агапова Ю.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="4">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">42.Богма Д.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="4">
+                            <td class="fix-hdr-cell td-rowspan">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">43.Вахненко Е.</td>
+                        </tr>
+                        <tr data-wrappable-set-id="4">
+                            <td class="fix-hdr-cell">&nbsp;</td>
+                            <td class="fix-hdr-cell fix-hdr-cell--last">44.Волков И.</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <!-- end:  -->
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+</div>
+</div>
+</div>
+
+
+<!-- beg: popover filter tags -->
+<div style="display: none;" class="popover-olap-filter" id="popover-filter-tags">
+    <form action="" method="post" class="form-respons popover-form-olap" id="search-filter-tags">
+        <div class="group-btns js-filter-group">
+            <button type="button" class="btn btn-default active">Условие</button>
+            <button type="button" class="btn btn-default">Все</button>
+        </div>
+        <div class="form-group">
+            <input class="form-control" id="search-input-tags" type="text" placeholder="" onkeyup="searchStr('search-input-tags', 'search-filter-tags');">
+        </div>
+        <div class="scrollbar-inner olap-search-btns">
+            <button type="button" class="btn btn-default js-filter-btn">Самойлова Е. И.</button>
+            <button type="button" class="btn btn-default js-filter-btn active">Смирнова А. Н.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Соколов П. С.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Старогородцева К. Д.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Самойлова Е. И.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Смирнова А. Н.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Соколов П. С.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Старогородцева К. Д.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Самойлова Е. И.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Смирнова А. Н.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Соколов П. С.</button>
+            <button type="button" class="btn btn-default js-filter-btn">Старогородцева К. Д.</button>
+        </div>
+        <div class="form-group-btns">
+            <button type="button" class="btn btn-primary btn-p25 js-close-popover">Применить</button>
+        </div>
+    </form>
+</div>
+<!-- end: popover filter tags -->
+
+<!-- beg: popover filter form -->
+<div style="display: none;" class="popover-olap-filter" id="popover-filter-form">
+    <form action="" method="post" class="form-respons popover-form-olap">
+        <div class="group-btns js-filter-group">
+            <button type="button" class="btn btn-default active">Условие</button>
+            <button type="button" class="btn btn-default">Все</button>
+        </div>
+        <div class="scrollbar-inner">
+            <div class="js-condition-block">
+                <div class="condition js-condition-row">
+                    <select class="form-control condition__select js-select-condition" name="condition">
+                        <option value="range" selected="">Диапазон от - до</option>
+                        <option value="contains">Содержит</option>
+                        <option value="isnt-set">Не задано</option>
+                        <option value="specified">Задано</option>
+                    </select>
+                    <div class="condition__range js-range-block">
+                        <div class="form-group">
+                            <input type="text" class="form-control" value="" name="range-start" />
+                        </div>
+                        <div class="form-group-dash">–</div>
+                        <div class="form-group">
+                            <input type="text" class="form-control" value="" name="range-end" />
+                        </div>
+                    </div>
+                    <div class="condition__contains js-contains-block" style="display: none;">
+                        <div class="form-group">
+                            <input type="text" class="form-control" value="" name="contains" />
+                        </div>
+                    </div>
+                    <div class="condition__empty js-isnt-block" style="display: none;">
+                        
+                    </div>
+                    <div class="condition__empty js-specified-block" style="display: none;">
+                        
+                    </div>
+                    <div class="condition__btns">
+                        <button class="btn btn-cancel btn-neutral js-delete-row" style="display: none;" type="button" title="Удалить условие">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-add btn-neutral js-add-row" type="button" title="Добавить условие">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group-btns">
+            <button type="button" class="btn btn-primary btn-p25 js-close-popover">Применить</button>
+        </div>
+    </form>
+</div>
+<!-- end: popover filter tags -->
+
+<!-- beg: Modal message -->
+<div class="modal modal-olap-report-message fade" tabindex="-1" role="dialog" id="modalMessage">
+    <div class="modal-dialog modal-dialog-gl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-message">OLAP отчёт по сотрудникам успешно изменён</p>
+                <div class="modal-btns">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">ОК</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end: Modal message -->
+
+<!-- beg: Modal change report name -->
+<div class="modal modal-olap-report-saveas fade" tabindex="-1" role="dialog" id="modalChangeReportname">
+    <div class="modal-dialog modal-dialog-gl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post">
+                    <div class="form-ctrl">
+                        <label for="report-name" class="hidden-xs">Название отчёта</label>
+                        <input class="form-control" name="report-name" id="report-name" placeholder="Название отчёта">
+                    </div>
+                    <div class="modal-btns">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+                        <button type="submit" class="btn btn-primary">Применить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end: Modal change report name -->
+
+<!-- beg: Modal report data highlight  -->
+<div class="modal modal-olap-report-data-highlight fade" tabindex="-1" role="dialog" id="modalReportDataHighlight">
+    <div class="modal-dialog modal-dialog-gl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Подсветка данных OLAP-отчёта</h4>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post">
+                    <div class="highlight-type-section">
+                        <h6>Подсвечивать</h6>
+                        <label class="radio-inline">
+                            <input type="radio" name="highlight" id="highlightRadio1" value="1"> Строки
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="highlight" id="highlightRadio2" value="2"> Столбцы
+                        </label>
+                    </div>
+
+                    <div class="row row-parameters-section">
+                        <div class="col-sm-6 col-xs-12">
+                            <h5>Параметры строк</h5>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от выручки
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> Сумма расхода
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от общей выручки
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от выручки
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> Сумма расхода
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-xs-12">
+                            <h5>Показатели в отчёте</h5>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от выручки
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> Сумма расхода
+                                </label>
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" value=""> % от общей выручки
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="colorscale-section">
+                        <h5>Цветовая шкала</h5>
+                        <div class="row">
+                            <div class="col-sm-4 col-xs-5">
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option1" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #A969AF"></li>
+                                            <li style="background-color: #BE83B9"></li>
+                                            <li style="background-color: #D49EC2"></li>
+                                            <li style="background-color: #E7B5CA"></li>
+                                            <li style="background-color: #FFD4D4"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option2" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #29C4AA"></li>
+                                            <li style="background-color: #4BD5BC"></li>
+                                            <li style="background-color: #8EE2B5"></li>
+                                            <li style="background-color: #C7EEA9"></li>
+                                            <li style="background-color: #EFF5A8"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option2" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #9E77EC"></li>
+                                            <li style="background-color: #B18CFB"></li>
+                                            <li style="background-color: #B8A2EB"></li>
+                                            <li style="background-color: #CAB6F8"></li>
+                                            <li style="background-color: #DFD8FF"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-4 col-xs-5">
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option1" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #A65216"></li>
+                                            <li style="background-color: #BB7940"></li>
+                                            <li style="background-color: #D3A56F"></li>
+                                            <li style="background-color: #EACE9B"></li>
+                                            <li style="background-color: #FEF4C3"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option2" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #657CFF"></li>
+                                            <li style="background-color: #6DA0F8"></li>
+                                            <li style="background-color: #73C2EF"></li>
+                                            <li style="background-color: #78DCEA"></li>
+                                            <li style="background-color: #7DF9E1"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" value="option2" checked>
+                                        <ul class="colorscale">
+                                            <li style="background-color: #DC427F"></li>
+                                            <li style="background-color: #E6678C"></li>
+                                            <li style="background-color: #EF8B97"></li>
+                                            <li style="background-color: #F6A8A1"></li>
+                                            <li style="background-color: #FDC8AA"></li>
+                                        </ul>
+                                    </label>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-btns">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Отменить</button>
+                        <button type="submit" class="btn btn-primary">Применить</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end: Modal report data highlight -->
+
+<!-- beg: template condition row -->
+<script id="rowTemplate" type="text/template">
+    <div class="condition js-condition-row" style="display: none;">
+        <select class="form-control condition__select js-select-condition" name="condition[1]">
+            <option value="range" selected="">Диапазон от - до</option>
+            <option value="contains">Содержит</option>
+            <option value="isnt-set">Не задано</option>
+            <option value="specified">Задано</option>
+        </select>
+        <div class="condition__range js-range-block">
+            <div class="form-group">
+                <input type="text" class="form-control" value="" name="range-start[1]" />
+            </div>
+            <div class="form-group-dash">–</div>
+            <div class="form-group">
+                <input type="text" class="form-control" value="" name="range-end[1]" />
+            </div>
+        </div>
+        <div class="condition__contains js-contains-block" style="display: none;">
+            <div class="form-group">
+                <input type="text" class="form-control" value="" name="contains[1]" />
+            </div>
+        </div>
+        <div class="condition__empty js-isnt-block" style="display: none;">
+            
+        </div>
+        <div class="condition__empty js-specified-block" style="display: none;">
+            
+        </div>
+        <div class="condition__btns">
+            <button class="btn btn-cancel btn-neutral js-delete-row" type="button" title="Удалить условие">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+            <button class="btn btn-add btn-neutral js-add-row" type="button" title="Добавить условие">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+</script>
+<!-- end: template condition row -->
+
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+        integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+        crossorigin="anonymous"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"
+        integrity="sha256-AAhU14J4Gv8bFupUUcHaPQfvrdNauRHMt+S4UVcaJb0=" crossorigin="anonymous"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
+</script>
+
+<!-- Bootstrap DateTimepicker, https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+<script type="text/javascript" src="js/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
+
+<!-- Select2, https://select2.org/getting-started/basic-usage -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/js/select2.full.min.js"></script>
+
+<!-- Custom Scroll, http://gromo.github.io/jquery.scrollbar/-->
+<script src="js/jquery.scrollbar.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/nestedSortable/2.0.0/jquery.mjs.nestedSortable.min.js"
+        integrity="sha256-EnaBcZsgejHg52kCwmsQHxvCIL0nl9YmWnPKQoKjWhg=" crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="js/js-gl.js"></script>
+
+
+<!-- scrollbar http://manos.malihu.gr/jquery-custom-content-scroller/ -->
+<script src="js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+
+<!-- https://github.com/taye/interact.js -->
+<script src="https://unpkg.com/interactjs@1.3.4/dist/interact.min.js"></script>
+
+<script type="text/javascript" src="js/js-olap.js"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+        initHatNavbar(document);
+
+        $('.datepicker').datetimepicker({
+            language: 'ru',
+            pickTime: false
+        });
+
+        $('#period-select').on('change', function() {
+            onPeriodChanged(this);
+        });
+        $('#btn-toggle-all-groups').on('click', function(btn) {
+            onToggleAllGroupButtons($(btn.target));
+        });
+        $('.olap-report-groups .group-btns').find('button:not(#btn-toggle-all-groups)').on('click', function(btn) {
+            onClickGroupButton($(btn.target), false);
+        });
+
+        initGroupListSearch();
+        initDragAndDrop();
+        checkFilterMode();
+
+        $('.filter-btn.big-popover').popover({
+            html: true,
+            placement: 'bottom',
+            container: 'body',
+            content: function() {
+                let id = $(this).data('target');
+                return $(id).html();
+            },
+            template: '<div class="popover popover-olap-filter popover-olap-filter--big" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>'
+        });
+        $('.filter-btn:not(.big-popover)').popover({
+            html: true,
+            placement: 'bottom',
+            container: 'body',
+            content: function() {
+                let id = $(this).data('target');
+                return $(id).html();
+            },
+            template: '<div class="popover popover-olap-filter" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>'
+        });
+
+        $('.filter-btn').on('shown.bs.popover', function (e) {
+            let popover = $('body > div.popover:last-of-type'),
+                otherPop = $('body > div.popover').not(popover);
+
+            if (otherPop) closePopover(otherPop.attr('id'));
+
+            $('.scrollbar-inner').mCustomScrollbar('destroy');
+            $(popover).find('.scrollbar-inner').mCustomScrollbar({
+                axis: "y",
+                theme: "dark"
+            });
+
+            $('.js-close-popover').on('click', function(){
+                let pop = $(this).closest('.popover'),
+                    pop_id = pop.attr('id'),
+                    btn = $(`.filter-btn[aria-describedby=${pop_id}]`);
+                console.log(btn);
+                $(btn).popover('hide');
+            });
+
+            $('.js-filter-btn').on('click', function(){
+                $(this).toggleClass('active');
+            });
+
+            $('.js-filter-group .btn').on('click', function(){
+                $(this).parent().children().removeClass('active');
+                $(this).toggleClass('active');
+            });
+
+            $(popover).find('.js-select-condition').select2({
+                width: '100%',
+                minimumResultsForSearch: 10
+            });
+
+            $(document).on('change', '.js-select-condition', function () {
+				let select = $(this),
+                    now = select.val(),
+                    block = select.closest('.js-condition-row'),
+                    range = block.find('.js-range-block'),
+                    contains = block.find('.js-contains-block'),
+                    isnt = block.find('.js-isnt-block'),
+                    spec = block.find('.js-specified-block');
+                showOrHideBlock(range, 'range', now);
+                showOrHideBlock(contains, 'contains', now);
+                showOrHideBlock(isnt, 'isnt-set', now);
+                showOrHideBlock(spec, 'specified', now);
+            });
+
+        });
+
+        editCondition.init();
+    });
+
+    (function($){
+        $(window).on("load",function(){
+            updateOlapTableDimensions(false);
+            updateOlapTableFirstColumn();
+
+            $(".group-list-scroll").mCustomScrollbar({
+                axis: "y",
+                theme: "dark"
+            });
+            $(".olap-report-table").mCustomScrollbar({
+                axis: "x",
+                theme: "dark"
+            });
+            $(".olap-table-data-vscroll").mCustomScrollbar({
+                axis: "y",
+                theme: "dark",
+                callbacks:{
+                    whileScrolling:function() {
+                        onDataScrollUpdateFirstColumnY(this.mcs.top);
+                    },
+                    onOverflowYNone:function() {
+                        onDataScrollUpdateFirstColumnY(0);
+                    }
+                }
+            });
+        });
+    })(jQuery);
+
+    //поиск по строкам
+    function searchStr(inputId, modalId) {
+        //добавлен toLowerCase и поиск по ID только внутри поповера
+        let searchString = $('.popover').find(`#${inputId}`).val().toLowerCase();
+        let labelArr = $('.popover').find(`#${modalId} .olap-search-btns button`);
+        let labelText = '';
+
+        labelArr.addClass('hidden');
+
+        labelArr.each(function (i) {
+            labelText = labelArr.eq(i).text().toLowerCase();
+
+            if (labelText.indexOf(searchString) != -1) {
+                labelArr.eq(i).removeClass('hidden');
+            }
+        })
+    };
+
+    function closePopover(popId) {
+        let btn = $(`.filter-btn[aria-describedby=${popId}]`);
+        $(btn).popover('hide');
+    }
+
+    let editCondition = (function() {
+        let me = {};
+        me.blockEdit = $('.js-condition-block');
+        me.init = function() {
+            $(document).on('click', '.js-add-row', me.addRow);
+            $(document).on('click', '.js-delete-row', me.removeRow);
+        }
+        me.addRow = function() {
+            let parent = $(this).closest('.js-condition-block'),
+                rowTemplate = $('#rowTemplate'),
+                row = parent.find('.js-condition-row'),
+                addBtn = row.find('.js-add-row'),
+                popover = $('body > div.popover:last-of-type'),
+                allDelBtn, newRow;
+            
+            if (!rowTemplate) return false;
+            rowTemplate = $(rowTemplate.html());
+            rowTemplate.appendTo(parent);
+            addBtn.hide();
+            
+            allDelBtn = parent.find('.js-delete-row');
+            allDelBtn.show();
+            newRow = parent.find('.js-condition-row:last-child');
+            newRow.fadeIn(500);
+
+            $(popover).find('.js-select-condition').select2({
+                width: '100%',
+                minimumResultsForSearch: 10
+            });
+        }
+        me.removeRow = function() {
+            let parent = $(this).closest('.js-condition-block'),
+                row = $(this).closest('.js-condition-row'),
+                rowLastChild = parent.find('.js-condition-row:last-child'),
+                lastRow, lastRow_index, addBtn, delBtn;
+            
+            if (row.index() === rowLastChild.index()) {
+                lastRow_index = row.index() - 1;
+                lastRow = $(this).closest('.js-condition-block').find('.js-condition-row:eq(' + lastRow_index + ')');
+            } else {
+                lastRow = rowLastChild;
+            }
+
+            addBtn = lastRow.find('.js-add-row');
+            addBtn.show();
+            
+            row.fadeOut(500, function() {
+                row.remove();
+            });
+
+            if (rowLastChild.index() === 1) {
+                delBtn = parent.find('.js-delete-row');
+                delBtn.hide();
+            }
+        }
+        return me;
+    }());
+</script>
+</body>
+</html>
