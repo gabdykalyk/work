@@ -14,8 +14,10 @@
 <link href="fonts/fontawesome/css/all.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.4/css/select2.min.css" rel="stylesheet" />
+<link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />
 <link href="css/main.min.css" rel="stylesheet">
-    
+
+
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -1122,10 +1124,10 @@
                         </div>
                     </div>
                     <div class="condition__empty js-isnt-block" style="display: none;">
-                        
+
                     </div>
                     <div class="condition__empty js-specified-block" style="display: none;">
-                        
+
                     </div>
                     <div class="condition__btns">
                         <button class="btn btn-cancel btn-neutral js-delete-row" style="display: none;" type="button" title="Удалить условие">
@@ -1382,10 +1384,10 @@
             </div>
         </div>
         <div class="condition__empty js-isnt-block" style="display: none;">
-            
+
         </div>
         <div class="condition__empty js-specified-block" style="display: none;">
-            
+
         </div>
         <div class="condition__btns">
             <button class="btn btn-cancel btn-neutral js-delete-row" type="button" title="Удалить условие">
@@ -1539,6 +1541,9 @@
 
     (function($){
         $(window).on("load",function(){
+            const $olapReportTable = $('.olap-report-table');
+            const $olapReportHeadTable = $('.olap-table-head');
+
             updateOlapTableDimensions(false);
             updateOlapTableFirstColumn();
 
@@ -1546,7 +1551,7 @@
                 axis: "y",
                 theme: "dark"
             });
-            $(".olap-report-table").mCustomScrollbar({
+            $olapReportTable.mCustomScrollbar({
                 axis: "x",
                 theme: "dark"
             });
@@ -1560,6 +1565,24 @@
                     onOverflowYNone:function() {
                         onDataScrollUpdateFirstColumnY(0);
                     }
+                }
+            });
+
+            const thHeight = $olapReportHeadTable.find('th:first').height();
+
+            $olapReportHeadTable.find('th').append($('<div class="column-header-sizer"></div>')).resizable({
+                handles: "e",
+                minHeight: thHeight,
+                maxHeight: thHeight,
+                minWidth: 40,
+                resize: function (event, ui) {
+                    const $sizer = $(event.target).find('.column-header-sizer');
+                    $sizer.width(ui.size.width);
+                    updateOlapTableDimensions(false);
+                },
+                stop: function () {
+                    updateOlapTableDimensions(false);
+                    $olapReportTable.mCustomScrollbar('update');
                 }
             });
         });
@@ -1602,12 +1625,12 @@
                 addBtn = row.find('.js-add-row'),
                 popover = $('body > div.popover:last-of-type'),
                 allDelBtn, newRow;
-            
+
             if (!rowTemplate) return false;
             rowTemplate = $(rowTemplate.html());
             rowTemplate.appendTo(parent);
             addBtn.hide();
-            
+
             allDelBtn = parent.find('.js-delete-row');
             allDelBtn.show();
             newRow = parent.find('.js-condition-row:last-child');
@@ -1623,7 +1646,7 @@
                 row = $(this).closest('.js-condition-row'),
                 rowLastChild = parent.find('.js-condition-row:last-child'),
                 lastRow, lastRow_index, addBtn, delBtn;
-            
+
             if (row.index() === rowLastChild.index()) {
                 lastRow_index = row.index() - 1;
                 lastRow = $(this).closest('.js-condition-block').find('.js-condition-row:eq(' + lastRow_index + ')');
@@ -1633,7 +1656,7 @@
 
             addBtn = lastRow.find('.js-add-row');
             addBtn.show();
-            
+
             row.fadeOut(500, function() {
                 row.remove();
             });
