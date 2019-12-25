@@ -507,6 +507,7 @@
 
                     <!-- name and action btns -->
                     <div class="candidates__popup-name-wrap">
+						<i class="far fa-file-check candidates__popup-profile-icon candidates__popup-profile-icon--check"></i>
                         <h2 class="candidates__popup-name">Семенова Анастасия Ярославовна</h2>
                         <div class="candidates__popup-actions">
                             <button title="Переход в анкету кандиадата"><i class="far fa-id-badge"></i></button>
@@ -902,10 +903,11 @@
                     { text: "Отказался", dataField: "fail2" }
                 ],
                 templateContent : templateContent,
-                template:'<div class="candidates__board-item"><div class="candidates__board-item-content"><h3 class="candidates__board-item-name"></h3><div class="candidates__board-item-caption"><ul class="candidates__board-item-list"></ul><div class="candidates__board-item-location"></div><div class="candidates__board-item-target-date"></div><div class="candidates__tooltip"> <button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button><h5 class="candidates__tooltip-title"></h5><div class="candidates__tooltip-status"></div><div class="candidates__tooltip-position"></div><ul class="candidates__tooltip-list"></ul></div></div><div class="candidates__board-item-footer"><div class="candidates__board-item-avatar" data-toggle="tooltip" data-placement="bottom" title=""></div> <time class="candidates__board-item-date" data-placement="bottom" data-toggle="tooltip" title="Количество дней в статусе"><i class="fal fa-clock"></i> </time><div class="candidates__board-item-status" data-current-status=""><div class="candidates__inline-status candidates__inline-status--new" data-toggle="tooltip" data-placement="bottom" title="Новый">new</div><div class="candidates__inline-status candidates__inline-status--alert" data-toggle="tooltip" data-placement="bottom" title="Просрочен"><i class="far fa-exclamation-circle"></i></div><div class="candidates__inline-status candidates__inline-status--wait" data-toggle="tooltip" data-placement="bottom" title="Ожидает"><i class="fas fa-spinner"></i></div></div></div></div></div>',
+                template:'<div class="candidates__board-item"><div class="candidates__board-item-content"><div class="candidates__board-item-header"><h3 class="candidates__board-item-name"></h3><i class="far fa-file-check candidates__board-item-profile-icon candidates__board-item-profile-icon--check"></i></div><div class="candidates__board-item-caption"><ul class="candidates__board-item-list"></ul><div class="candidates__board-item-location"></div><div class="candidates__board-item-target-date"></div><div class="candidates__tooltip"> <button class="candidates__tooltip-close-btn"><i class="fas fa-times"></i></button><h5 class="candidates__tooltip-title"></h5><div class="candidates__tooltip-status"></div><div class="candidates__tooltip-position"></div><ul class="candidates__tooltip-list"></ul></div></div><div class="candidates__board-item-footer"><div class="candidates__board-item-avatar" data-toggle="tooltip" data-placement="bottom" title=""></div> <time class="candidates__board-item-date" data-placement="bottom" data-toggle="tooltip" title="Количество дней в статусе"><i class="fal fa-clock"></i> </time><div class="candidates__board-item-status" data-current-status=""><div class="candidates__inline-status candidates__inline-status--new" data-toggle="tooltip" data-placement="bottom" title="Новый">new</div><div class="candidates__inline-status candidates__inline-status--alert" data-toggle="tooltip" data-placement="bottom" title="Просрочен"><i class="far fa-exclamation-circle"></i></div><div class="candidates__inline-status candidates__inline-status--wait" data-toggle="tooltip" data-placement="bottom" title="Ожидает"><i class="fas fa-spinner"></i></div></div></div></div></div>',
                 itemRenderer : function(element, item, resource){
                     var currentElem         = $(element),
                         name                = currentElem.find('.candidates__board-item-name'),
+						profileIcon         = currentElem.find('.candidates__board-item-profile-icon'),
                         location            = currentElem.find('.candidates__board-item-location'),
                         detailsList         = currentElem.find('.candidates__board-item-list'),
                         avatar              = currentElem.find('.candidates__board-item-avatar'),
@@ -926,6 +928,8 @@
                         'data-toggle': 'modal',
                         'data-target': '#candidateModal'
                     });
+
+					initEmployeeFilePopover(profileIcon[0]);
 
                     // set candidate location
                     resource.location ? location.html(resource.location) : '';
@@ -1133,6 +1137,7 @@
                 $("body").find(".candidates__board-item-location, .candidates__board-item-target-date").removeClass('active');
             })
 
+			initEmployeeFilePopover($(".candidates__popup-profile-icon")[0]);
         });
 
     </script>

@@ -321,6 +321,81 @@ function initSearch(searchInputElement, items, valueExtractorFn = item => $(item
     });
 }
 
+function initActionsPopover(triggerElement, content) {
+    const $trigger = $(triggerElement);
+
+    $trigger.popover({
+        trigger: 'manual',
+        placement: 'auto bottom',
+        html: true,
+        container: 'body',
+        content,
+        template: '<div class="popover actions-popover" role="tooltip"><div class="popover-content"></div></div>'
+    });
+
+    $trigger.on('inserted.bs.popover', () => {
+        const $items = $trigger.data('bs.popover').$tip.find('.actions-popover__item');
+
+        $items.on('click', () => {
+            $trigger.popover('hide');
+        });
+    });
+
+    $trigger.on('click', () => {
+        $trigger.popover('toggle');
+    });
+
+    const bodyClickHandler = function (e) {
+        if ($(e.target) !== triggerElement && $(e.target).parents('.popover.in').length === 0) {
+            $trigger.popover('hide');
+        }
+    };
+
+    $trigger.bind('shown.bs.popover', () => {
+        $('body').bind('click', bodyClickHandler);
+    });
+
+    $trigger.on('hide.bs.popover', () => {
+        $('body').unbind('click', bodyClickHandler);
+    });
+}
+
+function initEmployeeFilePopover(triggerElement) {
+    $(triggerElement).popover({
+        trigger: 'hover',
+        placement: 'auto bottom',
+        container: 'body',
+        html: true,
+        content: `
+					<span class="employee-file-popover__title">Заполнено:</span>
+					<table class="table employee-file-popover__table">
+						<tbody>
+							<tr>
+								<td>обязательных полей</td>
+								<td class="employee-file-popover__table-quantity-cell">5</td>
+								<td class="employee-file-popover__table-percentage-cell">50%</td>
+							</tr>
+
+							<tr>
+								<td>дополнительных полей</td>
+								<td class="employee-file-popover__table-quantity-cell">10</td>
+								<td class="employee-file-popover__table-percentage-cell">30%</td>
+							</tr>
+
+							<tr>
+								<td>всего</td>
+								<td class="employee-file-popover__table-quantity-cell">15</td>
+								<td class="employee-file-popover__table-percentage-cell">45%</td>
+							</tr>
+						</tbody>
+					</table>
+				`,
+        template: `
+					<div class="popover employee-file-popover" role="tooltip"><div class="popover-content"></div></div>
+				`
+    });
+}
+
 function switchPayments(lnk) {
     $('.nav-pay li').removeClass('active');
     lnk.parent().addClass('active');
