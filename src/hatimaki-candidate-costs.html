@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Расходы по кандидатам</title>
+
+    @@include('include/_css.html')
+
+    @@include('include/_ie8.html')
+</head>
+
+<body>
+    <div class="hat-scaffold">
+        <div class="hat-scaffold__navbar">
+            @@include('include/hat-navbar.html')
+        </div>
+
+        <div class="hat-scaffold__body">
+            <div class="hat-scaffold__content-wrapper">
+                <div class="candidate-costs__content" data-bind="childrenComplete: onInit">
+                    <div class="candidate-costs__header">
+                        <h1>Расходы по кандидатам</h1>
+                    </div>
+
+                    <div class="candidate-costs__filters form-respons">
+                        <div class="candidate-costs__filters-row">
+                            <div class="candidate-costs__filter candidate-costs__period-filter">
+                                <div class="form-group candidate-costs__period-form-group">
+                                    <label>Период</label>
+                                    <div class="input-groups-periods">
+                                        <div class="input-group datepicker">
+                                            <input type="text" class="form-control periodDateInput" name="fromdate"
+                                                   placeholder="00.00.0000">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                        <span class="input-group-dash">&dash;</span>
+                                        <div class="input-group datepicker">
+                                            <input type="text" class="form-control periodDateInput" name="todate"
+                                                   placeholder="00.00.0000">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="candidate-costs__filter candidate-costs__connection-channel-filter">
+                                <div class="form-group">
+                                    <label>Каналы связи</label>
+                                    <input class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="candidate-costs__filters-row">
+                            <div class="candidate-costs__filter candidate-costs__empty-period-filter">
+                                <div class="checkbox-nice">
+                                    <label>
+                                        <input type="checkbox">
+                                        <span class="fa fa-check"></span>
+                                        Периоды без данных
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="candidate-costs__filters-actions">
+                                <button class="btn btn-default btn-p25 candidate-costs__filters-reset-button">
+                                    Сбросить
+                                </button>
+
+                                <button class="btn btn-primary btn-p25 candidate-costs__filters-apply-button">
+                                    Применить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="candidate-costs__body">
+                        <div class="candidate-costs__total">
+                            <div class="candidate-costs__total-main-block">
+                                <span class="candidate-costs__total-main-block-label">Расходы всего</span>
+                                <span class="candidate-costs__total-main-block-value" data-bind="text: $root.formatValue(totalValue())">
+                                </span>
+                            </div>
+
+                            <div class="candidate-costs__total-additional-block" title="hh.ru">
+                                <i class="far fa-hospital-symbol candidate-costs__total-additional-block-icon"></i>
+                                <span class="candidate-costs__total-additional-block-label">hh.ru</span>
+                                <span class="candidate-costs__total-additional-block-value" data-bind="text: $root.formatValue(hhTotalValue())"></span>
+                            </div>
+
+                            <div class="candidate-costs__total-additional-block" title="Ссылка на сотрудника">
+                                <i class="far fa-user-friends candidate-costs__total-additional-block-icon"></i>
+                                <span class="candidate-costs__total-additional-block-label">Ссылка от сотрудника</span>
+                                <span class="candidate-costs__total-additional-block-value" data-bind="text: $root.formatValue(employeeReferralTotalValue())"></span>
+                            </div>
+
+                            <div class="candidate-costs__total-additional-block" title="Внешняя ссылка">
+                                <i class="far fa-link candidate-costs__total-additional-block-icon"></i>
+                                <span class="candidate-costs__total-additional-block-label">Внешняя ссылка</span>
+                                <span class="candidate-costs__total-additional-block-value" data-bind="text: $root.formatValue(referralTotalValue())"></span>
+                            </div>
+
+                            <div class="candidate-costs__total-additional-block" title="Заполнена на сайте">
+                                <i class="far fa-globe candidate-costs__total-additional-block-icon"></i>
+                                <span class="candidate-costs__total-additional-block-label">Заполнена на сайте</span>
+                                <span class="candidate-costs__total-additional-block-value" data-bind="text: $root.formatValue(siteTotalValue())"></span>
+                            </div>
+                        </div>
+                        <div class="candidate-costs__table-wrapper">
+                        <div class="candidate-costs__page-size-selector">
+                            Показать на странице:
+                            <a class="candidate-costs__page-size-selector-item candidate-costs__page-size-selector-item--active" href="#">20</a>
+                            <a class="candidate-costs__page-size-selector-item" href="#">40</a>
+                            <a class="candidate-costs__page-size-selector-item" href="#">60</a>
+                            <a class="candidate-costs__page-size-selector-item" href="#">Все</a>
+                        </div>
+                        
+                        <table class="table candidate-costs__table">
+                            <thead>
+                                <tr>
+                                    <th class="candidate-costs__table-head-cell candidate-costs__table-period-head-cell">
+                                        Период
+                                    </th>
+
+                                    <th class="candidate-costs__table-head-cell candidate-costs__table-period-month-cell"></th>
+
+                                    <th class="candidate-costs__table-head-cell candidate-costs__table-hh-head-cell">
+                                        hh.ru, <i class="far fa-ruble-sign"></i>
+                                    </th>
+
+                                    <th class="candidate-costs__table-head-cell candidate-costs__table-employee-referral-head-cell">
+                                        Ссылка от сотрудника, <i class="far fa-ruble-sign"></i>
+                                    </th>
+
+                                    <th class="candidate-costs__table-head-cell candidate-costs__table-referral-head-cell">
+                                        Внешняя ссылка, <i class="far fa-ruble-sign"></i>
+                                    </th>
+
+                                    <th class="candidate-costs__table-head-cell candidate-costs__table-site-head-cell">
+                                        Заполнена на сайте, <i class="far fa-ruble-sign"></i>
+                                    </th>
+
+                                    <th class="candidate-costs__table-head-cell candidate-costs__table-total-head-cell">
+                                        Всего, <i class="far fa-ruble-sign"></i>
+                                    </th>
+
+                                    <th class="candidate-costs__table-head-cell candidate-costs__table-actions-head-cell"></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <!-- ko foreach: { data: periods, as: 'period' } -->
+                                    <tr class="candidate-costs__table-row candidate-costs__table-total-row">
+                                        <td class="candidate-costs__table-cell candidate-costs__table-period-cell"
+                                            data-bind="text: name"></td>
+
+                                        <td class="candidate-costs__table-cell candidate-costs__table-month-cell"></td>
+
+                                        <td class="candidate-costs__table-cell candidate-costs__table-hh-cell"
+                                            data-bind="text: $root.formatValue($root.getPeriodHhTotalValue(period))">
+                                        </td>
+
+                                        <td class="candidate-costs__table-cell candidate-costs__table-employee-referral-cell"
+                                            data-bind="text: $root.formatValue($root.getPeriodEmployeeReferralTotalValue(period))">
+                                        </td>
+
+                                        <td class="candidate-costs__table-cell candidate-costs__table-referral-cell"
+                                            data-bind="text: $root.formatValue($root.getPeriodReferralTotalValue(period))">
+                                        </td>
+
+                                        <td class="candidate-costs__table-cell candidate-costs__table-site-cell"
+                                            data-bind="text: $root.formatValue($root.getPeriodSiteTotalValue(period))">
+                                        </td>
+
+                                        <td class="candidate-costs__table-cell candidate-costs__table-total-cell"
+                                            data-bind="text: $root.formatValue($root.getPeriodTotalValue(period))">
+                                    </td>
+
+                                    <td class="candidate-costs__table-cell candidate-costs__table-actions-cell"></td>
+                                </tr>
+
+                                    <!-- ko foreach: { data: period.months, as: 'month' } -->
+                                        <tr
+                                            class="candidate-costs__table-row candidate-costs__table-month-row"
+                                            data-bind="css: {
+                                                'candidate-costs__table-month-row--empty': month === null,
+                                                'candidate-costs__table-month-row--editing': $root.isEditingMonth(periodIndex(), monthIndex())}
+                                            "
+                                        >
+                                            <td class="candidate-costs__table-cell candidate-costs__table-period-cell"></td>
+
+                                            <td class="candidate-costs__table-cell candidate-costs__table-month-cell"
+                                                data-bind="text: $root.getMonthName(monthIndex())">
+                                            </td>
+
+                                            <td class="candidate-costs__table-cell candidate-costs__table-hh-cell">
+                                                <!-- ko if: !$root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <!-- ko text: (month !== null && hh() !== null) ? $root.formatValue(hh()) : '-' -->
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <div class="form-group">
+                                                        <input class="form-control" data-bind="{ value: $root.newHhValue, candidateCostsNumberInput }">
+                                                    </div>
+                                                <!-- /ko -->
+                                            </td>
+
+                                            <td class="candidate-costs__table-cell candidate-costs__table-employee-referral-cell">
+                                                <!-- ko if: !$root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <!-- ko text: (month !== null && employeeReferral() !== null) ? $root.formatValue(employeeReferral()) : '-' -->
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <div class="form-group">
+                                                        <input class="form-control" data-bind="{ value: $root.newEmployeeReferralValue, candidateCostsNumberInput }">
+                                                    </div>
+                                                <!-- /ko -->
+                                            </td>
+
+                                            <td class="candidate-costs__table-cell candidate-costs__table-referral-cell">
+                                                <!-- ko if: !$root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <!-- ko text: (month !== null && referral() !== null) ? $root.formatValue(referral()) : '-' -->
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <div class="form-group">
+                                                        <input class="form-control" data-bind="{ value: $root.newReferralValue, candidateCostsNumberInput }">
+                                                    </div>
+                                                <!-- /ko -->
+                                            </td>
+
+                                            <td class="candidate-costs__table-cell candidate-costs__table-site-cell">
+                                                <!-- ko if: !$root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <!-- ko text: (month !== null && site() !== null) ? $root.formatValue(site()) : '-' -->
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <div class="form-group">
+                                                        <input class="form-control" data-bind="{ value: $root.newSiteValue, candidateCostsNumberInput }">
+                                                    </div>
+                                                <!-- /ko -->
+                                            </td>
+
+                                            <td class="candidate-costs__table-cell candidate-costs__table-total-cell"
+                                                data-bind="text: month !== null ? $root.formatValue($root.getMonthTotalValue(month)) : '-'">
+                                            </td>
+
+                                            <td class="candidate-costs__table-cell candidate-costs__table-actions-cell">
+                                                <!-- ko if: !$root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <a type="button" class="btn btn-default icon-btn candidate-costs__table-row-edit-button"
+                                                            title="Редактировать" data-bind="click: function() { $root.editMonth(periodIndex(), monthIndex()); }">
+                                                        <i class="far fa-pencil"></i>
+                                                    </a>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.isEditingMonth(periodIndex(), monthIndex()) -->
+                                                    <a type="button" class="btn btn-default icon-btn candidate-costs__table-row-reset-button"
+                                                            title="Сбросить значения" data-bind="click: function() { $root.resetEditingMonth(); }">
+                                                        <i class="far fa-broom"></i>
+                                                    </a>
+
+                                                    <a type="button" class="btn btn-default icon-btn candidate-costs__table-row-save-button"
+                                                            title="Сохранить" data-bind="click: function() { $root.saveEditingMonth(); }">
+                                                        <i class="far fa-check"></i>
+                                                    </a>
+                                                <!-- /ko -->
+                                            </td>
+                                        </tr>
+                                    <!-- /ko -->
+                                <!-- /ko -->
+                            </tbody>
+                        </table>
+
+                        @@include('include/pagination.html')
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @@include('include/_js.html')
+
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/inputmask.min.js" integrity="sha256-JUbLuiRKiaXfbMpDSL9JwAJugW+Hg2E07+fjOCFjSSA=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/jquery.inputmask.min.js" integrity="sha256-BhZ+laf8gu3ZySieS2lNZWQ7Aeeada3d9b/0Gb7HBYc=" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            initHatNavbar(document);
+
+            ko.bindingHandlers.candidateCostsNumberInput = {
+                init: function(element) {
+                    $(element).inputFilter(value => /^\d*[.,]?\d*$/.test(value));
+                }
+            };
+
+            const ViewModel = function(periods) {
+                this.periods = periods.map(t => ({
+                    name: t.name,
+                    months: ko.observableArray(t.months.map(m => {
+                        if (m !== null) {
+                            return {
+                                hh: ko.observable(m.hh),
+                                employeeReferral: ko.observable(m.employeeReferral),
+                                referral: ko.observable(m.referral),
+                                site: ko.observable(m.site)
+                            };
+                        } else {
+                            return null;
+                        }
+                    }))
+                }));
+
+                this.editingMonth = ko.observable(null);
+                this.newHhValue = ko.observable('0');
+                this.newEmployeeReferralValue = ko.observable('0');
+                this.newReferralValue = ko.observable('0');
+                this.newSiteValue = ko.observable('0');
+
+                this.isEditingMonth = function (periodIndex, monthIndex) {
+                    return this.editingMonth() !== null && this.editingMonth().periodIndex === periodIndex && this.editingMonth().monthIndex === monthIndex;
+                };
+
+                this.getMonth = function(periodIndex, monthIndex) {
+                    return this.periods[periodIndex].months()[monthIndex];
+                };
+
+                this.editMonth = function(periodIndex, monthIndex) {
+                    if (this.editingMonth() !== null) {
+                        this.resetEditingMonth();
+                    }
+
+                    const month = this.getMonth(periodIndex, monthIndex);
+                    this.newHhValue(month !== null ? month.hh() : 0);
+                    this.newEmployeeReferralValue(month !== null ? month.employeeReferral() : 0);
+                    this.newReferralValue(month !== null ? month.referral() : 0);
+                    this.newSiteValue(month !== null ? month.site() : 0);
+                    this.editingMonth({periodIndex, monthIndex});
+                };
+
+                this.resetEditingMonth = function() {
+                    const month = this.getMonth(this.editingMonth().periodIndex, this.editingMonth().monthIndex);
+                    this.newHhValue(month !== null ? month.hh() : 0);
+                    this.newEmployeeReferralValue(month !== null ? month.employeeReferral() : 0);
+                    this.newReferralValue(month !== null ? month.referral() : 0);
+                    this.newSiteValue(month !== null ? month.site() : 0);
+                };
+
+                this.saveEditingMonth = function() {
+                    const month = this.getMonth(this.editingMonth().periodIndex, this.editingMonth().monthIndex);
+
+                    if (month !== null) {
+                        month.hh(+this.newHhValue());
+                        month.employeeReferral(+this.newEmployeeReferralValue());
+                        month.referral(+this.newReferralValue());
+                        month.site(+this.newSiteValue());
+                    } else {
+                        this.periods[this.editingMonth().periodIndex].months.splice(this.editingMonth().monthIndex, 1, {
+                            hh: ko.observable(+this.newHhValue()),
+                            employeeReferral: ko.observable(+this.newEmployeeReferralValue()),
+                            referral: ko.observable(+this.newReferralValue()),
+                            site: ko.observable(+this.newSiteValue())
+                        });
+                    }
+
+                    this.editingMonth(null);
+                };
+
+                this.getMonthName = function (monthIndex) {
+                    return ([
+                        'Январь',
+                        'Февраль',
+                        'Март',
+                        'Апрель',
+                        'Мая',
+                        'Июнь',
+                        'Июль',
+                        'Август',
+                        'Сентябрь',
+                        'Октябрь',
+                        'Ноябрь',
+                        'Декабрь'
+                    ])[monthIndex];
+                };
+
+                this.formatValue = function (value) {
+                    const parts = value.toString().split(".");
+                    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                    return parts.join(".");
+                };
+
+                this.getMonthTotalValue = function (month) {
+                    return month.hh() + month.employeeReferral() + month.referral() + month.site();
+                };
+
+                this.getPeriodHhTotalValue = function (period) {
+                    return period.months().reduce((v, month) => v + (month !== null ? month.hh() : 0), 0);
+                };
+
+                this.getPeriodEmployeeReferralTotalValue = function (period) {
+                    return period.months().reduce((v, month) => v + (month !== null ? month.employeeReferral() : 0), 0);
+                };
+
+                this.getPeriodReferralTotalValue = function (period) {
+                    return period.months().reduce((v, month) => v + (month !== null ? month.referral() : 0), 0);
+                };
+
+                this.getPeriodSiteTotalValue = function (period) {
+                    return period.months().reduce((v, month) => v + (month !== null ? month.site() : 0), 0);
+                };
+
+                this.getPeriodTotalValue = function (period) {
+                    return period.months().reduce((v, month) => v + (month !== null ? this.getMonthTotalValue(month) : 0), 0);
+                };
+
+                this.hhTotalValue = ko.computed(() => {
+                    return this.periods.reduce((v, period) => v + this.getPeriodHhTotalValue(period), 0);
+                });
+
+                this.employeeReferralTotalValue = ko.computed(() => {
+                    return this.periods.reduce((v, period) => v + this.getPeriodEmployeeReferralTotalValue(period), 0);
+                });
+
+                this.referralTotalValue = ko.computed(() => {
+                    return this.periods.reduce((v, period) => v + this.getPeriodReferralTotalValue(period), 0);
+                });
+
+                this.siteTotalValue = ko.computed(() => {
+                    return this.periods.reduce((v, period) => v + this.getPeriodSiteTotalValue(period), 0);
+                });
+
+                this.totalValue = ko.computed(() => {
+                    return this.periods.reduce((v, period) => v + this.getPeriodTotalValue(period), 0);
+                });
+            };
+
+            const viewModel = new ViewModel(
+                [
+                    {
+                        name: '2018',
+                        months: [
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            null,
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000}
+                        ]
+                    },
+                    {
+                        name: '2019',
+                        months: [
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000},
+                            {hh: 5000, employeeReferral: 4000, referral: 3000, site: 2000}
+                        ]
+                    }
+                ]
+            );
+
+            const $documentsContent = $('.candidate-costs__content');
+
+            viewModel.onInit = function() {
+                $('.datepicker').datetimepicker({
+                    dateFormat: 'dd.mm.yyyy',
+                    language: 'ru',
+                    pickTime: false,
+                    daysOfWeekDisabled:[0,6]
+                });
+
+                $('.periodDateInput').inputmask("99.99.9999");
+
+                $('.candidate-costs__period-form-group').each((index, formGroupElement) => {
+                    const dateFormat = 'DD.MM.YYYY';
+
+                    const $formGroupElement = $(formGroupElement);
+                    const $fromInput = $(formGroupElement).find('input').eq(0);
+                    const $toInput = $(formGroupElement).find('input').eq(1);
+                    const $helpBlock = $('<p class="help-block"></p>');
+
+                    function validate() {
+                        const error = (() => {
+                            const fromInputValue = $fromInput.val();
+                            const toInputValue = $toInput.val();
+
+                            if (toInputValue === '' && fromInputValue === '') {
+                                return null;
+                            }
+
+                            if (toInputValue === '' || fromInputValue === '') {
+                                return 'Необходимо заполнить и начало, и конец периода';
+                            }
+
+                            const fromDate = moment(fromInputValue, dateFormat);
+                            const toDate = moment(toInputValue, dateFormat);
+
+                            if (!fromDate.isValid() || !toDate.isValid()) {
+                                return 'Неверный формат дат';
+                            }
+
+                            if (!(toDate.isSame(fromDate) || toDate.isAfter(fromDate))) {
+                                return 'Дата начала периода должна быть до даты окончания или такой же';
+                            }
+
+                            return null;
+                        })();
+
+                        $formGroupElement.toggleClass('has-error', error !== null);
+
+                        if (error !== null) {
+                            $helpBlock.text(error);
+                            $formGroupElement.append($helpBlock);
+                        } else {
+                            $helpBlock.text('');
+                            $helpBlock.remove();
+                        }
+                    }
+
+                    $fromInput.on('change', () => {
+                        validate();
+                    });
+
+                    $fromInput.parent().on('dp.change', () => {
+                        validate();
+                    });
+
+                    $toInput.on('change', () => {
+                        validate();
+                    });
+
+                    $toInput.parent().on('dp.change', () => {
+                        validate();
+                    });
+
+                    validate();
+                });
+
+                $('.candidate-costs__filters-reset-button').on('click', () => {
+                    $('.candidate-costs__filters').find('input, select').val('').trigger('change');
+                    $('.candidate-costs__filters').find('input[type="checkbox"]').prop("checked", false);
+                });
+            };
+
+            ko.applyBindings(
+                viewModel,
+                $documentsContent.get()[0]
+            );
+        });
+    </script>
+</body>
+</html>

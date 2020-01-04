@@ -159,7 +159,7 @@
 										Очистить
 									</button>
 
-									<button class="btn btn-default btn-w-30 candidates__form-clear-button hidden-md hidden-lg">
+									<button class="btn btn-default icon-btn candidates__form-clear-button hidden-md hidden-lg">
 										<i class="far fa-broom"></i>
 									</button>
 
@@ -167,7 +167,7 @@
 										Применить
 									</button>
 
-									<button class="btn btn-primary btn-w-30 candidates__form-apply-button hidden-md hidden-lg">
+									<button class="btn btn-primary icon-btn candidates__form-apply-button hidden-md hidden-lg">
 										<i class="far fa-check"></i>
 									</button>
 								</div>
@@ -179,11 +179,12 @@
 
 					<div class="candidates__tab-group">
 						<ul class="nav nav-tabs">
-							<li class="active"><a href="#table" role="tab" data-toggle="tab">Таблица</a></li>
+							<li><a href="#table" role="tab" data-toggle="tab">Таблица</a></li>
 							<li><a href="#reports" role="tab" data-toggle="tab">Отчёты</a></li>
+							<li class="active"><a href="#periodReports" role="tab" data-toggle="tab">Отчёты по периодам</a></li>
 						</ul>
 						<div class="tab-content">
-							<div role="tabpanel" class="tab-pane active" id="table">
+							<div role="tabpanel" class="tab-pane" id="table">
 								<div class="candidates__table">
 									<div class="table-responsive">
 										<table class="table table-valign-middle table-hover">
@@ -830,6 +831,72 @@
 									</div>
 								</div>
 							</div>
+							<div role="tabpanel" class="tab-pane active" id="periodReports">
+								<div class="candidates__additional-filters form-respons">
+									<div class="candidates__additional-filter candidates__period-additional-filter">
+										<div class="form-group candidates__period-form-group">
+											<label>Период</label>
+											<div class="input-groups-periods">
+												<div class="input-group datepicker">
+													<input type="text" class="form-control periodDateInput" value="01.01.1995" name="fromdate"
+														   placeholder="00.00.0000">
+													<span class="input-group-btn">
+														<button class="btn btn-default" type="button">
+															<i class="fas fa-calendar-alt"></i>
+														</button>
+													</span>
+												</div>
+												<span class="input-group-dash">&dash;</span>
+												<div class="input-group datepicker">
+													<input type="text" class="form-control periodDateInput" value="01.01.1995" name="todate"
+														   placeholder="00.00.0000">
+													<span class="input-group-btn">
+														<button class="btn btn-default" type="button">
+															<i class="fas fa-calendar-alt"></i>
+														</button>
+													</span>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="candidates__additional-filter candidates__group-by-additional-filter">
+										<div class="form-group">
+											<label>Группировать по</label>
+											<select class="form-control">
+												<option value="0">Неделям</option>
+												<option value="0">Месяцам</option>
+												<option value="2">Кварталам</option>
+												<option value="3">Годам</option>
+											</select>
+										</div>
+									</div>
+
+									<button class="btn btn-primary btn-p25 candidates__additional-filters-apply-button hidden-sm hidden-xs">
+										Применить
+									</button>
+
+									<button class="btn btn-primary icon-btn candidates__additional-filters-apply-button hidden-md hidden-lg">
+										<i class="far fa-check"></i>
+									</button>
+								</div>
+								<div class="row charts">
+									<div class="col-lg-6 col-md-6 col-sm-12 chart stacked-column-chart">
+										<div id="stackedColumn1"></div>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-12 chart stacked-column-chart">
+										<div id="stackedColumn2"></div>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-12 chart stacked-column-chart">
+										<div id="stackedColumn3"></div>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-12 chart stacked-column-chart">
+										<div id="stackedColumn4"></div>
+									</div>
+									<div class="col-lg-6 col-md-6 col-sm-12 chart stacked-column-chart">
+										<div id="stackedColumn5"></div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -949,7 +1016,7 @@
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
 							aria-hidden="true">&times;</span></button>
 				</div>
-				<div class="modal-body">				
+				<div class="modal-body">
 					<div class="scrollbar-inner">
 						<div class="form-group mod-charts__form-group">
 							<label>Группировать по</label>
@@ -960,7 +1027,7 @@
 								 <option value="">Гражданству</option>
 								 <option value="">Кто привел</option>
 							</select>
-						</div>					
+						</div>
 						<div class="row charts">
 							<div class="col-xs-6 chart sales-funnel-chart">
 								<div id="modal-pyramid1"></div>
@@ -1022,7 +1089,7 @@
 								 <option value="">Гражданству</option>
 								 <option value="">Кто привел</option>
 							</select>
-						</div>					
+						</div>
 						<div class="row charts">
 							<div class="col-xs-6 chart">
 								<div id="modal-bars1"></div>
@@ -1050,6 +1117,71 @@
 							</div>
 							<div class="col-xs-6 chart">
 								<div id="modal-bars9"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" tabindex="-1" role="dialog" id="modalStackedColumnCharts">
+		<div class="modal-dialog modal-dialog-centered mod-charts" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<ul class="mod-legend">
+						<li class="mod-legend__line">
+							<span class="mod-legend__point highcharts-color-0"></span>Заполнены все обязательные и часть дополнительных полей
+						</li>
+						<li class="mod-legend__line">
+							<span class="mod-legend__point highcharts-color-1"></span>Заполнены все поля
+						</li>
+						<li class="mod-legend__line">
+							<span class="mod-legend__point highcharts-color-2"></span>Не заполнены обязательные поля
+						</li>
+					</ul>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+							aria-hidden="true">&times;</span></button>
+				</div>
+				<div class="modal-body">
+					<div class="scrollbar-inner">
+						<div class="form-group mod-charts__form-group">
+							<label>Группировать по</label>
+							<select class="form-control">
+								<option value="" selected="">Филиалу</option>
+								<option value="">Ответственному</option>
+								<option value="">Должности</option>
+								<option value="">Гражданству</option>
+								<option value="">Кто привел</option>
+							</select>
+						</div>
+						<div class="row charts">
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column1"></div>
+							</div>
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column2"></div>
+							</div>
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column3"></div>
+							</div>
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column4"></div>
+							</div>
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column5"></div>
+							</div>
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column6"></div>
+							</div>
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column7"></div>
+							</div>
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column8"></div>
+							</div>
+							<div class="col-xs-12 chart stacked-column-chart">
+								<div id="modal-stacked-column9"></div>
 							</div>
 						</div>
 					</div>
@@ -1298,6 +1430,9 @@
 
 	<script src="https://cdn.jsdelivr.net/npm/responsive-toolkit@2.6.3/src/bootstrap-toolkit.min.js"></script>
 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/inputmask.min.js" integrity="sha256-JUbLuiRKiaXfbMpDSL9JwAJugW+Hg2E07+fjOCFjSSA=" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/jquery.inputmask.min.js" integrity="sha256-BhZ+laf8gu3ZySieS2lNZWQ7Aeeada3d9b/0Gb7HBYc=" crossorigin="anonymous"></script>
+
     <script type="text/javascript">
         $(document).ready(function () {
             initHatNavbar(document);
@@ -1310,11 +1445,13 @@
 	        });
 
 	        $('.js-select2').select2({
-                width: '100%'
+                width: '100%',
+				allowClear: true
             });
 
             $('.js-select-single').select2({
-                width: '100%'
+                width: '100%',
+				allowClear: true
             });
 
             $('.input-timework').datetimepicker({
@@ -1442,11 +1579,11 @@
 				})
 			);
 
-			$('#modalRoundCharts, #modalPyramidCharts, #modalBarsCharts').on('hidden.bs.modal', function () {
+			$('#modalRoundCharts, #modalPyramidCharts, #modalBarsCharts, #modalStackedColumnCharts').on('hidden.bs.modal', function () {
 				$(this).find('.scrollbar-inner').mCustomScrollbar('destroy');
 			});
 
-			$('#modalRoundCharts, #modalPyramidCharts, #modalBarsCharts').on('show.bs.modal', function () {
+			$('#modalRoundCharts, #modalPyramidCharts, #modalBarsCharts, #modalStackedColumnCharts').on('show.bs.modal', function () {
 				$(this).find('.scrollbar-inner').mCustomScrollbar({
 					axis: 'y',
 					theme: 'dark',
@@ -1489,1093 +1626,1897 @@
 				`);
 			});
 
-			function processPyramidSeries (values) {
-				let maxValue = null;
+			$('.periodDateInput').inputmask("99.99.9999");
 
-				values.forEach(function (v) {
-					if (!maxValue || maxValue < v.value) {
-						maxValue = v.value;
+			$('.candidates__period-form-group').each((index, formGroupElement) => {
+				const dateFormat = 'DD.MM.YYYY';
+
+				const $formGroupElement = $(formGroupElement);
+				const $fromInput = $(formGroupElement).find('input').eq(0);
+				const $toInput = $(formGroupElement).find('input').eq(1);
+				const $helpBlock = $('<p class="help-block"></p>');
+
+				function validate() {
+					const fromDate = moment($fromInput.val(), dateFormat);
+					const toDate = moment($toInput.val(), dateFormat);
+
+					const error = (() => {
+						if (!fromDate.isValid() || !toDate.isValid()) {
+							return 'Неверный формат дат';
+						}
+
+						if (!(toDate.isSame(fromDate) || toDate.isAfter(fromDate))) {
+							return 'Дата начала периода должна быть до даты окончания или такой же';
+						}
+
+						return null;
+					})();
+
+					$formGroupElement.toggleClass('has-error', error !== null);
+
+					if (error !== null) {
+						$helpBlock.text(error);
+						$formGroupElement.append($helpBlock);
+					} else {
+						$helpBlock.text('');
+						$helpBlock.remove();
 					}
+				}
+
+				$fromInput.on('change', () => {
+					validate();
 				});
 
-				const paddingSeries = {
-					data: [],
-					enableMouseTracking: false,
-					showInLegend: false,
-					colorIndex: 51,
-					dataLabels: {
-						enabled: false
-					}
-				};
-
-				const valueSeries = [];
-
-				values.forEach(function (value, index) {
-					const w = (maxValue - value.value) / 2;
-
-					paddingSeries.data.push({y: w});
-
-					valueSeries.push({
-						name: value.name,
-						data: values.map((v, i) => i === index ? v.value : null),
-						maxValue
-					});
+				$fromInput.parent().on('dp.change', () => {
+					validate();
 				});
 
+				$toInput.on('change', () => {
+					validate();
+				});
 
-				return [paddingSeries, ...valueSeries, paddingSeries]
-			}
+				$toInput.parent().on('dp.change', () => {
+					validate();
+				});
 
-			let highchartsRoundChart = {
-						type: 'pie',
-						styledMode: true,
-						width: 354,
-						height: 485,
-						className: 'chart--big'
-					},
-					highchartsPyramidChart = {
-						type: 'bar',
-						styledMode: true
-					},
-					highchartsBarsChart = {
-						type: 'bar',
-						height: 350,
-						styledMode: true
-					},
-					highchartsModalRoundChart = {
-						type: 'pie',
-						styledMode: true,
-						width: 330,
-						height: 250,
-						className: 'chart--modal'
-					},
-					highchartsModalPyramidChart = {
-						type: 'bar',
-						styledMode: true,
-						height: 220,
-					},
-					highchartsModalBarsChart = {
-						type: 'bar',
-						height: 250,
-						styledMode: true
-					},
-					highchartsTooltip = {
-						pointFormat: '{point.y} <b>{point.percentage:.1f}%</b>'
-					},
-					highchartsBarsTooltip = {
-						pointFormat: '{point.y}'
-					},
-					highchartsRoundPlotOptions = {
-						pie: {
-							allowPointSelect: false,
-							cursor: 'pointer',
-							dataLabels: {
-								enabled: false
-							},
-							showInLegend: true,
-							size: 230,
-							center: ["50%", "90"],
-							events: {
-								click: function (event) {
-									$('#modalRoundCharts').modal('show');
-								}
-							}
-						}
-					},
-					highchartsModalRoundPlotOptions = {
-						pie: {
-							allowPointSelect: false,
-							cursor: 'pointer',
-							dataLabels: {
-								enabled: false
-							},
-							showInLegend: true,
-							center: ["70", "70"],
-							size: 180
-						}
-					},
-					highchartsPyramidPlotOptions = {
-						series: {
-							stacking: 'percent',
-							shadow: false,
-							pointPadding: 0.05,
-							dataLabels: {
-								enabled: true
-							}
-						},
-						bar: {
-							groupPadding: 0,
-							events: {
-								click: function (event) {
-									$('#modalPyramidCharts').modal('show');
-								}
-							}
-						}
-					},
-					highchartsBarsPlotOptions = {
-						bar: {
-							grouping: false,
-							step: 5,
-							events: {
-								click: function (event) {
-									$('#modalBarsCharts').modal('show');
-								}
-							}
-						}
-					},
-					highchartsModalPyramidPlotOptions = {
-						series: {
-							stacking: 'percent',
-							shadow: false,
-							pointPadding: 0.05,
-							dataLabels: {
-								enabled: false
-							}
-						},
-						bar: {
-							groupPadding: 0,
-							dataLabels: {
-								enabled: false
-							}
-						}
-					},
-					highchartsRoundDoubleLegend = {
-						align: 'left',
-						verticalAlign: 'proximate',
-						y: 280,
-						layout: 'horizontal',
-						alignColumns: true,
-						symbolPadding: 8,
-						symbolWidth: 10,
-						symbolHeight: 10,
-						symbolRadius: 5,
-						useHTML: true,
-						width:354,
-						itemWidth:177,
-						itemMarginBottom: 5,
-                        maxHeight: 163,
-						labelFormatter: function () {
-							return `
-                            <span class="chart__name">${this.name}</span>
-                            <span class="chart__num">${this.y}</span>
-                            <span class="chart__percent">${this.percentage.toFixed(0)}%</span>
-                        `
-						}
-					},
-					highchartsRoundSingleLegend = {
-						align: 'center',
-						verticalAlign: 'proximate',
-						y: 280,
-						layout: 'horizontal',
-						alignColumns: true,
-						symbolPadding: 8,
-						symbolWidth: 10,
-						symbolHeight: 10,
-						symbolRadius: 5,
-						useHTML: true,
-						itemMarginBottom: 5,
-						maxHeight: 163,
-						labelFormatter: function () {
-							return `
-                            <span class="chart__name">${this.name}</span>
-                            <span class="chart__num">${this.y}</span>
-                            <span class="chart__percent">${this.percentage.toFixed(0)}%</span>
-                        `
-						}
-					},
-					highchartsPyramidLegend = {
-						enabled: false
-					},
-					highchartsBarsLegend = {
-						align: 'center',
-						y: 3,
-						symbolPadding: 8,
-						symbolWidth: 10,
-						symbolHeight: 10,
-						symbolRadius: 5,
-						useHTML: true,
-						itemMarginBottom: 5,
-						labelFormatter: function () {
-							return `
-								<span class="chart__name">${this.name}</span>
-								<span class="chart__num">${this.yData[0]}</span>
-							`;
-						}
-					},
-					highchartsModalRoundLegend = {
-						align: 'right',
-						x: -20,
-						verticalAlign: 'middle',
-						layout: 'vertical',
-						symbolPadding: 8,
-						symbolWidth: 10,
-						symbolHeight: 10,
-						symbolRadius: 5,
-						useHTML: true,
-						itemMarginBottom: 5,
-						labelFormatter: function () {
-							return `
-								<span class="chart__num">${this.y}</span>
-								<span class="chart__percent">${this.percentage.toFixed(0)}%</span>
-							`
-						}
-					},
-					highchartsModalPyramidLegend = {
-						align: 'right',
-						x: 130,
-						y: -20,
-						verticalAlign: 'middle',
-						layout: 'vertical',
-						symbolPadding: 8,
-						symbolWidth: 10,
-						symbolHeight: 10,
-						symbolRadius: 5,
-						useHTML: true,
-						itemMarginBottom: 5,
-						labelFormatter: function () {
-							const value = this.yData[this.index - 1];
-							const maxValue = this.userOptions.maxValue;
-
-							return `
-								<span class="chart__num">${this.yData[this.index - 1]}</span>
-								<span class="chart__percent">${(value / maxValue * 100).toFixed(0)}%</span>
-							`;
-						}
-					},
-					highchartsModalBarsLegend = {
-						align: 'left',
-						y: 10,
-						padding: 0,
-						symbolPadding: 8,
-						symbolWidth: 10,
-						symbolHeight: 10,
-						symbolRadius: 5,
-						useHTML: true,
-						itemMarginBottom: 30,
-						width: 90,
-						itemWidth: 45,
-						labelFormatter: function () {
-							return `
-								<b>${this.yData[0]}</b>
-							`
-						}
-					},
-					highchartsPyramidXAxis = {
-						labels: {
-							enabled: false
-						},
-						visible: false
-					},
-					highchartsPyramidYAxis = {
-						gridLineWidth: 0,
-						min: 0,
-						labels: {
-							enabled: false
-						},
-						visible: false
-					},
-					highchartsBarsYAxis = {
-						title: {
-							text: ''
-						}
-					},
-					highchartsBarsXAxisLabels = {
-						enabled: false
-					};
-
-			Highcharts.chart('round1', {
-				chart: highchartsRoundChart,
-				title: {
-					text: 'Кандидаты по статусам'
-				},
-				tooltip: highchartsTooltip,
-				plotOptions: highchartsRoundPlotOptions,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				legend: highchartsRoundDoubleLegend
+				validate();
 			});
-			Highcharts.chart('round2', {
-				chart: highchartsRoundChart,
+
+            function processPyramidSeries(values, hiddenSeries) {
+                const visibleValues = values.filter((v, i) => !hiddenSeries.includes(i));
+
+                let maxValue = 0;
+
+                visibleValues.forEach(function (v) {
+                    maxValue = Math.max(v.value, maxValue);
+                });
+
+                const series = [];
+
+                values
+                    .map((v, i) => ({...v, originalIndex: i, visible: !hiddenSeries.includes(i)}))
+                    .sort((v1, v2) => {
+                        if (v1.visible === v2.visible) {
+                            return 0;
+                        } else if (v1.visible) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    })
+                    .forEach(function (value, index) {
+                        const w = (maxValue - value.value) / 2;
+
+                        series.push({
+                            data: visibleValues.map((v, i) => i === index ? w : null),
+                            enableMouseTracking: false,
+                            showInLegend: false,
+                            colorIndex: 51,
+                            dataLabels: {
+                                enabled: false
+                            }
+                        });
+
+                        series.push({
+                            name: value.name,
+                            colorIndex: value.colorIndex,
+                            data: visibleValues.map((v, i) => i === index ? v.value : null),
+                            value: value.value,
+                            legendIndex: value.originalIndex,
+                            originalIndex: value.originalIndex,
+                            visible: value.visible,
+                            maxValue
+                        });
+
+                        series.push({
+                            data: visibleValues.map((v, i) => i === index ? w : null),
+                            enableMouseTracking: false,
+                            showInLegend: false,
+                            colorIndex: 51,
+                            dataLabels: {
+                                enabled: false
+                            }
+                        });
+                    });
+
+                return series;
+            }
+
+            let highchartsRoundChart = {
+                    type: 'pie',
+                    styledMode: true,
+                    width: 354,
+                    height: 485,
+					className: 'chart--big'
+                },
+				highchartsRoundWithSingleLegendChart = {
+					type: 'pie',
+					styledMode: true,
+					width: 354,
+					height: 485,
+					className: 'chart--single-legend'
+				},
+                highchartsPyramidChart = {
+                    type: 'bar',
+                    styledMode: true
+                },
+                highchartsBarsChart = {
+                    type: 'bar',
+                    height: 350,
+                    styledMode: true
+                },
+				highchartsStackedColumnChart = {
+					type: 'column',
+					height: 500,
+					styledMode: true
+				},
+                highchartsModalRoundChart = {
+                    type: 'pie',
+                    styledMode: true,
+                    width: 330,
+                    height: 250,
+                    className: 'chart--modal'
+                },
+                highchartsModalPyramidChart = {
+                    type: 'bar',
+                    styledMode: true,
+                    height: 220,
+                },
+                highchartsModalBarsChart = {
+                    type: 'bar',
+                    height: 250,
+                    styledMode: true
+                },
+				highchartsStackedColumnTitle = {
+					align: 'left',
+					margin: 35
+				},
+                highchartsTooltip = {
+                    pointFormat: '{point.y} <b>{point.percentage:.1f}%</b>'
+                },
+                highchartsPyramidTooltip = {
+					positioner: function(labelWidth, labelHeight, point) {
+						const tooltipX = 0;
+						const tooltipY = point.plotY;
+						return {
+							x: tooltipX,
+							y: tooltipY
+						};
+					}
+                },
+                highchartsBarsTooltip = {
+                    pointFormat: '{point.y}'
+                },
+                highchartsRoundPlotOptions = {
+                    pie: {
+                        allowPointSelect: false,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: true,
+                        size: 230,
+                        center: ["50%", "90"],
+                        events: {
+                            click: function (event) {
+                                $('#modalRoundCharts').modal('show');
+                            }
+                        }
+                    }
+                },
+                highchartsModalRoundPlotOptions = {
+                    pie: {
+                        allowPointSelect: false,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: true,
+                        center: ["70", "70"],
+                        size: 180
+                    }
+                },
+                highchartsPyramidPlotOptions = {
+                    series: {
+                        stacking: 'percent',
+                        shadow: false,
+                        pointPadding: 0.05,
+                        dataLabels: {
+                            enabled: true
+                        }
+                    },
+                    bar: {
+                        groupPadding: 0,
+                        events: {
+                            click: function (event) {
+                                $('#modalPyramidCharts').modal('show');
+                            }
+                        }
+                    }
+                },
+                highchartsBarsPlotOptions = {
+                    bar: {
+                        grouping: false,
+                        step: 5,
+                        events: {
+                            click: function (event) {
+                                $('#modalBarsCharts').modal('show');
+                            }
+                        }
+                    }
+                },
+				highchartsStackedColumnPlotOptions = {
+					column: {
+						stacking: 'normal',
+						dataLabels: {
+							enabled: false
+						},
+						pointPadding: 0.01,
+						groupPadding: 0.07,
+						events: {
+							click: function (event) {
+								$('#modalStackedColumnCharts').modal('show');
+							}
+						}
+					}
+				},
+                highchartsModalPyramidPlotOptions = function (series, hiddenSeries) {
+                    return {
+                        series: {
+                            stacking: 'percent',
+                                shadow: false,
+                                pointPadding: 0.05,
+                                dataLabels: {
+                                enabled: false
+                            },
+                            events: {
+                                legendItemClick: function (event) {
+                                    const index = event.target.userOptions.originalIndex;
+
+                                    if (!hiddenSeries.includes(index)) {
+                                        hiddenSeries.push(index);
+                                    } else {
+                                        hiddenSeries.splice(hiddenSeries.indexOf(index), 1);
+                                    }
+
+                                    const chart = event.target.chart;
+
+                                    while (chart.series.length > 0) {
+                                        chart.series[chart.series.length - 1].remove(false);
+                                    }
+
+                                    processPyramidSeries(series, hiddenSeries).forEach(s => {
+                                        chart.addSeries(s);
+                                    });
+
+                                    chart.redraw();
+
+                                    return false;
+                                }
+                            }
+                        },
+                        bar: {
+                            groupPadding: 0,
+                                dataLabels: {
+                                enabled: false
+                            }
+                        }
+                    }
+                },
+				highchartsModalStackedColumnPlotOptions = {
+					column: {
+						stacking: 'normal',
+						dataLabels: {
+							enabled: false
+						},
+						pointPadding: 0.01,
+						groupPadding: 0.2,
+						events: {
+							click: function (event) {
+								$('#modalStackedColumnCharts').modal('show');
+							}
+						}
+					}
+				},
+                highchartsRoundDoubleLegend = {
+                    align: 'left',
+                    verticalAlign: 'proximate',
+                    y: 280,
+                    layout: 'horizontal',
+                    alignColumns: true,
+                    symbolPadding: 8,
+                    symbolWidth: 10,
+                    symbolHeight: 10,
+                    symbolRadius: 5,
+                    useHTML: true,
+                    width: 354,
+                    itemWidth: 177,
+                    itemMarginBottom: 5,
+                    maxHeight: 163,
+                    labelFormatter: function () {
+                        return `
+							<span class="chart__name">${this.name}</span>
+							<span class="chart__num">${this.y}</span>
+							<span class="chart__percent">${this.percentage.toFixed(0)}%</span>
+						`
+                    }
+                },
+                highchartsRoundSingleLegend = {
+                    align: 'left',
+                    verticalAlign: 'proximate',
+                    y: 280,
+                    layout: 'vertical',
+                    symbolPadding: 8,
+                    symbolWidth: 10,
+                    symbolHeight: 10,
+                    symbolRadius: 5,
+                    useHTML: true,
+                    itemMarginBottom: 5,
+					width: '400%',
+					itemWidth: 500,
+                    maxHeight: 163,
+                    labelFormatter: function () {
+                        return `
+                                <span class="chart__name">${this.name}</span>
+                                <span class="chart__num">${this.y}</span>
+                                <span class="chart__percent">${this.percentage.toFixed(0)}%</span>
+                            `
+                    }
+                },
+                highchartsPyramidLegend = {
+                    enabled: false
+                },
+                highchartsBarsLegend = {
+                    align: 'center',
+                    y: 3,
+                    symbolPadding: 8,
+                    symbolWidth: 10,
+                    symbolHeight: 10,
+                    symbolRadius: 5,
+                    useHTML: true,
+                    itemMarginBottom: 5,
+                    labelFormatter: function () {
+                        return `
+							<span class="chart__name">${this.name}</span>
+							<span class="chart__num">${this.yData[0]}</span>
+						`;
+                    }
+                },
+				highchartsStackedColumnLegend = {
+					align: 'left',
+					y: 3,
+					x: 30,
+					symbolPadding: 8,
+					symbolWidth: 10,
+					symbolHeight: 10,
+					symbolRadius: 5,
+					useHTML: true,
+					itemMarginBottom: 5,
+					labelFormatter: function () {
+						return `<span class="chart__name">${this.name}</span>`;
+					}
+				},
+                highchartsModalRoundLegend = {
+                    align: 'right',
+                    x: -20,
+                    verticalAlign: 'middle',
+                    layout: 'vertical',
+                    symbolPadding: 8,
+                    symbolWidth: 10,
+                    symbolHeight: 10,
+                    symbolRadius: 5,
+                    useHTML: true,
+                    itemMarginBottom: 5,
+                    labelFormatter: function () {
+                        return `
+                                    <span class="chart__num">${this.y}</span>
+                                    <span class="chart__percent">${this.percentage.toFixed(0)}%</span>
+                                `
+                    }
+                },
+                highchartsModalPyramidLegend = {
+                    align: 'right',
+                    x: 130,
+                    y: -20,
+                    verticalAlign: 'middle',
+                    layout: 'vertical',
+                    symbolPadding: 8,
+                    symbolWidth: 10,
+                    symbolHeight: 10,
+                    symbolRadius: 5,
+                    useHTML: true,
+                    itemMarginBottom: 5,
+                    labelFormatter: function () {
+                        const value = this.visible ? this.userOptions.value : 0;
+                        const maxValue = this.userOptions.maxValue;
+
+                        const percent = maxValue !== 0 ? (value / maxValue * 100) : 0;
+
+                        return `
+                            <span class="chart__num">${value}</span>
+                            <span class="chart__percent">${(percent).toFixed(0)}%</span>
+                        `;
+                    }
+                },
+                highchartsModalBarsLegend = {
+                    align: 'left',
+                    y: 10,
+                    padding: 0,
+                    symbolPadding: 8,
+                    symbolWidth: 10,
+                    symbolHeight: 10,
+                    symbolRadius: 5,
+                    useHTML: true,
+                    itemMarginBottom: 30,
+                    width: 90,
+                    itemWidth: 45,
+                    labelFormatter: function () {
+                        return `
+                                    <b>${this.yData[0]}</b>
+                                `
+                    }
+                },
+				highchartsModalStackedColumnLegend = {
+            		enabled: false
+				},
+                highchartsPyramidXAxis = {
+                    labels: {
+                        enabled: false
+                    },
+                    visible: false
+                },
+                highchartsPyramidYAxis = {
+                    gridLineWidth: 0,
+                    min: 0,
+                    labels: {
+                        enabled: false
+                    },
+                    visible: false
+                },
+                highchartsBarsYAxis = {
+                    title: {
+                        text: ''
+                    }
+                },
+				highchartsStackedColumnXAxis = {
+					scrollbar: {
+						enabled: true
+					},
+					max: 11
+				},
+				highchartsStackedColumnYAxis = {
+					title: {
+						text: ''
+					},
+					tickInterval: 10
+				},
+                highchartsBarsXAxisLabels = {
+                    enabled: false
+                };
+
+            Highcharts.chart('round1', {
+                chart: highchartsRoundChart,
+                title: {
+                    text: 'Кандидаты по статусам'
+                },
+                tooltip: highchartsTooltip,
+                plotOptions: highchartsRoundPlotOptions,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                legend: highchartsRoundDoubleLegend
+            });
+            Highcharts.chart('round2', {
+                chart: highchartsRoundChart,
+                title: {
+                    text: 'Источник поступления'
+                },
+                tooltip: highchartsTooltip,
+                plotOptions: highchartsRoundPlotOptions,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['hh.ru', 14, 0],
+                        ['superjob.ru', 16, 1],
+                        ['avito.ru', 20, 2],
+                        ['youla.ru', 30, 3],
+                        ['Сайт Хатимаки', 10, 4],
+                        ['Работники сети', 24, 5],
+                        ['Был клиентом сети', 16, 6],
+                        ['Объявление на улице', 10, 7],
+                        ['Прочее', 60, 8]
+                    ],
+                }],
+                legend: highchartsRoundDoubleLegend
+            });
+            Highcharts.chart('round3', {
+                chart: highchartsRoundChart,
+                title: {
+                    text: 'Причина отказов'
+                },
+                tooltip: highchartsTooltip,
+                plotOptions: highchartsRoundPlotOptions,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Нет документов', 18, 0],
+                        ['Возраст', 24, 1],
+                        ['Нет опыта работы', 7, 2],
+                        ['Не устроил уровень ЗП', 16, 3],
+                        ['Нужно официальное трудоустройство', 53, 4],
+                        ['Место работы далеко', 10, 5],
+                        ['Плохие характеристики', 9, 6],
+                        ['Не подходит график работы', 12, 7],
+                        ['Не подходит режим работы', 19, 8],
+                        ['Прочее', 6, 9]
+                    ],
+                }],
+                legend: highchartsRoundDoubleLegend
+            });
+            Highcharts.chart('pyramid1', {
+                chart: highchartsPyramidChart,
+                title: {
+                    text: 'Воронка подбора'
+                },
+                xAxis: {
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                legend: highchartsPyramidLegend,
+                tooltip: highchartsTooltip,
+                plotOptions: highchartsPyramidPlotOptions,
+                series: processPyramidSeries([
+                    {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                    {
+                        name: 'Ждёт звонка',
+                        value: 38,
+                        colorIndex: 1
+                    },
+                    {name: 'Собеседование', value: 22, colorIndex: 2},
+                    {name: 'Тестирование', value: 18, colorIndex: 3},
+                    {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+                ], [])
+            });
+            Highcharts.chart('bars1', {
+                chart: highchartsBarsChart,
+                title: {
+                    text: 'Кол-во просроченных задач по статусам'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsBarsLegend
+            });
+            Highcharts.chart('round4', {
+                chart: highchartsRoundWithSingleLegendChart,
+                title: {
+                    text: 'По заполненности анкеты'
+                },
+                tooltip: highchartsTooltip,
+                plotOptions: highchartsRoundPlotOptions,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Заполнены все обязательные и часть дополнительных полей', 475, 0],
+                        ['Заполнены все поля', 240, 1],
+                        ['Не заполнены обязательные поля', 196, 2]
+                    ]
+                }],
+                legend: highchartsRoundSingleLegend
+            });
+            Highcharts.chart('stackedColumn1', {
+                chart: highchartsStackedColumnChart,
+                title: {
+                	...highchartsStackedColumnTitle,
+                    text: 'Кандидаты по статусам'
+                },
+                yAxis: highchartsStackedColumnYAxis,
+                xAxis: {
+					...highchartsStackedColumnXAxis,
+                    categories: [
+                    		'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек',
+                    		'янв<br>2019', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
+                },
+                tooltip: highchartsTooltip,
+                plotOptions: highchartsStackedColumnPlotOptions,
+                series: [
+					{
+						name: 'Ждёт звонка',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Направлен на стажировку',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Резерв',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Принят на стажировку',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Назначено собеседование',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Назначено тестирование',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Ждём документы',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Кандидат отказался',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Недозвон',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Кандидат думает',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Отказано',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					}
+                ],
+                legend: highchartsStackedColumnLegend
+            });
+			Highcharts.chart('stackedColumn2', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 481
+				},
 				title: {
+					...highchartsStackedColumnTitle,
 					text: 'Источник поступления'
 				},
-				tooltip: highchartsTooltip,
-				plotOptions: highchartsRoundPlotOptions,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['hh.ru', 14, 0],
-						['superjob.ru', 16, 1],
-						['avito.ru', 20, 2],
-						['youla.ru', 30, 3],
-						['Сайт Хатимаки', 10, 4],
-						['Работники сети', 24, 5],
-						['Был клиентом сети', 16, 6],
-						['Объявление на улице', 10, 7],
-						['Прочее', 60, 8]
-					],
-				}],
-				legend: highchartsRoundDoubleLegend
-			});
-			Highcharts.chart('round3', {
-				chart: highchartsRoundChart,
-				title: {
-					text: 'Причина отказов'
-				},
-				tooltip: highchartsTooltip,
-				plotOptions: highchartsRoundPlotOptions,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Нет документов', 18, 0],
-						['Возраст', 24, 1],
-						['Нет опыта работы', 7, 2],
-						['Не устроил уровень ЗП', 16, 3],
-						['Нужно официальное трудоустройство', 53, 4],
-						['Место работы далеко', 10, 5],
-						['Плохие характеристики', 9, 6],
-						['Не подходит график работы', 12, 7],
-						['Не подходит режим работы', 19, 8],
-						['Прочее', 6, 9]
-					],
-				}],
-				legend: highchartsRoundDoubleLegend
-			});
-			Highcharts.chart('pyramid1', {
-				chart: highchartsPyramidChart,
-				title: {
-					text: 'Воронка подбора'
-				},
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
+					...highchartsStackedColumnXAxis,
 					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек',
+						'янв<br>2019', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
 					]
 				},
-				yAxis: highchartsPyramidYAxis,
-				legend: highchartsPyramidLegend,
 				tooltip: highchartsTooltip,
-				plotOptions: highchartsPyramidPlotOptions,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				])
+				plotOptions: highchartsStackedColumnPlotOptions,
+				series: [
+					{
+						name: 'hh.ru',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Работники сети',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'superjob.ru',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Был клиентом сети',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'avito.ru',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Объявление на улице',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'youla.ru',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Прочее',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Сайт Хатимаки',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					}
+				],
+				legend: highchartsStackedColumnLegend
 			});
-			Highcharts.chart('bars1', {
-				chart: highchartsBarsChart,
+			Highcharts.chart('stackedColumn3', {
+				chart: highchartsStackedColumnChart,
 				title: {
+					...highchartsStackedColumnTitle,
+					text: 'Причины отказов'
+				},
+				yAxis: highchartsStackedColumnYAxis,
+				xAxis: {
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек',
+						'янв<br>2019', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
+				},
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsStackedColumnPlotOptions,
+				series: [
+					{
+						name: 'Нет документов',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Место работы далеко',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Возраст',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Плохие характеристики',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Нет опыта работы',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Не подходит график работы',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Не устроил уровень ЗП',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Не подходит режим работы',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Нужно официальное трудоустройство',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Прочее',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					}
+				],
+				legend: highchartsStackedColumnLegend
+			});
+			Highcharts.chart('stackedColumn4', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 410
+				},
+				title: {
+					...highchartsStackedColumnTitle,
 					text: 'Кол-во просроченных задач по статусам'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек',
+						'янв<br>2019', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Задачи, выполненные в срок',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Просроченные задачи',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					}
 				],
-				legend: highchartsBarsLegend
+				legend: highchartsStackedColumnLegend
 			});
-			Highcharts.chart('round4', {
-				chart: highchartsRoundChart,
+			Highcharts.chart('stackedColumn5', {
+				chart: highchartsStackedColumnChart,
 				title: {
+					...highchartsStackedColumnTitle,
 					text: 'По заполненности анкеты'
 				},
-				tooltip: highchartsTooltip,
-				plotOptions: highchartsRoundPlotOptions,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Заполнены все обязательные и часть дополнительных полей', 475, 0],
-						['Заполнены все поля', 240, 1],
-						['Не заполнены обязательные поля', 196, 2]
+				yAxis: highchartsStackedColumnYAxis,
+				xAxis: {
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек',
+						'янв<br>2019', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
 					]
-				}],
-				legend: highchartsRoundSingleLegend
+				},
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsStackedColumnPlotOptions,
+				series: [
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10]
+					}
+				],
+				legend: highchartsStackedColumnLegend
 			});
 
-			// modal charts:
-			Highcharts.chart('modal-round1', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Щербинка',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
-			Highcharts.chart('modal-round2', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Бутово',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
-			Highcharts.chart('modal-round3', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Ясенево',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
-			Highcharts.chart('modal-round4', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Коммунарка',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
-			Highcharts.chart('modal-round5', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Подольск',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
-			Highcharts.chart('modal-round6', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Эталон',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
-			Highcharts.chart('modal-round7', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Южная',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
-			Highcharts.chart('modal-round8', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Call center',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
-			Highcharts.chart('modal-round9', {
-				chart: highchartsModalRoundChart,
-				title: {
-					text: 'Офис',
-					align: 'left'
-				},
-				tooltip: highchartsTooltip,
-				series: [{
-					keys: ['name', 'y', 'colorIndex'],
-					data: [
-						['Ждёт звонка', 18, 0],
-						['Резерв', 24, 1],
-						['Назначено собеседование', 7, 2],
-						['Ждёт документы', 11, 3],
-						['Недозвон', 5, 4],
-						['Отказано', 53, 5],
-						['Направлен на стажировку', 10, 6],
-						['Принят на стажировку', 9, 7],
-						['Назначено тестирование', 12, 8],
-						['Кандидат отказался', 19, 9],
-						['Кандидат думает', 6, 10]
-					],
-				}],
-				plotOptions: highchartsModalRoundPlotOptions,
-				legend: highchartsModalRoundLegend
-			});
+            // modal charts:
+            Highcharts.chart('modal-round1', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Щербинка',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
+            Highcharts.chart('modal-round2', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Бутово',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
+            Highcharts.chart('modal-round3', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Ясенево',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
+            Highcharts.chart('modal-round4', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Коммунарка',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
+            Highcharts.chart('modal-round5', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Подольск',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
+            Highcharts.chart('modal-round6', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Эталон',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
+            Highcharts.chart('modal-round7', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Южная',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
+            Highcharts.chart('modal-round8', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Call center',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
+            Highcharts.chart('modal-round9', {
+                chart: highchartsModalRoundChart,
+                title: {
+                    text: 'Офис',
+                    align: 'left'
+                },
+                tooltip: highchartsTooltip,
+                series: [{
+                    keys: ['name', 'y', 'colorIndex'],
+                    data: [
+                        ['Ждёт звонка', 18, 0],
+                        ['Резерв', 24, 1],
+                        ['Назначено собеседование', 7, 2],
+                        ['Ждёт документы', 11, 3],
+                        ['Недозвон', 5, 4],
+                        ['Отказано', 53, 5],
+                        ['Направлен на стажировку', 10, 6],
+                        ['Принят на стажировку', 9, 7],
+                        ['Назначено тестирование', 12, 8],
+                        ['Кандидат отказался', 19, 9],
+                        ['Кандидат думает', 6, 10]
+                    ],
+                }],
+                plotOptions: highchartsModalRoundPlotOptions,
+                legend: highchartsModalRoundLegend
+            });
 
-			Highcharts.chart('modal-pyramid1', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Щербинка',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
-			Highcharts.chart('modal-pyramid2', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Бутово',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
-			Highcharts.chart('modal-pyramid3', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Ясенево',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
-			Highcharts.chart('modal-pyramid4', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Коммунарка',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
-			Highcharts.chart('modal-pyramid5', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Подольск',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
-			Highcharts.chart('modal-pyramid6', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Эталон',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
-			Highcharts.chart('modal-pyramid7', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Южная',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
-			Highcharts.chart('modal-pyramid8', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Call center',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
-			Highcharts.chart('modal-pyramid9', {
-				chart: highchartsModalPyramidChart,
-				title: {
-					text: 'Офис',
-					align: 'left'
-				},
-				xAxis: {
-					...highchartsPyramidXAxis,
-					categories: [
-						'Все кандидаты',
-						'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено собеседование + Назначено тестирование + Принят на стажировку',
-						'Назначено тестирование + Принят на стажировку',
-						'Принят на стажировку'
-					]
-				},
-				yAxis: highchartsPyramidYAxis,
-				tooltip: highchartsTooltip,
-				series: processPyramidSeries([
-					{name: 'Все кандидаты', value: 120},
-					{name: 'Ждёт звонка + Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 38},
-					{name: 'Назначено собеседование + Назначено тестирование + Принят на стажировку', value: 22},
-					{name: 'Назначено тестирование + Принят на стажировку', value: 18},
-					{name: 'Принят на стажировку', value: 11	}
-				]),
-				plotOptions: highchartsModalPyramidPlotOptions,
-				legend: highchartsModalPyramidLegend
-			});
+            const pyramid1Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid1HiddenSeries = [];
+            Highcharts.chart('modal-pyramid1', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Щербинка',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid1Series, pyramid1HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid1Series, pyramid1HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
+            const pyramid2Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid2HiddenSeries = [];
+            Highcharts.chart('modal-pyramid2', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Бутово',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid2Series, pyramid2HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid2Series, pyramid2HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
+            const pyramid3Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid3HiddenSeries = [];
+            Highcharts.chart('modal-pyramid3', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Ясенево',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid3Series, pyramid3HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid3Series, pyramid3HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
+            const pyramid4Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid4HiddenSeries = [];
+            Highcharts.chart('modal-pyramid4', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Коммунарка',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid4Series, pyramid4HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid4Series, pyramid4HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
+            const pyramid5Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid5HiddenSeries = [];
+            Highcharts.chart('modal-pyramid5', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Подольск',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid5Series, pyramid5HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid5Series, pyramid5HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
+            const pyramid6Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid6HiddenSeries = [];
+            Highcharts.chart('modal-pyramid6', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Эталон',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid6Series, pyramid6HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid6Series, pyramid6HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
+            const pyramid7Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid7HiddenSeries = [];
+            Highcharts.chart('modal-pyramid7', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Южная',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid7Series, pyramid7HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid7Series, pyramid7HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
+            const pyramid8Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid8HiddenSeries = [];
+            Highcharts.chart('modal-pyramid8', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Call center',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid8Series, pyramid8HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid8Series, pyramid8HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
+            const pyramid9Series = [
+                {name: 'Все кандидаты', value: 120, colorIndex: 0},
+                {
+                    name: 'Ждёт звонка',
+                    value: 38,
+                    colorIndex: 1
+                },
+                {name: 'Собеседование', value: 22, colorIndex: 2},
+                {name: 'Тестирование', value: 18, colorIndex: 3},
+                {name: 'Принят на стажировку', value: 11, colorIndex: 4}
+            ];
+            const pyramid9HiddenSeries = [];
+            Highcharts.chart('modal-pyramid9', {
+                chart: highchartsModalPyramidChart,
+                title: {
+                    text: 'Офис',
+                    align: 'left'
+                },
+                xAxis: {
+                    ...highchartsPyramidXAxis,
+                    categories: [
+                        'Все кандидаты',
+                        'Ждёт звонка',
+                        'Собеседование',
+                        'Тестирование',
+                        'Принят на стажировку'
+                    ]
+                },
+                yAxis: highchartsPyramidYAxis,
+                tooltip: highchartsPyramidTooltip,
+                series: processPyramidSeries(pyramid9Series, pyramid9HiddenSeries),
+                plotOptions: highchartsModalPyramidPlotOptions(pyramid9Series, pyramid9HiddenSeries),
+                legend: highchartsModalPyramidLegend
+            });
 
-			Highcharts.chart('modal-bars1', {
-				chart: highchartsModalBarsChart,
+            Highcharts.chart('modal-bars1', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Щербинка',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+            Highcharts.chart('modal-bars2', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Бутово',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+            Highcharts.chart('modal-bars3', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Ясенево',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+            Highcharts.chart('modal-bars4', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Коммунарка',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+            Highcharts.chart('modal-bars5', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Подольск',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+            Highcharts.chart('modal-bars6', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Эталон',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+            Highcharts.chart('modal-bars7', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Южная',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+            Highcharts.chart('modal-bars8', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Call center',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+            Highcharts.chart('modal-bars9', {
+                chart: highchartsModalBarsChart,
+                title: {
+                    text: 'Офис',
+                    align: 'left'
+                },
+                yAxis: highchartsBarsYAxis,
+                xAxis: {
+                    categories: ['Актуальные задачи', 'Из них просрочено'],
+                    labels: highchartsBarsXAxisLabels
+                },
+                tooltip: highchartsBarsTooltip,
+                plotOptions: highchartsBarsPlotOptions,
+                series: [
+                    {name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
+                    {name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+                ],
+                legend: highchartsModalBarsLegend
+            });
+			Highcharts.chart('modal-stacked-column1', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Щербинка',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Щербинка'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
-			Highcharts.chart('modal-bars2', {
-				chart: highchartsModalBarsChart,
+			Highcharts.chart('modal-stacked-column2', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Бутово',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Бутово'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
-			Highcharts.chart('modal-bars3', {
-				chart: highchartsModalBarsChart,
+			Highcharts.chart('modal-stacked-column3', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Ясенево',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Ясенево'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
-			Highcharts.chart('modal-bars4', {
-				chart: highchartsModalBarsChart,
+			Highcharts.chart('modal-stacked-column4', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Коммунарка',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Коммунарка'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
-			Highcharts.chart('modal-bars5', {
-				chart: highchartsModalBarsChart,
+			Highcharts.chart('modal-stacked-column5', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Подольск',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Подольск'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
-			Highcharts.chart('modal-bars6', {
-				chart: highchartsModalBarsChart,
+			Highcharts.chart('modal-stacked-column6', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Эталон',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Эталон'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
-			Highcharts.chart('modal-bars7', {
-				chart: highchartsModalBarsChart,
+			Highcharts.chart('modal-stacked-column7', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Южная',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Южная'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
-			Highcharts.chart('modal-bars8', {
-				chart: highchartsModalBarsChart,
+			Highcharts.chart('modal-stacked-column8', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Call center',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Call center'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
-			Highcharts.chart('modal-bars9', {
-				chart: highchartsModalBarsChart,
+			Highcharts.chart('modal-stacked-column9', {
+				chart: {
+					...highchartsStackedColumnChart,
+					height: 400
+				},
 				title: {
-					text: 'Офис',
-					align: 'left'
+					...highchartsStackedColumnTitle,
+					text: 'Офис'
 				},
-				yAxis: highchartsBarsYAxis,
+				yAxis: highchartsStackedColumnYAxis,
 				xAxis: {
-					categories: ['Актуальные задачи', 'Из них просрочено'],
-					labels: highchartsBarsXAxisLabels
+					...highchartsStackedColumnXAxis,
+					categories: [
+						'янв<br>2018', 'фев', 'март', 'апр', 'май', 'июнь', 'июль', 'авг', 'сен', 'окт', 'ноя', 'дек'
+					]
 				},
-				tooltip: highchartsBarsTooltip,
-				plotOptions: highchartsBarsPlotOptions,
+				tooltip: highchartsTooltip,
+				plotOptions: highchartsModalStackedColumnPlotOptions,
 				series: [
-					{name: 'Актуальные задачи', data: [{name: 'Актуальные задачи', y: 37, x: 0, colorIndex: 0}]},
-					{name: 'Из них просрочено', data: [{name: 'Из них просрочено', y: 5, x: 1, colorIndex: 1}]}
+					{
+						name: 'Заполнены все обязательные и часть дополнительных полей',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Заполнены все поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					},
+					{
+						name: 'Не заполнены обязательные поля',
+						data: [10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12, 10, 11, 12]
+					}
 				],
-				legend: highchartsModalBarsLegend
+				legend: highchartsModalStackedColumnLegend
 			});
         });
     </script>
