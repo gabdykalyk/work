@@ -1,0 +1,29 @@
+<script type="text/javascript">
+    $(function () {
+        const ViewModel = function () {
+            this.windowResizeHandler = () => {
+                this.viewportSize({width: $(window).width(), height: $(window).height()});
+            };
+            this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
+
+            this.activeStep = ko.observable(1);
+
+            this.selectCompanyType = function (type) {
+                this.activeStep(2);
+            };
+
+            $(window).on('resize', this.windowResizeHandler);
+        };
+
+        const viewModel = new ViewModel();
+
+        ViewModel.prototype.dispose = function() {
+            $(window).off('resize', this.windowResizeHandler);
+        };
+
+        ko.applyBindings(
+            viewModel,
+            document.documentElement
+        );
+    });
+</script>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html class="login-page" lang="ru">
+<head>
+    @@include('../../base/_page-head-content.html')
+</head>
+
+<body>
+    <div class="hrm-scaffold">
+        <div class="hrm-scaffold__content login-page__content">
+            <div class="login-page__form" data-bind="using: formModel()">
+                <div class="login-page__form-logo"></div>
+
+                <div class="login-page__form-field"
+                     data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {hasError: $root.formControlErrorStateMatcher(login)}
+                        }
+                     "
+                >
+                    <label class="hrm-form-field__label" for="login">Логин</label>
+                    <input class="hrm-form-field__input" data-bind="textInput: $parent.login" id="login">
+                    <div data-bind="
+                        component: {name: 'hrm-form-field-error'},
+                        hrmSlide,
+                        hrmSlideValue: $root.formControlErrorStateMatcher($parent.login),
+                        hrmSlideDuration: 150
+                    ">
+                        <!-- ko text: $parents[1].login.error() --><!-- /ko -->
+                    </div>
+                </div>
+
+                <div class="login-page__form-field"
+                     data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {hasError: $root.formControlErrorStateMatcher(password)}
+                        }
+                     "
+                >
+                    <label class="hrm-form-field__label" for="password">Пароль</label>
+                    <input class="hrm-form-field__input" data-bind="textInput: $parent.password" id="password"
+                           type="password">
+                    <div data-bind="
+                        component: {name: 'hrm-form-field-error'},
+                        hrmSlide,
+                        hrmSlideValue: $root.formControlErrorStateMatcher($parent.password),
+                        hrmSlideDuration: 150
+                    ">
+                        <!-- ko text: $parents[1].password.error() --><!-- /ko -->
+                    </div>
+                </div>
+
+                <button class="hrm-button login-page__form-submit-button"
+                        data-bind="click: function () {$root.submitForm();}">
+                    Войти
+                </button>
+            </div>
+        </div>
+
+        <div class="hrm-scaffold__footer login-page__footer" data-bind="component: {name: 'hrm-footer'}"></div>
+    </div>
+    @@include('../../base/_page-scripts.html')
+    @@include('./_login-page.js.html')
+</body>
+</html>

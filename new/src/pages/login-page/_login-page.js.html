@@ -1,0 +1,37 @@
+<script type="text/javascript">
+    $(function () {
+        const ViewModel = function () {
+            this.isFormSubmitted = ko.observable(false);
+
+            this.formModel = ko.validatedObservable({
+                login: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                }),
+                password: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                })
+            });
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.computed(() => {
+                    return this.isFormSubmitted() && !formControl.isValid();
+                });
+            };
+
+            this.submitForm = function () {
+                this.isFormSubmitted(true);
+            }
+        };
+
+        const viewModel = new ViewModel();
+
+        ko.applyBindings(
+            viewModel,
+            document.documentElement
+        );
+    });
+</script>
