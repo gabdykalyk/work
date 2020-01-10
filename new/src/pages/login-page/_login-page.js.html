@@ -1,5 +1,7 @@
 <script type="text/javascript">
     $(function () {
+        const $page = $(document.documentElement);
+
         const ViewModel = function () {
             this.isFormSubmitted = ko.observable(false);
 
@@ -22,6 +24,10 @@
                 });
             };
 
+            this.childrenComplete = function () {
+                $page.removeClass('hrm-page--initializing');
+            };
+
             this.submitForm = function () {
                 this.isFormSubmitted(true);
             }
@@ -31,7 +37,7 @@
 
         ko.applyBindings(
             viewModel,
-            document.documentElement
+            $page.get()[0]
         );
     });
 </script>

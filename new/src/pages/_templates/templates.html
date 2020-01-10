@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="templates" lang="ru">
+<html class="hrm-page templates hrm-page--initializing" data-bind="childrenComplete: childrenComplete" lang="ru">
 <head>
     @@include('../../base/_page-head-content.html')
 </head>
@@ -10,24 +10,90 @@
             <div class="templates__section">
                 <div class="templates__section-title">Поле ввода</div>
 
-                <div data-bind="
+                <!-- ko let: {formField: ko.observable(null)} -->
+                    <div class="templates__form-field" data-bind="
                         component: {
                             name: 'hrm-form-field',
-                            params: {hasError: $root.formControlErrorStateMatcher(value)}
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(value),
+                                exportAs: formField
+                            }
                         }
-                     "
-                >
-                    <label class="hrm-form-field__label" for="value">Значение</label>
-                    <input class="hrm-form-field__input" data-bind="textInput: $parent.value" id="value">
-                    <div data-bind="
-                        component: {name: 'hrm-form-field-error'},
-                        hrmSlide,
-                        hrmSlideValue: $root.formControlErrorStateMatcher($parent.value),
-                        hrmSlideDuration: 150
                     ">
-                        <!-- ko text: $parents[1].value.error() --><!-- /ko -->
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Значение
+                            </label>
+                        </hrm-slot>
+
+                        <input data-bind="
+                            textInput: $root.value,
+                            hrmFormFieldInputControl,
+                            hrmFormFieldInputControlOwner: formField
+                        ">
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($root.value),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $root.value.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
                     </div>
-                </div>
+                <!-- /ko -->
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Поле ввода + выпадающий список</div>
+
+                <!-- ko let: {formField: ko.observable(null), selectControl: ko.observable(null)} -->
+                    <div class="templates__form-field" data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(value2),
+                                exportAs: formField
+                            }
+                        }
+                     ">
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Значение
+                            </label>
+                        </hrm-slot>
+
+                        <select data-bind="
+                            value: $parent.value2,
+                            hrmSelect,
+                            hrmFormFieldSelectControl: selectControl,
+                            hrmFormFieldSelectControlOwner: formField
+                        ">
+                            <option></option>
+                            <option value="1">Значение #1</option>
+                            <option value="2">Значение #2</option>
+                            <option value="3">Значение #3</option>
+                            <option value="4">Значение #4</option>
+                            <option value="5">Значение #5</option>
+                            <option value="6">Значение #6</option>
+                            <option value="7">Значение #7</option>
+                            <option value="8">Значение #8</option>
+                            <option value="9">Значение #9</option>
+                        </select>
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($root.value2),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $root.value2.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
+                    </div>
+                <!-- /ko -->
             </div>
             <div class="templates__section">
                 <div class="templates__section-title">Линейка из шагов</div>
@@ -90,6 +156,37 @@
                         <!-- /ko -->
                     </div>
                 <!-- /ko -->
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Стилизованная полоса прокрутки</div>
+
+                <div class="templates__scrollable-block" data-bind="hrmScrollable">
+                    <div class="templates__scrollable-block-content"></div>
+                </div>
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Кнопки с иконками</div>
+
+                <div class="templates__button-with-icon-list">
+                    <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                hrm-button-with-plus-icon">
+                        Добавить
+                    </div>
+
+                    <div class="templates__button-with-icon-list">
+                        <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
+                                    hrm-button-with-plus-icon">
+                            Добавить
+                        </div>
+                    </div>
+
+                    <div class="templates__button-with-icon-list">
+                        <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                    hrm-button-with-plus-icon">
+                            Добавить
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -9,6 +9,10 @@ ko.bindingHandlers.hrmSlide = {
         }
 
         $(element).data('hrmSlide', value);
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+            $(element).removeData('hrmSlide');
+        });
     },
     update: function (element, valueAccessor, allBindings) {
         const value = ko.unwrap(allBindings.get('hrmSlideValue'));
@@ -37,6 +41,10 @@ ko.bindingHandlers.hrmFade = {
         }
 
         $(element).data('hrmFade', value);
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+            $(element).removeData('hrmFade');
+        });
     },
     update: function (element, valueAccessor, allBindings) {
         const value = ko.unwrap(allBindings.get('hrmFadeValue'));
@@ -55,3 +63,47 @@ ko.bindingHandlers.hrmFade = {
         }
     }
 };
+
+ko.bindingHandlers.hrmElement = {
+    init: function (element, valueAccessor) {
+        if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().push(element);
+        } else {
+            valueAccessor()(element);
+        }
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+            if (ko.isObservableArray(valueAccessor())) {
+                valueAccessor().remove(element);
+            } else {
+                valueAccessor()(null);
+            }
+        });
+    }
+};
+
+function hrmSplitComponentTemplateNodes (nodes) {
+    const result = {
+        main: [],
+        slots: {}
+    };
+
+    $(nodes).filter('hrm-slot').each((index, slotElement) => {
+        const $slot = $(slotElement);
+        result.slots[$slot.attr('name')] = $slot.contents();
+    });
+
+    result.main = nodes.filter(node => {
+        return !(node.nodeType === 1 && node.tagName === 'HRM-SLOT');
+    });
+
+    return result;
+}
+
+function hrmSlideBeforeRemoveFactory (duration = 200) {
+    return element => $(element).slideUp(duration, () => $(element).remove());
+}
+
+function hrmSlideAfterAddFactory (duration = 200) {
+    return element => $(element).hide().slideDown(duration);
+}

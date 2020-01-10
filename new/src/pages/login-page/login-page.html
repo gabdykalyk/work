@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="login-page" lang="ru">
+<html class="hrm-page login-page hrm-page--initializing" data-bind="childrenComplete: childrenComplete" lang="ru">
 <head>
     @@include('../../base/_page-head-content.html')
 </head>
@@ -10,46 +10,75 @@
             <div class="login-page__form" data-bind="using: formModel()">
                 <div class="login-page__form-logo"></div>
 
-                <div class="login-page__form-field"
-                     data-bind="
+                <!-- ko let: {formField: ko.observable(null)} -->
+                    <div class="login-page__form-field" data-bind="
                         component: {
                             name: 'hrm-form-field',
-                            params: {hasError: $root.formControlErrorStateMatcher(login)}
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(login),
+                                exportAs: formField
+                            }
                         }
-                     "
-                >
-                    <label class="hrm-form-field__label" for="login">Логин</label>
-                    <input class="hrm-form-field__input" data-bind="textInput: $parent.login" id="login">
-                    <div data-bind="
-                        component: {name: 'hrm-form-field-error'},
-                        hrmSlide,
-                        hrmSlideValue: $root.formControlErrorStateMatcher($parent.login),
-                        hrmSlideDuration: 150
                     ">
-                        <!-- ko text: $parents[1].login.error() --><!-- /ko -->
-                    </div>
-                </div>
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Логин
+                            </label>
+                        </hrm-slot>
 
-                <div class="login-page__form-field"
-                     data-bind="
+                        <input data-bind="
+                            textInput: $parent.login,
+                            hrmFormFieldInputControl,
+                            hrmFormFieldInputControlOwner: formField
+                        ">
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($parent.login),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $parents[1].login.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko let: {formField: ko.observable(null)} -->
+                    <div class="login-page__form-field" data-bind="
                         component: {
                             name: 'hrm-form-field',
-                            params: {hasError: $root.formControlErrorStateMatcher(password)}
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(password),
+                                exportAs: formField
+                            }
                         }
-                     "
-                >
-                    <label class="hrm-form-field__label" for="password">Пароль</label>
-                    <input class="hrm-form-field__input" data-bind="textInput: $parent.password" id="password"
-                           type="password">
-                    <div data-bind="
-                        component: {name: 'hrm-form-field-error'},
-                        hrmSlide,
-                        hrmSlideValue: $root.formControlErrorStateMatcher($parent.password),
-                        hrmSlideDuration: 150
                     ">
-                        <!-- ko text: $parents[1].password.error() --><!-- /ko -->
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Пароль
+                            </label>
+                        </hrm-slot>
+
+                        <input data-bind="
+                            textInput: $parent.password,
+                            hrmFormFieldInputControl,
+                            hrmFormFieldInputControlOwner: formField
+                        " type="password">
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($parent.password),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $parents[1].password.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
                     </div>
-                </div>
+                <!-- /ko -->
 
                 <button class="hrm-button login-page__form-submit-button"
                         data-bind="click: function () {$root.submitForm();}">
