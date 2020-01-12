@@ -113,7 +113,7 @@
                             } -->
                                 <div class="setup-wizard-page__dish-category-selector-item">
                                     <div class="setup-wizard-page__dish-category-selector-item-content">
-                                        <!-- ko let: {formField: ko.observable(null), selectControl: ko.observable(null)} -->
+                                        <!-- ko let: {formField: ko.observable(null)} -->
                                             <div class="setup-wizard-page__dish-category-selector-item-field" data-bind="
                                                 component: {
                                                     name: 'hrm-form-field',
@@ -132,7 +132,7 @@
                                                 <select data-bind="
                                                     value: $parent.value,
                                                     hrmSelect,
-                                                    hrmFormFieldSelectControl: selectControl,
+                                                    hrmFormFieldSelectControl,
                                                     hrmFormFieldSelectControlOwner: formField
                                                 ">
                                                     <option></option>
@@ -170,6 +170,7 @@
                             Добавить
                         </div>
                     </div>
+
                     <div class="setup-wizard-page__tab-pane-actions">
                         <button class="hrm-button setup-wizard-page__tab-pane-actions-button
                                        setup-wizard-page__tab-pane-actions-back-button"
@@ -179,7 +180,7 @@
                         <button class="hrm-button setup-wizard-page__tab-pane-actions-button
                                        setup-wizard-page__tab-pane-actions-forward-button"
                                 data-bind="
-                                    click: dishCategoriesStepSubmit,
+                                    click: submitDishCategoriesStep,
                                     attr: {disabled: $root.isDishCategoriesStepSubmitted() && !$root.dishCategoriesStepFormModel.isValid()}
                                 "
                         >
@@ -187,7 +188,117 @@
                         </button>
                     </div>
                 </div>
-                <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 3, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
+                <div class="setup-wizard-page__tab-pane setup-wizard-page__schedule-tab-pane"
+                     data-bind="
+                        hrmFade,
+                        hrmFadeValue: activeStep() === 3,
+                        hrmFadeDuration: 100,
+                        hrmFadeInDelay: 100
+                     ">
+                    <!-- ko let: {calendar: ko.observable(null)} -->
+                        <div class="setup-wizard-page__schedule-selector" data-bind="using: scheduleStepFormModel">
+                            <span class="setup-wizard-page__schedule-selector-title">График работы предприятия</span>
+
+                            <div class="setup-wizard-page__schedule-selector-interval-selector">
+                                <span class="setup-wizard-page__schedule-selector-interval-selector-label">
+                                    Задать интервал таблицы
+                                </span>
+
+                                <div class="setup-wizard-page__schedule-selector-interval-selector-control">
+                                    <!-- ko let: {formField: ko.observable(null)} -->
+                                        <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
+                                                    setup-wizard-page__schedule-selector-interval-selector-control-start-field"
+                                             data-bind="component: {
+                                                name: 'hrm-form-field',
+                                                params: {
+                                                    noLabel: true,
+                                                    exportAs: formField,
+                                                    hasError: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher(intervalStart)
+                                                }
+                                             }"
+                                        >
+                                            <input data-bind="
+                                                value: $parent.intervalStart,
+                                                hrmMask,
+                                                hrmMaskPattern: '99:99',
+                                                hrmFormFieldInputControl,
+                                                hrmFormFieldInputControlOwner: formField
+                                            " placeholder="00:00">
+                                        </div>
+                                    <!-- /ko -->
+
+                                    <span class="setup-wizard-page__schedule-selector-interval-selector-control-separator">—</span>
+
+                                    <!-- ko let: {formField: ko.observable(null)} -->
+                                        <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
+                                                        setup-wizard-page__schedule-selector-interval-selector-control-end-field"
+                                             data-bind="component: {
+                                                name: 'hrm-form-field',
+                                                params: {
+                                                    noLabel: true,
+                                                    exportAs: formField,
+                                                    hasError: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher(intervalEnd)
+                                                }
+                                             }"
+                                        >
+                                            <input data-bind="
+                                                    value: $parent.intervalEnd,
+                                                    hrmMask,
+                                                    hrmMaskPattern: '99:99',
+                                                    hrmFormFieldInputControl,
+                                                    hrmFormFieldInputControlOwner: formField
+                                                " placeholder="00:00">
+                                        </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+
+                            <div data-bind="component: {
+                                name: 'setup-wizard-page-schedule-selector-calendar',
+                                params: {
+                                    value: schedule,
+                                    intervalStart: $root.scheduleStepUsedIntervalStart,
+                                    intervalEnd: $root.scheduleStepUsedIntervalEnd,
+                                    exportAs: calendar
+                                }
+                            }">
+                            </div>
+
+                            <div class="setup-wizard-page__schedule-selector-actions">
+                                <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
+                                            hrm-button-with-check-icon setup-wizard-page__schedule-selector-action"
+                                     data-bind="click: function() {calendar().pickAll();}">
+                                    Заполнить автоматически
+                                </div>
+
+                                <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                            hrm-button-with-times-icon setup-wizard-page__schedule-selector-action"
+                                     data-bind="click: function() {calendar().clear();}">
+                                    Очистить
+                                </div>
+                            </div>
+                        </div>
+                    <!-- /ko -->
+
+                    <div class="setup-wizard-page__tab-pane-actions">
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-back-button"
+                                data-bind="click: back">
+                            Назад
+                        </button>
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-forward-button"
+                                data-bind="
+                                    click: submitScheduleStep,
+                                    attr: {
+                                        disabled: $root.isScheduleStepSubmitted() && !$root.scheduleStepFormModel.isValid()
+                                    }
+                                "
+                        >
+                            Далее
+                        </button>
+                    </div>
+                </div>
                 <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 4, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
                 <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 5, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
                 <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 6, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
@@ -197,6 +308,7 @@
         <div class="hrm-scaffold__footer" data-bind="component: {name: 'hrm-footer'}"></div>
     </div>
     @@include('../../base/_page-scripts.html')
+    @@include('./components/schedule-selector-calendar/_schedule-selector-calendar.js.html')
     @@include('./_setup-wizard-page.js.html')
 </body>
 </html>

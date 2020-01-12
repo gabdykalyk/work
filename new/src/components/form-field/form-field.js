@@ -7,6 +7,10 @@ ko.components.register('hrm-form-field', {
 
             $element.addClass(['hrm-form-field']);
 
+            if ('noLabel' in params && params.noLabel) {
+                $element.addClass(['hrm-form-field--no-label']);
+            }
+
             const ViewModel = function () {
                 this.subscriptions = [];
                 this.templateNodes = hrmSplitComponentTemplateNodes(componentInfo.templateNodes);

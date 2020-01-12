@@ -1,0 +1,188 @@
+@@include('./_schedule-selector-calendar.html')
+
+<script type="text/javascript">
+    ko.components.register('setup-wizard-page-schedule-selector-calendar', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+
+                $element.addClass(['setup-wizard-page__schedule-selector-calendar']);
+
+                const ViewModel = function () {
+                    this.subscriptions = [];
+
+                    this.value = params.value;
+                    this.intervalStart = params.intervalStart;
+                    this.intervalEnd = params.intervalEnd;
+
+                    this.isPicking = ko.observable(false);
+
+                    this.touchmoveHandler = event => {
+                        const touchPosition = event.originalEvent.changedTouches[0];
+                        const $target = $(document.elementFromPoint(touchPosition.clientX, touchPosition.clientY));
+
+                        if ($target.hasClass('setup-wizard-page__schedule-selector-calendar-hour')) {
+                            const weekday = $target.data('setup-wizard-page-schedule-selector-calendar-hour-week');
+                            const hour = $target.data('setup-wizard-page-schedule-selector-calendar-hour-hour');
+
+                            if (this.isPicking()) {
+                                if (!this.isPickedHour(weekday, hour)) {
+                                    this.value[weekday - 1].push(hour);
+                                    this.value[weekday - 1].sort();
+                                }
+                            }
+                        }
+                    };
+
+                    this.windowMouseupHandler = () => this.isPicking(false);
+
+                    this.hours = ko.computed(() => {
+                        const start = moment(this.intervalStart(), 'HH:mm');
+                        const end = moment(this.intervalEnd(), 'HH:mm');
+
+                        if (start.isSameOrAfter(end)) {
+                            end.add(1, 'd');
+                        }
+
+                        const isEndHourInteger = end.minutes() === 0;
+
+                        if (!isEndHourInteger) {
+                            end.add(1, 'h').minutes(0);
+                        }
+
+                        const hours = [];
+
+                        while (start.isBefore(end)) {
+                            hours.push(start.hours());
+                            start.add(1, 'h');
+                        }
+
+                        return hours;
+                    });
+
+                    this.isStartHourInteger = ko.computed(() => {
+                        return moment(this.intervalStart(), 'HH:mm').minutes() === 0;
+                    });
+
+                    this.isEndHourInteger = ko.computed(() => {
+                        return moment(this.intervalEnd(), 'HH:mm').minutes() === 0;
+                    });
+
+                    this.isIntegerHour = function (hourIndex) {
+                        const hours = this.hours();
+
+                        if (hourIndex === 0) {
+                            return this.isStartHourInteger();
+                        } else if (hourIndex === hours.length - 1) {
+                            return this.isEndHourInteger();
+                        } else {
+                            return true;
+                        }
+                    };
+
+                    this.isPickedHour = function (weekday, hour) {
+                        return this.value[weekday - 1]().includes(hour);
+                    };
+
+                    this.hourMousedownOrTouchstart = function (weekday, hour) {
+                        if (!this.isPickedHour(weekday, hour)) {
+                            this.isPicking(true);
+                            this.value[weekday - 1].push(hour);
+                        } else {
+                            this.value[weekday - 1].remove(hour);
+                        }
+
+                        this.value[weekday - 1].sort();
+                    };
+
+                    this.hourMouseover = function (weekday, hour) {
+                        if (this.isPicking()) {
+                            if (!this.isPickedHour(weekday, hour)) {
+                                this.value[weekday - 1].push(hour);
+                                this.value[weekday - 1].sort();
+                            }
+                        }
+                    };
+
+                    this.getWeekdayLabelText = function (weekday) {
+                        switch (weekday) {
+                            case 1: return 'Пн';
+                            case 2: return 'Вт';
+                            case 3: return 'Ср';
+                            case 4: return 'Чт';
+                            case 5: return 'Пт';
+                            case 6: return 'Сб';
+                            case 7: return 'Вс';
+                        }
+                    };
+
+                    this.getHourHeaderCellTextData = function (hourIndex) {
+                        function process (time) {
+                            const parts = time.split(':');
+
+                            return {
+                                hour: parts[0],
+                                minute: parts[1]
+                            };
+                        }
+
+                        const hours = this.hours();
+
+                        if (hourIndex === 0) {
+                            return process(this.intervalStart());
+                        } else if (hourIndex !== hours.length - 1 && hourIndex % 2 === 0) {
+                            return process(moment().hour(hours[hourIndex]).minute(0).format('HH:mm'));
+                        } else {
+                            return null;
+                        }
+                    };
+
+                    this.pickAll = function () {
+                        const hours = this.hours();
+                        this.value.forEach(week => week(hours));
+                    };
+
+                    this.clear = function () {
+                        this.value.forEach(week => week([]));
+                    };
+
+                    this.descendantsComplete = () => {
+                        $element.on('touchmove', this.touchmoveHandler);
+                        $(window).on('mouseup touchend', this.windowMouseupHandler);
+                    };
+
+                    (() => {
+                        this.subscriptions.push(
+                            ko.bindingEvent.subscribe(componentInfo.element, 'descendantsComplete', this.descendantsComplete)
+                        );
+
+                        if (params !== undefined && 'exportAs' in params) {
+                            if (ko.isObservableArray(params.exportAs)) {
+                                params.exportAs.push(this);
+                            } else {
+                                params.exportAs(this);
+                            }
+                        }
+                    })();
+                };
+
+                ViewModel.prototype.dispose = function() {
+                    this.subscriptions.forEach(s => s.dispose());
+                    $element.off('touchmove', this.touchmoveHandler);
+                    $(window).off('mouseup touchend', this.windowMouseupHandler);
+
+                    if (params !== undefined && 'exportAs' in params) {
+                        if (ko.isObservableArray(params.exportAs)) {
+                            params.exportAs.remove(this);
+                        } else {
+                            params.exportAs(null);
+                        }
+                    }
+                };
+
+                return new ViewModel();
+            }
+        },
+        template: {element: 'setup-wizard-page-schedule-selector-calendar-template'}
+    });
+</script>

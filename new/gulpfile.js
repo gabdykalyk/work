@@ -31,7 +31,7 @@ function clean() {
 	return del(config.dist);
 }
 
-function compilePagesHtml () {
+function compileHtml () {
 	return gulp.src([config.src + '/**/*.html', '!' + config.src + '/**/_*.html'])
 		.pipe(plumber())
 		.pipe(includePartials({
@@ -43,7 +43,7 @@ function compilePagesHtml () {
 		.pipe(gulp.dest(config.dist));
 }
 
-function complileStyles() {
+function compileStyles() {
 	let bundle = 'main.css';
 	if (prod) bundle = 'main.min.css';
 
@@ -60,10 +60,11 @@ function complileStyles() {
 		})))
 		.pipe(concat(bundle))
 		.pipe(gulpif(prod, cssmin()))
-		.pipe(gulp.dest(config.dist + '/assets/css/'));
+		.pipe(gulp.dest(config.dist + '/assets/css/'))
+		.pipe(gulpif(!prod, browserSync.stream()));
 }
 
-function compileComponentsScripts() {
+function compileScripts() {
 	let bundle = 'main.js';
 	if (prod) bundle = 'main.min.js';
 	return gulp.src(config.src + '/**/*.js')
@@ -83,7 +84,7 @@ function copyAssets() {
 		.pipe(gulp.dest(config.dist + '/assets'));
 }
 
-const build = gulp.series([clean, gulp.parallel([compilePagesHtml, complileStyles, compileComponentsScripts, copyAssets])]);
+const build = gulp.series([clean, gulp.parallel([compileHtml, compileStyles, compileScripts, copyAssets])]);
 
 const serve = gulp.series([build, () => {
 	browserSync.init({
@@ -94,17 +95,14 @@ const serve = gulp.series([build, () => {
 		open: false
 	});
 
-	gulp.watch(config.src + '/**/*.less', gulp.series(complileStyles, done => {
+	gulp.watch(config.src + '/**/*.less', gulp.series(compileStyles));
+
+	gulp.watch(config.src + '/**/*.js', gulp.series(compileScripts, done => {
 		browserSync.reload();
 		done();
 	}));
 
-	gulp.watch(config.src + '/**/*.js', gulp.series(gulp.parallel(compileComponentsScripts), done => {
-		browserSync.reload();
-		done();
-	}));
-
-	gulp.watch(config.src + '/**/*.html', gulp.series(compilePagesHtml, done => {
+	gulp.watch(config.src + '/**/*.html', gulp.series(compileHtml, done => {
 		browserSync.reload();
 		done();
 	}));
