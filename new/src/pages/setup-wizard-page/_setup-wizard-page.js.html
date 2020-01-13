@@ -1,0 +1,82 @@
+<script type="text/javascript">
+    $(function () {
+        const $page = $(document.documentElement);
+
+        const ViewModel = function () {
+            this.windowResizeHandler = () => {
+                this.viewportSize({width: $(window).width(), height: $(window).height()});
+            };
+            this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
+
+            this.activeStep = ko.observable(1);
+
+            this.back = function () {
+                if (this.activeStep() > 0) {
+                    this.activeStep(this.activeStep() - 1);
+                }
+            };
+
+            this.createDishCategoryFormModel = function (value) {
+                return {
+                    value: ko.observable(value).extend({
+                        required: {
+                            message: 'Необходимо выбрать'
+                        }
+                    })
+                }
+            };
+
+            this.companyType = ko.observable();
+
+            this.dishCategoriesStepFormModel = ko.validatedObservable({
+                categories: ko.observableArray([this.createDishCategoryFormModel('')])
+            }, {deep: true, live: true});
+
+            this.dishCategoriesStepAdd = function () {
+                this.dishCategoriesStepFormModel().categories.push(this.createDishCategoryFormModel(''));
+            };
+
+            this.dishCategoriesStepRemove = function (index) {
+                this.dishCategoriesStepFormModel().categories.splice(index, 1);
+            };
+
+            this.isDishCategoriesStepSubmitted = ko.observable(false);
+
+            this.dishCategoriesStepFormControlErrorStateMatcher = function (formControl) {
+                return ko.computed(() => {
+                    return this.isDishCategoriesStepSubmitted() && !formControl.isValid();
+                });
+            };
+
+            this.dishCategoriesStepSubmit = function () {
+                this.isDishCategoriesStepSubmitted(true);
+
+                if (this.dishCategoriesStepFormModel.isValid()) {
+                    this.activeStep(this.activeStep() + 1);
+                }
+            };
+
+            this.childrenComplete = function () {
+                $page.removeClass('hrm-page--initializing');
+            };
+
+            this.selectCompanyType = function (type) {
+                this.companyType(type);
+                this.activeStep(2);
+            };
+
+            $(window).on('resize', this.windowResizeHandler);
+        };
+
+        const viewModel = new ViewModel();
+
+        ViewModel.prototype.dispose = function() {
+            $(window).off('resize', this.windowResizeHandler);
+        };
+
+        ko.applyBindings(
+            viewModel,
+            $page.get()[0]
+        );
+    });
+</script>

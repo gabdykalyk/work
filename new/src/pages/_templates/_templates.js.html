@@ -1,0 +1,47 @@
+<script type="text/javascript">
+    $(function () {
+        const $page = $(document.documentElement);
+
+        const ViewModel = function () {
+            this.windowResizeHandler = () => {
+                this.viewportSize({width: $(window).width(), height: $(window).height()});
+            };
+            this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
+
+            this.value = ko.observable('').extend({
+                required: {
+                    message: 'Обязательное поле'
+                }
+            });
+
+            this.value2 = ko.observable('').extend({
+                required: {
+                    message: 'Обязательное поле'
+                }
+            });
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.computed(() => {
+                    return !formControl.isValid();
+                });
+            };
+
+            this.childrenComplete = function () {
+                $page.removeClass('hrm-page--initializing');
+            };
+
+            $(window).on('resize', this.windowResizeHandler);
+        };
+
+        const viewModel = new ViewModel();
+
+        ViewModel.prototype.dispose = function() {
+            $(window).off('resize', this.windowResizeHandler);
+        };
+
+        ko.applyBindings(
+            viewModel,
+            $page.get()[0]
+        );
+    });
+</script>

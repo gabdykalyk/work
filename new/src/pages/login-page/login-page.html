@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html class="hrm-page login-page hrm-page--initializing" data-bind="childrenComplete: childrenComplete" lang="ru">
+<head>
+    @@include('../../base/_page-head-content.html')
+</head>
+
+<body>
+    <div class="hrm-scaffold">
+        <div class="hrm-scaffold__content login-page__content">
+            <div class="login-page__form" data-bind="using: formModel()">
+                <div class="login-page__form-logo"></div>
+
+                <!-- ko let: {formField: ko.observable(null)} -->
+                    <div class="login-page__form-field" data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(login),
+                                exportAs: formField
+                            }
+                        }
+                    ">
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Логин
+                            </label>
+                        </hrm-slot>
+
+                        <input data-bind="
+                            textInput: $parent.login,
+                            hrmFormFieldInputControl,
+                            hrmFormFieldInputControlOwner: formField
+                        ">
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($parent.login),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $parents[1].login.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko let: {formField: ko.observable(null)} -->
+                    <div class="login-page__form-field" data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(password),
+                                exportAs: formField
+                            }
+                        }
+                    ">
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Пароль
+                            </label>
+                        </hrm-slot>
+
+                        <input data-bind="
+                            textInput: $parent.password,
+                            hrmFormFieldInputControl,
+                            hrmFormFieldInputControlOwner: formField
+                        " type="password">
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($parent.password),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $parents[1].password.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
+                    </div>
+                <!-- /ko -->
+
+                <button class="hrm-button login-page__form-submit-button"
+                        data-bind="click: function () {$root.submitForm();}">
+                    Войти
+                </button>
+            </div>
+        </div>
+
+        <div class="hrm-scaffold__footer login-page__footer" data-bind="component: {name: 'hrm-footer'}"></div>
+    </div>
+    @@include('../../base/_page-scripts.html')
+    @@include('./_login-page.js.html')
+</body>
+</html>

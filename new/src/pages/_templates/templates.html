@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="hrm-page templates hrm-page--initializing" data-bind="childrenComplete: childrenComplete" lang="ru">
+<head>
+    @@include('../../base/_page-head-content.html')
+</head>
+
+<body>
+    <div class="hrm-scaffold">
+        <div class="hrm-scaffold__content templates__content">
+            <div class="templates__section">
+                <div class="templates__section-title">Поле ввода</div>
+
+                <!-- ko let: {formField: ko.observable(null)} -->
+                    <div class="templates__form-field" data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(value),
+                                exportAs: formField
+                            }
+                        }
+                    ">
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Значение
+                            </label>
+                        </hrm-slot>
+
+                        <input data-bind="
+                            textInput: $root.value,
+                            hrmFormFieldInputControl,
+                            hrmFormFieldInputControlOwner: formField
+                        ">
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($root.value),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $root.value.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
+                    </div>
+                <!-- /ko -->
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Поле ввода + выпадающий список</div>
+
+                <!-- ko let: {formField: ko.observable(null), selectControl: ko.observable(null)} -->
+                    <div class="templates__form-field" data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(value2),
+                                exportAs: formField
+                            }
+                        }
+                     ">
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Значение
+                            </label>
+                        </hrm-slot>
+
+                        <select data-bind="
+                            value: $parent.value2,
+                            hrmSelect,
+                            hrmFormFieldSelectControl: selectControl,
+                            hrmFormFieldSelectControlOwner: formField
+                        ">
+                            <option></option>
+                            <option value="1">Значение #1</option>
+                            <option value="2">Значение #2</option>
+                            <option value="3">Значение #3</option>
+                            <option value="4">Значение #4</option>
+                            <option value="5">Значение #5</option>
+                            <option value="6">Значение #6</option>
+                            <option value="7">Значение #7</option>
+                            <option value="8">Значение #8</option>
+                            <option value="9">Значение #9</option>
+                        </select>
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($root.value2),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $root.value2.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
+                    </div>
+                <!-- /ko -->
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Линейка из шагов</div>
+
+                <!-- ko let: {activeStep: ko.observable(1)} -->
+                    <div class="hrm-stepper"
+                         data-bind="css: {'hrm-stepper--dense': viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth}">
+                        <!-- ko let: {step: 1} -->
+                            <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                                <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                                    <span class="hrm-stepper__step-label">Шаг <!-- ko text: step --> <!-- /ko --></span>
+                                    <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                        <!-- ko let: {step: 2} -->
+                            <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                                <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                                    <span class="hrm-stepper__step-label">Шаг <!-- ko text: step --> <!-- /ko --></span>
+                                    <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                        <!-- ko let: {step: 3} -->
+                            <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                                <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                                    <span class="hrm-stepper__step-label">Шаг <!-- ko text: step --> <!-- /ko --></span>
+                                    <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                        <!-- ko let: {step: 4} -->
+                            <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                                <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                                    <span class="hrm-stepper__step-label">Шаг <!-- ko text: step --> <!-- /ko --></span>
+                                    <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                        <!-- ko let: {step: 5} -->
+                            <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                                <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                                    <span class="hrm-stepper__step-label">Шаг <!-- ko text: step --> <!-- /ko --></span>
+                                    <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                        <!-- ko let: {step: 6} -->
+                            <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                                <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                                    <span class="hrm-stepper__step-label">Шаг <!-- ko text: step --> <!-- /ko --></span>
+                                    <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                <!-- /ko -->
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Стилизованная полоса прокрутки</div>
+
+                <div class="templates__scrollable-block" data-bind="hrmScrollable">
+                    <div class="templates__scrollable-block-content"></div>
+                </div>
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Кнопки с иконками</div>
+
+                <div class="templates__button-with-icon-list">
+                    <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                hrm-button-with-plus-icon">
+                        Добавить
+                    </div>
+
+                    <div class="templates__button-with-icon-list">
+                        <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
+                                    hrm-button-with-plus-icon">
+                            Добавить
+                        </div>
+                    </div>
+
+                    <div class="templates__button-with-icon-list">
+                        <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                    hrm-button-with-plus-icon">
+                            Добавить
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hrm-scaffold__footer" data-bind="component: {name: 'hrm-footer'}"></div>
+    </div>
+    @@include('../../base/_page-scripts.html')
+    @@include('./_templates.js.html')
+</body>
+</html>

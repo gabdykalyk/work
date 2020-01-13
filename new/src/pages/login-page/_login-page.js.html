@@ -1,0 +1,43 @@
+<script type="text/javascript">
+    $(function () {
+        const $page = $(document.documentElement);
+
+        const ViewModel = function () {
+            this.isFormSubmitted = ko.observable(false);
+
+            this.formModel = ko.validatedObservable({
+                login: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                }),
+                password: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                })
+            });
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.computed(() => {
+                    return this.isFormSubmitted() && !formControl.isValid();
+                });
+            };
+
+            this.childrenComplete = function () {
+                $page.removeClass('hrm-page--initializing');
+            };
+
+            this.submitForm = function () {
+                this.isFormSubmitted(true);
+            }
+        };
+
+        const viewModel = new ViewModel();
+
+        ko.applyBindings(
+            viewModel,
+            $page.get()[0]
+        );
+    });
+</script>

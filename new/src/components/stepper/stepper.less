@@ -1,0 +1,129 @@
+@import '../../base/_variables.less';
+
+.hrm-stepper {
+    display: flex;
+    justify-content: space-between;
+
+    .hrm-stepper__step {
+        width: 28px;
+
+        &:not(:first-child) {
+            width: 100%;
+            flex-grow: 1;
+        }
+    }
+
+    &__step {
+        display: flex;
+        justify-content: flex-end;
+
+        &:before {
+            content: '';
+
+            display: block;
+            flex-grow: 1;
+            align-self: flex-end;
+            height: 4px;
+            margin-bottom: 12px;
+
+            background-color: #0066FF;
+        }
+
+        .hrm-stepper__step-content {
+            width: 28px;
+        }
+
+        .hrm-stepper__step-index-number {
+            margin-top: 14px;
+        }
+
+        &--active {
+            &:before {
+                background: linear-gradient(90deg, #0066FF 0%, #FF238D 100%);
+            }
+        }
+
+        &--active ~ & {
+            &:before {
+                height: 2px;
+
+                background-color: #DFE4EF;
+            }
+        }
+
+        .hrm-stepper--dense & {
+            .hrm-stepper__step-label {
+                display: none;
+            }
+
+            .hrm-stepper__step-index-number {
+                margin-top: 0;
+            }
+        }
+    }
+
+    &__step-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        cursor: pointer;
+    }
+
+    &__step-label {
+        font-weight: 500;
+        font-size: 13px;
+        color: #333333;
+        white-space: nowrap;
+
+        transition: color @hover-transition-duration @hover-transition-timing-function;
+
+        .hrm-stepper__step--active ~ .hrm-stepper__step & {
+            color: #0066FF;
+        }
+
+        .hrm-stepper__step-content:hover & {
+            color: #8E9CBB;
+        }
+
+        .hrm-stepper__step--active ~ .hrm-stepper__step .hrm-stepper__step-content:hover & {
+            color: #003F9D;
+        }
+    }
+
+    &__step-index-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-width: 2px;
+
+        border-style: solid;
+        border-color: #0066FF;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 15px;
+        color: #333333;
+
+        transition: background-color @hover-transition-duration @hover-transition-timing-function,
+                    color @hover-transition-duration @hover-transition-timing-function;
+
+        .hrm-stepper__step--active & {
+            border-color: #FF238D;
+        }
+
+        .hrm-stepper__step--active ~ .hrm-stepper__step & {
+            border-color: #DFE4EF;
+            color: #0066FF;
+        }
+
+        .hrm-stepper__step-content:hover & {
+            color: #8E9CBB;
+        }
+
+        .hrm-stepper__step--active ~ .hrm-stepper__step .hrm-stepper__step-content:hover & {
+            color: #003F9D;
+        }
+    }
+}

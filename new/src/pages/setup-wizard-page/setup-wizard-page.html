@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="hrm-page setup-wizard-page hrm-page--initializing"
+      data-bind="childrenComplete: childrenComplete" lang="ru">
+<head>
+    @@include('../../base/_page-head-content.html')
+</head>
+
+<body>
+    <div class="hrm-scaffold">
+        <div class="hrm-scaffold__content setup-wizard-page__content">
+            <div class="hrm-stepper setup-wizard-page__stepper"
+                 data-bind="css: {'hrm-stepper--dense': viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth}">
+                <!-- ko let: {step: 1} -->
+                    <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                        <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                            <span class="hrm-stepper__step-label">Тип предприятия</span>
+                            <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 2} -->
+                    <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                        <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                            <span class="hrm-stepper__step-label">Категория</span>
+                            <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 3} -->
+                    <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                        <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                            <span class="hrm-stepper__step-label">График работы</span>
+                            <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 4} -->
+                    <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                        <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                            <span class="hrm-stepper__step-label">Оборот и нагрузка</span>
+                            <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 5} -->
+                    <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                        <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                            <span class="hrm-stepper__step-label">Должности</span>
+                            <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 6} -->
+                    <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                        <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                            <span class="hrm-stepper__step-label">Тип нагрузки</span>
+                            <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+            </div>
+
+            <div class="setup-wizard-page__tab-container">
+                <div class="setup-wizard-page__tab-pane setup-wizard-page__company-type-tab-pane"
+                     data-bind="
+                        hrmFade,
+                        hrmFadeValue: activeStep() === 1,
+                        hrmFadeDuration: 100,
+                        hrmFadeInDelay: 100
+                     "
+                >
+                    <div class="setup-wizard-page__company-type-selector">
+                        <div class="setup-wizard-page__company-type-selector-option setup-wizard-page__company-type-selector-option--value_retail"
+                             data-bind="click: function () {selectCompanyType(0);}">
+                            <div class="setup-wizard-page__company-type-selector-option-icon"></div>
+
+                            <span class="setup-wizard-page__company-type-selector-option-label">
+                                Розничная торговля
+                            </span>
+                        </div>
+
+                        <div class="setup-wizard-page__company-type-selector-option setup-wizard-page__company-type-selector-option--value_foodservice"
+                             data-bind="click: function () {selectCompanyType(1);}">
+                            <div class="setup-wizard-page__company-type-selector-option-icon"></div>
+
+                            <span class="setup-wizard-page__company-type-selector-option-label">
+                                Общепит / Рестораны
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="setup-wizard-page__tab-pane setup-wizard-page__dish-category-tab-pane"
+                     data-bind="
+                        hrmFade,
+                        hrmFadeValue: activeStep() === 2,
+                        hrmFadeDuration: 100,
+                        hrmFadeInDelay: 100
+                     "
+                >
+                    <div class="setup-wizard-page__dish-category-selector" data-bind="using: dishCategoriesStepFormModel">
+                        <span class="setup-wizard-page__dish-category-selector-title">Выберите категории блюд</span>
+
+                        <div class="setup-wizard-page__dish-category-selector-list">
+                            <!-- ko foreach: {
+                                data: categories,
+                                beforeRemove: hrmSlideBeforeRemoveFactory(),
+                                afterAdd: hrmSlideAfterAddFactory()
+                            } -->
+                                <div class="setup-wizard-page__dish-category-selector-item">
+                                    <div class="setup-wizard-page__dish-category-selector-item-content">
+                                        <!-- ko let: {formField: ko.observable(null), selectControl: ko.observable(null)} -->
+                                            <div class="setup-wizard-page__dish-category-selector-item-field" data-bind="
+                                                component: {
+                                                    name: 'hrm-form-field',
+                                                    params: {
+                                                        hasError: $root.dishCategoriesStepFormControlErrorStateMatcher(value),
+                                                        exportAs: formField
+                                                    }
+                                                }
+                                            ">
+                                                <hrm-slot name="label">
+                                                    <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                                        Категория
+                                                    </label>
+                                                </hrm-slot>
+
+                                                <select data-bind="
+                                                    value: $parent.value,
+                                                    hrmSelect,
+                                                    hrmFormFieldSelectControl: selectControl,
+                                                    hrmFormFieldSelectControlOwner: formField
+                                                ">
+                                                    <option></option>
+                                                    <option value="1">Пицца</option>
+                                                    <option value="2">Роллы</option>
+                                                </select>
+
+                                                <hrm-slot name="error">
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: $root.dishCategoriesStepFormControlErrorStateMatcher($parent.value),
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parents[1].value.error() --><!-- /ko -->
+                                                    </div>
+                                                </hrm-slot>
+                                            </div>
+
+                                            <!-- ko if: $parent.categories().length > 1 -->
+                                                <button class="hrm-button setup-wizard-page__dish-category-selector-item-remove-button"
+                                                        title="Удалить"
+                                                        data-bind="click: function () {$root.dishCategoriesStepRemove($index());}">
+                                                </button>
+                                            <!-- /ko -->
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                    hrm-button-with-plus-icon setup-wizard-page__dish-category-selector-add-button"
+                             data-bind="click: function () {$root.dishCategoriesStepAdd();}">
+                            Добавить
+                        </div>
+                    </div>
+                    <div class="setup-wizard-page__tab-pane-actions">
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-back-button"
+                                data-bind="click: back">
+                            Назад
+                        </button>
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-forward-button"
+                                data-bind="
+                                    click: dishCategoriesStepSubmit,
+                                    attr: {disabled: $root.isDishCategoriesStepSubmitted() && !$root.dishCategoriesStepFormModel.isValid()}
+                                "
+                        >
+                            Далее
+                        </button>
+                    </div>
+                </div>
+                <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 3, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
+                <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 4, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
+                <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 5, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
+                <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 6, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
+            </div>
+        </div>
+
+        <div class="hrm-scaffold__footer" data-bind="component: {name: 'hrm-footer'}"></div>
+    </div>
+    @@include('../../base/_page-scripts.html')
+    @@include('./_setup-wizard-page.js.html')
+</body>
+</html>
