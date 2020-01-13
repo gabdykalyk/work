@@ -759,3 +759,17 @@ var dayOfMonth = (function (block) {
     block_select2.data('select2').$dropdown.addClass('day-of-month-block');
     block_select2.data('select2').$container.addClass('day-of-month-input');
 });
+
+Highcharts.setOptions({
+    lang: {
+        viewFullscreen: 'Посмотреть в полноэкранном режиме',
+        printChart: 'Распечатать',
+        downloadPNG: 'Скачать PNG',
+        downloadJPEG: 'Скачать JPEG',
+        downloadPDF: 'Скачать PDF',
+        downloadSVG: 'Скачать SVG'
+    },
+    exporting: {
+        enabled: false
+    }
+});
