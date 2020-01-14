@@ -82,6 +82,17 @@ ko.bindingHandlers.hrmElement = {
     }
 };
 
+ko.bindingHandlers.hrmMask = {
+    init: function (element, valueAccessor, allBindings) {
+        const pattern = allBindings()['hrmMaskPattern'];
+
+        $(element).inputmask({
+            mask: pattern,
+            jitMasking: true
+        });
+    }
+};
+
 function hrmSplitComponentTemplateNodes (nodes) {
     const result = {
         main: [],
@@ -107,3 +118,12 @@ function hrmSlideBeforeRemoveFactory (duration = 200) {
 function hrmSlideAfterAddFactory (duration = 200) {
     return element => $(element).hide().slideDown(duration);
 }
+
+ko.validation.rules['hrmTime'] = {
+    validator: function (val) {
+        return moment(val, 'HH:mm').isValid();
+    },
+    message: 'Неверный формат времени'
+};
+
+ko.validation.registerExtenders();

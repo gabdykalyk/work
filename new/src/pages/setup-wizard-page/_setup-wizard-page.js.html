@@ -3,17 +3,28 @@
         const $page = $(document.documentElement);
 
         const ViewModel = function () {
+            this.subscriptions = [];
+
             this.windowResizeHandler = () => {
                 this.viewportSize({width: $(window).width(), height: $(window).height()});
             };
             this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
 
-            this.activeStep = ko.observable(1);
+            this.activeStep = ko.observable(3);
+
+            this.childrenComplete = function () {
+                $page.removeClass('hrm-page--initializing');
+            };
 
             this.back = function () {
                 if (this.activeStep() > 0) {
                     this.activeStep(this.activeStep() - 1);
                 }
+            };
+
+            this.selectCompanyType = function (type) {
+                this.companyType(type);
+                this.activeStep(2);
             };
 
             this.createDishCategoryFormModel = function (value) {
@@ -48,7 +59,7 @@
                 });
             };
 
-            this.dishCategoriesStepSubmit = function () {
+            this.submitDishCategoriesStep = function () {
                 this.isDishCategoriesStepSubmitted(true);
 
                 if (this.dishCategoriesStepFormModel.isValid()) {
@@ -56,22 +67,125 @@
                 }
             };
 
-            this.childrenComplete = function () {
-                $page.removeClass('hrm-page--initializing');
+            this.scheduleStepFormModel = (() => {
+                const schedule = [
+                    ko.observableArray([]),
+                    ko.observableArray([]),
+                    ko.observableArray([]),
+                    ko.observableArray([]),
+                    ko.observableArray([]),
+                    ko.observableArray([]),
+                    ko.observableArray([])
+                ];
+
+                return ko.validatedObservable({
+                    intervalStart: ko.observable('00:00').extend({
+                        required: true,
+                        hrmTime: true,
+                        notEqual: '24:00'
+                    }),
+                    intervalEnd: ko.observable('24:00').extend({
+                        required: true,
+                        hrmTime: true
+                    }),
+                    schedule: schedule,
+                    validationObject: ko.validatedObservable().extend({
+                        validation: {
+                            validator: () => {
+                                return schedule.some(weekday => weekday().length > 0);
+                            }
+                        }
+                    })
+                });
+            })();
+
+            this.scheduleStepLastValidIntervalStart = ko.observable(this.scheduleStepFormModel().intervalStart());
+            this.scheduleStepLastValidIntervalEnd = ko.observable(this.scheduleStepFormModel().intervalEnd());
+
+            this.isScheduleStepIntervalValid = ko.computed(() => {
+                return this.scheduleStepFormModel().intervalStart.isValid() && this.scheduleStepFormModel().intervalEnd.isValid();
+            });
+
+            this.scheduleStepUsedIntervalStart = ko.computed(() => {
+                if (this.isScheduleStepIntervalValid()) {
+                    return this.scheduleStepFormModel().intervalStart();
+                } else {
+                    return this.scheduleStepLastValidIntervalStart();
+                }
+            });
+
+            this.scheduleStepUsedIntervalEnd = ko.computed(() => {
+                if (this.isScheduleStepIntervalValid()) {
+                    return this.scheduleStepFormModel().intervalEnd();
+                } else {
+                    return this.scheduleStepLastValidIntervalEnd();
+                }
+            });
+
+            this.scheduleStepIntervalBoundaryFormControlErrorStateMatcher = function (formControl) {
+                return ko.computed(() => {
+                    return !formControl.isValid();
+                });
             };
 
-            this.selectCompanyType = function (type) {
-                this.companyType(type);
-                this.activeStep(2);
+            this.isScheduleStepSubmitted = ko.observable(null);
+
+            this.scheduleStepCutSchedule = function () {
+                const start = moment(this.scheduleStepUsedIntervalStart(), 'HH:mm');
+                const end = moment(this.scheduleStepUsedIntervalEnd(), 'HH:mm');
+
+                const startHour = start.hour() === 0 ? (start.isBefore(end) ? 0 : 24) : start.hour();
+                const endHour = end.hour() === 0 ? (start.isBefore(end) ? 24 : 0) : end.hour();
+
+                this.scheduleStepFormModel().schedule.forEach(week => {
+                    if (start.isBefore(end)) {
+                        week.remove(hour => hour < startHour || hour > endHour);
+                    } else {
+                        week.remove(hour => hour < endHour && hour > startHour);
+                    }
+
+                    week.sort();
+                });
             };
 
-            $(window).on('resize', this.windowResizeHandler);
+            this.submitScheduleStep = function () {
+                this.isScheduleStepSubmitted(true);
+
+                if (this.scheduleStepFormModel.isValid()) {
+                    this.activeStep(this.activeStep() + 1);
+                }
+            };
+
+            (() => {
+                $(window).on('resize', this.windowResizeHandler);
+
+                this.subscriptions.push(this.scheduleStepUsedIntervalStart.subscribe(() => {
+                    this.scheduleStepCutSchedule();
+                }));
+
+                this.subscriptions.push(this.scheduleStepUsedIntervalEnd.subscribe(() => {
+                    this.scheduleStepCutSchedule();
+                }));
+
+                this.subscriptions.push(this.scheduleStepFormModel().intervalStart.subscribe(value => {
+                    if (this.scheduleStepFormModel().intervalStart.isValid()) {
+                        this.scheduleStepLastValidIntervalStart(value);
+                    }
+                }));
+
+                this.subscriptions.push(this.scheduleStepFormModel().intervalEnd.subscribe(value => {
+                    if (this.scheduleStepFormModel().intervalEnd.isValid()) {
+                        this.scheduleStepLastValidIntervalEnd(value);
+                    }
+                }));
+            })();
         };
 
         const viewModel = new ViewModel();
 
         ViewModel.prototype.dispose = function() {
             $(window).off('resize', this.windowResizeHandler);
+            this.subscriptions.forEach(s => s.dispose());
         };
 
         ko.applyBindings(

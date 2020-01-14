@@ -48,7 +48,7 @@
             <div class="templates__section">
                 <div class="templates__section-title">Поле ввода + выпадающий список</div>
 
-                <!-- ko let: {formField: ko.observable(null), selectControl: ko.observable(null)} -->
+                <!-- ko let: {formField: ko.observable(null)} -->
                     <div class="templates__form-field" data-bind="
                         component: {
                             name: 'hrm-form-field',
@@ -67,7 +67,7 @@
                         <select data-bind="
                             value: $parent.value2,
                             hrmSelect,
-                            hrmFormFieldSelectControl: selectControl,
+                            hrmFormFieldSelectControl,
                             hrmFormFieldSelectControlOwner: formField
                         ">
                             <option></option>
@@ -93,6 +93,41 @@
                             </div>
                         </hrm-slot>
                     </div>
+                <!-- /ko -->
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Поле ввода с маской и без подписи</div>
+
+                <!-- ko let: {formField: ko.observable(null)} -->
+                <div class="templates__form-field" data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {
+                                noLabel: true,
+                                hasError: $root.formControlErrorStateMatcher(value3),
+                                exportAs: formField
+                            }
+                        }
+                    ">
+                    <input data-bind="
+                        textInput: $root.value3,
+                        hrmMask,
+                        hrmMaskPattern: '99:99',
+                        hrmFormFieldInputControl,
+                        hrmFormFieldInputControlOwner: formField
+                    " placeholder="00:00">
+
+                    <hrm-slot name="error">
+                        <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($root.value3),
+                                hrmSlideDuration: 150
+                            ">
+                            <!-- ko text: $root.value3.error() --><!-- /ko -->
+                        </div>
+                    </hrm-slot>
+                </div>
                 <!-- /ko -->
             </div>
             <div class="templates__section">
@@ -173,18 +208,14 @@
                         Добавить
                     </div>
 
-                    <div class="templates__button-with-icon-list">
-                        <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
-                                    hrm-button-with-plus-icon">
-                            Добавить
-                        </div>
+                    <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
+                                hrm-button-with-check-icon">
+                        Заполнить автоматически
                     </div>
 
-                    <div class="templates__button-with-icon-list">
-                        <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
-                                    hrm-button-with-plus-icon">
-                            Добавить
-                        </div>
+                    <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                hrm-button-with-times-icon">
+                        Очистить
                     </div>
                 </div>
             </div>

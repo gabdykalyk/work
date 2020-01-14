@@ -1,0 +1,65 @@
+<template id="setup-wizard-page-schedule-selector-calendar-template">
+    <div class="setup-wizard-page__schedule-selector-calendar-hour-header">
+        <!-- ko foreach: {data: $component.hours, as: 'hour'} -->
+            <!-- ko if: $index() !== 0 -->
+                <div class="setup-wizard-page__schedule-selector-calendar-hour-header-divider"
+                     data-bind="css: {
+                        'setup-wizard-page__schedule-selector-calendar-hour-header-divider--short': $index() % 2 === 1
+                     }"
+                >
+                </div>
+            <!-- /ko -->
+
+            <div class="setup-wizard-page__schedule-selector-calendar-hour-header-cell"
+                 data-bind="
+                    css: {
+                        'setup-wizard-page__schedule-selector-calendar-hour-header-cell--not-integer': !$component.isIntegerHour(hourIndex())
+                    }
+                 "
+            >
+                <div class="setup-wizard-page__schedule-selector-calendar-hour-header-cell-content">
+                    <!-- ko if: $component.getHourHeaderCellTextData(hourIndex()) !== null -->
+                        <span class="setup-wizard-page__schedule-selector-calendar-hour-header-cell-time">
+                            <!-- ko text: $component.getHourHeaderCellTextData(hourIndex()).hour -->
+                            <!-- /ko --><sup class="setup-wizard-page__schedule-selector-calendar-hour-header-cell-minute"
+                                  data-bind="text: $component.getHourHeaderCellTextData(hourIndex()).minute">
+                            </sup>
+                        </span>
+                    <!-- /ko -->
+                </div>
+            </div>
+        <!-- /ko -->
+    </div>
+
+    <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
+        <div class="setup-wizard-page__schedule-selector-calendar-weekday">
+            <span class="setup-wizard-page__schedule-selector-calendar-weekday-label"
+                  data-bind="text: $component.getWeekdayLabelText(weekday)">
+            </span>
+
+            <!-- ko foreach: {data: $component.hours, as: 'hour'} -->
+                <!-- ko if: $index() !== 0 -->
+                    <div class="setup-wizard-page__schedule-selector-calendar-weekday-divider"></div>
+                <!-- /ko -->
+                <div class="setup-wizard-page__schedule-selector-calendar-hour"
+                     data-bind="
+                        event: {
+                            mousedown: function () {$component.hourMousedownOrTouchstart(weekday, hour);},
+                            touchstart: function () {$component.hourMousedownOrTouchstart(weekday, hour);},
+                            mouseover: function () {$component.hourMouseover(weekday, hour);}
+                        },
+                        css: {
+                            'setup-wizard-page__schedule-selector-calendar-hour--not-integer': !$component.isIntegerHour(hourIndex()),
+                            'setup-wizard-page__schedule-selector-calendar-hour--picked': $component.isPickedHour(weekday, hour)
+                        },
+                        attr: {
+                            'data-setup-wizard-page-schedule-selector-calendar-hour-week': weekday,
+                            'data-setup-wizard-page-schedule-selector-calendar-hour-hour': hour
+                        }
+                     "
+                >
+                </div>
+            <!-- /ko -->
+        </div>
+    <!-- /ko -->
+</template>
