@@ -2071,7 +2071,7 @@
 						}
 
 						if (toDate !== null && fromDate !== null && (!(toDate.isSame(fromDate) || toDate.isAfter(fromDate)))) {
-							return 'Дата начала периода должна быть до даты окончания или такой же';
+							return 'Некорректный период';
 						}
 
 						return null;
@@ -2167,6 +2167,20 @@
                 return series;
             }
 
+			function renderElementsFactory(legendColumnCount) {
+				return function () {
+					if (this.legend) {
+						this.legend.destroy();
+					}
+
+					let boxWidth = this.plotBox.width;
+
+					this.legend.options.itemWidth = boxWidth / legendColumnCount;
+
+					this.render();
+				}
+			}
+
             let highchartsRoundChart = {
                     type: 'pie',
                     styledMode: true,
@@ -2192,7 +2206,11 @@
                 },
 				highchartsStackedColumnChart = {
 					type: 'column',
-					styledMode: true
+					styledMode: true,
+					events: {
+						load: renderElementsFactory(2),
+						redraw: renderElementsFactory(2)
+					}
 				},
                 highchartsModalRoundChart = {
                     type: 'pie',
@@ -2436,9 +2454,10 @@
 					symbolRadius: 5,
 					useHTML: true,
 					reversed: true,
+					width: '100%',
 					itemMarginBottom: 5,
 					labelFormatter: function () {
-						return `<span class="chart__name">${this.name}</span>`;
+						return `<span title="${this.name}">${this.name}</span>`;
 					}
 				},
                 highchartsModalRoundLegend = {
@@ -2752,7 +2771,10 @@
 						colorIndex: 55
 					}
                 ],
-                legend: highchartsStackedColumnLegend,
+                legend: {
+                	...highchartsStackedColumnLegend,
+					maxHeight: 120
+				},
 				exporting: highchartsStackedColumnExporting
             });
 			Highcharts.chart('stackedColumn2', {
@@ -2818,7 +2840,10 @@
 						colorIndex: 55
 					}
 				],
-				legend: highchartsStackedColumnLegend,
+				legend: {
+					...highchartsStackedColumnLegend,
+					maxHeight: 100
+				},
 				exporting: highchartsStackedColumnExporting
 			});
 			Highcharts.chart('stackedColumn3', {
@@ -2889,7 +2914,10 @@
 						colorIndex: 55
 					}
 				],
-				legend: highchartsStackedColumnLegend,
+				legend: {
+					...highchartsStackedColumnLegend,
+					maxHeight: 130
+				},
 				exporting: highchartsStackedColumnExporting
 			});
 			Highcharts.chart('stackedColumn4', {
@@ -2920,11 +2948,20 @@
 						colorIndex: 55
 					}
 				],
-				legend: highchartsStackedColumnLegend,
+				legend: {
+					...highchartsStackedColumnLegend,
+					maxHeight: 140
+				},
 				exporting: highchartsStackedColumnExporting
 			});
 			Highcharts.chart('stackedColumn5', {
-				chart: highchartsStackedColumnChart,
+				chart: {
+					...highchartsStackedColumnChart,
+					events: {
+						load: renderElementsFactory(1),
+						redraw: renderElementsFactory(1)
+					}
+				},
 				title: {
 					...highchartsStackedColumnTitle,
 					text: 'По заполненности анкеты'
@@ -3777,7 +3814,7 @@
 					}
 				],
 				legend: highchartsModalStackedColumnLegend,
- exporting: highchartsStackedColumnExporting
+				exporting: highchartsStackedColumnExporting
 			});
 			Highcharts.chart('modal-stacked-column4', {
 				chart: highchartsStackedColumnChart,
