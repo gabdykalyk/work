@@ -10,7 +10,7 @@
             };
             this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
 
-            this.activeStep = ko.observable(3);
+            this.activeStep = ko.observable(1);
 
             this.childrenComplete = function () {
                 $page.removeClass('hrm-page--initializing');
@@ -155,6 +155,117 @@
                     this.activeStep(this.activeStep() + 1);
                 }
             };
+
+            this.turnoverStepFormModel = (() => {
+                return ko.validatedObservable({
+                    categories: ko.observableArray([
+                        {
+                            name: 'Пицца',
+                            units: ko.observable('0'),
+                            week: [
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable('')
+                            ]
+                        },
+                        {
+                            name: 'Роллы',
+                            units: ko.observable('1'),
+                            week: [
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable(''),
+                                ko.observable('')
+                            ]
+                        }
+                    ])
+                });
+            })();
+
+            this.getTurnoverStepWeekTotal = function (categoryIndex) {
+                const week = this.turnoverStepFormModel().categories()[categoryIndex].week;
+                const isEmpty = week.every(weekday => weekday() === '');
+
+                if (isEmpty) {
+                    return '';
+                }
+
+                return +week.reduce((total, wd) => total + +wd(), 0).toFixed(2);
+            };
+
+            this.turnoverStepDistributeWeekTotal = function (categoryIndex, total) {
+                const portion = Math.floor((total / 7) * 100) / 100;
+                this.turnoverStepFormModel().categories()[categoryIndex].week.forEach(weekday => weekday(portion));
+                this.onTurnoverStepCategoryWeekdayChange(categoryIndex);
+            };
+
+            this.turnoverStepCategoriesWithFillingError = ko.observableArray([]);
+
+            this.turnoverStepTableCategoryErrorExtractor = function (index) {
+                return ko.computed(() => {
+                    if (this.turnoverStepCategoriesWithFillingError().includes(index)) {
+                        return {message: 'Для автоматического заполнения данными, введите хотя бы одно значение'};
+                    } else {
+                        return null;
+                    }
+                });
+            };
+
+            this.onTurnoverStepCategoryWeekdayChange = function (categoryIndex) {
+                this.turnoverStepCategoriesWithFillingError.remove(categoryIndex);
+            };
+
+            this.fillTurnoverStep = function () {
+                const valuesByUnits = {};
+
+                this.turnoverStepFormModel().categories().forEach(category => {
+                    const values = [];
+
+                    if (!(category.units() in valuesByUnits)) {
+                        valuesByUnits[category.units()] = [];
+                    }
+
+                    category.week.forEach(weekday => {
+                        if (weekday() !== '' && !valuesByUnits[category.units()].includes(weekday())) {
+                            valuesByUnits[category.units()].push(weekday());
+                        }
+
+                        if (weekday() !== '' && !values.includes(weekday())) {
+                            values.push(weekday());
+                        }
+                    });
+
+                    if (values.length === 1) {
+                        category.week.forEach(weekday => weekday(values[0]));
+                    }
+                });
+
+                this.turnoverStepFormModel().categories().forEach((category, index) => {
+                    if (valuesByUnits[category.units()].length === 1 && category.week[0]() === '') {
+                        category.week.forEach(weekday => weekday(valuesByUnits[category.units()][0]));
+                    } else if (valuesByUnits[category.units()].length === 0) {
+                        if (!this.turnoverStepCategoriesWithFillingError().includes(index)) {
+                            this.turnoverStepCategoriesWithFillingError.push(index);
+                        }
+                    }
+                });
+            };
+
+            this.clearTurnoverStep = function () {
+                this.turnoverStepFormModel().categories().forEach((category, index) => {
+                    category.week.forEach(weekday => weekday(''));
+                    this.onTurnoverStepCategoryWeekdayChange(index);
+                });
+            };
+
+            this.submitTurnoverStep = function () {};
 
             (() => {
                 $(window).on('resize', this.windowResizeHandler);

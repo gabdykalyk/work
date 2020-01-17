@@ -86,8 +86,7 @@ ko.bindingHandlers.hrmMask = {
     init: function (element, valueAccessor, allBindings) {
         const pattern = allBindings()['hrmMaskPattern'];
 
-        $(element).inputmask({
-            mask: pattern,
+        $(element).inputmask(pattern, {
             jitMasking: true
         });
     }

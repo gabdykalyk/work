@@ -27,9 +27,21 @@
                 hrmTime: true
             });
 
+            this.value4 = ko.observable('').extend({
+                required: {
+                    message: 'Пример ошибки'
+                }
+            });
+
             this.formControlErrorStateMatcher = function (formControl) {
                 return ko.computed(() => {
                     return !formControl.isValid();
+                });
+            };
+
+            this.editableCellControlErrorExtractor = function (control) {
+                return ko.computed(() => {
+                    return !control.isValid() ? {message: control.error()} : null;
                 });
             };
 

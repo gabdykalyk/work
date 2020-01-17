@@ -99,35 +99,35 @@
                 <div class="templates__section-title">Поле ввода с маской и без подписи</div>
 
                 <!-- ko let: {formField: ko.observable(null)} -->
-                <div class="templates__form-field" data-bind="
-                        component: {
-                            name: 'hrm-form-field',
-                            params: {
-                                noLabel: true,
-                                hasError: $root.formControlErrorStateMatcher(value3),
-                                exportAs: formField
+                    <div class="templates__form-field" data-bind="
+                            component: {
+                                name: 'hrm-form-field',
+                                params: {
+                                    noLabel: true,
+                                    hasError: $root.formControlErrorStateMatcher(value3),
+                                    exportAs: formField
+                                }
                             }
-                        }
-                    ">
-                    <input data-bind="
-                        textInput: $root.value3,
-                        hrmMask,
-                        hrmMaskPattern: '99:99',
-                        hrmFormFieldInputControl,
-                        hrmFormFieldInputControlOwner: formField
-                    " placeholder="00:00">
+                        ">
+                        <input data-bind="
+                            textInput: $root.value3,
+                            hrmMask,
+                            hrmMaskPattern: '99:99',
+                            hrmFormFieldInputControl,
+                            hrmFormFieldInputControlOwner: formField
+                        " placeholder="00:00">
 
-                    <hrm-slot name="error">
-                        <div data-bind="
-                                component: {name: 'hrm-form-field-error'},
-                                hrmSlide,
-                                hrmSlideValue: $root.formControlErrorStateMatcher($root.value3),
-                                hrmSlideDuration: 150
-                            ">
-                            <!-- ko text: $root.value3.error() --><!-- /ko -->
-                        </div>
-                    </hrm-slot>
-                </div>
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                    component: {name: 'hrm-form-field-error'},
+                                    hrmSlide,
+                                    hrmSlideValue: $root.formControlErrorStateMatcher($root.value3),
+                                    hrmSlideDuration: 150
+                                ">
+                                <!-- ko text: $root.value3.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
+                    </div>
                 <!-- /ko -->
             </div>
             <div class="templates__section">
@@ -203,21 +203,101 @@
                 <div class="templates__section-title">Кнопки с иконками</div>
 
                 <div class="templates__button-with-icon-list">
-                    <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
                                 hrm-button-with-plus-icon">
                         Добавить
-                    </div>
+                    </button>
 
-                    <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
+                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
                                 hrm-button-with-check-icon">
                         Заполнить автоматически
-                    </div>
+                    </button>
 
-                    <div class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
                                 hrm-button-with-times-icon">
                         Очистить
-                    </div>
+                    </button>
                 </div>
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Таблица</div>
+
+                <table data-bind="hrmTable">
+                    <thead>
+                        <tr>
+                            <th>Колонка #1</th>
+                            <th>Колонка #2</th>
+                            <th>Колонка #3</th>
+                            <th>Колонка #4</th>
+                            <th>Колонка #5</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+                            <!-- ko let: {editableCell: ko.observable(null)} -->
+                                <td data-bind="hrmTableEditableCell: editableCell">
+                                    <input data-bind="
+                                        value: 'Редактируемое значение #1',
+                                        hrmTableEditableCellInputControl,
+                                        hrmTableEditableCellInputControlOwner: editableCell
+                                    " placeholder="Значение #1">
+                                </td>
+                            <!-- /ko -->
+                            <td>Значение #7</td>
+                            <td>Значение #8</td>
+                            <td>Значение #9</td>
+                            <td>Значение #10</td>
+                        </tr>
+
+                        <tr>
+                            <!-- ko let: {editableCell: ko.observable(null)} -->
+                                <td data-bind="
+                                    hrmTableEditableCell: editableCell,
+                                    hrmTableEditableCellError: editableCellControlErrorExtractor(value4)
+                                ">
+                                    <input data-bind="
+                                        textInput: value4,
+                                        hrmTableEditableCellInputControl,
+                                        hrmTableEditableCellInputControlOwner: editableCell
+                                    " placeholder="Значение #11">
+                                </td>
+                            <!-- /ko -->
+                            <td>Значение #12</td>
+                            <td>Значение #13</td>
+                            <td>Значение #14</td>
+                            <td>Значение #15</td>
+                        </tr>
+
+                        <tr>
+                            <td>Значение #16</td>
+                            <td>Значение #17</td>
+                            <td>Значение #18</td>
+                            <td>Значение #19</td>
+                            <!-- ko let: {editableCell: ko.observable(null)} -->
+                                <td data-bind="hrmTableEditableCell: editableCell">
+                                    <select data-bind="
+                                        value: 1,
+                                        hrmSelect,
+                                        hrmTableEditableCellSelectControl,
+                                        hrmTableEditableCellSelectControlOwner: editableCell
+                                    ">
+                                        <option></option>
+                                        <option value="1">Вариант #1</option>
+                                        <option value="2">Очень-очень длинный варинт #2</option>
+                                        <option value="3">Вариант #3</option>
+                                        <option value="4">Вариант #4</option>
+                                        <option value="5">Вариант #5</option>
+                                        <option value="6">Вариант #6</option>
+                                        <option value="7">Вариант #7</option>
+                                        <option value="8">Вариант #8</option>
+                                        <option value="9">Вариант #9</option>
+                                    </select>
+                                </td>
+                            <!-- /ko -->
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
