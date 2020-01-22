@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html class="hrm-page setup-wizard-page hrm-page--initializing" data-bind="childrenComplete: childrenComplete" lang="ru">
+
+<head>
+    <title>Sakura</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:100,200,300,400,500,600,700,800,900&display=swap&subset=cyrillic" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/css/OverlayScrollbars.min.css" integrity="sha256-zUBmWpj0DsZzFautKgMOtiOkT6ECQ+a6RitMns7+HRM=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body>
+    <div class="hrm-scaffold">
+        <div class="hrm-scaffold__content setup-wizard-page__content">
+            <div class="hrm-stepper setup-wizard-page__stepper" data-bind="css: {'hrm-stepper--dense': viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth}">
+                <!-- ko let: {step: 1} -->
+                <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                        <span class="hrm-stepper__step-label">Тип предприятия</span>
+                        <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                    </div>
+                </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 2} -->
+                <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                        <span class="hrm-stepper__step-label">Категория</span>
+                        <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                    </div>
+                </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 3} -->
+                <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                        <span class="hrm-stepper__step-label">График работы</span>
+                        <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                    </div>
+                </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 4} -->
+                <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                        <span class="hrm-stepper__step-label">Оборот и нагрузка</span>
+                        <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                    </div>
+                </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 5} -->
+                <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                        <span class="hrm-stepper__step-label">Должности</span>
+                        <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                    </div>
+                </div>
+                <!-- /ko -->
+
+                <!-- ko let: {step: 6} -->
+                <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                        <span class="hrm-stepper__step-label">Тип нагрузки</span>
+                        <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
+                    </div>
+                </div>
+                <!-- /ko -->
+            </div>
+
+            <div class="setup-wizard-page__tab-container">
+                <div class="setup-wizard-page__tab-pane setup-wizard-page__company-type-tab-pane" data-bind="
+                        hrmFade,
+                        hrmFadeValue: activeStep() === 1,
+                        hrmFadeDuration: 100,
+                        hrmFadeInDelay: 100
+                     ">
+                    <div class="setup-wizard-page__company-type-selector">
+                        <div class="setup-wizard-page__company-type-selector-option setup-wizard-page__company-type-selector-option--value_retail" data-bind="click: function () {selectCompanyType(0);}">
+                            <div class="setup-wizard-page__company-type-selector-option-icon"></div>
+
+                            <span class="setup-wizard-page__company-type-selector-option-label">
+                                Розничная торговля
+                            </span>
+                        </div>
+
+                        <div class="setup-wizard-page__company-type-selector-option setup-wizard-page__company-type-selector-option--value_foodservice" data-bind="click: function () {selectCompanyType(1);}">
+                            <div class="setup-wizard-page__company-type-selector-option-icon"></div>
+
+                            <span class="setup-wizard-page__company-type-selector-option-label">
+                                Общепит / Рестораны
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="setup-wizard-page__tab-pane setup-wizard-page__dish-category-tab-pane" data-bind="
+                        hrmFade,
+                        hrmFadeValue: activeStep() === 2,
+                        hrmFadeDuration: 100,
+                        hrmFadeInDelay: 100
+                     ">
+                    <div class="setup-wizard-page__dish-category-selector" data-bind="using: dishCategoriesStepFormModel">
+                        <span class="setup-wizard-page__dish-category-selector-title">Выберите категории блюд</span>
+
+                        <div class="setup-wizard-page__dish-category-selector-list">
+                            <!-- ko foreach: {
+                                data: categories,
+                                beforeRemove: hrmSlideBeforeRemoveFactory(),
+                                afterAdd: hrmSlideAfterAddFactory()
+                            } -->
+                            <div class="setup-wizard-page__dish-category-selector-item">
+                                <div class="setup-wizard-page__dish-category-selector-item-content">
+                                    <!-- ko let: {formField: ko.observable(null)} -->
+                                    <div class="setup-wizard-page__dish-category-selector-item-field" data-bind="
+                                                component: {
+                                                    name: 'hrm-form-field',
+                                                    params: {
+                                                        hasError: $root.dishCategoriesStepFormControlErrorStateMatcher(value),
+                                                        exportAs: formField
+                                                    }
+                                                }
+                                            ">
+                                        <hrm-slot name="label">
+                                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                                Категория
+                                            </label>
+                                        </hrm-slot>
+
+                                        <select data-bind="
+                                                    value: $parent.value,
+                                                    hrmSelect,
+                                                    hrmFormFieldSelectControl,
+                                                    hrmFormFieldSelectControlOwner: formField
+                                                ">
+                                            <option></option>
+                                            <option value="1">Пицца</option>
+                                            <option value="2">Роллы</option>
+                                        </select>
+
+                                        <hrm-slot name="error">
+                                            <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: $root.dishCategoriesStepFormControlErrorStateMatcher($parent.value),
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                <!-- ko text: $parents[1].value.error() -->
+                                                <!-- /ko -->
+                                            </div>
+                                        </hrm-slot>
+                                    </div>
+
+                                    <!-- ko if: $parent.categories().length > 1 -->
+                                    <button class="hrm-button setup-wizard-page__dish-category-selector-item-remove-button" title="Удалить" data-bind="click: function () {$root.dishCategoriesStepRemove($index());}">
+                                    </button>
+                                    <!-- /ko -->
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                    hrm-button-with-plus-icon setup-wizard-page__dish-category-selector-add-button" data-bind="click: function () {$root.dishCategoriesStepAdd();}">
+                            Добавить
+                        </button>
+                    </div>
+
+                    <div class="setup-wizard-page__tab-pane-actions">
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-back-button" data-bind="click: back">
+                            Назад
+                        </button>
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-forward-button" data-bind="
+                                    click: submitDishCategoriesStep,
+                                    attr: {disabled: $root.isDishCategoriesStepSubmitted() && !$root.dishCategoriesStepFormModel.isValid()}
+                                ">
+                            Далее
+                        </button>
+                    </div>
+                </div>
+                <div class="setup-wizard-page__tab-pane setup-wizard-page__schedule-tab-pane" data-bind="
+                        hrmFade,
+                        hrmFadeValue: activeStep() === 3,
+                        hrmFadeDuration: 100,
+                        hrmFadeInDelay: 100
+                     ">
+                    <!-- ko let: {calendar: ko.observable(null)} -->
+                    <div class="setup-wizard-page__schedule-selector" data-bind="using: scheduleStepFormModel">
+                        <span class="setup-wizard-page__schedule-selector-title">График работы предприятия</span>
+
+                        <div class="setup-wizard-page__schedule-selector-interval-selector">
+                            <span class="setup-wizard-page__schedule-selector-interval-selector-label">
+                                    Задать интервал таблицы
+                                </span>
+
+                            <div class="setup-wizard-page__schedule-selector-interval-selector-control">
+                                <!-- ko let: {formField: ko.observable(null)} -->
+                                <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
+                                                    setup-wizard-page__schedule-selector-interval-selector-control-start-field" data-bind="component: {
+                                                name: 'hrm-form-field',
+                                                params: {
+                                                    noLabel: true,
+                                                    exportAs: formField,
+                                                    hasError: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher(intervalStart)
+                                                }
+                                             }">
+                                    <input data-bind="
+                                                value: $parent.intervalStart,
+                                                hrmMask,
+                                                hrmMaskPattern: '99:99',
+                                                hrmFormFieldInputControl,
+                                                hrmFormFieldInputControlOwner: formField
+                                            " placeholder="00:00">
+                                </div>
+                                <!-- /ko -->
+
+                                <span class="setup-wizard-page__schedule-selector-interval-selector-control-separator">—</span>
+
+                                <!-- ko let: {formField: ko.observable(null)} -->
+                                <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
+                                                        setup-wizard-page__schedule-selector-interval-selector-control-end-field" data-bind="component: {
+                                                name: 'hrm-form-field',
+                                                params: {
+                                                    noLabel: true,
+                                                    exportAs: formField,
+                                                    hasError: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher(intervalEnd)
+                                                }
+                                             }">
+                                    <input data-bind="
+                                                    value: $parent.intervalEnd,
+                                                    hrmMask,
+                                                    hrmMaskPattern: '99:99',
+                                                    hrmFormFieldInputControl,
+                                                    hrmFormFieldInputControlOwner: formField
+                                                " placeholder="00:00">
+                                </div>
+                                <!-- /ko -->
+                            </div>
+                        </div>
+
+                        <div data-bind="component: {
+                                name: 'setup-wizard-page-schedule-selector-calendar',
+                                params: {
+                                    value: schedule,
+                                    intervalStart: $root.scheduleStepUsedIntervalStart,
+                                    intervalEnd: $root.scheduleStepUsedIntervalEnd,
+                                    exportAs: calendar
+                                }
+                            }">
+                        </div>
+
+                        <div class="setup-wizard-page__schedule-selector-actions">
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
+                                            hrm-button-with-check-icon setup-wizard-page__schedule-selector-action" data-bind="click: function() {calendar().pickAll();}">
+                                Заполнить автоматически
+                            </button>
+
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                            hrm-button-with-times-icon setup-wizard-page__schedule-selector-action" data-bind="click: function() {calendar().clear();}">
+                                Очистить
+                            </button>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+
+                    <div class="setup-wizard-page__tab-pane-actions">
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-back-button" data-bind="click: back">
+                            Назад
+                        </button>
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-forward-button" data-bind="
+                                    click: submitScheduleStep,
+                                    attr: {
+                                        disabled: $root.isScheduleStepSubmitted() && !$root.scheduleStepFormModel.isValid()
+                                    }
+                                ">
+                            Далее
+                        </button>
+                    </div>
+                </div>
+                <div class="setup-wizard-page__tab-pane setup-wizard-page__turnover-tab-pane" data-bind="
+                        hrmFade,
+                        hrmFadeValue: activeStep() === 4,
+                        hrmFadeDuration: 100,
+                        hrmFadeInDelay: 100
+                     ">
+                    <div class="setup-wizard-page__turnover-selector" data-bind="using: turnoverStepFormModel">
+                        <span class="setup-wizard-page__turnover-selector-title">Оборот предприятия</span>
+
+                        <span class="setup-wizard-page__turnover-selector-description">
+                            Заполните поля хотя бы для одной категории
+                        </span>
+
+                        <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                        <table class="setup-wizard-page__turnover-selector-table" data-bind="hrmTable">
+                            <thead>
+                                <tr>
+                                    <th>Единица измерения</th>
+                                    <th>Пн</th>
+                                    <th>Вт</th>
+                                    <th>Ср</th>
+                                    <th>Чт</th>
+                                    <th>Пт</th>
+                                    <th>Сб</th>
+                                    <th>Вс</th>
+                                    <th>За неделю</th>
+                                </tr>
+                            </thead>
+
+                            <tbody data-bind="foreach: categories">
+                                <tr>
+                                    <td class="setup-wizard-page__turnover-selector-table-category-name-cell" data-bind="text: name" colspan="9">
+                                    </td>
+                                </tr>
+
+                                <tr class="setup-wizard-page__turnover-selector-table-data-row">
+                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                    <td class="setup-wizard-page__turnover-selector-table-units-cell" data-bind="
+                                                hrmTableEditableCell: editableCell
+                                            ">
+                                        <select data-bind="
+                                                value: units,
+                                                hrmSelect,
+                                                hrmTableEditableCellSelectControl,
+                                                hrmTableEditableCellSelectControlOwner: editableCell
+                                            ">
+                                            <option value="1">Штуки</option>
+                                            <option value="2">Рубли</option>
+                                            <option value="3">Норма времени</option>
+                                        </select>
+                                    </td>
+                                    <!-- /ko -->
+                                    <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
+                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                    <td class="setup-wizard-page__turnover-selector-table-weekday-cell" data-bind="
+                                                    hrmTableEditableCell: editableCell,
+                                                    hrmTableEditableCellError: weekday === 1 ? $root.turnoverStepTableCategoryErrorExtractor($index()) : null
+                                                ">
+                                        <input data-bind="
+                                                    textInput: $parent.week[weekday - 1],
+                                                    event: {
+                                                        input: function() {
+                                                            $root.onTurnoverStepCategoryWeekdayChange($parentContext.$index());
+                                                        }
+                                                    },
+                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                    hrmTableEditableCellInputControl,
+                                                    hrmTableEditableCellInputControlOwner: editableCell
+                                                " placeholder="0">
+                                    </td>
+                                    <!-- /ko -->
+                                    <!-- /ko -->
+
+                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                    <td class="setup-wizard-page__turnover-selector-table-week-total-cell" data-bind="hrmTableEditableCell: editableCell">
+                                        <input data-bind="
+                                                value: $root.getTurnoverStepWeekTotal($index()),
+                                                event: {
+                                                    change: function (_, event) {
+                                                        $root.turnoverStepDistributeWeekTotal($index(), event.target.value);
+                                                    }
+                                                },
+                                                hrmMask, hrmMaskPattern: 'decimal',
+                                                hrmTableEditableCellInputControl,
+                                                hrmTableEditableCellInputControlOwner: editableCell
+                                            " placeholder="0">
+                                    </td>
+                                    <!-- /ko -->
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- /ko -->
+
+                        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                        <div class="setup-wizard-page__turnover-selector-table">
+                            <!-- ko foreach: categories -->
+                            <div class="setup-wizard-page__turnover-selector-table-category-section">
+                                <div class="setup-wizard-page__turnover-selector-table-category-section-header">
+                                    <span class="setup-wizard-page__turnover-selector-table-category-section-header-title"
+                                                  data-bind="text: name">
+                                            </span>
+
+                                    <!-- ko let: {formField: ko.observable(null)} -->
+                                    <div class="setup-wizard-page__turnover-selector-table-category-section-header-units-field" data-bind="
+                                                    component: {
+                                                        name: 'hrm-form-field',
+                                                        params: {
+                                                            noLabel: true,
+                                                            exportAs: formField
+                                                        }
+                                                    }
+                                                 ">
+                                        <select data-bind="
+                                                        value: $parent.units,
+                                                        hrmSelect,
+                                                        hrmFormFieldSelectControl,
+                                                        hrmFormFieldSelectControlOwner: formField
+                                                    ">
+                                            <option value="1">Штуки</option>
+                                            <option value="2">Рубли</option>
+                                            <option value="3">Норма времени</option>
+                                        </select>
+                                    </div>
+                                    <!-- /ko -->
+                                </div>
+
+                                <div class="hrm-table__fixed-section-container setup-wizard-page__turnover-selector-table-category-section-table-fixed-section-container">
+                                    <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left
+                                                          setup-wizard-page__turnover-selector-table-category-section-table-fixed-section" data-bind="hrmTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="setup-wizard-page__turnover-selector-table-category-section-table-week-total-cell">
+                                                    За неделю
+                                                </th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                <td class="setup-wizard-page__turnover-selector-table-category-section-table-week-total-cell" data-bind="hrmTableEditableCell: editableCell">
+                                                    <input data-bind="
+                                                                    value: $root.getTurnoverStepWeekTotal($index()),,
+                                                                    event: {
+                                                                        change: function (_, event) {
+                                                                            $root.turnoverStepDistributeWeekTotal($index(), event.target.value);
+                                                                        }
+                                                                    },
+                                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                                    hrmTableEditableCellInputControl,
+                                                                    hrmTableEditableCellInputControlOwner: editableCell
+                                                                " placeholder="0">
+                                                </td>
+                                                <!-- /ko -->
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <div class="hrm-table__scrollable-wrapper">
+                                        <table class="setup-wizard-page__turnover-selector-table-category-section-table" data-bind="hrmTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Пн</th>
+                                                    <th>Вт</th>
+                                                    <th>Ср</th>
+                                                    <th>Чт</th>
+                                                    <th>Пт</th>
+                                                    <th>Сб</th>
+                                                    <th>Вс</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr>
+                                                    <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
+                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                    <td class="setup-wizard-page__turnover-selector-table-category-section-table-weekday-cell" data-bind="
+                                                                        hrmTableEditableCell: editableCell,
+                                                                        hrmTableEditableCellError: weekday === 1 ? $root.turnoverStepTableCategoryErrorExtractor($index()) : null
+                                                                    ">
+                                                        <input data-bind="
+                                                                        textInput: $parent.week[weekday - 1],
+                                                                        event: {
+                                                                            input: function() {
+                                                                                $root.onTurnoverStepCategoryWeekdayChange($parentContext.$index());
+                                                                            }
+                                                                        },
+                                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                                        hrmTableEditableCellInputControl,
+                                                                        hrmTableEditableCellInputControlOwner: editableCell
+                                                                    " placeholder="0">
+                                                    </td>
+                                                    <!-- /ko -->
+                                                    <!-- /ko -->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                        <!-- /ko -->
+
+                        <div class="setup-wizard-page__turnover-selector-actions">
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
+                                            hrm-button-with-check-icon setup-wizard-page__turnover-selector-action" data-bind="click: function() {$root.fillTurnoverStep();}">
+                                Заполнить автоматически
+                            </button>
+
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                            hrm-button-with-times-icon setup-wizard-page__turnover-selector-action" data-bind="click: function() {$root.clearTurnoverStep();}">
+                                Очистить
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setup-wizard-page__tab-pane-actions">
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-back-button" data-bind="click: back">
+                            Назад
+                        </button>
+                        <button class="hrm-button setup-wizard-page__tab-pane-actions-button
+                                       setup-wizard-page__tab-pane-actions-forward-button">
+                            Рассчитать
+                        </button>
+                    </div>
+                </div>
+                <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 5, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
+                <div class="setup-wizard-page__tab-pane" data-bind="hrmFade, hrmFadeValue: activeStep() === 6, hrmFadeDuration: 100, hrmFadeInDelay: 100"></div>
+            </div>
+        </div>
+
+        <div class="hrm-scaffold__footer" data-bind="component: {name: 'hrm-footer'}"></div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-debug.js" integrity="sha256-M5ZomNNnrnEB2WjSbnty5GWGqq6UuAAVNnWECisgEis=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.12/js/select2.full.min.js" integrity="sha256-vucLmrjdfi9YwjGY/3CQ7HnccFSS/XRS1M/3k/FDXJw=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/i18n/ru.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplebar/5.1.0/simplebar.min.js" integrity="sha256-hFddD6XMIwFba4ITQjpv5WWE557w6O0w9RRfmGjIz4k=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/js/OverlayScrollbars.min.js" integrity="sha256-5Tj3ZUgjHEGwF7TxpOgbPpjhq+WxXvpfb+qr9OxRHtY=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/js/jquery.overlayScrollbars.min.js" integrity="sha256-RE+oy7ofA6XerySMpTlDcg0gFUwHN3n0qQ5fUIZVq/M=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/inputmask.min.js" integrity="sha256-JUbLuiRKiaXfbMpDSL9JwAJugW+Hg2E07+fjOCFjSSA=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/jquery.inputmask.min.js" integrity="sha256-BhZ+laf8gu3ZySieS2lNZWQ7Aeeada3d9b/0Gb7HBYc=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/inputmask.numeric.extensions.min.js" integrity="sha256-dVx2gYHsRUlxMn8IvlyIclSnhktfPGUCHvXaPkdVqHc=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/popper.js@1"></script>
+    <script src="https://unpkg.com/tippy.js@5"></script>
+
+    <script src="assets/js/main.js"></script>
+    <template id="setup-wizard-page-schedule-selector-calendar-template">
+        <div class="setup-wizard-page__schedule-selector-calendar-hour-header">
+            <!-- ko foreach: {data: $component.hours, as: 'hour'} -->
+            <!-- ko if: $index() !== 0 -->
+            <div class="setup-wizard-page__schedule-selector-calendar-hour-header-divider" data-bind="css: {
+                        'setup-wizard-page__schedule-selector-calendar-hour-header-divider--short': $index() % 2 === 1
+                     }">
+            </div>
+            <!-- /ko -->
+
+            <div class="setup-wizard-page__schedule-selector-calendar-hour-header-cell" data-bind="
+                    css: {
+                        'setup-wizard-page__schedule-selector-calendar-hour-header-cell--not-integer': !$component.isIntegerHour(hourIndex())
+                    }
+                 ">
+                <div class="setup-wizard-page__schedule-selector-calendar-hour-header-cell-content">
+                    <!-- ko if: $component.getHourHeaderCellTextData(hourIndex()) !== null -->
+                    <span class="setup-wizard-page__schedule-selector-calendar-hour-header-cell-time">
+                            <!-- ko text: $component.getHourHeaderCellTextData(hourIndex()).hour -->
+                            <!-- /ko --><sup class="setup-wizard-page__schedule-selector-calendar-hour-header-cell-minute"
+                                  data-bind="text: $component.getHourHeaderCellTextData(hourIndex()).minute">
+                            </sup>
+                        </span>
+                    <!-- /ko -->
+                </div>
+            </div>
+            <!-- /ko -->
+        </div>
+
+        <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
+        <div class="setup-wizard-page__schedule-selector-calendar-weekday">
+            <span class="setup-wizard-page__schedule-selector-calendar-weekday-label"
+                  data-bind="text: $component.getWeekdayLabelText(weekday)">
+            </span>
+
+            <!-- ko foreach: {data: $component.hours, as: 'hour'} -->
+            <!-- ko if: $index() !== 0 -->
+            <div class="setup-wizard-page__schedule-selector-calendar-weekday-divider"></div>
+            <!-- /ko -->
+            <div class="setup-wizard-page__schedule-selector-calendar-hour" data-bind="
+                        event: {
+                            mousedown: function () {$component.hourMousedownOrTouchstart(weekday, hour);},
+                            touchstart: function () {$component.hourMousedownOrTouchstart(weekday, hour);},
+                            mouseover: function () {$component.hourMouseover(weekday, hour);}
+                        },
+                        css: {
+                            'setup-wizard-page__schedule-selector-calendar-hour--not-integer': !$component.isIntegerHour(hourIndex()),
+                            'setup-wizard-page__schedule-selector-calendar-hour--picked': $component.isPickedHour(weekday, hour)
+                        },
+                        attr: {
+                            'data-setup-wizard-page-schedule-selector-calendar-hour-week': weekday,
+                            'data-setup-wizard-page-schedule-selector-calendar-hour-hour': hour
+                        }
+                     ">
+            </div>
+            <!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </template>
+
+    <script type="text/javascript">
+        ko.components.register('setup-wizard-page-schedule-selector-calendar', {
+            viewModel: {
+                createViewModel: function(params, componentInfo) {
+                    const $element = $(componentInfo.element);
+
+                    $element.addClass(['setup-wizard-page__schedule-selector-calendar']);
+
+                    const ViewModel = function() {
+                        this.subscriptions = [];
+
+                        this.value = params.value;
+                        this.intervalStart = params.intervalStart;
+                        this.intervalEnd = params.intervalEnd;
+
+                        this.isPicking = ko.observable(false);
+
+                        this.touchmoveHandler = event => {
+                            const touchPosition = event.originalEvent.changedTouches[0];
+                            const $target = $(document.elementFromPoint(touchPosition.clientX, touchPosition.clientY));
+
+                            if ($target.hasClass('setup-wizard-page__schedule-selector-calendar-hour')) {
+                                const weekday = $target.data('setup-wizard-page-schedule-selector-calendar-hour-week');
+                                const hour = $target.data('setup-wizard-page-schedule-selector-calendar-hour-hour');
+
+                                if (this.isPicking()) {
+                                    if (!this.isPickedHour(weekday, hour)) {
+                                        this.value[weekday - 1].push(hour);
+                                        this.value[weekday - 1].sort();
+                                    }
+                                }
+                            }
+                        };
+
+                        this.windowMouseupHandler = () => this.isPicking(false);
+
+                        this.hours = ko.computed(() => {
+                            const start = moment(this.intervalStart(), 'HH:mm');
+                            const end = moment(this.intervalEnd(), 'HH:mm');
+
+                            if (start.isSameOrAfter(end)) {
+                                end.add(1, 'd');
+                            }
+
+                            const isEndHourInteger = end.minutes() === 0;
+
+                            if (!isEndHourInteger) {
+                                end.add(1, 'h').minutes(0);
+                            }
+
+                            const hours = [];
+
+                            while (start.isBefore(end)) {
+                                hours.push(start.hours());
+                                start.add(1, 'h');
+                            }
+
+                            return hours;
+                        });
+
+                        this.isStartHourInteger = ko.computed(() => {
+                            return moment(this.intervalStart(), 'HH:mm').minutes() === 0;
+                        });
+
+                        this.isEndHourInteger = ko.computed(() => {
+                            return moment(this.intervalEnd(), 'HH:mm').minutes() === 0;
+                        });
+
+                        this.isIntegerHour = function(hourIndex) {
+                            const hours = this.hours();
+
+                            if (hourIndex === 0) {
+                                return this.isStartHourInteger();
+                            } else if (hourIndex === hours.length - 1) {
+                                return this.isEndHourInteger();
+                            } else {
+                                return true;
+                            }
+                        };
+
+                        this.isPickedHour = function(weekday, hour) {
+                            return this.value[weekday - 1]().includes(hour);
+                        };
+
+                        this.hourMousedownOrTouchstart = function(weekday, hour) {
+                            if (!this.isPickedHour(weekday, hour)) {
+                                this.isPicking(true);
+                                this.value[weekday - 1].push(hour);
+                            } else {
+                                this.value[weekday - 1].remove(hour);
+                            }
+
+                            this.value[weekday - 1].sort();
+                        };
+
+                        this.hourMouseover = function(weekday, hour) {
+                            if (this.isPicking()) {
+                                if (!this.isPickedHour(weekday, hour)) {
+                                    this.value[weekday - 1].push(hour);
+                                    this.value[weekday - 1].sort();
+                                }
+                            }
+                        };
+
+                        this.getWeekdayLabelText = function(weekday) {
+                            switch (weekday) {
+                                case 1:
+                                    return 'Пн';
+                                case 2:
+                                    return 'Вт';
+                                case 3:
+                                    return 'Ср';
+                                case 4:
+                                    return 'Чт';
+                                case 5:
+                                    return 'Пт';
+                                case 6:
+                                    return 'Сб';
+                                case 7:
+                                    return 'Вс';
+                            }
+                        };
+
+                        this.getHourHeaderCellTextData = function(hourIndex) {
+                            function process(time) {
+                                const parts = time.split(':');
+
+                                return {
+                                    hour: parts[0],
+                                    minute: parts[1]
+                                };
+                            }
+
+                            const hours = this.hours();
+
+                            if (hourIndex === 0) {
+                                return process(this.intervalStart());
+                            } else if (hourIndex !== hours.length - 1 && hourIndex % 2 === 0) {
+                                return process(moment().hour(hours[hourIndex]).minute(0).format('HH:mm'));
+                            } else {
+                                return null;
+                            }
+                        };
+
+                        this.pickAll = function() {
+                            const hours = this.hours();
+                            this.value.forEach(week => week([...hours]));
+                        };
+
+                        this.clear = function() {
+                            this.value.forEach(week => week([]));
+                        };
+
+                        this.descendantsComplete = () => {
+                            $element.on('touchmove', this.touchmoveHandler);
+                            $(window).on('mouseup touchend', this.windowMouseupHandler);
+                        };
+
+                        (() => {
+                            this.subscriptions.push(
+                                ko.bindingEvent.subscribe(componentInfo.element, 'descendantsComplete', this.descendantsComplete)
+                            );
+
+                            if (params !== undefined && 'exportAs' in params) {
+                                if (ko.isObservableArray(params.exportAs)) {
+                                    params.exportAs.push(this);
+                                } else {
+                                    params.exportAs(this);
+                                }
+                            }
+                        })();
+                    };
+
+                    ViewModel.prototype.dispose = function() {
+                        this.subscriptions.forEach(s => s.dispose());
+                        $element.off('touchmove', this.touchmoveHandler);
+                        $(window).off('mouseup touchend', this.windowMouseupHandler);
+
+                        if (params !== undefined && 'exportAs' in params) {
+                            if (ko.isObservableArray(params.exportAs)) {
+                                params.exportAs.remove(this);
+                            } else {
+                                params.exportAs(null);
+                            }
+                        }
+                    };
+
+                    return new ViewModel();
+                }
+            },
+            template: {
+                element: 'setup-wizard-page-schedule-selector-calendar-template'
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        $(function() {
+            const $page = $(document.documentElement);
+
+            const ViewModel = function() {
+                this.subscriptions = [];
+
+                this.windowResizeHandler = () => {
+                    this.viewportSize({
+                        width: $(window).width(),
+                        height: $(window).height()
+                    });
+                };
+                this.viewportSize = ko.observable({
+                    width: $(window).width(),
+                    height: $(window).height()
+                });
+
+                this.activeStep = ko.observable(1);
+
+                this.childrenComplete = function() {
+                    $page.removeClass('hrm-page--initializing');
+                };
+
+                this.back = function() {
+                    if (this.activeStep() > 0) {
+                        this.activeStep(this.activeStep() - 1);
+                    }
+                };
+
+                this.selectCompanyType = function(type) {
+                    this.companyType(type);
+                    this.activeStep(2);
+                };
+
+                this.createDishCategoryFormModel = function(value) {
+                    return {
+                        value: ko.observable(value).extend({
+                            required: {
+                                message: 'Необходимо выбрать'
+                            }
+                        })
+                    }
+                };
+
+                this.companyType = ko.observable();
+
+                this.dishCategoriesStepFormModel = ko.validatedObservable({
+                    categories: ko.observableArray([this.createDishCategoryFormModel('')])
+                }, {
+                    deep: true,
+                    live: true
+                });
+
+                this.dishCategoriesStepAdd = function() {
+                    this.dishCategoriesStepFormModel().categories.push(this.createDishCategoryFormModel(''));
+                };
+
+                this.dishCategoriesStepRemove = function(index) {
+                    this.dishCategoriesStepFormModel().categories.splice(index, 1);
+                };
+
+                this.isDishCategoriesStepSubmitted = ko.observable(false);
+
+                this.dishCategoriesStepFormControlErrorStateMatcher = function(formControl) {
+                    return ko.computed(() => {
+                        return this.isDishCategoriesStepSubmitted() && !formControl.isValid();
+                    });
+                };
+
+                this.submitDishCategoriesStep = function() {
+                    this.isDishCategoriesStepSubmitted(true);
+
+                    if (this.dishCategoriesStepFormModel.isValid()) {
+                        this.activeStep(this.activeStep() + 1);
+                    }
+                };
+
+                this.scheduleStepFormModel = (() => {
+                    const schedule = [
+                        ko.observableArray([]),
+                        ko.observableArray([]),
+                        ko.observableArray([]),
+                        ko.observableArray([]),
+                        ko.observableArray([]),
+                        ko.observableArray([]),
+                        ko.observableArray([])
+                    ];
+
+                    return ko.validatedObservable({
+                        intervalStart: ko.observable('00:00').extend({
+                            required: true,
+                            hrmTime: true,
+                            notEqual: '24:00'
+                        }),
+                        intervalEnd: ko.observable('24:00').extend({
+                            required: true,
+                            hrmTime: true
+                        }),
+                        schedule: schedule,
+                        validationObject: ko.validatedObservable().extend({
+                            validation: {
+                                validator: () => {
+                                    return schedule.some(weekday => weekday().length > 0);
+                                }
+                            }
+                        })
+                    });
+                })();
+
+                this.scheduleStepLastValidIntervalStart = ko.observable(this.scheduleStepFormModel().intervalStart());
+                this.scheduleStepLastValidIntervalEnd = ko.observable(this.scheduleStepFormModel().intervalEnd());
+
+                this.isScheduleStepIntervalValid = ko.computed(() => {
+                    return this.scheduleStepFormModel().intervalStart.isValid() && this.scheduleStepFormModel().intervalEnd.isValid();
+                });
+
+                this.scheduleStepUsedIntervalStart = ko.computed(() => {
+                    if (this.isScheduleStepIntervalValid()) {
+                        return this.scheduleStepFormModel().intervalStart();
+                    } else {
+                        return this.scheduleStepLastValidIntervalStart();
+                    }
+                });
+
+                this.scheduleStepUsedIntervalEnd = ko.computed(() => {
+                    if (this.isScheduleStepIntervalValid()) {
+                        return this.scheduleStepFormModel().intervalEnd();
+                    } else {
+                        return this.scheduleStepLastValidIntervalEnd();
+                    }
+                });
+
+                this.scheduleStepIntervalBoundaryFormControlErrorStateMatcher = function(formControl) {
+                    return ko.computed(() => {
+                        return !formControl.isValid();
+                    });
+                };
+
+                this.isScheduleStepSubmitted = ko.observable(null);
+
+                this.scheduleStepCutSchedule = function() {
+                    const start = moment(this.scheduleStepUsedIntervalStart(), 'HH:mm');
+                    const end = moment(this.scheduleStepUsedIntervalEnd(), 'HH:mm');
+
+                    const startHour = start.hour() === 0 ? (start.isBefore(end) ? 0 : 24) : start.hour();
+                    const endHour = end.hour() === 0 ? (start.isBefore(end) ? 24 : 0) : end.hour();
+
+                    this.scheduleStepFormModel().schedule.forEach(week => {
+                        if (start.isBefore(end)) {
+                            week.remove(hour => hour < startHour || hour > endHour);
+                        } else {
+                            week.remove(hour => hour < endHour && hour > startHour);
+                        }
+
+                        week.sort();
+                    });
+                };
+
+                this.submitScheduleStep = function() {
+                    this.isScheduleStepSubmitted(true);
+
+                    if (this.scheduleStepFormModel.isValid()) {
+                        this.activeStep(this.activeStep() + 1);
+                    }
+                };
+
+                this.turnoverStepFormModel = (() => {
+                    return ko.validatedObservable({
+                        categories: ko.observableArray([{
+                                name: 'Пицца',
+                                units: ko.observable('0'),
+                                week: [
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable('')
+                                ]
+                            },
+                            {
+                                name: 'Роллы',
+                                units: ko.observable('1'),
+                                week: [
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable(''),
+                                    ko.observable('')
+                                ]
+                            }
+                        ])
+                    });
+                })();
+
+                this.getTurnoverStepWeekTotal = function(categoryIndex) {
+                    const week = this.turnoverStepFormModel().categories()[categoryIndex].week;
+                    const isEmpty = week.every(weekday => weekday() === '');
+
+                    if (isEmpty) {
+                        return '';
+                    }
+
+                    return +week.reduce((total, wd) => total + +wd(), 0).toFixed(2);
+                };
+
+                this.turnoverStepDistributeWeekTotal = function(categoryIndex, total) {
+                    const portion = Math.floor((total / 7) * 100) / 100;
+                    this.turnoverStepFormModel().categories()[categoryIndex].week.forEach(weekday => weekday(portion));
+                    this.onTurnoverStepCategoryWeekdayChange(categoryIndex);
+                };
+
+                this.turnoverStepCategoriesWithFillingError = ko.observableArray([]);
+
+                this.turnoverStepTableCategoryErrorExtractor = function(index) {
+                    return ko.computed(() => {
+                        if (this.turnoverStepCategoriesWithFillingError().includes(index)) {
+                            return {
+                                message: 'Для автоматического заполнения данными, введите хотя бы одно значение'
+                            };
+                        } else {
+                            return null;
+                        }
+                    });
+                };
+
+                this.onTurnoverStepCategoryWeekdayChange = function(categoryIndex) {
+                    this.turnoverStepCategoriesWithFillingError.remove(categoryIndex);
+                };
+
+                this.fillTurnoverStep = function() {
+                    const valuesByUnits = {};
+
+                    this.turnoverStepFormModel().categories().forEach(category => {
+                        const values = [];
+
+                        if (!(category.units() in valuesByUnits)) {
+                            valuesByUnits[category.units()] = [];
+                        }
+
+                        category.week.forEach(weekday => {
+                            if (weekday() !== '' && !valuesByUnits[category.units()].includes(weekday())) {
+                                valuesByUnits[category.units()].push(weekday());
+                            }
+
+                            if (weekday() !== '' && !values.includes(weekday())) {
+                                values.push(weekday());
+                            }
+                        });
+
+                        if (values.length === 1) {
+                            category.week.forEach(weekday => weekday(values[0]));
+                        }
+                    });
+
+                    this.turnoverStepFormModel().categories().forEach((category, index) => {
+                        if (valuesByUnits[category.units()].length === 1 && category.week[0]() === '') {
+                            category.week.forEach(weekday => weekday(valuesByUnits[category.units()][0]));
+                        } else if (valuesByUnits[category.units()].length === 0) {
+                            if (!this.turnoverStepCategoriesWithFillingError().includes(index)) {
+                                this.turnoverStepCategoriesWithFillingError.push(index);
+                            }
+                        }
+                    });
+                };
+
+                this.clearTurnoverStep = function() {
+                    this.turnoverStepFormModel().categories().forEach((category, index) => {
+                        category.week.forEach(weekday => weekday(''));
+                        this.onTurnoverStepCategoryWeekdayChange(index);
+                    });
+                };
+
+                this.submitTurnoverStep = function() {};
+
+                (() => {
+                    $(window).on('resize', this.windowResizeHandler);
+
+                    this.subscriptions.push(this.scheduleStepUsedIntervalStart.subscribe(() => {
+                        this.scheduleStepCutSchedule();
+                    }));
+
+                    this.subscriptions.push(this.scheduleStepUsedIntervalEnd.subscribe(() => {
+                        this.scheduleStepCutSchedule();
+                    }));
+
+                    this.subscriptions.push(this.scheduleStepFormModel().intervalStart.subscribe(value => {
+                        if (this.scheduleStepFormModel().intervalStart.isValid()) {
+                            this.scheduleStepLastValidIntervalStart(value);
+                        }
+                    }));
+
+                    this.subscriptions.push(this.scheduleStepFormModel().intervalEnd.subscribe(value => {
+                        if (this.scheduleStepFormModel().intervalEnd.isValid()) {
+                            this.scheduleStepLastValidIntervalEnd(value);
+                        }
+                    }));
+                })();
+            };
+
+            const viewModel = new ViewModel();
+
+            ViewModel.prototype.dispose = function() {
+                $(window).off('resize', this.windowResizeHandler);
+                this.subscriptions.forEach(s => s.dispose());
+            };
+
+            ko.applyBindings(
+                viewModel,
+                $page.get()[0]
+            );
+        });
+    </script>
+</body>
+
+</html>
