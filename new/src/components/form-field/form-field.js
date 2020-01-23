@@ -133,11 +133,20 @@ ko.bindingHandlers.hrmFormFieldInputControl = {
 
 ko.bindingHandlers.hrmFormFieldSelectControl = {
     init: function(element, valueAccessor, allBindings) {
+        const subscriptions = [];
+
         const formField = allBindings.get('hrmFormFieldSelectControlOwner');
         const $wrapper = $(formField().controlWrapperElement());
 
         const $element = $(element);
         const select2Instance = $element.data('select2');
+
+        const selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
+        const dropdownOpened = ko.observable(false);
+
+        subscriptions.push(
+            ko.computed(() => selectionFocused() || dropdownOpened()).subscribe(value => formField().focused(value))
+        );
 
         $element.attr('id', formField().controlId);
 
@@ -159,8 +168,10 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
                 });
             }
         };
-        const focusHandler = () => formField().focused(true);
-        const blurHandler = () => formField().focused(false);
+        const focusHandler = () => selectionFocused(true);
+        const blurHandler = () => selectionFocused(false);
+        const openingHandler = () => dropdownOpened(true);
+        const closingHandler = () => dropdownOpened(false);
         const valueHandler = event => {
             const value = event.target.value;
             formField().hasValue(value !== '');
@@ -170,15 +181,20 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
         select2Instance.$selection.on('blur', blurHandler);
         $wrapper.on('mousedown', wrapperMousedownHandler);
         $element.on('input change', valueHandler);
+        $element.on('select2:opening', openingHandler);
+        $element.on('select2:closing', closingHandler);
 
         formField().focused(select2Instance.$selection.is(':focus'));
         formField().hasValue($element.val() !== '');
 
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+            subscriptions.forEach(s => s.unsubscribe());
             $wrapper.off('mousedown', wrapperMousedownHandler);
             select2Instance.$selection.off('focus', focusHandler);
             select2Instance.$selection.off('blur', blurHandler);
             $(element).off('input change', valueHandler);
+            $element.off('select2:opening', openingHandler);
+            $element.off('select2:closing', closingHandler);
         });
     }
 };
