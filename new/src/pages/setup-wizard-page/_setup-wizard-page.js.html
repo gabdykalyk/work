@@ -22,11 +22,6 @@
                 }
             };
 
-            this.selectCompanyType = function (type) {
-                this.companyType(type);
-                this.activeStep(2);
-            };
-
             this.createDishCategoryFormModel = function (value) {
                 return {
                     value: ko.observable(value).extend({
@@ -37,7 +32,12 @@
                 }
             };
 
-            this.companyType = ko.observable();
+            this.companyType = ko.observable(null);
+
+            this.selectCompanyType = function (type) {
+                this.companyType(type);
+                this.activeStep(2);
+            };
 
             this.dishCategoriesStepFormModel = ko.validatedObservable({
                 categories: ko.observableArray([this.createDishCategoryFormModel('')])
@@ -266,6 +266,22 @@
             };
 
             this.submitTurnoverStep = function () {};
+
+            this.maxAvailableStep = ko.computed(() => {
+                if (this.companyType() === null) {
+                    return 1;
+                } else if (!this.dishCategoriesStepFormModel.isValid()) {
+                    return 2;
+                } else if (!this.scheduleStepFormModel.isValid()) {
+                    return 3;
+                } else if (!this.turnoverStepFormModel.isValid()) {
+                    return 4;
+                } else {
+                    return 5;
+                }
+            });
+
+            this.maxAvailableStep.subscribe(console.log);
 
             (() => {
                 $(window).on('resize', this.windowResizeHandler);
