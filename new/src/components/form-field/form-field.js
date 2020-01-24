@@ -188,7 +188,7 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
         formField().hasValue($element.val() !== '');
 
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-            subscriptions.forEach(s => s.unsubscribe());
+            subscriptions.forEach(s => s.dispose());
             $wrapper.off('mousedown', wrapperMousedownHandler);
             select2Instance.$selection.off('focus', focusHandler);
             select2Instance.$selection.off('blur', blurHandler);
