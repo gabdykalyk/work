@@ -2,11 +2,14 @@
 @import '../../base/_variables.less';
 
 .login-page {
-    background: url('../../assets/img/login-page-background.png');
-    background-size: cover;
-
     .login-page__content {
         flex-grow: 1;
+    }
+
+    &__scaffold {
+        background: url('../../assets/img/login-page-background.png');
+        background-size: cover;
+        background-position: center;
     }
 
     &__content {
@@ -60,20 +63,57 @@
         justify-content: center;
         width: 140px;
         height: 45px;
+        position: relative;
 
         background: linear-gradient(90deg, #CA47DF 0%, #FF238D 100%);
         border-radius: 60px;
         font-weight: 500;
         font-size: 17px;
         color: #FFFFFF;
+        overflow: hidden;
 
-        &:hover {
-            background: linear-gradient(90deg, #FF238D 0%, #CA47DF 100%);
+        .login-page__form-submit-button-content {
+            z-index: 3;
         }
 
-        &:active {
-            background: linear-gradient(90deg, #DB0069 0%, #9C06B5 100%);
+        .login-page__form-submit-button-background {
+            opacity: 0;
+
+            transition: opacity @hover-transition-duration @hover-transition-timing-function;
         }
+
+        &:hover:not([disabled]) {
+            .login-page__form-submit-button-hover-background {
+                opacity: 1;
+            }
+        }
+
+        &:active:not([disabled]) {
+            .login-page__form-submit-button-active-background {
+                opacity: 1;
+            }
+        }
+
+        &[disabled] {
+            opacity: 0.4;
+        }
+    }
+
+    &__form-submit-button-background {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+
+    &__form-submit-button-hover-background {
+        background: linear-gradient(90deg, #FF238D 0%, #CA47DF 100%);
+    }
+
+    &__form-submit-button-active-background {
+        background: linear-gradient(90deg, #DB0069 0%, #9C06B5 100%);
     }
 
     &__footer {
