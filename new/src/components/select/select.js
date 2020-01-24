@@ -53,7 +53,7 @@ ko.bindingHandlers.hrmSelect = {
             $dropdownResultsContainer.overlayScrollbars().update(true);
         };
 
-        $element.on('select2:opening', openingHandler);
+        $element.on('select2:open', openingHandler);
 
         const changeHandler = () => {
             if (value !== undefined && ko.isObservable(value)) {
