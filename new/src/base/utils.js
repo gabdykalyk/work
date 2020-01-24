@@ -84,10 +84,28 @@ ko.bindingHandlers.hrmElement = {
 
 ko.bindingHandlers.hrmMask = {
     init: function (element, valueAccessor, allBindings) {
-        const pattern = allBindings()['hrmMaskPattern'];
+        const pattern = allBindings.get('hrmMaskPattern');
+        const options = allBindings.get('hrmMaskOptions');
 
         $(element).inputmask(pattern, {
-            jitMasking: true
+            jitMasking: true,
+            showMaskOnFocus: false,
+            showMaskOnHover: false,
+            ...options
+        });
+    }
+};
+
+ko.bindingHandlers.hrmTimeAutocompleter = {
+    init: function (element) {
+        $(element).on('blur', () => {
+            const value = $(element).val();
+
+            const regExpExecuteResult = /^([0-9]{2}):\s$/.exec(value);
+
+            if (regExpExecuteResult !== null && +regExpExecuteResult[1] < 24) {
+                $(element).val(regExpExecuteResult[1] + ':00').trigger('change');
+            }
         });
     }
 };
@@ -120,7 +138,7 @@ function hrmSlideAfterAddFactory (duration = 200) {
 
 ko.validation.rules['hrmTime'] = {
     validator: function (val) {
-        return moment(val, 'HH:mm').isValid();
+        return val.length === 5 && moment(val, 'HH:mm').isValid();
     },
     message: 'Неверный формат времени'
 };
