@@ -271,10 +271,18 @@ ko.bindingHandlers.hrmFormFieldInputControl = {
 };
 ko.bindingHandlers.hrmFormFieldSelectControl = {
   init: function init(element, valueAccessor, allBindings) {
+    var subscriptions = [];
     var formField = allBindings.get('hrmFormFieldSelectControlOwner');
     var $wrapper = $(formField().controlWrapperElement());
     var $element = $(element);
     var select2Instance = $element.data('select2');
+    var selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
+    var dropdownOpened = ko.observable(false);
+    subscriptions.push(ko.computed(function () {
+      return selectionFocused() || dropdownOpened();
+    }).subscribe(function (value) {
+      return formField().focused(value);
+    }));
     $element.attr('id', formField().controlId);
     select2Instance.$container.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_select']);
     select2Instance.$dropdown.children().first().addClass(['hrm-form-field__dropdown']);
@@ -293,11 +301,19 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
     };
 
     var focusHandler = function focusHandler() {
-      return formField().focused(true);
+      return selectionFocused(true);
     };
 
     var blurHandler = function blurHandler() {
-      return formField().focused(false);
+      return selectionFocused(false);
+    };
+
+    var openingHandler = function openingHandler() {
+      return dropdownOpened(true);
+    };
+
+    var closingHandler = function closingHandler() {
+      return dropdownOpened(false);
     };
 
     var valueHandler = function valueHandler(event) {
@@ -309,13 +325,20 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
     select2Instance.$selection.on('blur', blurHandler);
     $wrapper.on('mousedown', wrapperMousedownHandler);
     $element.on('input change', valueHandler);
+    $element.on('select2:opening', openingHandler);
+    $element.on('select2:closing', closingHandler);
     formField().focused(select2Instance.$selection.is(':focus'));
     formField().hasValue($element.val() !== '');
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      subscriptions.forEach(function (s) {
+        return s.unsubscribe();
+      });
       $wrapper.off('mousedown', wrapperMousedownHandler);
       select2Instance.$selection.off('focus', focusHandler);
       select2Instance.$selection.off('blur', blurHandler);
       $(element).off('input change', valueHandler);
+      $element.off('select2:opening', openingHandler);
+      $element.off('select2:closing', closingHandler);
     });
   }
 };
@@ -390,7 +413,7 @@ ko.bindingHandlers.hrmSelect = {
       $dropdownResultsContainer.overlayScrollbars().update(true);
     };
 
-    $element.on('select2:opening', openingHandler);
+    $element.on('select2:open', openingHandler);
 
     var changeHandler = function changeHandler() {
       if (value !== undefined && ko.isObservable(value)) {

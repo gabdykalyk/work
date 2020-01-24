@@ -20,7 +20,7 @@
             <div class="hrm-stepper setup-wizard-page__stepper" data-bind="css: {'hrm-stepper--dense': viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth}">
                 <!-- ko let: {step: 1} -->
                 <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
-                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {if(maxAvailableStep() >= step) {activeStep(step);}}">
                         <span class="hrm-stepper__step-label">Тип предприятия</span>
                         <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
                     </div>
@@ -29,8 +29,8 @@
 
                 <!-- ko let: {step: 2} -->
                 <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
-                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
-                        <span class="hrm-stepper__step-label">Категория</span>
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {if(maxAvailableStep() >= step) {activeStep(step);}}">
+                        <span class="hrm-stepper__step-label">Категории</span>
                         <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
 
                 <!-- ko let: {step: 3} -->
                 <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
-                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {if(maxAvailableStep() >= step) {activeStep(step);}}">
                         <span class="hrm-stepper__step-label">График работы</span>
                         <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
                     </div>
@@ -47,7 +47,7 @@
 
                 <!-- ko let: {step: 4} -->
                 <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
-                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {if(maxAvailableStep() >= step) {activeStep(step);}}">
                         <span class="hrm-stepper__step-label">Оборот и нагрузка</span>
                         <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
                     </div>
@@ -56,7 +56,7 @@
 
                 <!-- ko let: {step: 5} -->
                 <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
-                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {if(maxAvailableStep() >= step) {activeStep(step);}}">
                         <span class="hrm-stepper__step-label">Должности</span>
                         <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
                     </div>
@@ -65,7 +65,7 @@
 
                 <!-- ko let: {step: 6} -->
                 <div class="hrm-stepper__step" data-bind="css: {'hrm-stepper__step--active': activeStep() === step}">
-                    <div class="hrm-stepper__step-content" data-bind="click: function () {activeStep(step);}">
+                    <div class="hrm-stepper__step-content" data-bind="click: function () {if(maxAvailableStep() >= step) {activeStep(step);}}">
                         <span class="hrm-stepper__step-label">Тип нагрузки</span>
                         <div class="hrm-stepper__step-index-number" data-bind="text: step"></div>
                     </div>
@@ -140,6 +140,11 @@
                                             <option></option>
                                             <option value="1">Пицца</option>
                                             <option value="2">Роллы</option>
+                                            <option value="3">Супы</option>
+                                            <option value="4">Салаты</option>
+                                            <option value="5">Закуски</option>
+                                            <option value="6">Десерты</option>
+                                            <option value="7">Напитки</option>
                                         </select>
 
                                         <hrm-slot name="error">
@@ -822,22 +827,22 @@
                     }
                 };
 
-                this.selectCompanyType = function(type) {
-                    this.companyType(type);
-                    this.activeStep(2);
-                };
-
                 this.createDishCategoryFormModel = function(value) {
                     return {
                         value: ko.observable(value).extend({
                             required: {
-                                message: 'Необходимо выбрать'
+                                message: 'Выберите категорию блюд'
                             }
                         })
                     }
                 };
 
-                this.companyType = ko.observable();
+                this.companyType = ko.observable(null);
+
+                this.selectCompanyType = function(type) {
+                    this.companyType(type);
+                    this.activeStep(2);
+                };
 
                 this.dishCategoriesStepFormModel = ko.validatedObservable({
                     categories: ko.observableArray([this.createDishCategoryFormModel('')])
@@ -1070,6 +1075,22 @@
                 };
 
                 this.submitTurnoverStep = function() {};
+
+                this.maxAvailableStep = ko.computed(() => {
+                    if (this.companyType() === null) {
+                        return 1;
+                    } else if (!this.dishCategoriesStepFormModel.isValid()) {
+                        return 2;
+                    } else if (!this.scheduleStepFormModel.isValid()) {
+                        return 3;
+                    } else if (!this.turnoverStepFormModel.isValid()) {
+                        return 4;
+                    } else {
+                        return 5;
+                    }
+                });
+
+                this.maxAvailableStep.subscribe(console.log);
 
                 (() => {
                     $(window).on('resize', this.windowResizeHandler);
