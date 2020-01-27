@@ -218,8 +218,13 @@
                                              }">
                                     <input data-bind="
                                                 value: $parent.intervalStart,
+                                                hrmTimeAutocompleter,
                                                 hrmMask,
-                                                hrmMaskPattern: '99:99',
+                                                hrmMaskPattern: 'datetime',
+                                                hrmMaskOptions: {
+                                                    inputFormat: 'HH:MM',
+                                                    placeholder: ' '
+                                                },
                                                 hrmFormFieldInputControl,
                                                 hrmFormFieldInputControlOwner: formField
                                             " placeholder="00:00">
@@ -239,12 +244,17 @@
                                                 }
                                              }">
                                     <input data-bind="
-                                                    value: $parent.intervalEnd,
-                                                    hrmMask,
-                                                    hrmMaskPattern: '99:99',
-                                                    hrmFormFieldInputControl,
-                                                    hrmFormFieldInputControlOwner: formField
-                                                " placeholder="00:00">
+                                                value: $parent.intervalEnd,
+                                                hrmTimeAutocompleter,
+                                                hrmMask,
+                                                hrmMaskPattern: 'datetime',
+                                                hrmMaskOptions: {
+                                                    inputFormat: 'HH:MM',
+                                                    placeholder: ' '
+                                                },
+                                                hrmFormFieldInputControl,
+                                                hrmFormFieldInputControlOwner: formField
+                                            " placeholder="00:00">
                                 </div>
                                 <!-- /ko -->
                             </div>
@@ -284,7 +294,7 @@
                                        setup-wizard-page__tab-pane-actions-forward-button" data-bind="
                                     click: submitScheduleStep,
                                     attr: {
-                                        disabled: $root.isScheduleStepSubmitted() && !$root.scheduleStepFormModel.isValid()
+                                        disabled: !$root.scheduleStepFormModel.isValid()
                                     }
                                 ">
                             Далее
@@ -534,9 +544,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simplebar/5.1.0/simplebar.min.js" integrity="sha256-hFddD6XMIwFba4ITQjpv5WWE557w6O0w9RRfmGjIz4k=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/js/OverlayScrollbars.min.js" integrity="sha256-5Tj3ZUgjHEGwF7TxpOgbPpjhq+WxXvpfb+qr9OxRHtY=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/js/jquery.overlayScrollbars.min.js" integrity="sha256-RE+oy7ofA6XerySMpTlDcg0gFUwHN3n0qQ5fUIZVq/M=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/inputmask.min.js" integrity="sha256-JUbLuiRKiaXfbMpDSL9JwAJugW+Hg2E07+fjOCFjSSA=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/jquery.inputmask.min.js" integrity="sha256-BhZ+laf8gu3ZySieS2lNZWQ7Aeeada3d9b/0Gb7HBYc=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/inputmask/inputmask.numeric.extensions.min.js" integrity="sha256-dVx2gYHsRUlxMn8IvlyIclSnhktfPGUCHvXaPkdVqHc=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/RobinHerbots/jquery.inputmask@5.0.3/dist/jquery.inputmask.min.js" integrity="sha256-qDfp2w3klz+ki2myZZlhuKXGMrVJd1ZDVkMJ8excc20=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/popper.js@1"></script>
     <script src="https://unpkg.com/tippy.js@5"></script>
@@ -887,12 +895,11 @@
                     ];
 
                     return ko.validatedObservable({
-                        intervalStart: ko.observable('00:00').extend({
+                        intervalStart: ko.observable('08:00').extend({
                             required: true,
-                            hrmTime: true,
-                            notEqual: '24:00'
+                            hrmTime: true
                         }),
-                        intervalEnd: ko.observable('24:00').extend({
+                        intervalEnd: ko.observable('20:00').extend({
                             required: true,
                             hrmTime: true
                         }),
@@ -936,8 +943,6 @@
                     });
                 };
 
-                this.isScheduleStepSubmitted = ko.observable(null);
-
                 this.scheduleStepCutSchedule = function() {
                     const start = moment(this.scheduleStepUsedIntervalStart(), 'HH:mm');
                     const end = moment(this.scheduleStepUsedIntervalEnd(), 'HH:mm');
@@ -957,8 +962,6 @@
                 };
 
                 this.submitScheduleStep = function() {
-                    this.isScheduleStepSubmitted(true);
-
                     if (this.scheduleStepFormModel.isValid()) {
                         this.activeStep(this.activeStep() + 1);
                     }
