@@ -231,8 +231,13 @@
                                         >
                                             <input data-bind="
                                                 value: $parent.intervalStart,
+                                                hrmTimeAutocompleter,
                                                 hrmMask,
-                                                hrmMaskPattern: '99:99',
+                                                hrmMaskPattern: 'datetime',
+                                                hrmMaskOptions: {
+                                                    inputFormat: 'HH:MM',
+                                                    placeholder: ' '
+                                                },
                                                 hrmFormFieldInputControl,
                                                 hrmFormFieldInputControlOwner: formField
                                             " placeholder="00:00">
@@ -254,12 +259,17 @@
                                              }"
                                         >
                                             <input data-bind="
-                                                    value: $parent.intervalEnd,
-                                                    hrmMask,
-                                                    hrmMaskPattern: '99:99',
-                                                    hrmFormFieldInputControl,
-                                                    hrmFormFieldInputControlOwner: formField
-                                                " placeholder="00:00">
+                                                value: $parent.intervalEnd,
+                                                hrmTimeAutocompleter,
+                                                hrmMask,
+                                                hrmMaskPattern: 'datetime',
+                                                hrmMaskOptions: {
+                                                    inputFormat: 'HH:MM',
+                                                    placeholder: ' '
+                                                },
+                                                hrmFormFieldInputControl,
+                                                hrmFormFieldInputControlOwner: formField
+                                            " placeholder="00:00">
                                         </div>
                                     <!-- /ko -->
                                 </div>
@@ -303,7 +313,7 @@
                                 data-bind="
                                     click: submitScheduleStep,
                                     attr: {
-                                        disabled: $root.isScheduleStepSubmitted() && !$root.scheduleStepFormModel.isValid()
+                                        disabled: !$root.scheduleStepFormModel.isValid()
                                     }
                                 "
                         >

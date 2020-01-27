@@ -79,12 +79,11 @@
                 ];
 
                 return ko.validatedObservable({
-                    intervalStart: ko.observable('00:00').extend({
+                    intervalStart: ko.observable('08:00').extend({
                         required: true,
-                        hrmTime: true,
-                        notEqual: '24:00'
+                        hrmTime: true
                     }),
-                    intervalEnd: ko.observable('24:00').extend({
+                    intervalEnd: ko.observable('20:00').extend({
                         required: true,
                         hrmTime: true
                     }),
@@ -128,8 +127,6 @@
                 });
             };
 
-            this.isScheduleStepSubmitted = ko.observable(null);
-
             this.scheduleStepCutSchedule = function () {
                 const start = moment(this.scheduleStepUsedIntervalStart(), 'HH:mm');
                 const end = moment(this.scheduleStepUsedIntervalEnd(), 'HH:mm');
@@ -149,8 +146,6 @@
             };
 
             this.submitScheduleStep = function () {
-                this.isScheduleStepSubmitted(true);
-
                 if (this.scheduleStepFormModel.isValid()) {
                     this.activeStep(this.activeStep() + 1);
                 }
