@@ -49,11 +49,32 @@ ko.bindingHandlers.hrmSelect = {
             }
         });
 
-        const openingHandler = () => {
+        const openHandler = () => {
             $dropdownResultsContainer.overlayScrollbars().update(true);
         };
 
-        $element.on('select2:open', openingHandler);
+        const openingHandler = () => {
+            select2Instance.$dropdown.hide().fadeIn(150);
+        };
+
+        let isClosingAnimated = false;
+        const closingHandler = () => {
+            if (!isClosingAnimated) {
+                select2Instance.$dropdown.fadeOut(150, () => {
+                    isClosingAnimated = true;
+                    select2Instance.close();
+                });
+
+                return false;
+            } else {
+                isClosingAnimated = false;
+                return true;
+            }
+        };
+
+        $element.on('select2:open', openHandler);
+        $element.on('select2:opening', openingHandler);
+        $element.on('select2:closing', closingHandler);
 
         const changeHandler = () => {
             if (value !== undefined && ko.isObservable(value)) {
@@ -64,7 +85,9 @@ ko.bindingHandlers.hrmSelect = {
 
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             $element.off('change', changeHandler);
+            $element.off('select2:open', openHandler);
             $element.off('select2:opening', openingHandler);
+            $element.off('select2:closing', closingHandler);
         });
     },
     update: function (element, valueAccessor, allBindings) {

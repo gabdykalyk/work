@@ -158,18 +158,6 @@ ko.validation.rules['hrmTime'] = {
 ko.validation.registerExtenders();
 "use strict";
 
-ko.components.register('hrm-footer', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-footer']);
-      return new function () {}();
-    }
-  },
-  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
-});
-"use strict";
-
 var hrmFormFieldNextId = 0;
 ko.components.register('hrm-form-field', {
   viewModel: {
@@ -430,11 +418,32 @@ ko.bindingHandlers.hrmSelect = {
       }
     });
 
-    var openingHandler = function openingHandler() {
+    var openHandler = function openHandler() {
       $dropdownResultsContainer.overlayScrollbars().update(true);
     };
 
-    $element.on('select2:open', openingHandler);
+    var openingHandler = function openingHandler() {
+      select2Instance.$dropdown.hide().fadeIn(150);
+    };
+
+    var isClosingAnimated = false;
+
+    var closingHandler = function closingHandler() {
+      if (!isClosingAnimated) {
+        select2Instance.$dropdown.fadeOut(150, function () {
+          isClosingAnimated = true;
+          select2Instance.close();
+        });
+        return false;
+      } else {
+        isClosingAnimated = false;
+        return true;
+      }
+    };
+
+    $element.on('select2:open', openHandler);
+    $element.on('select2:opening', openingHandler);
+    $element.on('select2:closing', closingHandler);
 
     var changeHandler = function changeHandler() {
       if (value !== undefined && ko.isObservable(value)) {
@@ -446,7 +455,9 @@ ko.bindingHandlers.hrmSelect = {
 
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
       $element.off('change', changeHandler);
+      $element.off('select2:open', openHandler);
       $element.off('select2:opening', openingHandler);
+      $element.off('select2:closing', closingHandler);
     });
   },
   update: function update(element, valueAccessor, allBindings) {
@@ -460,6 +471,18 @@ ko.bindingHandlers.hrmSelect = {
     }
   }
 };
+"use strict";
+
+ko.components.register('hrm-footer', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-footer']);
+      return new function () {}();
+    }
+  },
+  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
+});
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
