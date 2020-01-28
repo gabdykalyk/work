@@ -158,6 +158,18 @@ ko.validation.rules['hrmTime'] = {
 ko.validation.registerExtenders();
 "use strict";
 
+ko.components.register('hrm-footer', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-footer']);
+      return new function () {}();
+    }
+  },
+  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
+});
+"use strict";
+
 var hrmFormFieldNextId = 0;
 ko.components.register('hrm-form-field', {
   viewModel: {
@@ -471,18 +483,6 @@ ko.bindingHandlers.hrmSelect = {
     }
   }
 };
-"use strict";
-
-ko.components.register('hrm-footer', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-footer']);
-      return new function () {}();
-    }
-  },
-  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
-});
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
