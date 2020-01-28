@@ -224,8 +224,11 @@ ko.bindingHandlers.hrmTable = {
 (() => {
     class ViewModel {
         constructor(element, owner) {
-            this._focusHandler = null;
-            this._blurHandler = null;
+            this._subscriptions = [];
+            this._selectionFocusHandler = null;
+            this._selectionBlurHandler = null;
+            this._openingHandler = null;
+            this._closeHandler = null;
             this.element = element;
             this._owner = owner;
 
@@ -239,19 +242,35 @@ ko.bindingHandlers.hrmTable = {
             select2Instance.$container.addClass(['hrm-table__editable-cell-control', 'hrm-table__editable-cell-control--type_select']);
             select2Instance.$dropdown.children().first().addClass(['hrm-table__editable-cell-dropdown']);
 
-            this._focusHandler = () => ko.unwrap(this._owner).focused(true);
-            this._blurHandler = () => ko.unwrap(this._owner).focused(false);
+            const selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
+            const dropdownOpened = ko.observable(false);
 
-            $element.on('focus', this._focusHandler);
-            $element.on('blur', this._blurHandler);
+            this._subscriptions.push(
+                ko.computed(() => selectionFocused() || dropdownOpened())
+                    .subscribe(value => ko.unwrap(this._owner).focused(value))
+            );
 
-            ko.unwrap(this._owner).focused($element.is(':focus'));
+            this._selectionFocusHandler = () => selectionFocused(true);
+            this._selectionBlurHandler = () => selectionFocused(false);
+            this._openingHandler = () => dropdownOpened(true);
+            this._closeHandler = () => dropdownOpened(false);
+
+            select2Instance.$selection.on('focus', this._selectionFocusHandler);
+            select2Instance.$selection.on('blur', this._selectionBlurHandler);
+            $element.on('select2:opening', this._openingHandler);
+            $element.on('select2:close', this._closeHandler);
+
+            selectionFocused(select2Instance.$selection.is(':focus'));
         }
 
         _destroy() {
             const $element = $(this.element);
-            $element.off('focus', this._focusHandler);
-            $element.off('blur', this._blurHandler);
+            const select2Instance = $element.data('select2');
+            select2Instance.$selection.off('focus', this._selectionFocusHandler);
+            select2Instance.$selection.off('blur', this._selectionBlurHandler);
+            $element.off('select2:opening', this._openingHandler);
+            $element.off('select2:close', this._closeHandler);
+            this._subscriptions.forEach(s => s.dispose());
         }
     }
 

@@ -168,21 +168,21 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
                 });
             }
         };
-        const focusHandler = () => selectionFocused(true);
-        const blurHandler = () => selectionFocused(false);
+        const selectionFocusHandler = () => selectionFocused(true);
+        const selectionBlurHandler = () => selectionFocused(false);
         const openingHandler = () => dropdownOpened(true);
-        const closingHandler = () => dropdownOpened(false);
+        const closeHandler = () => dropdownOpened(false);
         const valueHandler = event => {
             const value = event.target.value;
             formField().hasValue(value !== '');
         };
 
-        select2Instance.$selection.on('focus', focusHandler);
-        select2Instance.$selection.on('blur', blurHandler);
+        select2Instance.$selection.on('focus', selectionFocusHandler);
+        select2Instance.$selection.on('blur', selectionBlurHandler);
         $wrapper.on('mousedown', wrapperMousedownHandler);
         $element.on('input change', valueHandler);
         $element.on('select2:opening', openingHandler);
-        $element.on('select2:closing', closingHandler);
+        $element.on('select2:close', closeHandler);
 
         formField().focused(select2Instance.$selection.is(':focus'));
         formField().hasValue($element.val() !== '');
@@ -190,11 +190,11 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             subscriptions.forEach(s => s.dispose());
             $wrapper.off('mousedown', wrapperMousedownHandler);
-            select2Instance.$selection.off('focus', focusHandler);
-            select2Instance.$selection.off('blur', blurHandler);
+            select2Instance.$selection.off('focus', selectionFocusHandler);
+            select2Instance.$selection.off('blur', selectionBlurHandler);
             $(element).off('input change', valueHandler);
             $element.off('select2:opening', openingHandler);
-            $element.off('select2:closing', closingHandler);
+            $element.off('select2:close', closeHandler);
         });
     }
 };

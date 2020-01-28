@@ -10,7 +10,7 @@
             };
             this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
 
-            this.activeStep = ko.observable(1);
+            this.activeStep = ko.observable(4);
 
             this.childrenComplete = function () {
                 $page.removeClass('hrm-page--initializing');
@@ -165,7 +165,8 @@
                                 ko.observable(''),
                                 ko.observable(''),
                                 ko.observable('')
-                            ]
+                            ],
+                            weekTotal: ko.observable('')
                         },
                         {
                             name: 'Роллы',
@@ -178,27 +179,17 @@
                                 ko.observable(''),
                                 ko.observable(''),
                                 ko.observable('')
-                            ]
+                            ],
+                            weekTotal: ko.observable('')
                         }
                     ])
                 });
             })();
 
-            this.getTurnoverStepWeekTotal = function (categoryIndex) {
-                const week = this.turnoverStepFormModel().categories()[categoryIndex].week;
-                const isEmpty = week.every(weekday => weekday() === '');
-
-                if (isEmpty) {
-                    return '';
-                }
-
-                return +week.reduce((total, wd) => total + +wd(), 0).toFixed(2);
-            };
-
             this.turnoverStepDistributeWeekTotal = function (categoryIndex, total) {
-                const portion = Math.floor((total / 7) * 100) / 100;
-                this.turnoverStepFormModel().categories()[categoryIndex].week.forEach(weekday => weekday(portion));
-                this.onTurnoverStepCategoryWeekdayChange(categoryIndex);
+                const portion = Math.floor((this.unmaskTurnoverStepValue(total) / 7) * 100) / 100;
+                this.turnoverStepFormModel().categories()[categoryIndex].week.forEach(weekday => weekday(this.formatTurnoverStepValue(portion)));
+                this.turnoverStepCategoriesWithFillingError.remove(categoryIndex);
             };
 
             this.turnoverStepCategoriesWithFillingError = ko.observableArray([]);
@@ -213,7 +204,12 @@
                 });
             };
 
-            this.onTurnoverStepCategoryWeekdayChange = function (categoryIndex) {
+            this.onTurnoverStepCategoryWeekdayInput = function (categoryIndex) {
+                const category = this.turnoverStepFormModel().categories()[categoryIndex];
+                const isEmpty = category.week.every(weekday => weekday() === '');
+                const total = !isEmpty ? +category.week.reduce((total, wd) => total + +this.unmaskTurnoverStepValue(wd()), 0).toFixed(2) : 0;
+
+                category.weekTotal(this.formatTurnoverStepValue(total));
                 this.turnoverStepCategoriesWithFillingError.remove(categoryIndex);
             };
 
@@ -256,11 +252,20 @@
             this.clearTurnoverStep = function () {
                 this.turnoverStepFormModel().categories().forEach((category, index) => {
                     category.week.forEach(weekday => weekday(''));
-                    this.onTurnoverStepCategoryWeekdayChange(index);
+                    category.weekTotal('');
+                    this.turnoverStepCategoriesWithFillingError.remove(index);
                 });
             };
 
             this.submitTurnoverStep = function () {};
+
+            this.formatTurnoverStepValue = function (value) {
+                return Inputmask.format(value, {alias: 'decimal', digits: 2, groupSeparator: ' ', autoGroup: true, allowMinus: false});
+            };
+
+            this.unmaskTurnoverStepValue = function (value) {
+                return Inputmask.unmask(value, {alias: 'decimal', digits: 2, groupSeparator: ' ', autoGroup: true, allowMinus: false});
+            };
 
             this.maxAvailableStep = ko.computed(() => {
                 if (this.companyType() === null) {
@@ -275,8 +280,6 @@
                     return 5;
                 }
             });
-
-            this.maxAvailableStep.subscribe(console.log);
 
             (() => {
                 $(window).on('resize', this.windowResizeHandler);

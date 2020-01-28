@@ -321,11 +321,11 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
       }
     };
 
-    var focusHandler = function focusHandler() {
+    var selectionFocusHandler = function selectionFocusHandler() {
       return selectionFocused(true);
     };
 
-    var blurHandler = function blurHandler() {
+    var selectionBlurHandler = function selectionBlurHandler() {
       return selectionFocused(false);
     };
 
@@ -333,7 +333,7 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
       return dropdownOpened(true);
     };
 
-    var closingHandler = function closingHandler() {
+    var closeHandler = function closeHandler() {
       return dropdownOpened(false);
     };
 
@@ -342,12 +342,12 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
       formField().hasValue(value !== '');
     };
 
-    select2Instance.$selection.on('focus', focusHandler);
-    select2Instance.$selection.on('blur', blurHandler);
+    select2Instance.$selection.on('focus', selectionFocusHandler);
+    select2Instance.$selection.on('blur', selectionBlurHandler);
     $wrapper.on('mousedown', wrapperMousedownHandler);
     $element.on('input change', valueHandler);
     $element.on('select2:opening', openingHandler);
-    $element.on('select2:closing', closingHandler);
+    $element.on('select2:close', closeHandler);
     formField().focused(select2Instance.$selection.is(':focus'));
     formField().hasValue($element.val() !== '');
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
@@ -355,11 +355,11 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
         return s.dispose();
       });
       $wrapper.off('mousedown', wrapperMousedownHandler);
-      select2Instance.$selection.off('focus', focusHandler);
-      select2Instance.$selection.off('blur', blurHandler);
+      select2Instance.$selection.off('focus', selectionFocusHandler);
+      select2Instance.$selection.off('blur', selectionBlurHandler);
       $(element).off('input change', valueHandler);
       $element.off('select2:opening', openingHandler);
-      $element.off('select2:closing', closingHandler);
+      $element.off('select2:close', closeHandler);
     });
   }
 };
@@ -755,8 +755,11 @@ ko.bindingHandlers.hrmTable = {
     function ViewModel(element, owner) {
       _classCallCheck(this, ViewModel);
 
-      this._focusHandler = null;
-      this._blurHandler = null;
+      this._subscriptions = [];
+      this._selectionFocusHandler = null;
+      this._selectionBlurHandler = null;
+      this._openingHandler = null;
+      this._closeHandler = null;
       this.element = element;
       this._owner = owner;
 
@@ -772,25 +775,50 @@ ko.bindingHandlers.hrmTable = {
         var select2Instance = $element.data('select2');
         select2Instance.$container.addClass(['hrm-table__editable-cell-control', 'hrm-table__editable-cell-control--type_select']);
         select2Instance.$dropdown.children().first().addClass(['hrm-table__editable-cell-dropdown']);
+        var selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
+        var dropdownOpened = ko.observable(false);
 
-        this._focusHandler = function () {
-          return ko.unwrap(_this4._owner).focused(true);
+        this._subscriptions.push(ko.computed(function () {
+          return selectionFocused() || dropdownOpened();
+        }).subscribe(function (value) {
+          return ko.unwrap(_this4._owner).focused(value);
+        }));
+
+        this._selectionFocusHandler = function () {
+          return selectionFocused(true);
         };
 
-        this._blurHandler = function () {
-          return ko.unwrap(_this4._owner).focused(false);
+        this._selectionBlurHandler = function () {
+          return selectionFocused(false);
         };
 
-        $element.on('focus', this._focusHandler);
-        $element.on('blur', this._blurHandler);
-        ko.unwrap(this._owner).focused($element.is(':focus'));
+        this._openingHandler = function () {
+          return dropdownOpened(true);
+        };
+
+        this._closeHandler = function () {
+          return dropdownOpened(false);
+        };
+
+        select2Instance.$selection.on('focus', this._selectionFocusHandler);
+        select2Instance.$selection.on('blur', this._selectionBlurHandler);
+        $element.on('select2:opening', this._openingHandler);
+        $element.on('select2:close', this._closeHandler);
+        selectionFocused(select2Instance.$selection.is(':focus'));
       }
     }, {
       key: "_destroy",
       value: function _destroy() {
         var $element = $(this.element);
-        $element.off('focus', this._focusHandler);
-        $element.off('blur', this._blurHandler);
+        var select2Instance = $element.data('select2');
+        select2Instance.$selection.off('focus', this._selectionFocusHandler);
+        select2Instance.$selection.off('blur', this._selectionBlurHandler);
+        $element.off('select2:opening', this._openingHandler);
+        $element.off('select2:close', this._closeHandler);
+
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
       }
     }]);
 
