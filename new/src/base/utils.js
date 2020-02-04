@@ -65,9 +65,13 @@ ko.bindingHandlers.hrmFade = {
 };
 
 ko.bindingHandlers.hrmElement = {
-    init: function (element, valueAccessor) {
+    init: function (element, valueAccessor, allBindings) {
         if (ko.isObservableArray(valueAccessor())) {
-            valueAccessor().push(element);
+            if (allBindings.has('hrmElementIndex')) {
+                valueAccessor().splice(allBindings.get('hrmElementIndex'), 0, element);
+            } else {
+                valueAccessor().push(element);
+            }
         } else {
             valueAccessor()(element);
         }
@@ -128,13 +132,22 @@ function hrmSplitComponentTemplateNodes (nodes) {
     return result;
 }
 
-function hrmSlideBeforeRemoveFactory (duration = 200) {
-    return element => $(element).slideUp(duration, () => $(element).remove());
+function hrmSlideBeforeRemoveFactory (duration = 200, delay = 0) {
+    return element => $(element).delay(delay).slideUp(duration, () => $(element).remove());
 }
 
-function hrmSlideAfterAddFactory (duration = 200) {
-    return element => $(element).hide().slideDown(duration);
+function hrmSlideAfterAddFactory (duration = 200, delay = 0) {
+    return element => $(element).hide().delay(delay).slideDown(duration);
 }
+
+function hrmFadeBeforeRemoveFactory (duration = 200, delay = 0) {
+    return element => $(element).delay(delay).fadeOut(duration, () => $(element).remove());
+}
+
+function hrmFadeAfterAddFactory (duration = 200, delay = 0) {
+    return element => $(element).hide().delay(delay).fadeIn(duration);
+}
+
 
 ko.validation.rules['hrmTime'] = {
     validator: function (val) {
@@ -144,3 +157,7 @@ ko.validation.rules['hrmTime'] = {
 };
 
 ko.validation.registerExtenders();
+
+function hrmTemplateIf (condition, data) {
+    return condition ? [data] : undefined;
+}

@@ -78,9 +78,13 @@ ko.bindingHandlers.hrmFade = {
   }
 };
 ko.bindingHandlers.hrmElement = {
-  init: function init(element, valueAccessor) {
+  init: function init(element, valueAccessor, allBindings) {
     if (ko.isObservableArray(valueAccessor())) {
-      valueAccessor().push(element);
+      if (allBindings.has('hrmElementIndex')) {
+        valueAccessor().splice(allBindings.get('hrmElementIndex'), 0, element);
+      } else {
+        valueAccessor().push(element);
+      }
     } else {
       valueAccessor()(element);
     }
@@ -135,8 +139,9 @@ function hrmSplitComponentTemplateNodes(nodes) {
 
 function hrmSlideBeforeRemoveFactory() {
   var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
+  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   return function (element) {
-    return $(element).slideUp(duration, function () {
+    return $(element).delay(delay).slideUp(duration, function () {
       return $(element).remove();
     });
   };
@@ -144,8 +149,27 @@ function hrmSlideBeforeRemoveFactory() {
 
 function hrmSlideAfterAddFactory() {
   var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
+  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
   return function (element) {
-    return $(element).hide().slideDown(duration);
+    return $(element).hide().delay(delay).slideDown(duration);
+  };
+}
+
+function hrmFadeBeforeRemoveFactory() {
+  var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
+  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  return function (element) {
+    return $(element).delay(delay).fadeOut(duration, function () {
+      return $(element).remove();
+    });
+  };
+}
+
+function hrmFadeAfterAddFactory() {
+  var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
+  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+  return function (element) {
+    return $(element).hide().delay(delay).fadeIn(duration);
   };
 }
 
@@ -156,18 +180,10 @@ ko.validation.rules['hrmTime'] = {
   message: 'Неверный формат времени'
 };
 ko.validation.registerExtenders();
-"use strict";
 
-ko.components.register('hrm-footer', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-footer']);
-      return new function () {}();
-    }
-  },
-  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
-});
+function hrmTemplateIf(condition, data) {
+  return condition ? [data] : undefined;
+}
 "use strict";
 
 var hrmFormFieldNextId = 0;
@@ -373,15 +389,16 @@ ko.bindingHandlers.hrmFormFieldLabel = {
 };
 "use strict";
 
-ko.bindingHandlers.hrmScrollable = {
-  init: function init(element) {
-    var $element = $(element);
-    $element.addClass('hrm-scrollable__content');
-    $element.overlayScrollbars({
-      className: 'hrm-scrollable'
-    });
-  }
-};
+ko.components.register('hrm-footer', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-footer']);
+      return new function () {}();
+    }
+  },
+  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
+});
 "use strict";
 
 ko.bindingHandlers.hrmSelect = {
@@ -422,13 +439,7 @@ ko.bindingHandlers.hrmSelect = {
     var select2Instance = $element.data('select2');
     select2Instance.$results.unbind('mousewheel');
     var $dropdownResultsContainer = $element.data('select2').$results.parent();
-    $dropdownResultsContainer.overlayScrollbars({
-      callbacks: {
-        onUpdated: function onUpdated() {
-          select2Instance.dropdown._positionDropdown();
-        }
-      }
-    });
+    $dropdownResultsContainer.overlayScrollbars({});
 
     var openHandler = function openHandler() {
       $dropdownResultsContainer.overlayScrollbars().update(true);
@@ -484,6 +495,25 @@ ko.bindingHandlers.hrmSelect = {
   }
 };
 "use strict";
+
+ko.bindingHandlers.hrmScrollable = {
+  init: function init(element) {
+    var $element = $(element);
+    $element.addClass('hrm-scrollable__content');
+    $element.overlayScrollbars({
+      className: 'hrm-scrollable'
+    });
+  }
+};
+"use strict";
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -830,6 +860,192 @@ ko.bindingHandlers.hrmTable = {
       var owner = allBindings.get('hrmTableEditableCellSelectControlOwner');
       var viewModel = new ViewModel(element, owner);
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        viewModel._destroy();
+      });
+    }
+  };
+})(); // hrmTableStickySectionContainer
+
+
+(function () {
+  var StickyEvents = window['stickyEvents'];
+
+  var ViewModel =
+  /*#__PURE__*/
+  function () {
+    function ViewModel(element, sectionWrappers) {
+      _classCallCheck(this, ViewModel);
+
+      this._subscriptions = [];
+      this._sectionWrappers = sectionWrappers;
+      this._sectionWrapperElementStuckHandler = null;
+      this._sectionWrapperElementUnstuckHandler = null;
+      this.element = element;
+      this._stickyEvents = null;
+
+      this._init();
+    }
+
+    _createClass(ViewModel, [{
+      key: "_init",
+      value: function _init() {
+        var _this5 = this;
+
+        var $element = $(this.element);
+        $element.addClass('hrm-table__sticky-section-container');
+        this._stickyEvents = new StickyEvents();
+
+        this._stickyEvents.addStickies(this._sectionWrappers());
+
+        this._sectionWrapperElementStuckHandler = function (event) {
+          var wrapper = _this5._sectionWrappers().find(function (wrapper) {
+            return wrapper.element === event.target;
+          });
+
+          wrapper.stuck(true);
+        };
+
+        this._sectionWrapperElementUnstuckHandler = function (event) {
+          var wrapper = _this5._sectionWrappers().find(function (wrapper) {
+            return wrapper.element === event.target;
+          });
+
+          wrapper.stuck(false);
+        };
+
+        this._sectionWrappers().forEach(function (wrapper) {
+          wrapper.element.addEventListener(StickyEvents.STUCK, _this5._sectionWrapperElementStuckHandler);
+          wrapper.element.addEventListener(StickyEvents.UNSTUCK, _this5._sectionWrapperElementUnstuckHandler);
+        });
+
+        var lastSectionWrappers = _toConsumableArray(this._sectionWrappers());
+
+        this._subscriptions.push(this._sectionWrappers.subscribe(function (addedWrapper) {
+          _.difference(lastSectionWrappers, addedWrapper).forEach(function (removedElement) {
+            removedElement.element.removeEventListener(StickyEvents.STUCK, _this5._sectionWrapperElementStuckHandler);
+            removedElement.element.removeEventListener(StickyEvents.UNSTUCK, _this5._sectionWrapperElementUnstuckHandler);
+          });
+
+          _.difference(addedWrapper, lastSectionWrappers).forEach(function (addedWrapper) {
+            addedWrapper.element.addEventListener(StickyEvents.STUCK, _this5._sectionWrapperElementStuckHandler);
+            addedWrapper.element.addEventListener(StickyEvents.UNSTUCK, _this5._sectionWrapperElementUnstuckHandler);
+
+            _this5._stickyEvents.addSticky(addedWrapper.element);
+
+            $(addedWrapper.element).addClass('sticky-events');
+          });
+
+          lastSectionWrappers = _toConsumableArray(addedWrapper);
+        }));
+      }
+    }, {
+      key: "_destroy",
+      value: function _destroy() {
+        var _this6 = this;
+
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
+
+        this._sectionWrappers().forEach(function (wrapper) {
+          wrapper.element.removeEventListener(StickyEvents.STUCK, _this6._sectionWrapperElementStuckHandler);
+          wrapper.element.removeEventListener(StickyEvents.UNSTUCK, _this6._sectionWrapperElementUnstuckHandler);
+        });
+
+        this._stickyEvents.disableEvents();
+      }
+    }]);
+
+    return ViewModel;
+  }();
+
+  ko.bindingHandlers.hrmTableStickySectionContainer = {
+    init: function init(element, valueAccessor, allBindings) {
+      var sectionWrappers = allBindings.get('hrmTableStickySectionContainerSectionWrappers');
+      var viewModel = new ViewModel(element, sectionWrappers);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
+    }
+  };
+})(); // hrmTableStickySectionWrapper
+
+
+(function () {
+  var ViewModel =
+  /*#__PURE__*/
+  function () {
+    function ViewModel(element, sectionWrappers) {
+      _classCallCheck(this, ViewModel);
+
+      this._subscriptions = [];
+      this.element = element;
+      this.stuck = ko.observable(false);
+
+      this._init();
+    }
+
+    _createClass(ViewModel, [{
+      key: "_init",
+      value: function _init() {
+        var $element = $(this.element);
+        $element.addClass('hrm-table__sticky-section-wrapper');
+        $element.toggleClass('hrm-table__sticky-section-wrapper--stuck', this.stuck());
+
+        this._subscriptions.push(this.stuck.subscribe(function (stuck) {
+          $element.toggleClass('hrm-table__sticky-section-wrapper--stuck', stuck);
+        }));
+      }
+    }, {
+      key: "_destroy",
+      value: function _destroy() {
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
+      }
+    }]);
+
+    return ViewModel;
+  }();
+
+  ko.bindingHandlers.hrmTableStickySectionWrapper = {
+    init: function init(element, valueAccessor) {
+      var viewModel = new ViewModel(element);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
         viewModel._destroy();
       });
     }

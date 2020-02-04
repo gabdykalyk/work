@@ -41,13 +41,7 @@ ko.bindingHandlers.hrmSelect = {
         select2Instance.$results.unbind('mousewheel');
 
         const $dropdownResultsContainer = $element.data('select2').$results.parent();
-        $dropdownResultsContainer.overlayScrollbars({
-            callbacks: {
-                onUpdated: () => {
-                    select2Instance.dropdown._positionDropdown();
-                }
-            }
-        });
+        $dropdownResultsContainer.overlayScrollbars({});
 
         const openHandler = () => {
             $dropdownResultsContainer.overlayScrollbars().update(true);

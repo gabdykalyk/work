@@ -1,8 +1,186 @@
 <script type="text/javascript">
+    // setupWizardPageTurnoverSelectorTable
+    (() => {
+        class ViewModel {
+            constructor(element, categoryRowElements) {
+                this._subscriptions = [];
+                this.element = element;
+                this._categoryRowElements = categoryRowElements;
+                this._windowScrollHandler = () => {
+                    this._updateActiveCategoryIndex();
+                };
+                this.activeCategoryIndex = ko.observable(null);
+
+                this._init();
+            }
+
+            _init() {
+                const $element = $(this.element);
+                $element.addClass('setup-wizard-page__turnover-selector-table');
+
+                if (this._categoryRowElements !== null) {
+                    this._subscriptions.push(this._categoryRowElements.subscribe(() => {
+                        this._updateActiveCategoryIndex();
+                    }));
+
+                    $(window).on('scroll', this._windowScrollHandler);
+
+                    this._updateActiveCategoryIndex();
+                }
+            }
+
+            _destroy() {
+                this._subscriptions.forEach(s => s.dispose());
+                $(window).off('scroll', this._windowScrollHandler);
+            }
+
+            _updateActiveCategoryIndex() {
+                const rowElements = this._categoryRowElements();
+
+                if (rowElements.length === 0) {
+                    this.activeCategoryIndex(null);
+                    return;
+                }
+
+                for (let i = 0; i < rowElements.length; i++) {
+                    if ($(rowElements[i]).offset().top - $(window).scrollTop() > 0) {
+                        this.activeCategoryIndex(Math.max(i - 1, 0));
+                        return;
+                    }
+                }
+
+                this.activeCategoryIndex(rowElements.length - 1);
+            }
+        }
+
+        ko.bindingHandlers.setupWizardPageTurnoverSelectorTable = {
+            init: function (element, valueAccessor, allBindings) {
+                const categoryRowElements = allBindings.get('setupWizardPageTurnoverSelectorTableCategoryRowElements') || null;
+                const viewModel = new ViewModel(element, categoryRowElements);
+
+                if (valueAccessor() !== undefined) {
+                    if (ko.isObservableArray(valueAccessor())) {
+                        valueAccessor().push(viewModel);
+                    } else {
+                        valueAccessor()(viewModel);
+                    }
+                }
+
+                ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                    if (valueAccessor() !== undefined) {
+                        if (ko.isObservableArray(valueAccessor())) {
+                            valueAccessor().remove(this);
+                        } else {
+                            valueAccessor()(null);
+                        }
+                    }
+
+                    viewModel._destroy();
+                });
+            }
+        };
+    })();
+
+
+
     $(function () {
         const $page = $(document.documentElement);
 
         const ViewModel = function () {
+            this.dishCategories = [
+                {
+                    id: '1',
+                    name: 'Пицца',
+                    turnoverDistribution: [
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
+                    ]
+                },
+                {
+                    id: '2',
+                    name: 'Роллы',
+                    turnoverDistribution: [
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
+                    ]
+                },
+                {
+                    id: '3',
+                    name: 'Супы',
+                    turnoverDistribution: [
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
+                    ]
+                },
+                {
+                    id: '4',
+                    name: 'Салаты',
+                    turnoverDistribution: [
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
+                    ]
+                },
+                {
+                    id: '5',
+                    name: 'Закуски',
+                    turnoverDistribution: [
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
+                    ]
+                },
+                {
+                    id: '6',
+                    name: 'Десерты',
+                    turnoverDistribution: [
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
+                    ]
+                },
+                {
+                    id: '7',
+                    name: 'Напитки',
+                    turnoverDistribution: [
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5],
+                        [2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
+                    ]
+                }
+            ];
+
             this.subscriptions = [];
 
             this.windowResizeHandler = () => {
@@ -10,7 +188,7 @@
             };
             this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
 
-            this.activeStep = ko.observable(4);
+            this.activeStep = ko.observable(1);
 
             this.childrenComplete = function () {
                 $page.removeClass('hrm-page--initializing');
@@ -28,47 +206,36 @@
                         required: {
                             message: 'Выберите категорию блюд'
                         }
+                    }),
+                    units: ko.observable('0'),
+                    week: [1, 2, 3, 4, 5, 6, 7].map(() => ({
+                        hours: ko.observable(null),
+                        weekdayTotal: ko.observable('').extend({
+                            required: true
+                        })
+                    })),
+                    hourTotals: ko.observable(null),
+                    weekTotal: ko.observable('').extend({
+                        required: true
                     })
                 }
             };
 
-            this.companyType = ko.observable(null);
-
-            this.selectCompanyType = function (type) {
-                this.companyType(type);
-                this.activeStep(2);
-            };
-
-            this.dishCategoriesStepFormModel = ko.validatedObservable({
-                categories: ko.observableArray([this.createDishCategoryFormModel('')])
-            }, {deep: true, live: true});
-
-            this.dishCategoriesStepAdd = function () {
-                this.dishCategoriesStepFormModel().categories.push(this.createDishCategoryFormModel(''));
-            };
-
-            this.dishCategoriesStepRemove = function (index) {
-                this.dishCategoriesStepFormModel().categories.splice(index, 1);
-            };
-
-            this.isDishCategoriesStepSubmitted = ko.observable(false);
-
-            this.dishCategoriesStepFormControlErrorStateMatcher = function (formControl) {
-                return ko.computed(() => {
-                    return this.isDishCategoriesStepSubmitted() && !formControl.isValid();
-                });
-            };
-
-            this.submitDishCategoriesStep = function () {
-                this.isDishCategoriesStepSubmitted(true);
-
-                if (this.dishCategoriesStepFormModel.isValid()) {
-                    this.activeStep(this.activeStep() + 1);
-                }
-            };
-
-            this.scheduleStepFormModel = (() => {
-                const schedule = [
+            this.formModel = ko.validatedObservable({
+                companyType: ko.observable(null),
+                dishCategories: ko.observableArray([
+                    this.createDishCategoryFormModel('')
+                ]),
+                isTurnoverCalculated: ko.observable(false),
+                intervalStart: ko.observable('08:00').extend({
+                    required: true,
+                    hrmTime: true
+                }),
+                intervalEnd: ko.observable('20:00').extend({
+                    required: true,
+                    hrmTime: true
+                }),
+                schedule: [
                     ko.observableArray([]),
                     ko.observableArray([]),
                     ko.observableArray([]),
@@ -76,38 +243,57 @@
                     ko.observableArray([]),
                     ko.observableArray([]),
                     ko.observableArray([])
-                ];
+                ]
+            });
 
-                return ko.validatedObservable({
-                    intervalStart: ko.observable('08:00').extend({
-                        required: true,
-                        hrmTime: true
-                    }),
-                    intervalEnd: ko.observable('20:00').extend({
-                        required: true,
-                        hrmTime: true
-                    }),
-                    schedule: schedule,
-                    validationObject: ko.validatedObservable().extend({
-                        validation: {
-                            validator: () => {
-                                return schedule.some(weekday => weekday().length > 0);
-                            }
-                        }
-                    })
+            this.companyTypeStepSelect = function (type) {
+                this.formModel().companyType(type);
+                this.activeStep(2);
+            };
+
+            this.isDishCategoriesStepSubmitted = ko.observable(false);
+
+            this.isDishCategoriesStepValid = ko.computed(() => {
+                return this.formModel().dishCategories().every(c => c.value() !== '');
+            });
+
+            this.dishCategoriesStepAdd = function () {
+                this.formModel().dishCategories.push(this.createDishCategoryFormModel(''));
+            };
+
+            this.dishCategoriesStepRemove = function (index) {
+                this.formModel().dishCategories.splice(index, 1);
+            };
+
+            this.dishCategoriesStepFormControlErrorStateMatcher = function (formControl) {
+                return ko.computed(() => {
+                    return this.isDishCategoriesStepSubmitted() && !formControl.isValid();
                 });
-            })();
+            };
 
-            this.scheduleStepLastValidIntervalStart = ko.observable(this.scheduleStepFormModel().intervalStart());
-            this.scheduleStepLastValidIntervalEnd = ko.observable(this.scheduleStepFormModel().intervalEnd());
+            this.dishCategoriesStepSubmit = function () {
+                this.isDishCategoriesStepSubmitted(true);
+
+                if (this.isDishCategoriesStepValid()) {
+                    this.activeStep(this.activeStep() + 1);
+                }
+            };
+
+            this.scheduleStepLastValidIntervalStart = ko.observable(this.formModel().intervalStart());
+            this.scheduleStepLastValidIntervalEnd = ko.observable(this.formModel().intervalEnd());
 
             this.isScheduleStepIntervalValid = ko.computed(() => {
-                return this.scheduleStepFormModel().intervalStart.isValid() && this.scheduleStepFormModel().intervalEnd.isValid();
+                return this.formModel().intervalStart.isValid() &&
+                       this.formModel().intervalEnd.isValid();
+            });
+
+            this.isScheduleStepValid = ko.computed(() => {
+                return this.isScheduleStepIntervalValid() && this.formModel().schedule.some(weekday => weekday().length > 0);
             });
 
             this.scheduleStepUsedIntervalStart = ko.computed(() => {
                 if (this.isScheduleStepIntervalValid()) {
-                    return this.scheduleStepFormModel().intervalStart();
+                    return this.formModel().intervalStart();
                 } else {
                     return this.scheduleStepLastValidIntervalStart();
                 }
@@ -115,7 +301,7 @@
 
             this.scheduleStepUsedIntervalEnd = ko.computed(() => {
                 if (this.isScheduleStepIntervalValid()) {
-                    return this.scheduleStepFormModel().intervalEnd();
+                    return this.formModel().intervalEnd();
                 } else {
                     return this.scheduleStepLastValidIntervalEnd();
                 }
@@ -134,7 +320,7 @@
                 const startHour = start.hour() === 0 ? (start.isBefore(end) ? 0 : 24) : start.hour();
                 const endHour = end.hour() === 0 ? (start.isBefore(end) ? 24 : 0) : end.hour();
 
-                this.scheduleStepFormModel().schedule.forEach(week => {
+                this.formModel().schedule.forEach(week => {
                     if (start.isBefore(end)) {
                         week.remove(hour => hour < startHour || hour > endHour);
                     } else {
@@ -145,51 +331,229 @@
                 });
             };
 
-            this.submitScheduleStep = function () {
-                if (this.scheduleStepFormModel.isValid()) {
+            this.scheduleStepSubmit = function () {
+                if (this.isScheduleStepValid()) {
                     this.activeStep(this.activeStep() + 1);
                 }
             };
 
-            this.turnoverStepFormModel = (() => {
-                return ko.validatedObservable({
-                    categories: ko.observableArray([
-                        {
-                            name: 'Пицца',
-                            units: ko.observable('0'),
-                            week: [
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable('')
-                            ],
-                            weekTotal: ko.observable('')
-                        },
-                        {
-                            name: 'Роллы',
-                            units: ko.observable('1'),
-                            week: [
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable(''),
-                                ko.observable('')
-                            ],
-                            weekTotal: ko.observable('')
-                        }
-                    ])
-                });
-            })();
+            this.isTurnoverStepSubmitted = ko.observable(false);
 
-            this.turnoverStepDistributeWeekTotal = function (categoryIndex, total) {
-                const portion = Math.floor((this.unmaskTurnoverStepValue(total) / 7) * 100) / 100;
-                this.turnoverStepFormModel().categories()[categoryIndex].week.forEach(weekday => weekday(this.formatTurnoverStepValue(portion)));
-                this.turnoverStepCategoriesWithFillingError.remove(categoryIndex);
+            this.turnoverStepLastWeekTotals = ko.observable(null);
+            this.turnoverStepLastWeekdayTotals = ko.observable(null);
+            this.turnoverStepLastHourTotals = ko.observable(null);
+
+            this.turnoverStepUpdateLastWeekTotal = function (categoryIndex) {
+                const weekTotal = this.formModel().dishCategories()[categoryIndex].weekTotal();
+                this.turnoverStepLastWeekTotals()[categoryIndex](weekTotal);
+            };
+
+            this.turnoverStepUpdateLastWeekdayTotal = function (categoryIndex, weekdayIndex) {
+                const weekdayTotal = this.formModel().dishCategories()[categoryIndex].week[weekdayIndex].weekdayTotal();
+                this.turnoverStepLastWeekdayTotals()[categoryIndex][weekdayIndex](weekdayTotal);
+            };
+
+            this.turnoverStepUpdateLastHourTotal = function (categoryIndex, hourIndex) {
+                const hourTotal = this.formModel().dishCategories()[categoryIndex].hourTotals()[hourIndex]();
+                this.turnoverStepLastHourTotals()[categoryIndex][hourIndex](hourTotal);
+            };
+
+            this.turnoverStepIntervalHours = ko.computed(() => {
+                if (!this.formModel().intervalStart.isValid() || !this.formModel().intervalEnd.isValid()) {
+                    return null;
+                }
+
+                const start = moment(this.formModel().intervalStart(), 'HH:mm');
+                const end = moment(this.formModel().intervalEnd(), 'HH:mm');
+
+                if (start.isSameOrAfter(end)) {
+                    end.add(1, 'd');
+                }
+
+                const isEndHourInteger = end.minutes() === 0;
+
+                if (!isEndHourInteger) {
+                    end.add(1, 'h').minutes(0);
+                }
+
+                let hours = [];
+
+                while (start.isBefore(end)) {
+                    hours.push(start.hours());
+                    start.add(1, 'h');
+                }
+
+                hours = hours.filter(hour => this.formModel().schedule.some(weekday => weekday().includes(hour)));
+
+                return hours;
+            });
+
+            this.onTurnoverStepWeekTotalChange = function (categoryIndex) {
+                if (this.formModel().isTurnoverCalculated()) {
+                    const previousTotal = this.unmaskTurnoverStepValue(this.turnoverStepLastWeekTotals()[categoryIndex]());
+                    const total = this.unmaskTurnoverStepValue(this.formModel().dishCategories()[categoryIndex].weekTotal());
+
+                    if (previousTotal !== 0) {
+                        const changeFactor = total / previousTotal;
+                        this.turnoverStepChangeWeekTotal(categoryIndex, total / previousTotal);
+                        [1, 2, 3, 4, 5, 6, 7].forEach((weekday, weekdayIndex) => this.turnoverStepChangeWeekdayTotal(categoryIndex, weekdayIndex, changeFactor));
+                    } else {
+                        this.turnoverStepDivideWeekTotal(categoryIndex);
+                        [1, 2, 3, 4, 5, 6, 7].forEach((weekday, weekdayIndex) => this.turnoverStepDistributeWeekdayTotal(categoryIndex, weekdayIndex));
+                    }
+
+                    this.turnoverStepIntervalHours().forEach((hour, hourIndex) => {
+                        this.turnoverStepCalculateHourTotal(categoryIndex, hourIndex);
+                        this.turnoverStepUpdateLastHourTotal(categoryIndex, hourIndex);
+                    });
+
+                    this.turnoverStepUpdateLastWeekTotal(categoryIndex);
+                } else {
+                    this.turnoverStepDivideWeekTotal(categoryIndex);
+                    this.turnoverStepCategoriesWithFillingError.remove(categoryIndex);
+                }
+            };
+
+            this.turnoverStepDivideWeekTotal = function (categoryIndex) {
+                const total = this.unmaskTurnoverStepValue(this.formModel().dishCategories()[categoryIndex].weekTotal());
+                const portion = Math.floor((total / 7) * 100) / 100;
+                this.formModel().dishCategories()[categoryIndex].week.forEach(weekday => weekday.weekdayTotal(this.formatTurnoverStepValue(portion)));
+            };
+
+            this.turnoverStepChangeWeekTotal = function (categoryIndex, changeFactor) {
+                this.formModel().dishCategories()[categoryIndex].week.forEach(weekday => {
+                    const value = this.unmaskTurnoverStepValue(weekday.weekdayTotal()) * changeFactor;
+                    weekday.weekdayTotal(this.formatTurnoverStepValue(value));
+                });
+            };
+
+            this.onTurnoverStepWeekdayTotalChange = function (categoryIndex, weekdayIndex) {
+                if (this.formModel().isTurnoverCalculated()) {
+                    const previousTotal = this.unmaskTurnoverStepValue(this.turnoverStepLastWeekdayTotals()[categoryIndex][weekdayIndex]());
+
+                    if (previousTotal !== 0) {
+                        const total = this.unmaskTurnoverStepValue(this.formModel().dishCategories()[categoryIndex].week[weekdayIndex].weekdayTotal());
+                        this.turnoverStepChangeWeekdayTotal(categoryIndex, weekdayIndex, total / previousTotal);
+                    } else {
+                        this.turnoverStepDistributeWeekdayTotal(categoryIndex, weekdayIndex);
+                    }
+
+                    this.turnoverStepIntervalHours().forEach((hour, hourIndex) => {
+                        this.turnoverStepCalculateHourTotal(categoryIndex, hourIndex);
+                        this.turnoverStepUpdateLastHourTotal(categoryIndex, hourIndex);
+                    });
+
+                    this.turnoverStepUpdateLastWeekdayTotal(categoryIndex, weekdayIndex);
+                }
+            };
+
+            this.turnoverStepChangeWeekdayTotal = function (categoryIndex, weekdayIndex, changeFactor) {
+                this.formModel().dishCategories()[categoryIndex].week[weekdayIndex].hours().forEach(hour => {
+                    if (hour !== null) {
+                        const value = this.unmaskTurnoverStepValue(hour()) * changeFactor;
+                        hour(this.formatTurnoverStepValue(value));
+                    }
+                });
+            };
+
+            this.turnoverStepDistributeWeekdayTotal = function (categoryIndex, weekdayIndex) {
+                const category = this.formModel().dishCategories()[categoryIndex];
+                const total = this.unmaskTurnoverStepValue(category.week[weekdayIndex].weekdayTotal());
+
+                const weekdayDistribution = this.getDishCategory(category.value()).turnoverDistribution[weekdayIndex]
+                    .filter((factor, hourIndex) => this.turnoverStepIntervalHours().includes(hourIndex))
+                    .map((factor, hourIndex) => category.week[weekdayIndex].hours()[hourIndex] !== null ? factor : 0);
+
+                const weekdayDistributionSum = weekdayDistribution.reduce((sum, factor) => sum + factor, 0);
+
+                this.turnoverStepIntervalHours().forEach((_, hourIndex) => {
+                    const hourValue = category.week[weekdayIndex].hours()[hourIndex];
+
+                    if (hourValue !== null) {
+                        const value = total * weekdayDistribution[hourIndex] / weekdayDistributionSum;
+                        hourValue(this.formatTurnoverStepValue(value));
+                    }
+                });
+            };
+
+            this.onTurnoverStepWeekdayTotalInput = function (categoryIndex) {
+                this.turnoverStepCalculateWeekTotal(categoryIndex);
+
+                if (this.formModel().isTurnoverCalculated()) {
+                    this.turnoverStepUpdateLastWeekTotal(categoryIndex);
+                } else {
+                    this.turnoverStepCategoriesWithFillingError.remove(categoryIndex);
+                }
+            };
+
+            this.onTurnoverStepHourInput = function (categoryIndex, weekdayIndex, hourIndex) {
+                this.turnoverStepCalculateWeekdayTotal(categoryIndex, weekdayIndex);
+                this.turnoverStepCalculateWeekTotal(categoryIndex);
+                this.turnoverStepCalculateHourTotal(categoryIndex, hourIndex);
+
+                this.turnoverStepUpdateLastWeekdayTotal(categoryIndex, weekdayIndex);
+                this.turnoverStepUpdateLastWeekTotal(categoryIndex);
+                this.turnoverStepUpdateLastHourTotal(categoryIndex, hourIndex);
+            };
+
+            this.onTurnoverStepHourTotalChange = function (categoryIndex, hourIndex) {
+                const previousTotal = this.unmaskTurnoverStepValue(this.turnoverStepLastHourTotals()[categoryIndex][hourIndex]());
+
+                if (previousTotal !== 0) {
+                    const total = this.unmaskTurnoverStepValue(this.formModel().dishCategories()[categoryIndex].hourTotals()[hourIndex]());
+                    this.turnoverStepChangeHourTotal(categoryIndex, hourIndex, total / previousTotal);
+                } else {
+                    this.turnoverStepDivideHourTotal(categoryIndex, hourIndex);
+                }
+
+                [1, 2, 3, 4, 5, 6, 7].forEach((weekday, weekdayIndex) => {
+                    this.turnoverStepCalculateWeekdayTotal(categoryIndex, weekdayIndex);
+                });
+
+                this.turnoverStepCalculateWeekTotal(categoryIndex);
+                this.turnoverStepUpdateLastHourTotal(categoryIndex, hourIndex);
+            };
+
+            this.turnoverStepDivideHourTotal = function (categoryIndex, hourIndex) {
+                const category = this.formModel().dishCategories()[categoryIndex];
+                const total = this.unmaskTurnoverStepValue(category.hourTotals()[hourIndex]());
+                const enabledHours = category.week.map(weekday => weekday.hours()[hourIndex]).filter(hour => hour !== null);
+
+                if (enabledHours.length !== 0) {
+                    const portion = Math.floor((total / enabledHours.length) * 100) / 100;
+                    enabledHours.forEach(hour => {
+                        hour(this.formatTurnoverStepValue(portion));
+                    });
+                }
+            };
+
+            this.turnoverStepChangeHourTotal = function (categoryIndex, hourIndex, changeFactor) {
+                [1, 2, 3, 4, 5, 6, 7].forEach((weekday, weekdayIndex) => {
+                    const hour = this.formModel().dishCategories()[categoryIndex].week[weekdayIndex].hours()[hourIndex];
+                    const value = this.unmaskTurnoverStepValue(hour()) * changeFactor;
+                    hour(this.formatTurnoverStepValue(value));
+                });
+            };
+
+            this.turnoverStepCalculateWeekTotal = function (categoryIndex) {
+                const category = this.formModel().dishCategories()[categoryIndex];
+                const total = category.week.reduce((total, wd) => total + this.unmaskTurnoverStepValue(wd.weekdayTotal()), 0);
+
+                category.weekTotal(this.formatTurnoverStepValue(total));
+            };
+
+            this.turnoverStepCalculateWeekdayTotal = function (categoryIndex, weekdayIndex) {
+                const category = this.formModel().dishCategories()[categoryIndex];
+                const weekdayTotal = category.week[weekdayIndex].hours().reduce((total, hour) => total + (hour !== null ? this.unmaskTurnoverStepValue(hour()) : 0), 0);
+                category.week[weekdayIndex].weekdayTotal(this.formatTurnoverStepValue(weekdayTotal));
+            };
+
+            this.turnoverStepCalculateHourTotal = function (categoryIndex, hourIndex) {
+                const total = this.formModel().dishCategories()[categoryIndex].week.reduce((total, weekday) => {
+                    return total + (weekday.hours()[hourIndex] !== null ? this.unmaskTurnoverStepValue(weekday.hours()[hourIndex]()) : 0);
+                }, 0);
+
+                this.formModel().dishCategories()[categoryIndex].hourTotals()[hourIndex](this.formatTurnoverStepValue(total));
             };
 
             this.turnoverStepCategoriesWithFillingError = ko.observableArray([]);
@@ -204,19 +568,12 @@
                 });
             };
 
-            this.onTurnoverStepCategoryWeekdayInput = function (categoryIndex) {
-                const category = this.turnoverStepFormModel().categories()[categoryIndex];
-                const isEmpty = category.week.every(weekday => weekday() === '');
-                const total = !isEmpty ? +category.week.reduce((total, wd) => total + +this.unmaskTurnoverStepValue(wd()), 0).toFixed(2) : 0;
-
-                category.weekTotal(this.formatTurnoverStepValue(total));
-                this.turnoverStepCategoriesWithFillingError.remove(categoryIndex);
-            };
-
-            this.fillTurnoverStep = function () {
+            this.turnoverStepFill = function () {
                 const valuesByUnits = {};
 
-                this.turnoverStepFormModel().categories().forEach(category => {
+                this.turnoverStepCategoriesWithFillingError([]);
+
+                this.formModel().dishCategories().forEach(category => {
                     const values = [];
 
                     if (!(category.units() in valuesByUnits)) {
@@ -224,57 +581,227 @@
                     }
 
                     category.week.forEach(weekday => {
-                        if (weekday() !== '' && !valuesByUnits[category.units()].includes(weekday())) {
-                            valuesByUnits[category.units()].push(weekday());
+                        if (weekday.weekdayTotal() !== '' && !valuesByUnits[category.units()].includes(weekday.weekdayTotal())) {
+                            valuesByUnits[category.units()].push(weekday.weekdayTotal());
                         }
 
-                        if (weekday() !== '' && !values.includes(weekday())) {
-                            values.push(weekday());
+                        if (weekday.weekdayTotal() !== '' && !values.includes(weekday.weekdayTotal())) {
+                            values.push(weekday.weekdayTotal());
                         }
                     });
 
                     if (values.length === 1) {
-                        category.week.forEach(weekday => weekday(values[0]));
+                        category.week.forEach(weekday => weekday.weekdayTotal(values[0]));
                     }
                 });
 
-                this.turnoverStepFormModel().categories().forEach((category, index) => {
-                    if (valuesByUnits[category.units()].length === 1 && category.week[0]() === '') {
-                        category.week.forEach(weekday => weekday(valuesByUnits[category.units()][0]));
+                this.formModel().dishCategories().forEach((category, categoryIndex) => {
+                    if (valuesByUnits[category.units()].length === 1 && category.week[0].weekdayTotal() === '') {
+                        category.week.forEach(weekday => weekday.weekdayTotal(valuesByUnits[category.units()][0]));
                     } else if (valuesByUnits[category.units()].length === 0) {
-                        if (!this.turnoverStepCategoriesWithFillingError().includes(index)) {
-                            this.turnoverStepCategoriesWithFillingError.push(index);
+                        if (!this.turnoverStepCategoriesWithFillingError().includes(categoryIndex)) {
+                            this.turnoverStepCategoriesWithFillingError.push(categoryIndex);
                         }
                     }
+
+                    this.turnoverStepCalculateWeekTotal(categoryIndex);
                 });
             };
 
-            this.clearTurnoverStep = function () {
-                this.turnoverStepFormModel().categories().forEach((category, index) => {
-                    category.week.forEach(weekday => weekday(''));
-                    category.weekTotal('');
-                    this.turnoverStepCategoriesWithFillingError.remove(index);
-                });
+            this.turnoverStepClear = function () {
+                if (this.formModel().isTurnoverCalculated()) {
+                    this.isTurnoverStepSubmitted(false);
+                    this.formModel().isTurnoverCalculated(false);
+
+                    this.formModel().dishCategories().forEach(category => {
+                        category.week.forEach(weekday => {
+                            weekday.hours(null);
+                        });
+
+                        category.hourTotals(null);
+                    });
+
+                    this.turnoverStepLastWeekTotals(null);
+                    this.turnoverStepLastWeekdayTotals(null);
+                    this.turnoverStepLastHourTotals(null);
+                } else {
+                    this.formModel().dishCategories().forEach((category, index) => {
+                        category.week.forEach(weekday => weekday.weekdayTotal(''));
+                        category.weekTotal('');
+                        this.turnoverStepCategoriesWithFillingError.remove(index);
+                    });
+                }
             };
 
-            this.submitTurnoverStep = function () {};
+            this.turnoverStepBack = function () {
+                if (this.formModel().isTurnoverCalculated()) {
+                    this.isTurnoverStepSubmitted(false);
+                    this.formModel().isTurnoverCalculated(false);
+
+                    this.formModel().dishCategories().forEach(category => {
+                        category.week.forEach(weekday => {
+                            weekday.hours(null);
+                        });
+
+                        category.hourTotals(null);
+                    });
+
+                    this.turnoverStepLastWeekTotals(null);
+                    this.turnoverStepLastWeekdayTotals(null);
+                    this.turnoverStepLastHourTotals(null);
+                } else {
+                    this.back();
+                }
+            };
+
+            this.isTurnoverStepValid = ko.computed(() => {
+                if (!this.formModel().isTurnoverCalculated()) {
+                    return false;
+                }
+
+                for (let category of this.formModel().dishCategories()) {
+                    if (category.weekTotal() === '') {
+                        return false;
+                    }
+
+                    for (let weekday of category.week) {
+                        if (weekday.weekdayTotal() === '') {
+                            return false;
+                        }
+
+                        for (let hour of weekday.hours()) {
+                            if (hour !== null && hour() === '') {
+                                return false;
+                            }
+                        }
+                    }
+
+                    for (let hourTotal of category.hourTotals()) {
+                        if (hourTotal() === '') {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            });
+
+            this.turnoverStepSubmit = function () {
+                if (!this.formModel().isTurnoverCalculated()) {
+                    const schedule = this.formModel().schedule;
+
+                    this.formModel().dishCategories().forEach((category, categoryIndex) => {
+                        category.week.forEach((weekday, weekdayIndex) => {
+                            weekday.hours(this.turnoverStepIntervalHours().map(hour => {
+                                if (schedule[weekdayIndex]().includes(hour)) {
+                                    return ko.observable('').extend({
+                                        required: true
+                                    });
+                                } else {
+                                    return null;
+                                }
+                            }));
+
+                            this.turnoverStepDistributeWeekdayTotal(categoryIndex, weekdayIndex);
+                        });
+
+                        category.hourTotals(this.turnoverStepIntervalHours().map(() => ko.observable('').extend({required: true})));
+                        this.turnoverStepIntervalHours().forEach((hour, hourIndex) => {
+                            this.turnoverStepCalculateHourTotal(categoryIndex, hourIndex);
+                        });
+                    });
+
+                    this.turnoverStepLastWeekTotals(this.formModel().dishCategories().map(category => ko.observable(category.weekTotal())));
+                    this.turnoverStepLastWeekdayTotals(this.formModel().dishCategories().map(category => {
+                        return category.week.map(weekday => {
+                            return ko.observable(weekday.weekdayTotal());
+                        })
+                    }));
+                    this.turnoverStepLastHourTotals(this.formModel().dishCategories().map(category => {
+                        return category.hourTotals()    .map(hourTotal => ko.observable(hourTotal()));
+                    }));
+
+                    this.formModel().isTurnoverCalculated(true);
+                } else {
+                    this.isTurnoverStepSubmitted(true);
+
+                    if (this.isTurnoverStepValid()) {
+                        this.activeStep(this.activeStep() + 1);
+                    }
+                }
+
+                this.turnoverStepCategoriesWithFillingError([]);
+            };
+
+            this.turnoverStepGetHourLabelData = function (hourIndex) {
+                function process (time) {
+                    const parts = time.split(':');
+
+                    return {
+                        hour: parts[0],
+                        minute: parts[1]
+                    };
+                }
+
+                const hours = this.turnoverStepIntervalHours();
+
+                const currentParts = process(moment().hour(hours[hourIndex]).minute(0).format('HH:mm'));
+
+                const data = {
+                    start: currentParts,
+                    end: {
+                        ...currentParts,
+                        minute: '59'
+                    }
+                };
+
+                if (hourIndex === 0) {
+                    const startParts = process(this.formModel().intervalStart());
+
+                    if (startParts.minute !== '00') {
+                        data.start.minute = startParts.minute;
+                    }
+                }
+
+                if (hourIndex === hours.length - 1) {
+                    const endParts = process(this.formModel().intervalEnd());
+
+                    if (endParts.minute !== '00') {
+                        data.end.minute = endParts.minute;
+                    } else {
+                        data.end = process(moment().hour(hours[hourIndex]).add(1, 'h').minute(0).format('HH:mm'));
+                    }
+                }
+
+                return data;
+            };
 
             this.formatTurnoverStepValue = function (value) {
-                return Inputmask.format(value, {alias: 'decimal', digits: 2, groupSeparator: ' ', autoGroup: true, allowMinus: false});
+                return Inputmask.format(value, {alias: 'decimal', digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false}).replace('.00', '');
             };
 
             this.unmaskTurnoverStepValue = function (value) {
-                return Inputmask.unmask(value, {alias: 'decimal', digits: 2, groupSeparator: ' ', autoGroup: true, allowMinus: false});
+                const result = Inputmask.unmask(value, {alias: 'decimal', digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, unmaskAsNumber: true});
+
+                if (result === '') {
+                    return 0;
+                }
+
+                return result;
+            };
+
+            this.getDishCategory = function (categoryId) {
+                return this.dishCategories.find(c => c.id === categoryId);
             };
 
             this.maxAvailableStep = ko.computed(() => {
-                if (this.companyType() === null) {
+                if (this.formModel().companyType() === null) {
                     return 1;
-                } else if (!this.dishCategoriesStepFormModel.isValid()) {
+                } else if (!this.isDishCategoriesStepValid()) {
                     return 2;
-                } else if (!this.scheduleStepFormModel.isValid()) {
+                } else if (!this.isScheduleStepValid()) {
                     return 3;
-                } else if (!this.turnoverStepFormModel.isValid()) {
+                } else if (!this.isTurnoverStepValid()) {
                     return 4;
                 } else {
                     return 5;
@@ -292,17 +819,47 @@
                     this.scheduleStepCutSchedule();
                 }));
 
-                this.subscriptions.push(this.scheduleStepFormModel().intervalStart.subscribe(value => {
-                    if (this.scheduleStepFormModel().intervalStart.isValid()) {
+                this.subscriptions.push(this.formModel().intervalStart.subscribe(value => {
+                    if (this.formModel().intervalStart.isValid()) {
                         this.scheduleStepLastValidIntervalStart(value);
                     }
                 }));
 
-                this.subscriptions.push(this.scheduleStepFormModel().intervalEnd.subscribe(value => {
-                    if (this.scheduleStepFormModel().intervalEnd.isValid()) {
+                this.subscriptions.push(this.formModel().intervalEnd.subscribe(value => {
+                    if (this.formModel().intervalEnd.isValid()) {
                         this.scheduleStepLastValidIntervalEnd(value);
                     }
                 }));
+
+                this.subscriptions.push(this.formModel().dishCategories.subscribe(() => {
+                    this.isTurnoverStepSubmitted(false);
+                    this.formModel().isTurnoverCalculated(false);
+
+                    this.formModel().dishCategories().forEach(category => {
+                        category.week.forEach(weekday => {
+                            weekday.hours(null);
+                        });
+
+                        category.hourTotals(null);
+                    });
+
+                    this.turnoverStepLastWeekdayTotals([]);
+                }));
+
+                this.subscriptions.push(...this.formModel().schedule.map(weekday => weekday.subscribe(() => {
+                    this.isTurnoverStepSubmitted(false);
+                    this.formModel().isTurnoverCalculated(false);
+
+                    this.formModel().dishCategories().forEach(category => {
+                        category.week.forEach(weekday => {
+                            weekday.hours(null);
+                        });
+
+                        category.hourTotals(null);
+                    });
+
+                    this.turnoverStepLastWeekdayTotals([]);
+                })));
             })();
         };
 

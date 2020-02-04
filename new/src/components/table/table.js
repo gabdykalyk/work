@@ -285,3 +285,155 @@ ko.bindingHandlers.hrmTable = {
         }
     };
 })();
+
+// hrmTableStickySectionContainer
+(() => {
+    const StickyEvents = window['stickyEvents'];
+
+    class ViewModel {
+        constructor(element, sectionWrappers) {
+            this._subscriptions = [];
+            this._sectionWrappers = sectionWrappers;
+            this._sectionWrapperElementStuckHandler = null;
+            this._sectionWrapperElementUnstuckHandler = null;
+            this.element = element;
+            this._stickyEvents = null;
+
+            this._init();
+        }
+
+        _init() {
+            const $element = $(this.element);
+            $element.addClass('hrm-table__sticky-section-container');
+
+            this._stickyEvents = new StickyEvents();
+
+            this._stickyEvents.addStickies(this._sectionWrappers());
+
+            this._sectionWrapperElementStuckHandler = event => {
+                const wrapper = this._sectionWrappers().find(wrapper => wrapper.element === event.target);
+                wrapper.stuck(true);
+            };
+
+            this._sectionWrapperElementUnstuckHandler = event => {
+                const wrapper = this._sectionWrappers().find(wrapper => wrapper.element === event.target);
+                wrapper.stuck(false);
+            };
+
+            this._sectionWrappers().forEach(wrapper => {
+                wrapper.element.addEventListener(StickyEvents.STUCK, this._sectionWrapperElementStuckHandler);
+                wrapper.element.addEventListener(StickyEvents.UNSTUCK, this._sectionWrapperElementUnstuckHandler);
+            });
+
+            let lastSectionWrappers = [...this._sectionWrappers()];
+
+            this._subscriptions.push(this._sectionWrappers.subscribe(addedWrapper => {
+                _.difference(lastSectionWrappers, addedWrapper).forEach(removedElement => {
+                    removedElement.element.removeEventListener(StickyEvents.STUCK, this._sectionWrapperElementStuckHandler);
+                    removedElement.element.removeEventListener(StickyEvents.UNSTUCK, this._sectionWrapperElementUnstuckHandler);
+                });
+
+                _.difference(addedWrapper, lastSectionWrappers).forEach(addedWrapper => {
+                    addedWrapper.element.addEventListener(StickyEvents.STUCK, this._sectionWrapperElementStuckHandler);
+                    addedWrapper.element.addEventListener(StickyEvents.UNSTUCK, this._sectionWrapperElementUnstuckHandler);
+
+                    this._stickyEvents.addSticky(addedWrapper.element);
+                    $(addedWrapper.element).addClass('sticky-events');
+                });
+
+                lastSectionWrappers = [...addedWrapper];
+            }))
+        }
+
+        _destroy() {
+            this._subscriptions.forEach(s => s.dispose());
+            this._sectionWrappers().forEach(wrapper => {
+                wrapper.element.removeEventListener(StickyEvents.STUCK, this._sectionWrapperElementStuckHandler);
+                wrapper.element.removeEventListener(StickyEvents.UNSTUCK, this._sectionWrapperElementUnstuckHandler);
+            });
+
+            this._stickyEvents.disableEvents();
+        }
+    }
+
+    ko.bindingHandlers.hrmTableStickySectionContainer = {
+        init: function (element, valueAccessor, allBindings) {
+            const sectionWrappers = allBindings.get('hrmTableStickySectionContainerSectionWrappers');
+            const viewModel = new ViewModel(element, sectionWrappers);
+
+            if (valueAccessor() !== undefined) {
+                if (ko.isObservableArray(valueAccessor())) {
+                    valueAccessor().push(viewModel);
+                } else {
+                    valueAccessor()(viewModel);
+                }
+            }
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                if (valueAccessor() !== undefined) {
+                    if (ko.isObservableArray(valueAccessor())) {
+                        valueAccessor().remove(this);
+                    } else {
+                        valueAccessor()(null);
+                    }
+                }
+
+                viewModel._destroy();
+            });
+        }
+    };
+})();
+
+// hrmTableStickySectionWrapper
+(() => {
+    class ViewModel {
+        constructor(element, sectionWrappers) {
+            this._subscriptions = [];
+            this.element = element;
+            this.stuck = ko.observable(false);
+
+            this._init();
+        }
+
+        _init() {
+            const $element = $(this.element);
+            $element.addClass('hrm-table__sticky-section-wrapper');
+            $element.toggleClass('hrm-table__sticky-section-wrapper--stuck', this.stuck());
+
+            this._subscriptions.push(this.stuck.subscribe(stuck => {
+                $element.toggleClass('hrm-table__sticky-section-wrapper--stuck', stuck);
+            }));
+        }
+
+        _destroy() {
+            this._subscriptions.forEach(s => s.dispose());
+        }
+    }
+
+    ko.bindingHandlers.hrmTableStickySectionWrapper = {
+        init: function (element, valueAccessor) {
+            const viewModel = new ViewModel(element);
+
+            if (valueAccessor() !== undefined) {
+                if (ko.isObservableArray(valueAccessor())) {
+                    valueAccessor().push(viewModel);
+                } else {
+                    valueAccessor()(viewModel);
+                }
+            }
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                if (valueAccessor() !== undefined) {
+                    if (ko.isObservableArray(valueAccessor())) {
+                        valueAccessor().remove(this);
+                    } else {
+                        valueAccessor()(null);
+                    }
+                }
+
+                viewModel._destroy();
+            });
+        }
+    };
+})();
+
