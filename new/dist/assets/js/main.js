@@ -186,91 +186,16 @@ function hrmTemplateIf(condition, data) {
 }
 "use strict";
 
-ko.components.register('hrm-checkbox', {
+ko.components.register('hrm-footer', {
   viewModel: {
     createViewModel: function createViewModel(params, componentInfo) {
       var $element = $(componentInfo.element);
-      $element.addClass(['hrm-checkbox']);
-
-      var ViewModel = function ViewModel() {
-        var _this = this;
-
-        this._subscriptions = [];
-
-        if (params !== undefined && 'checked' in params) {
-          this.checked = ko.isObservable(params.checked) ? params.checked : ko.observable(params.checked);
-        } else {
-          this.checked = ko.observable(false);
-        }
-
-        this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
-
-        (function () {
-          $element.toggleClass('hrm-checkbox--checked', _this.checked());
-
-          _this._subscriptions.push(_this.checked.subscribe(function (checked) {
-            $element.toggleClass('hrm-checkbox--checked', checked);
-          }));
-        })();
-      };
-
-      ViewModel.prototype.dispose = function () {
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
-      };
-
-      return new ViewModel();
+      $element.addClass(['hrm-footer']);
+      return new function () {}();
     }
   },
-  template: "\n        <label class=\"hrm-checkbox__layout\">\n            <input data-bind=\"checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}\"\n                   type=\"checkbox\" hidden>\n        </label>\n    "
+  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
 });
-var hrmCheckboxGroupNextId = 0;
-ko.components.register('hrm-checkbox-group', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-checkbox-group']);
-
-      var ViewModel = function ViewModel() {
-        var _this2 = this;
-
-        this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
-
-        (function () {
-          if (params !== undefined && 'exportAs' in params) {
-            if (ko.isObservableArray(params.exportAs)) {
-              params.exportAs.push(_this2);
-            } else {
-              params.exportAs(_this2);
-            }
-          }
-        })();
-      };
-
-      ViewModel.prototype.dispose = function () {
-        if (params !== undefined && 'exportAs' in params) {
-          if (ko.isObservableArray(params.exportAs)) {
-            params.exportAs.remove(this);
-          } else {
-            params.exportAs(null);
-          }
-        }
-      };
-
-      return new ViewModel();
-    }
-  },
-  template: "\n        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->\n    "
-});
-ko.bindingHandlers.hrmCheckboxGroupLabel = {
-  init: function init(element, valueAccessor, allBindings) {
-    var checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
-    var $element = $(element);
-    $element.addClass('hrm-checkbox-group__label');
-    $element.attr('for', checkboxGroup().id);
-  }
-};
 "use strict";
 
 var hrmFormFieldNextId = 0;
@@ -512,16 +437,91 @@ ko.bindingHandlers.hrmFormFieldLabel = {
 };
 "use strict";
 
-ko.components.register('hrm-footer', {
+ko.components.register('hrm-checkbox', {
   viewModel: {
     createViewModel: function createViewModel(params, componentInfo) {
       var $element = $(componentInfo.element);
-      $element.addClass(['hrm-footer']);
-      return new function () {}();
+      $element.addClass(['hrm-checkbox']);
+
+      var ViewModel = function ViewModel() {
+        var _this = this;
+
+        this._subscriptions = [];
+
+        if (params !== undefined && 'checked' in params) {
+          this.checked = ko.isObservable(params.checked) ? params.checked : ko.observable(params.checked);
+        } else {
+          this.checked = ko.observable(false);
+        }
+
+        this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
+
+        (function () {
+          $element.toggleClass('hrm-checkbox--checked', _this.checked());
+
+          _this._subscriptions.push(_this.checked.subscribe(function (checked) {
+            $element.toggleClass('hrm-checkbox--checked', checked);
+          }));
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
+      };
+
+      return new ViewModel();
     }
   },
-  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
+  template: "\n        <label class=\"hrm-checkbox__layout\">\n            <input data-bind=\"checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}\"\n                   type=\"checkbox\" hidden>\n        </label>\n    "
 });
+var hrmCheckboxGroupNextId = 0;
+ko.components.register('hrm-checkbox-group', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-checkbox-group']);
+
+      var ViewModel = function ViewModel() {
+        var _this2 = this;
+
+        this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
+
+        (function () {
+          if (params !== undefined && 'exportAs' in params) {
+            if (ko.isObservableArray(params.exportAs)) {
+              params.exportAs.push(_this2);
+            } else {
+              params.exportAs(_this2);
+            }
+          }
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        if (params !== undefined && 'exportAs' in params) {
+          if (ko.isObservableArray(params.exportAs)) {
+            params.exportAs.remove(this);
+          } else {
+            params.exportAs(null);
+          }
+        }
+      };
+
+      return new ViewModel();
+    }
+  },
+  template: "\n        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->\n    "
+});
+ko.bindingHandlers.hrmCheckboxGroupLabel = {
+  init: function init(element, valueAccessor, allBindings) {
+    var checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
+    var $element = $(element);
+    $element.addClass('hrm-checkbox-group__label');
+    $element.attr('for', checkboxGroup().id);
+  }
+};
 "use strict";
 
 ko.bindingHandlers.hrmScrollable = {
