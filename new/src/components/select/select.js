@@ -1,25 +1,26 @@
 ko.bindingHandlers.hrmSelect = {
     init: function (element, valueAccessor, allBindings) {
         const $element = $(element);
-        const value = allBindings.get('value');
+        const isMultiple = $element.prop('multiple');
+        const value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
         const wrapperClass = allBindings.get('hrmSelectClass');
+        const customValuesAllowed = allBindings.has('hrmSelectCustomValuesAllowed') ? allBindings.get('hrmSelectCustomValuesAllowed') : false;
 
         const options = {
-            minimumResultsForSearch: Infinity,
+            minimumResultsForSearch: customValuesAllowed ? 0 : Infinity,
             language: 'ru',
             width: '100%',
             dropdownAutoWidth: true,
             dropdownCssClass: 'hrm-select__dropdown',
-            placeholder: ' '
+            placeholder: ' ',
+            tags: customValuesAllowed
         };
 
-        if (value) {
-            $element.val(ko.utils.unwrapObservable(value));
-        }
-
         const Select = $.fn.select2.amd.require('jquery.select2');
+        const Search = $.fn.select2.amd.require('select2/selection/search');
 
         const originalSelectRenderFn = Select.prototype.render;
+        const originalSearchUpdateFn = Search.prototype.update;
 
         Select.prototype.render = function () {
             const $container = originalSelectRenderFn.call(this, ...arguments);
@@ -32,19 +33,38 @@ ko.bindingHandlers.hrmSelect = {
             return $container;
         };
 
+        Search.prototype.update = function () {
+            originalSearchUpdateFn.call(this, ...arguments);
+            $element.trigger('hrm-select:search-update');
+        };
+
         $element.select2(options);
 
         Select.prototype.render = originalSelectRenderFn;
+        Search.prototype.update = originalSearchUpdateFn;
 
         const select2Instance = $element.data('select2');
 
         select2Instance.$results.unbind('mousewheel');
 
         const $dropdownResultsContainer = $element.data('select2').$results.parent();
-        $dropdownResultsContainer.overlayScrollbars({});
+        $dropdownResultsContainer.overlayScrollbars({
+            callbacks: {
+                    onUpdated: () => {
+                    if (select2Instance.$dropdown.is(':visible')) {
+                        select2Instance.dropdown._positionDropdown();
+
+                        // Правка бага в Chrome с неправильным синхронным вычислением положения выпадающего списка
+                        setTimeout(() => {
+                            select2Instance.dropdown._positionDropdown();
+                        });
+                    }
+                }
+            }
+        });
 
         const openHandler = () => {
-            $dropdownResultsContainer.overlayScrollbars().update(true);
+            $dropdownResultsContainer.overlayScrollbars().scroll(0);
         };
 
         const openingHandler = () => {
@@ -70,15 +90,7 @@ ko.bindingHandlers.hrmSelect = {
         $element.on('select2:opening', openingHandler);
         $element.on('select2:closing', closingHandler);
 
-        const changeHandler = () => {
-            if (value !== undefined && ko.isObservable(value)) {
-                const value = $element.val();
-                value(value);
-            }
-        };
-
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-            $element.off('change', changeHandler);
             $element.off('select2:open', openHandler);
             $element.off('select2:opening', openingHandler);
             $element.off('select2:closing', closingHandler);
@@ -86,11 +98,12 @@ ko.bindingHandlers.hrmSelect = {
     },
     update: function (element, valueAccessor, allBindings) {
         const $element = $(element);
-        const value = allBindings.get('value');
+        const isMultiple = $element.prop('multiple');
+        const value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
 
         if (value !== undefined && ko.isObservable(value)) {
             value.subscribe(v => {
-                $element.val(v).trigger('change');
+                $element.trigger('change.select2');
             });
         }
     }

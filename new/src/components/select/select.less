@@ -1,5 +1,4 @@
 @import '../../base/_variables.less';
-@import '../../base/_icons.less';
 
 @option-hover-transition-duration: 0.2s;
 
@@ -10,6 +9,12 @@
         border: none;
 
         background: none;
+
+        &--multiple {
+            border: none !important;
+            min-height: unset;
+            height: unset;
+        }
     }
 
     .select2-selection__rendered {
@@ -22,6 +27,27 @@
         color: #000000 !important;
     }
 
+    .select2-selection--multiple .select2-selection__rendered {
+        display: inline-flex !important;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: -5px;
+        margin-left: -5px;
+
+        .select2-selection__choice,
+        .select2-search {
+            margin-top: 5px;
+            margin-left: 5px;
+            margin-right: 0;
+        }
+    }
+
+    .select2-selection--multiple .select2-search {
+        .select2-search__field {
+            margin-top: 0;
+        }
+    }
+
     .select2-selection__arrow {
         display: inline-flex;
         position: unset !important;
@@ -29,6 +55,20 @@
         height: unset !important;
 
         b {
+            .arrow-down-icon(@color) {
+                @svg-content: escape('
+                    <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.30964 6.70905C4.92189 6.32111 4.92189 5.69215 5.30964 5.30421L10.305 0.306472C10.6928 -0.0814626 11.3214 -0.081462 11.7092 0.306473C12.0969 0.694408 12.0969 1.32337 11.7092 1.71131L6.71381 6.70905C6.32606 7.09698 5.69739 7.09698 5.30964 6.70905Z" fill="@{color}"/>
+                        <path d="M6.70587 6.70905C7.09363 6.32111 7.09363 5.69215 6.70587 5.30421L1.69498 0.290951C1.30723 -0.096984 0.678565 -0.0969834 0.290814 0.290951C-0.0969378 0.678886 -0.0969378 1.30785 0.290814 1.69579L5.3017 6.70905C5.68946 7.09698 6.31812 7.09698 6.70587 6.70905Z" fill="@{color}"/>
+                    </svg>
+                ');
+                width: 12px;
+                height: 7px;
+                background-image: url('data:image/svg+xml,@{svg-content}');
+                background-size: 100% 100%;
+                background-repeat: no-repeat;
+            }
+
             .arrow-down-icon(#8E9CBB) !important;
 
             display: inline-block;
@@ -38,6 +78,51 @@
             position: unset !important;
             border: none !important;
         }
+    }
+
+    .select2-selection__choice {
+        display: flex;
+        align-items: center;
+        height: 30px;
+        padding-right: 11.5px !important;
+        padding-left: 11.5px !important;
+
+        background: none !important;
+        border-color: #D3D8DF !important;
+        border-radius: 50px !important;
+
+        font-weight: 500;
+        font-size: 12px;
+
+        .select2-selection__choice__remove {
+            order: 1;
+            margin-left: 10px;
+        }
+    }
+
+    .select2-selection__choice__remove {
+        @background-svg: '
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1.2553 11.707C0.864771 11.3164 0.864771 10.6833 1.2553 10.2927L10.2928 1.25383C10.6833 0.863306 11.3165 0.863307 11.707 1.25383C12.0975 1.64436 12.0975 2.27752 11.707 2.66804L2.66951 11.707C2.27898 12.0975 1.64582 12.0975 1.2553 11.707Z" fill="#FF238D"/>
+                    <path d="M11.6132 11.6445C12.0038 11.254 12.0038 10.6208 11.6132 10.2303L2.63679 1.25383C2.24627 0.863306 1.6131 0.863307 1.22258 1.25383C0.832056 1.64436 0.832056 2.27752 1.22258 2.66804L10.199 11.6445C10.5896 12.035 11.2227 12.035 11.6132 11.6445Z" fill="#FF238D"/>
+                </svg>
+            ';
+
+        width: 12px;
+        height: 12px;
+        position: relative;
+
+        text-indent: 100%;
+        white-space: nowrap;
+        overflow: hidden;
+        @escaped-background-svg: escape(@background-svg);
+        background-image: url('data:image/svg+xml,@{escaped-background-svg}');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+    }
+
+    .select2-search__field {
+        font-size: 12px !important;
     }
 }
 

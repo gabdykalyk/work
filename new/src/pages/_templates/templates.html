@@ -96,6 +96,57 @@
                 <!-- /ko -->
             </div>
             <div class="templates__section">
+                <div class="templates__section-title">Поле ввода + выпадающий список со множественным выбором и возможностью добавить значение</div>
+
+                <!-- ko let: {formField: ko.observable(null)} -->
+                    <div class="templates__form-field" data-bind="
+                        component: {
+                            name: 'hrm-form-field',
+                            params: {
+                                hasError: $root.formControlErrorStateMatcher(value5),
+                                exportAs: formField
+                            }
+                        }
+                    ">
+                        <hrm-slot name="label">
+                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                Значение
+                            </label>
+                        </hrm-slot>
+
+                        <select data-bind="
+                            selectedOptions: $parent.value5,
+                            hrmSelect,
+                            hrmSelectCustomValuesAllowed: true,
+                            hrmFormFieldSelectControl,
+                            hrmFormFieldSelectControlOwner: formField
+                        " multiple>
+                            <option></option>
+                            <option value="1">Значение #1</option>
+                            <option value="2">Значение #2</option>
+                            <option value="3">Значение #3</option>
+                            <option value="4">Значение #4</option>
+                            <option value="5">Значение #5</option>
+                            <option value="6">Значение #6</option>
+                            <option value="7">Значение #7</option>
+                            <option value="8">Значение #8</option>
+                            <option value="9">Значение #9</option>
+                        </select>
+
+                        <hrm-slot name="error">
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: $root.formControlErrorStateMatcher($root.value5),
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $root.value5.error() --><!-- /ko -->
+                            </div>
+                        </hrm-slot>
+                    </div>
+                <!-- /ko -->
+            </div>
+            <div class="templates__section">
                 <div class="templates__section-title">Поле ввода с маской и без подписи</div>
 
                 <!-- ko let: {formField: ko.observable(null)} -->
@@ -127,6 +178,16 @@
                                 <!-- ko text: $root.value3.error() --><!-- /ko -->
                             </div>
                         </hrm-slot>
+                    </div>
+                <!-- /ko -->
+            </div>
+            <div class="templates__section">
+                <div class="templates__section-title">Чекбокс</div>
+
+                <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+                    <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+                        <div data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup}}"></div>
+                        <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup">Чекбокс</label>
                     </div>
                 <!-- /ko -->
             </div>
@@ -326,13 +387,13 @@
                             <tbody>
                                 <tr>
                                     <!-- ko let: {editableCell: ko.observable(null)} -->
-                                    <td data-bind="hrmTableEditableCell: editableCell">
-                                        <input data-bind="
+                                        <td data-bind="hrmTableEditableCell: editableCell">
+                                            <input data-bind="
                                                 value: 'Редактируемое значение #1',
                                                 hrmTableEditableCellInputControl,
                                                 hrmTableEditableCellInputControlOwner: editableCell
                                             " placeholder="Значение #1">
-                                    </td>
+                                        </td>
                                     <!-- /ko -->
                                     <td>Значение #7</td>
                                     <td>Значение #8</td>
@@ -342,16 +403,16 @@
 
                                 <tr>
                                     <!-- ko let: {editableCell: ko.observable(null)} -->
-                                    <td data-bind="
+                                        <td data-bind="
                                             hrmTableEditableCell: editableCell,
                                             hrmTableEditableCellError: editableCellControlErrorExtractor(value4)
                                         ">
-                                        <input data-bind="
+                                            <input data-bind="
                                                 textInput: value4,
                                                 hrmTableEditableCellInputControl,
                                                 hrmTableEditableCellInputControlOwner: editableCell
                                             " placeholder="Значение #11">
-                                    </td>
+                                        </td>
                                     <!-- /ko -->
                                     <td>Значение #12</td>
                                     <td>Значение #13</td>
@@ -365,25 +426,25 @@
                                     <td>Значение #18</td>
                                     <td>Значение #19</td>
                                     <!-- ko let: {editableCell: ko.observable(null)} -->
-                                    <td data-bind="hrmTableEditableCell: editableCell">
-                                        <select data-bind="
+                                        <td data-bind="hrmTableEditableCell: editableCell">
+                                            <select data-bind="
                                                 value: 1,
                                                 hrmSelect,
                                                 hrmTableEditableCellSelectControl,
                                                 hrmTableEditableCellSelectControlOwner: editableCell
                                             ">
-                                            <option></option>
-                                            <option value="1">Вариант #1</option>
-                                            <option value="2">Очень-очень длинный варинт #2</option>
-                                            <option value="3">Вариант #3</option>
-                                            <option value="4">Вариант #4</option>
-                                            <option value="5">Вариант #5</option>
-                                            <option value="6">Вариант #6</option>
-                                            <option value="7">Вариант #7</option>
-                                            <option value="8">Вариант #8</option>
-                                            <option value="9">Вариант #9</option>
-                                        </select>
-                                    </td>
+                                                <option></option>
+                                                <option value="1">Вариант #1</option>
+                                                <option value="2">Очень-очень длинный варинт #2</option>
+                                                <option value="3">Вариант #3</option>
+                                                <option value="4">Вариант #4</option>
+                                                <option value="5">Вариант #5</option>
+                                                <option value="6">Вариант #6</option>
+                                                <option value="7">Вариант #7</option>
+                                                <option value="8">Вариант #8</option>
+                                                <option value="9">Вариант #9</option>
+                                            </select>
+                                        </td>
                                     <!-- /ko -->
                                 </tr>
                             </tbody>

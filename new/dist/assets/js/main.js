@@ -186,6 +186,93 @@ function hrmTemplateIf(condition, data) {
 }
 "use strict";
 
+ko.components.register('hrm-checkbox', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-checkbox']);
+
+      var ViewModel = function ViewModel() {
+        var _this = this;
+
+        this._subscriptions = [];
+
+        if (params !== undefined && 'checked' in params) {
+          this.checked = ko.isObservable(params.checked) ? params.checked : ko.observable(params.checked);
+        } else {
+          this.checked = ko.observable(false);
+        }
+
+        this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
+
+        (function () {
+          $element.toggleClass('hrm-checkbox--checked', _this.checked());
+
+          _this._subscriptions.push(_this.checked.subscribe(function (checked) {
+            $element.toggleClass('hrm-checkbox--checked', checked);
+          }));
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
+      };
+
+      return new ViewModel();
+    }
+  },
+  template: "\n        <label class=\"hrm-checkbox__layout\">\n            <input data-bind=\"checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}\"\n                   type=\"checkbox\" hidden>\n        </label>\n    "
+});
+var hrmCheckboxGroupNextId = 0;
+ko.components.register('hrm-checkbox-group', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-checkbox-group']);
+
+      var ViewModel = function ViewModel() {
+        var _this2 = this;
+
+        this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
+
+        (function () {
+          if (params !== undefined && 'exportAs' in params) {
+            if (ko.isObservableArray(params.exportAs)) {
+              params.exportAs.push(_this2);
+            } else {
+              params.exportAs(_this2);
+            }
+          }
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        if (params !== undefined && 'exportAs' in params) {
+          if (ko.isObservableArray(params.exportAs)) {
+            params.exportAs.remove(this);
+          } else {
+            params.exportAs(null);
+          }
+        }
+      };
+
+      return new ViewModel();
+    }
+  },
+  template: "\n        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->\n    "
+});
+ko.bindingHandlers.hrmCheckboxGroupLabel = {
+  init: function init(element, valueAccessor, allBindings) {
+    var checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
+    var $element = $(element);
+    $element.addClass('hrm-checkbox-group__label');
+    $element.attr('for', checkboxGroup().id);
+  }
+};
+"use strict";
+
 var hrmFormFieldNextId = 0;
 ko.components.register('hrm-form-field', {
   viewModel: {
@@ -312,17 +399,23 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
     var formField = allBindings.get('hrmFormFieldSelectControlOwner');
     var $wrapper = $(formField().controlWrapperElement());
     var $element = $(element);
+    var isMultiple = $element.prop('multiple');
     var select2Instance = $element.data('select2');
     var selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
+    var searchFocused = isMultiple ? ko.observable(select2Instance.selection.$search.is(':focus')) : null;
     var dropdownOpened = ko.observable(false);
     subscriptions.push(ko.computed(function () {
-      return selectionFocused() || dropdownOpened();
+      return selectionFocused() || dropdownOpened() || searchFocused !== null && searchFocused();
     }).subscribe(function (value) {
       return formField().focused(value);
     }));
     $element.attr('id', formField().controlId);
     select2Instance.$container.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_select']);
     select2Instance.$dropdown.children().first().addClass(['hrm-form-field__dropdown']);
+
+    var emptyCheckFn = function emptyCheckFn(value) {
+      return value !== '' && value !== undefined && (!(value instanceof Array) || value.length !== 0);
+    };
 
     var wrapperMousedownHandler = function wrapperMousedownHandler(event) {
       if (event.target !== element && select2Instance.$container.get()[0] !== event.target && select2Instance.$container.has(event.target).length === 0) {
@@ -345,6 +438,14 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
       return selectionFocused(false);
     };
 
+    var searchFocusHandler = function searchFocusHandler() {
+      return searchFocused(true);
+    };
+
+    var searchBlurHandler = function searchBlurHandler() {
+      return searchFocused(false);
+    };
+
     var openingHandler = function openingHandler() {
       return dropdownOpened(true);
     };
@@ -353,19 +454,34 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
       return dropdownOpened(false);
     };
 
-    var valueHandler = function valueHandler(event) {
-      var value = event.target.value;
-      formField().hasValue(value !== '');
+    var changeHandler = function changeHandler() {
+      var value = $element.val();
+      formField().hasValue(emptyCheckFn(value));
+    };
+
+    var searchUpdate = function searchUpdate() {
+      if (isMultiple) {
+        select2Instance.selection.$search.off('focus', searchFocusHandler);
+        select2Instance.selection.$search.off('blur', searchBlurHandler);
+        select2Instance.selection.$search.on('focus', searchFocusHandler);
+        select2Instance.selection.$search.on('blur', searchBlurHandler);
+      }
     };
 
     select2Instance.$selection.on('focus', selectionFocusHandler);
     select2Instance.$selection.on('blur', selectionBlurHandler);
+
+    if (isMultiple) {
+      select2Instance.selection.$search.on('focus', searchFocusHandler);
+      select2Instance.selection.$search.on('blur', searchBlurHandler);
+    }
+
     $wrapper.on('mousedown', wrapperMousedownHandler);
-    $element.on('input change', valueHandler);
+    $element.on('change.select2', changeHandler);
     $element.on('select2:opening', openingHandler);
     $element.on('select2:close', closeHandler);
-    formField().focused(select2Instance.$selection.is(':focus'));
-    formField().hasValue($element.val() !== '');
+    $element.on('hrm-select:search-update', searchUpdate);
+    formField().hasValue(emptyCheckFn($element.val()));
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
       subscriptions.forEach(function (s) {
         return s.dispose();
@@ -373,9 +489,16 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
       $wrapper.off('mousedown', wrapperMousedownHandler);
       select2Instance.$selection.off('focus', selectionFocusHandler);
       select2Instance.$selection.off('blur', selectionBlurHandler);
-      $(element).off('input change', valueHandler);
+
+      if (isMultiple) {
+        select2Instance.selection.$search.off('focus', searchFocusHandler);
+        select2Instance.selection.$search.off('blur', searchBlurHandler);
+      }
+
+      $(element).off('change.select2', changeHandler);
       $element.off('select2:opening', openingHandler);
       $element.off('select2:close', closeHandler);
+      $element.off('hrm-select:search-update', searchUpdate);
     });
   }
 };
@@ -401,27 +524,40 @@ ko.components.register('hrm-footer', {
 });
 "use strict";
 
+ko.bindingHandlers.hrmScrollable = {
+  init: function init(element) {
+    var $element = $(element);
+    $element.addClass('hrm-scrollable__content');
+    $element.overlayScrollbars({
+      className: 'hrm-scrollable'
+    });
+  }
+};
+"use strict";
+
 ko.bindingHandlers.hrmSelect = {
   init: function init(element, valueAccessor, allBindings) {
     var $element = $(element);
-    var value = allBindings.get('value');
+    var isMultiple = $element.prop('multiple');
+    var value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
     var wrapperClass = allBindings.get('hrmSelectClass');
+    var customValuesAllowed = allBindings.has('hrmSelectCustomValuesAllowed') ? allBindings.get('hrmSelectCustomValuesAllowed') : false;
     var options = {
-      minimumResultsForSearch: Infinity,
+      minimumResultsForSearch: customValuesAllowed ? 0 : Infinity,
       language: 'ru',
       width: '100%',
       dropdownAutoWidth: true,
       dropdownCssClass: 'hrm-select__dropdown',
-      placeholder: ' '
+      placeholder: ' ',
+      tags: customValuesAllowed
     };
-
-    if (value) {
-      $element.val(ko.utils.unwrapObservable(value));
-    }
 
     var Select = $.fn.select2.amd.require('jquery.select2');
 
+    var Search = $.fn.select2.amd.require('select2/selection/search');
+
     var originalSelectRenderFn = Select.prototype.render;
+    var originalSearchUpdateFn = Search.prototype.update;
 
     Select.prototype.render = function () {
       var $container = originalSelectRenderFn.call.apply(originalSelectRenderFn, [this].concat(Array.prototype.slice.call(arguments)));
@@ -434,15 +570,34 @@ ko.bindingHandlers.hrmSelect = {
       return $container;
     };
 
+    Search.prototype.update = function () {
+      originalSearchUpdateFn.call.apply(originalSearchUpdateFn, [this].concat(Array.prototype.slice.call(arguments)));
+      $element.trigger('hrm-select:search-update');
+    };
+
     $element.select2(options);
     Select.prototype.render = originalSelectRenderFn;
+    Search.prototype.update = originalSearchUpdateFn;
     var select2Instance = $element.data('select2');
     select2Instance.$results.unbind('mousewheel');
     var $dropdownResultsContainer = $element.data('select2').$results.parent();
-    $dropdownResultsContainer.overlayScrollbars({});
+    $dropdownResultsContainer.overlayScrollbars({
+      callbacks: {
+        onUpdated: function onUpdated() {
+          if (select2Instance.$dropdown.is(':visible')) {
+            select2Instance.dropdown._positionDropdown(); // Правка бага в Chrome с неправильным синхронным вычислением положения выпадающего списка
+
+
+            setTimeout(function () {
+              select2Instance.dropdown._positionDropdown();
+            });
+          }
+        }
+      }
+    });
 
     var openHandler = function openHandler() {
-      $dropdownResultsContainer.overlayScrollbars().update(true);
+      $dropdownResultsContainer.overlayScrollbars().scroll(0);
     };
 
     var openingHandler = function openingHandler() {
@@ -467,17 +622,7 @@ ko.bindingHandlers.hrmSelect = {
     $element.on('select2:open', openHandler);
     $element.on('select2:opening', openingHandler);
     $element.on('select2:closing', closingHandler);
-
-    var changeHandler = function changeHandler() {
-      if (value !== undefined && ko.isObservable(value)) {
-        var _value = $element.val();
-
-        _value(_value);
-      }
-    };
-
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-      $element.off('change', changeHandler);
       $element.off('select2:open', openHandler);
       $element.off('select2:opening', openingHandler);
       $element.off('select2:closing', closingHandler);
@@ -485,24 +630,14 @@ ko.bindingHandlers.hrmSelect = {
   },
   update: function update(element, valueAccessor, allBindings) {
     var $element = $(element);
-    var value = allBindings.get('value');
+    var isMultiple = $element.prop('multiple');
+    var value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
 
     if (value !== undefined && ko.isObservable(value)) {
       value.subscribe(function (v) {
-        $element.val(v).trigger('change');
+        $element.trigger('change.select2');
       });
     }
-  }
-};
-"use strict";
-
-ko.bindingHandlers.hrmScrollable = {
-  init: function init(element) {
-    var $element = $(element);
-    $element.addClass('hrm-scrollable__content');
-    $element.overlayScrollbars({
-      className: 'hrm-scrollable'
-    });
   }
 };
 "use strict";
@@ -1048,6 +1183,158 @@ ko.bindingHandlers.hrmTable = {
 
         viewModel._destroy();
       });
+    }
+  };
+})();
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// hrmTooltip
+(function () {
+  var ViewModel =
+  /*#__PURE__*/
+  function () {
+    function ViewModel(element, text) {
+      var _this = this;
+
+      _classCallCheck(this, ViewModel);
+
+      this._subscriptions = [];
+      this._textSubscription = null;
+
+      this._clickHandler = function () {
+        _this._tippyInstance.show();
+      };
+
+      this._text = null;
+      this.element = element;
+      this._tippyInstance = null;
+
+      this._init(text);
+    }
+
+    _createClass(ViewModel, [{
+      key: "_init",
+      value: function _init(text) {
+        var _this2 = this;
+
+        $(this.element).on('click', this._clickHandler);
+
+        this._tooltipClickHandler = function (event) {
+          var $target = $(event.target);
+
+          if ($target.hasClass('hrm-tooltip__close-button')) {
+            _this2._tippyInstance.hide();
+          }
+        };
+
+        this._tippyInstance = tippy(this.element, {
+          arrow: false,
+          distance: 7,
+          placement: 'bottom',
+          interactive: true,
+          appendTo: document.body,
+          boundary: 'viewport',
+          hideOnClick: false,
+          trigger: 'manual',
+          onCreate: function onCreate(instance) {
+            $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
+            $(instance.popperChildren.tooltip).on('click', _this2._tooltipClickHandler);
+          }
+        });
+
+        this._setText(text);
+      }
+    }, {
+      key: "_setText",
+      value: function _setText(text) {
+        var _this3 = this;
+
+        if (this._textSubscription !== null) {
+          this._textSubscription.dispose();
+        }
+
+        if (ko.isObservable(text)) {
+          this._textSubscription = text.subscribe(function (text) {
+            _this3._text = text;
+
+            _this3._update();
+          });
+          this._text = text();
+        } else {
+          this._text = text;
+        }
+
+        this._update();
+      }
+    }, {
+      key: "_update",
+      value: function _update() {
+        this._tippyInstance.setContent(this._createContent(this._text));
+      }
+    }, {
+      key: "_createContent",
+      value: function _createContent(text) {
+        return "\n                <div class=\"hrm-tooltip__text\">".concat(text, "</div>\n                <button class=\"hrm-button hrm-tooltip__close-button\">\u041E\u043A</button>\n            ");
+      }
+    }, {
+      key: "_destroy",
+      value: function _destroy() {
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
+
+        $(this.element).off('click', this._clickHandler);
+      }
+    }]);
+
+    return ViewModel;
+  }();
+
+  var instances = new Map();
+  var previousBindingsList = new Map();
+  ko.bindingHandlers.hrmTooltip = {
+    init: function init(element, valueAccessor, allBindings) {
+      var text = allBindings.get('hrmTooltipText');
+      var viewModel = new ViewModel(element, text);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
+    },
+    update: function update(element, valueAccessor, allBindings) {
+      var instance = instances.get(element);
+      var previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['hrmTooltipText'] !== allBindings.get('hrmTooltipText')) {
+          instance._setText(allBindings.get('hrmTooltipText'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
     }
   };
 })();

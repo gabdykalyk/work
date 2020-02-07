@@ -139,19 +139,26 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
         const $wrapper = $(formField().controlWrapperElement());
 
         const $element = $(element);
+        const isMultiple = $element.prop('multiple');
         const select2Instance = $element.data('select2');
 
         const selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
+        const searchFocused = isMultiple ? ko.observable(select2Instance.selection.$search.is(':focus')) : null;
         const dropdownOpened = ko.observable(false);
 
         subscriptions.push(
-            ko.computed(() => selectionFocused() || dropdownOpened()).subscribe(value => formField().focused(value))
+            ko.computed(() => selectionFocused() || dropdownOpened() || (searchFocused !== null && searchFocused()))
+                .subscribe(value => formField().focused(value))
         );
 
         $element.attr('id', formField().controlId);
 
         select2Instance.$container.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_select']);
         select2Instance.$dropdown.children().first().addClass(['hrm-form-field__dropdown']);
+
+        const emptyCheckFn = value => {
+            return value !== '' && value !== undefined && (!(value instanceof Array) || value.length !== 0);
+        };
 
         const wrapperMousedownHandler = event => {
             if (event.target !== element &&
@@ -170,31 +177,51 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
         };
         const selectionFocusHandler = () => selectionFocused(true);
         const selectionBlurHandler = () => selectionFocused(false);
+        const searchFocusHandler = () => searchFocused(true);
+        const searchBlurHandler = () => searchFocused(false);
         const openingHandler = () => dropdownOpened(true);
         const closeHandler = () => dropdownOpened(false);
-        const valueHandler = event => {
-            const value = event.target.value;
-            formField().hasValue(value !== '');
+        const changeHandler = () => {
+            const value = $element.val();
+            formField().hasValue(emptyCheckFn(value));
+        };
+        const searchUpdate = () => {
+            if (isMultiple) {
+                select2Instance.selection.$search.off('focus', searchFocusHandler);
+                select2Instance.selection.$search.off('blur', searchBlurHandler);
+
+                select2Instance.selection.$search.on('focus', searchFocusHandler);
+                select2Instance.selection.$search.on('blur', searchBlurHandler);
+            }
         };
 
         select2Instance.$selection.on('focus', selectionFocusHandler);
         select2Instance.$selection.on('blur', selectionBlurHandler);
+        if (isMultiple) {
+            select2Instance.selection.$search.on('focus', searchFocusHandler);
+            select2Instance.selection.$search.on('blur', searchBlurHandler);
+        }
         $wrapper.on('mousedown', wrapperMousedownHandler);
-        $element.on('input change', valueHandler);
+        $element.on('change.select2', changeHandler);
         $element.on('select2:opening', openingHandler);
         $element.on('select2:close', closeHandler);
+        $element.on('hrm-select:search-update', searchUpdate);
 
-        formField().focused(select2Instance.$selection.is(':focus'));
-        formField().hasValue($element.val() !== '');
+        formField().hasValue(emptyCheckFn($element.val()));
 
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             subscriptions.forEach(s => s.dispose());
             $wrapper.off('mousedown', wrapperMousedownHandler);
             select2Instance.$selection.off('focus', selectionFocusHandler);
             select2Instance.$selection.off('blur', selectionBlurHandler);
-            $(element).off('input change', valueHandler);
+            if (isMultiple) {
+                select2Instance.selection.$search.off('focus', searchFocusHandler);
+                select2Instance.selection.$search.off('blur', searchBlurHandler);
+            }
+            $(element).off('change.select2', changeHandler);
             $element.off('select2:opening', openingHandler);
             $element.off('select2:close', closeHandler);
+            $element.off('hrm-select:search-update', searchUpdate);
         });
     }
 };
