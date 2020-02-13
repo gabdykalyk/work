@@ -1405,18 +1405,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   /*#__PURE__*/
   function () {
     function ViewModel(element, text) {
-      var _this = this;
+      var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'basic';
 
       _classCallCheck(this, ViewModel);
 
       this._subscriptions = [];
       this._textSubscription = null;
-
-      this._clickHandler = function () {
-        _this._tippyInstance.show();
-      };
-
+      this._clickHandler = null;
       this._text = null;
+      this._mode = mode;
       this.element = element;
       this._tippyInstance = null;
 
@@ -1426,17 +1423,23 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     _createClass(ViewModel, [{
       key: "_init",
       value: function _init(text) {
-        var _this2 = this;
+        var _this = this;
 
-        $(this.element).on('click', this._clickHandler);
+        if (this._mode === 'large') {
+          this._clickHandler = function () {
+            _this._tippyInstance.show();
+          };
 
-        this._tooltipClickHandler = function (event) {
-          var $target = $(event.target);
+          $(this.element).on('click', this._clickHandler);
 
-          if ($target.hasClass('hrm-tooltip__close-button')) {
-            _this2._tippyInstance.hide();
-          }
-        };
+          this._tooltipClickHandler = function (event) {
+            var $target = $(event.target);
+
+            if ($target.hasClass('hrm-tooltip__close-button')) {
+              _this._tippyInstance.hide();
+            }
+          };
+        }
 
         this._tippyInstance = tippy(this.element, {
           arrow: false,
@@ -1445,11 +1448,15 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           interactive: true,
           appendTo: document.body,
           boundary: 'viewport',
-          hideOnClick: false,
-          trigger: 'manual',
+          hideOnClick: this._mode === 'basic',
+          trigger: this._mode === 'basic' ? 'mouseenter click' : 'manual',
           onCreate: function onCreate(instance) {
             $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
-            $(instance.popperChildren.tooltip).on('click', _this2._tooltipClickHandler);
+            $(instance.popperChildren.tooltip).addClass(_this._mode === 'basic' ? 'hrm-tooltip--mode_basic' : 'hrm-tooltip--mode_large');
+
+            if (_this._mode === 'large') {
+              $(instance.popperChildren.tooltip).on('click', _this._tooltipClickHandler);
+            }
           }
         });
 
@@ -1458,7 +1465,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "_setText",
       value: function _setText(text) {
-        var _this3 = this;
+        var _this2 = this;
 
         if (this._textSubscription !== null) {
           this._textSubscription.dispose();
@@ -1466,9 +1473,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
         if (ko.isObservable(text)) {
           this._textSubscription = text.subscribe(function (text) {
-            _this3._text = text;
+            _this2._text = text;
 
-            _this3._update();
+            _this2._update();
           });
           this._text = text();
         } else {
@@ -1480,12 +1487,18 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
     }, {
       key: "_update",
       value: function _update() {
-        this._tippyInstance.setContent(this._createContent(this._text));
+        this._tippyInstance.setContent(this._createContent(this._text, this._mode));
       }
     }, {
       key: "_createContent",
-      value: function _createContent(text) {
-        return "\n                <div class=\"hrm-tooltip__text\">".concat(text, "</div>\n                <button class=\"hrm-button hrm-tooltip__close-button\">\u041E\u043A</button>\n            ");
+      value: function _createContent(text, mode) {
+        var result = "<div class=\"hrm-tooltip__text\">".concat(text, "</div>");
+
+        if (mode === 'large') {
+          result += '<button class="hrm-button hrm-tooltip__close-button">Ок</button>';
+        }
+
+        return result;
       }
     }, {
       key: "_destroy",
@@ -1494,7 +1507,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
           return s.dispose();
         });
 
-        $(this.element).off('click', this._clickHandler);
+        if (this._mode === 'large') {
+          $(this.element).off('click', this._clickHandler);
+        }
       }
     }]);
 
@@ -1506,7 +1521,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
   ko.bindingHandlers.hrmTooltip = {
     init: function init(element, valueAccessor, allBindings) {
       var text = allBindings.get('hrmTooltipText');
-      var viewModel = new ViewModel(element, text);
+      var mode = allBindings.get('hrmTooltipMode');
+      var viewModel = new ViewModel(element, text, mode);
       instances.set(element, viewModel);
 
       if (valueAccessor() !== undefined) {

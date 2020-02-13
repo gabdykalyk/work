@@ -24,6 +24,50 @@
                 }
             });
 
+            this.isBuilt = ko.observable(false);
+
+            this.formModel = ko.validatedObservable({
+                positions: ko.observable([
+                    {
+                        name: 'Повар-пицмейкер',
+                        workloadType: 1,
+                        categories: null,
+                        units: ko.observable(1),
+                        workload: ko.observable(90),
+                        employeeCount: 3,
+                        estimatedHours: 36
+                    },
+                    {
+                        name: 'Повар-сушист',
+                        workloadType: 2,
+                        categories: [
+                            {name: 'Роллы открытые'},
+                            {name: 'Роллы закрытые'},
+                            {name: 'Гунканы'},
+                            {name: 'Суши'},
+                            {name: 'Сашими'}
+                        ],
+                        units: ko.observable(2),
+                        workload: ko.observable(10000),
+                        employeeCount: 3,
+                        estimatedHours: 36
+                    },
+                    {
+                        name: 'Мороженщик',
+                        workloadType: 1,
+                        categories: null,
+                        units: ko.observable(3),
+                        workload: ko.observable(2.2),
+                        employeeCount: 3,
+                        estimatedHours: 36
+                    }
+                ])
+            });
+
+            this.buildForecast = function () {
+                this.isBuilt(true);
+            };
+
             this.formControlErrorStateMatcher = function (formControl) {
                 return ko.computed(() => {
                     return !formControl.isValid();
@@ -37,6 +81,17 @@
                    return 'Авторизация позволит <b>настраивать должности</b><br> и <b>сохранять параметры</b> таблиц для следующих расчетов';
                }
             });
+
+            this.getWorkloadTypeName = function (workloadType) {
+                switch (workloadType) {
+                    case 1: return 'Объём товара по всему предприятию';
+                    case 2: return 'Объём товара по категориям';
+                }
+            };
+
+            this.getCategoriesTooltipText = function (categories) {
+                return categories.map(c => c.name).join(', ');
+            };
 
             (() => {
                 $(window).on('resize', this.windowResizeHandler);

@@ -71,10 +71,284 @@
                             </div>
                         <!-- /ko -->
 
-                        <div class="hrm-button hrm-basic-button hrm-accent-button employee-forecast-page__build-forecast-button">
-                            Построить прогноз
-                        </div>
+                        <!-- ko template: {
+                            foreach: hrmTemplateIf(!isBuilt(), $data),
+                            afterAdd: hrmFadeAfterAddFactory(200, 200),
+                            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                        } -->
+                            <div class="hrm-button hrm-basic-button hrm-accent-button employee-forecast-page__form-header-action
+                                        employee-forecast-page__build-forecast-button"
+                                 data-bind="click: function () {buildForecast();}">
+                                Построить прогноз
+                            </div>
+                        <!-- /ko -->
+
+                        <!-- ko template: {
+                            foreach: hrmTemplateIf(isBuilt(), $data),
+                            afterAdd: hrmFadeAfterAddFactory(200, 200),
+                            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                        } -->
+                            <div class="hrm-button hrm-basic-button employee-forecast-page__form-header-action
+                                        employee-forecast-page__recalculate-forecast-button">
+                                Пересчитать
+                            </div>
+                        <!-- /ko -->
                     </div>
+
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf(isBuilt(), $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                            <table class="employee-forecast-page__positions-table" data-bind="hrmTable">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <div class="hrm-table__head-cell-content">
+                                        Должность
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Должность'">
+                                        </button>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="hrm-table__head-cell-content">
+                                        Тип нагрузки
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'">
+                                        </button>
+                                    </div>
+                                </th>
+                                <th colspan="2">
+                                    <div class="hrm-table__head-cell-content">
+                                        Нагрузка
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'">
+                                        </button>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="hrm-table__head-cell-content">
+                                        Сотрудники
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'">
+                                        </button>
+                                    </div>
+                                </th>
+                                <th>
+                                    <div class="hrm-table__head-cell-content">
+                                        Нормо-часы
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Нормо-часы'">
+                                        </button>
+                                    </div>
+                                </th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <!-- ko foreach: formModel().positions -->
+                                <tr>
+                                    <td data-bind="text: name"></td>
+                                    <td>
+                                        <!-- ko text: $root.getWorkloadTypeName(workloadType) --><!-- /ko -->
+                                        <!-- ko if: workloadType === 2 -->
+                                            <span class="employee-forecast-page__positions-table-categories-count"
+                                                  data-bind="text: categories.length, hrmTooltip, hrmTooltipText: $root.getCategoriesTooltipText(categories)">
+                                            </span>
+                                        <!-- /ko -->
+                                    </td>
+                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                        <td data-bind="hrmTableEditableCell: editableCell">
+                                            <select data-bind="
+                                                value: units,
+                                                hrmSelect,
+                                                hrmTableEditableCellSelectControl,
+                                                hrmTableEditableCellSelectControlOwner: editableCell
+                                            ">
+                                                <option value="1">Штуки</option>
+                                                <option value="2">Рубли</option>
+                                                <option value="3">Норма времени</option>
+                                            </select>
+                                        </td>
+                                    <!-- /ko -->
+                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                        <td class="employee-forecast-page__positions-table-workload-cell"
+                                            data-bind="hrmTableEditableCell: editableCell">
+                                            <input data-bind="
+                                                value: workload,
+                                                hrmMask, hrmMaskPattern: 'decimal',
+                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                hrmTableEditableCellInputControl,
+                                                hrmTableEditableCellInputControlOwner: editableCell
+                                            " placeholder="0">
+                                        </td>
+                                    <!-- /ko -->
+                                    <td class="employee-forecast-page__positions-table-employee-count-cell"
+                                        data-bind="text: employeeCount">
+                                    </td>
+                                    <td class="employee-forecast-page__positions-table-estimated-hours-cell"
+                                        data-bind="text: estimatedHours">
+                                    </td>
+                                </tr>
+                            <!-- /ko -->
+                            </tbody>
+                        </table>
+                        <!-- /ko -->
+
+                        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                            <div class="hrm-table__fixed-section-container employee-forecast-page__positions-table">
+                                <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left
+                                              employee-forecast-page__positions-table-fixed-section"
+                                       data-bind="hrmTable">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                Должность
+                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                        data-bind="hrmTooltip, hrmTooltipText: 'Должность'">
+                                                </button>
+                                            </div>
+                                        </th>
+                                    </tr>
+
+                                    <tr>
+                                        <th>
+                                            <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                Тип нагрузки
+                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                        data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'">
+                                                </button>
+                                            </div>
+                                        </th>
+                                    </tr>
+
+                                    <tr>
+                                        <th>
+                                            <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                Нагрузка
+                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                        data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'">
+                                                </button>
+                                            </div>
+                                        </th>
+                                    </tr>
+
+                                    <tr>
+                                        <th>
+                                            <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                Сотрудники
+                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                        data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'">
+                                                </button>
+                                            </div>
+                                        </th>
+                                    </tr>
+
+                                    <tr>
+                                        <th>
+                                            <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                Нормо-часы
+                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                        data-bind="hrmTooltip, hrmTooltipText: 'Нормо-часы'">
+                                                </button>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                </table>
+
+                                <div class="hrm-table__scrollable-wrapper">
+                                    <table class="employee-forecast-page__positions-table-table"
+                                           data-bind="hrmTable">
+                                        <tbody>
+                                        <tr>
+                                            <!-- ko foreach: formModel().positions -->
+                                                <td colspan="2" data-bind="text: name"></td>
+                                            <!-- /ko -->
+                                        </tr>
+                                        <tr>
+                                            <!-- ko foreach: formModel().positions -->
+                                                <td colspan="2">
+                                                    <!-- ko text: $root.getWorkloadTypeName(workloadType) --><!-- /ko -->
+                                                    <!-- ko if: workloadType === 2 -->
+                                                        <span class="employee-forecast-page__positions-table-categories-count"
+                                                              data-bind="text: categories.length, hrmTooltip, hrmTooltipText: $root.getCategoriesTooltipText(categories)">
+                                                        </span>
+                                                    <!-- /ko -->
+                                                </td>
+                                            <!-- /ko -->
+                                        </tr>
+
+                                        <tr>
+                                            <!-- ko foreach: formModel().positions -->
+                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                    <td data-bind="hrmTableEditableCell: editableCell">
+                                                        <select data-bind="
+                                                            value: units,
+                                                            hrmSelect,
+                                                            hrmTableEditableCellSelectControl,
+                                                            hrmTableEditableCellSelectControlOwner: editableCell
+                                                        ">
+                                                            <option value="1">Штуки</option>
+                                                            <option value="2">Рубли</option>
+                                                            <option value="3">Норма времени</option>
+                                                        </select>
+                                                    </td>
+                                                <!-- /ko -->
+
+                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                    <td class="employee-forecast-page__positions-table-workload-cell"
+                                                        data-bind="hrmTableEditableCell: editableCell">
+                                                        <input data-bind="
+                                                            value: workload,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                            hrmTableEditableCellInputControl,
+                                                            hrmTableEditableCellInputControlOwner: editableCell
+                                                        " placeholder="0">
+                                                    </td>
+                                                <!-- /ko -->
+                                            <!-- /ko -->
+                                        </tr>
+
+                                        <tr>
+                                            <!-- ko foreach: formModel().positions -->
+                                                <td class="employee-forecast-page__positions-table-estimated-hours-cell"
+                                                    data-bind="text: estimatedHours" colspan="2">
+                                                </td>
+                                            <!-- /ko -->
+                                        </tr>
+
+                                        <tr>
+                                            <!-- ko foreach: formModel().positions -->
+                                                <td class="employee-forecast-page__positions-table-estimated-hours-cell"
+                                                    data-bind="text: estimatedHours" colspan="2">
+                                                </td>
+                                            <!-- /ko -->
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                        <div class="hrm-button hrm-basic-button hrm-accent-button employee-forecast-page__add-employees-button">
+                            Добавить сотрудников
+                        </div>
+                    <!-- /ko -->
                 </div>
             </div>
             <div class="hrm-scaffold__footer employee-forecast-page__footer">
