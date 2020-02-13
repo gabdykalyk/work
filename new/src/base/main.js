@@ -4,3 +4,5 @@ const HRM_BREAKPOINTS = {
 };
 
 ko.validation.init({insertMessages: false});
+
+moment.locale('ru');

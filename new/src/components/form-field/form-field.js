@@ -72,6 +72,7 @@ ko.components.register('hrm-form-field', {
             <!-- ko template: {nodes: templateNodes.slots['label']} --><!-- /ko -->
             <div class="hrm-form-field__control-wrapper" data-bind="hrmElement: controlWrapperElement">
                 <!-- ko template: {nodes: templateNodes.main} --><!-- /ko -->
+                <!-- ko template: {nodes: templateNodes.slots['suffix']} --><!-- /ko -->
             </div>
             <!-- ko template: {nodes: templateNodes.slots['error']} --><!-- /ko -->
         <!-- /ko -->
@@ -222,6 +223,44 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
             $element.off('select2:opening', openingHandler);
             $element.off('select2:close', closeHandler);
             $element.off('hrm-select:search-update', searchUpdate);
+        });
+    }
+};
+
+ko.bindingHandlers.hrmFormFieldDatepickerControl = {
+    init: function(element, valueAccessor, allBindings) {
+        const formField = allBindings.get('hrmFormFieldDatepickerControlOwner');
+        const $wrapper = $(formField().controlWrapperElement());
+
+        const $element = $(element);
+        $element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_datepicker']);
+        $element.attr('id', formField().controlId);
+
+        const daterangepickerInstance = $element.data('daterangepicker');
+
+        daterangepickerInstance.container.addClass('hrm-form-field__dropdown');
+
+        const wrapperClickHandler = () => $element.focus();
+        const focusHandler = () => formField().focused(true);
+        const blurHandler = () => formField().focused(false);
+        const valueHandler = event => {
+            const value = event.target.value;
+            formField().hasValue(value !== '');
+        };
+
+        $wrapper.on('click', wrapperClickHandler);
+        $element.on('focus', focusHandler);
+        $element.on('blur', blurHandler);
+        $element.on('input change', valueHandler);
+
+        formField().focused($element.is(':focus'));
+        formField().hasValue($element.val() !== '');
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+            $wrapper.off('click', wrapperClickHandler);
+            $element.off('focus', focusHandler);
+            $element.off('blur', blurHandler);
+            $element.off('input change', valueHandler);
         });
     }
 };

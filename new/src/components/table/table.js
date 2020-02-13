@@ -306,7 +306,11 @@ ko.bindingHandlers.hrmTable = {
             const $element = $(this.element);
             $element.addClass('hrm-table__sticky-section-container');
 
-            this._stickyEvents = new StickyEvents();
+            const scrollableContainer = $('.hrm-scaffold__body').length > 0 ? $('.hrm-scaffold__body')[0] : $('body')[0];
+
+            this._stickyEvents = new StickyEvents({
+                container: scrollableContainer
+            });
 
             this._stickyEvents.addStickies(this._sectionWrappers());
 

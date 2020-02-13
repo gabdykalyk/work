@@ -1,0 +1,58 @@
+<script type="text/javascript">
+    $(function () {
+        const $page = $(document.documentElement);
+
+        const ViewModel = function () {
+            this.subscriptions = [];
+
+            this.windowResizeHandler = () => {
+                this.viewportSize({width: $(window).width(), height: $(window).height()});
+            };
+            this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
+
+            this.childrenComplete = function () {
+                $page.removeClass('hrm-page--initializing');
+            };
+
+            this.date = ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
+                required: {
+                    message: 'Обязательное поле'
+                },
+                hrmDate: {
+                    params: 'DD.MM.YYYY, dddd',
+                    message: 'Неверный формат даты'
+                }
+            });
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.computed(() => {
+                    return !formControl.isValid();
+                });
+            };
+
+            this.footerTextHtml = ko.computed(() => {
+               if (this.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth) {
+                   return 'Авторизация позволит <b>настраивать<br> должности</b> и <b>сохранять параметры</b> таблиц для следующих расчетов';
+               } else {
+                   return 'Авторизация позволит <b>настраивать должности</b><br> и <b>сохранять параметры</b> таблиц для следующих расчетов';
+               }
+            });
+
+            (() => {
+                $(window).on('resize', this.windowResizeHandler);
+            })();
+        };
+
+        const viewModel = new ViewModel();
+
+        ViewModel.prototype.dispose = function() {
+            $(window).off('resize', this.windowResizeHandler);
+            this.subscriptions.forEach(s => s.dispose());
+        };
+
+        ko.applyBindings(
+            viewModel,
+            $page.get()[0]
+        );
+    });
+</script>

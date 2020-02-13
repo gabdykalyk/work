@@ -7,6 +7,7 @@ var HRM_BREAKPOINTS = {
 ko.validation.init({
   insertMessages: false
 });
+moment.locale('ru');
 "use strict";
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -173,11 +174,11 @@ function hrmFadeAfterAddFactory() {
   };
 }
 
-ko.validation.rules['hrmTime'] = {
-  validator: function validator(val) {
-    return val.length === 5 && moment(val, 'HH:mm').isValid();
+ko.validation.rules['hrmDate'] = {
+  validator: function validator(val, params) {
+    return moment(val, params, true).isValid();
   },
-  message: 'Неверный формат времени'
+  message: 'Неверный формат даты и времени'
 };
 ko.validation.registerExtenders();
 
@@ -186,16 +187,257 @@ function hrmTemplateIf(condition, data) {
 }
 "use strict";
 
-ko.components.register('hrm-footer', {
+ko.components.register('hrm-basic-footer', {
   viewModel: {
     createViewModel: function createViewModel(params, componentInfo) {
       var $element = $(componentInfo.element);
-      $element.addClass(['hrm-footer']);
+      $element.addClass(['hrm-basic-footer']);
       return new function () {}();
     }
   },
-  template: "\n        <div class=\"hrm-footer__branding\">\n            <div class=\"hrm-footer__logo\"></div>\n            <span class=\"hrm-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
+  template: "\n        <div class=\"hrm-basic-footer__branding\">\n            <div class=\"hrm-basic-footer__logo\"></div>\n            <span class=\"hrm-basic-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-basic-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
 });
+"use strict";
+
+ko.components.register('hrm-basic-sidebar', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-basic-sidebar']);
+      return new function () {}();
+    }
+  },
+  template: "\n        <button class=\"hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button\n                       hrm-circle-icon-button--theme_neutral hrm-basic-sidebar__logout-button\"\n                title=\"\u0412\u043E\u0439\u0442\u0438/\u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C\u0441\u044F\">\n        </button>\n        <a class=\"hrm-basic-sidebar__support-link\" href=\"#\" title=\"\u041F\u043E\u043C\u043E\u0449\u044C\"></a>\n    "
+});
+"use strict";
+
+ko.components.register('hrm-checkbox', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-checkbox']);
+
+      var ViewModel = function ViewModel() {
+        var _this = this;
+
+        this._subscriptions = [];
+
+        if (params !== undefined && 'checked' in params) {
+          this.checked = ko.isObservable(params.checked) ? params.checked : ko.observable(params.checked);
+        } else {
+          this.checked = ko.observable(false);
+        }
+
+        this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
+
+        (function () {
+          $element.toggleClass('hrm-checkbox--checked', _this.checked());
+
+          _this._subscriptions.push(_this.checked.subscribe(function (checked) {
+            $element.toggleClass('hrm-checkbox--checked', checked);
+          }));
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
+      };
+
+      return new ViewModel();
+    }
+  },
+  template: "\n        <label class=\"hrm-checkbox__layout\">\n            <input data-bind=\"checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}\"\n                   type=\"checkbox\" hidden>\n        </label>\n    "
+});
+var hrmCheckboxGroupNextId = 0;
+ko.components.register('hrm-checkbox-group', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-checkbox-group']);
+
+      var ViewModel = function ViewModel() {
+        var _this2 = this;
+
+        this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
+
+        (function () {
+          if (params !== undefined && 'exportAs' in params) {
+            if (ko.isObservableArray(params.exportAs)) {
+              params.exportAs.push(_this2);
+            } else {
+              params.exportAs(_this2);
+            }
+          }
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        if (params !== undefined && 'exportAs' in params) {
+          if (ko.isObservableArray(params.exportAs)) {
+            params.exportAs.remove(this);
+          } else {
+            params.exportAs(null);
+          }
+        }
+      };
+
+      return new ViewModel();
+    }
+  },
+  template: "\n        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->\n    "
+});
+ko.bindingHandlers.hrmCheckboxGroupLabel = {
+  init: function init(element, valueAccessor, allBindings) {
+    var checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
+    var $element = $(element);
+    $element.addClass('hrm-checkbox-group__label');
+    $element.attr('for', checkboxGroup().id);
+  }
+};
+"use strict";
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+(function () {
+  var HrmDatepickerViewModel =
+  /*#__PURE__*/
+  function () {
+    function HrmDatepickerViewModel(element, value) {
+      _classCallCheck(this, HrmDatepickerViewModel);
+
+      this._subscriptions = [];
+      this._valueSubscription = null;
+      this._value = null;
+      this._daterangepicker = null;
+      this._applyHandler = null;
+      this.element = element;
+
+      this._init(value);
+    }
+
+    _createClass(HrmDatepickerViewModel, [{
+      key: "_init",
+      value: function _init(value) {
+        var _this = this;
+
+        var $element = $(this.element);
+        $element.attr('autocomplete', 'off');
+        $element.daterangepicker({
+          singleDatePicker: true,
+          showDropdown: false,
+          autoUpdateInput: false,
+          locale: {
+            format: 'DD.MM.YYYY, dddd',
+            monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+            daysOfWeek: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+            firstDay: 1
+          }
+        });
+
+        this._applyHandler = function () {
+          var newValue = _this._daterangepicker.startDate.format(_this._daterangepicker.locale.format);
+
+          if (newValue !== $element.val()) {
+            $element.val(newValue).trigger('change');
+          }
+        };
+
+        $element.on('apply.daterangepicker', this._applyHandler);
+        this._daterangepicker = $element.data('daterangepicker');
+
+        this._daterangepicker.container.addClass('hrm-datepicker');
+
+        this._setValue(value);
+      }
+    }, {
+      key: "_setValue",
+      value: function _setValue(value) {
+        var _this2 = this;
+
+        if (this._valueSubscription !== null) {
+          this._valueSubscription.dispose();
+
+          this._valueSubscription = null;
+        }
+
+        if (value !== undefined) {
+          if (ko.isObservable(value)) {
+            this._valueSubscription = value.subscribe(function (v) {
+              _this2._daterangepicker.elementChanged();
+            });
+          } else {
+            this._daterangepicker.elementChanged();
+          }
+        }
+
+        this._value = value;
+      }
+    }, {
+      key: "_destroy",
+      value: function _destroy() {
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
+
+        if (this._valueSubscription !== null) {
+          this._valueSubscription.dispose();
+        }
+
+        $element.off('apply.daterangepicker', this._applyHandler);
+      }
+    }]);
+
+    return HrmDatepickerViewModel;
+  }();
+
+  var instances = new Map();
+  var previousBindingsList = new Map();
+  ko.bindingHandlers.hrmDatepicker = {
+    init: function init(element, valueAccessor, allBindings) {
+      var value = allBindings.get('value');
+      var viewModel = new HrmDatepickerViewModel(element, value);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
+    },
+    update: function update(element, valueAccessor, allBindings) {
+      var instance = instances.get(element);
+      var previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['value'] !== allBindings.get('value')) {
+          instance._setValue(allBindings.get('value'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
 "use strict";
 
 var hrmFormFieldNextId = 0;
@@ -265,7 +507,7 @@ ko.components.register('hrm-form-field', {
       return new ViewModel();
     }
   },
-  template: "\n        <!-- ko template: {afterRender: function () {afterRender();}} -->\n            <!-- ko template: {nodes: templateNodes.slots['label']} --><!-- /ko -->\n            <div class=\"hrm-form-field__control-wrapper\" data-bind=\"hrmElement: controlWrapperElement\">\n                <!-- ko template: {nodes: templateNodes.main} --><!-- /ko -->\n            </div>\n            <!-- ko template: {nodes: templateNodes.slots['error']} --><!-- /ko -->\n        <!-- /ko -->\n    "
+  template: "\n        <!-- ko template: {afterRender: function () {afterRender();}} -->\n            <!-- ko template: {nodes: templateNodes.slots['label']} --><!-- /ko -->\n            <div class=\"hrm-form-field__control-wrapper\" data-bind=\"hrmElement: controlWrapperElement\">\n                <!-- ko template: {nodes: templateNodes.main} --><!-- /ko -->\n                <!-- ko template: {nodes: templateNodes.slots['suffix']} --><!-- /ko -->\n            </div>\n            <!-- ko template: {nodes: templateNodes.slots['error']} --><!-- /ko -->\n        <!-- /ko -->\n    "
 });
 ko.components.register('hrm-form-field-error', {
   viewModel: {
@@ -427,99 +669,53 @@ ko.bindingHandlers.hrmFormFieldSelectControl = {
     });
   }
 };
+ko.bindingHandlers.hrmFormFieldDatepickerControl = {
+  init: function init(element, valueAccessor, allBindings) {
+    var formField = allBindings.get('hrmFormFieldDatepickerControlOwner');
+    var $wrapper = $(formField().controlWrapperElement());
+    var $element = $(element);
+    $element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_datepicker']);
+    $element.attr('id', formField().controlId);
+    var daterangepickerInstance = $element.data('daterangepicker');
+    daterangepickerInstance.container.addClass('hrm-form-field__dropdown');
+
+    var wrapperClickHandler = function wrapperClickHandler() {
+      return $element.focus();
+    };
+
+    var focusHandler = function focusHandler() {
+      return formField().focused(true);
+    };
+
+    var blurHandler = function blurHandler() {
+      return formField().focused(false);
+    };
+
+    var valueHandler = function valueHandler(event) {
+      var value = event.target.value;
+      formField().hasValue(value !== '');
+    };
+
+    $wrapper.on('click', wrapperClickHandler);
+    $element.on('focus', focusHandler);
+    $element.on('blur', blurHandler);
+    $element.on('input change', valueHandler);
+    formField().focused($element.is(':focus'));
+    formField().hasValue($element.val() !== '');
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      $wrapper.off('click', wrapperClickHandler);
+      $element.off('focus', focusHandler);
+      $element.off('blur', blurHandler);
+      $element.off('input change', valueHandler);
+    });
+  }
+};
 ko.bindingHandlers.hrmFormFieldLabel = {
   init: function init(element, valueAccessor, allBindings) {
     var formField = allBindings.get('hrmFormFieldLabelOwner');
     var $element = $(element);
     $element.addClass('hrm-form-field__label');
     $element.attr('for', formField().controlId);
-  }
-};
-"use strict";
-
-ko.components.register('hrm-checkbox', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-checkbox']);
-
-      var ViewModel = function ViewModel() {
-        var _this = this;
-
-        this._subscriptions = [];
-
-        if (params !== undefined && 'checked' in params) {
-          this.checked = ko.isObservable(params.checked) ? params.checked : ko.observable(params.checked);
-        } else {
-          this.checked = ko.observable(false);
-        }
-
-        this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
-
-        (function () {
-          $element.toggleClass('hrm-checkbox--checked', _this.checked());
-
-          _this._subscriptions.push(_this.checked.subscribe(function (checked) {
-            $element.toggleClass('hrm-checkbox--checked', checked);
-          }));
-        })();
-      };
-
-      ViewModel.prototype.dispose = function () {
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
-      };
-
-      return new ViewModel();
-    }
-  },
-  template: "\n        <label class=\"hrm-checkbox__layout\">\n            <input data-bind=\"checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}\"\n                   type=\"checkbox\" hidden>\n        </label>\n    "
-});
-var hrmCheckboxGroupNextId = 0;
-ko.components.register('hrm-checkbox-group', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-checkbox-group']);
-
-      var ViewModel = function ViewModel() {
-        var _this2 = this;
-
-        this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
-
-        (function () {
-          if (params !== undefined && 'exportAs' in params) {
-            if (ko.isObservableArray(params.exportAs)) {
-              params.exportAs.push(_this2);
-            } else {
-              params.exportAs(_this2);
-            }
-          }
-        })();
-      };
-
-      ViewModel.prototype.dispose = function () {
-        if (params !== undefined && 'exportAs' in params) {
-          if (ko.isObservableArray(params.exportAs)) {
-            params.exportAs.remove(this);
-          } else {
-            params.exportAs(null);
-          }
-        }
-      };
-
-      return new ViewModel();
-    }
-  },
-  template: "\n        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->\n    "
-});
-ko.bindingHandlers.hrmCheckboxGroupLabel = {
-  init: function init(element, valueAccessor, allBindings) {
-    var checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
-    var $element = $(element);
-    $element.addClass('hrm-checkbox-group__label');
-    $element.attr('for', checkboxGroup().id);
   }
 };
 "use strict";
@@ -542,8 +738,14 @@ ko.bindingHandlers.hrmSelect = {
     var value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
     var wrapperClass = allBindings.get('hrmSelectClass');
     var customValuesAllowed = allBindings.has('hrmSelectCustomValuesAllowed') ? allBindings.get('hrmSelectCustomValuesAllowed') : false;
+    var searchEnabled = allBindings.has('hrmSelectSearchEnabled') ? allBindings.get('hrmSelectSearchEnabled') : false;
+
+    if (customValuesAllowed && !isMultiple && !searchEnabled) {
+      throw Error('You have to enable both options "hrmSelectCustomValuesAllowed" and "hrmSelectSearchEnabled"');
+    }
+
     var options = {
-      minimumResultsForSearch: customValuesAllowed ? 0 : Infinity,
+      minimumResultsForSearch: searchEnabled ? 0 : Infinity,
       language: 'ru',
       width: '100%',
       dropdownAutoWidth: true,
@@ -1028,7 +1230,10 @@ ko.bindingHandlers.hrmTable = {
 
         var $element = $(this.element);
         $element.addClass('hrm-table__sticky-section-container');
-        this._stickyEvents = new StickyEvents();
+        var scrollableContainer = $('.hrm-scaffold__body').length > 0 ? $('.hrm-scaffold__body')[0] : $('body')[0];
+        this._stickyEvents = new StickyEvents({
+          container: scrollableContainer
+        });
 
         this._stickyEvents.addStickies(this._sectionWrappers());
 

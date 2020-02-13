@@ -5,9 +5,14 @@ ko.bindingHandlers.hrmSelect = {
         const value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
         const wrapperClass = allBindings.get('hrmSelectClass');
         const customValuesAllowed = allBindings.has('hrmSelectCustomValuesAllowed') ? allBindings.get('hrmSelectCustomValuesAllowed') : false;
+        const searchEnabled = allBindings.has('hrmSelectSearchEnabled') ? allBindings.get('hrmSelectSearchEnabled') : false;
+
+        if (customValuesAllowed && (!isMultiple && !searchEnabled)) {
+            throw Error('You have to enable both options "hrmSelectCustomValuesAllowed" and "hrmSelectSearchEnabled"');
+        }
 
         const options = {
-            minimumResultsForSearch: customValuesAllowed ? 0 : Infinity,
+            minimumResultsForSearch: searchEnabled ? 0 : Infinity,
             language: 'ru',
             width: '100%',
             dropdownAutoWidth: true,

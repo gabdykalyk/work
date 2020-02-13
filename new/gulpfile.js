@@ -47,7 +47,7 @@ function compileStyles() {
 	let bundle = 'main.css';
 	if (prod) bundle = 'main.min.css';
 
-	return gulp.src(config.src + '/**/*.less')
+	return gulp.src([config.src + '/base/**/*.less', config.src + '/components/components.less', config.src + '/pages/**/*.less', '!' + config.src + '/**/_*.less'])
 		.pipe(plumber())
 		.pipe(gulpif(!prod, sourcemaps.init()))
 		.pipe(less())

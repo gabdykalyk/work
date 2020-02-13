@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html class="hrm-page employee-forecast-page hrm-page--initializing"
+      data-bind="childrenComplete: childrenComplete" lang="ru">
+<head>
+    @@include('../../base/_page-head-content.html')
+</head>
+
+<body>
+    <div class="hrm-scaffold">
+        <div class="hrm-scaffold__sidebar" data-bind="component: {name: 'hrm-basic-sidebar'}"></div>
+        <div class="hrm-scaffold__body">
+            <div class="hrm-scaffold__content employee-forecast-page__content">
+                <div class="employee-forecast-page__header">
+                    <span class="employee-forecast-page__title">
+                        Прогноз по сотрудникам
+                    </span>
+
+                    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary
+                                       hrm-button-with-arrow-left-icon employee-forecast-page__back-button">
+                            К мастеру настроек
+                        </button>
+                    <!-- /ko -->
+
+                    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                        <button class="hrm-button hrm-circle-icon-button hrm-circle-icon-button--theme_secondary
+                                       hrm-circle-arrow-left-icon-button employee-forecast-page__back-button">
+                        </button>
+                    <!-- /ko -->
+                </div>
+
+                <div class="employee-forecast-page__form">
+                    <div class="employee-forecast-page__form-header">
+                        <!-- ko let: {formField: ko.observable(null)} -->
+                            <div class="employee-forecast-page__date-form-field" data-bind="
+                                component: {
+                                    name: 'hrm-form-field',
+                                    params: {
+                                        hasError: $root.formControlErrorStateMatcher($root.date),
+                                        exportAs: formField
+                                    }
+                                }
+                            ">
+                                <hrm-slot name="label">
+                                    <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                        Расчёт на дату
+                                    </label>
+                                </hrm-slot>
+
+                                <input data-bind="
+                                    value: $root.date,
+                                    hrmDatepicker,
+                                    hrmFormFieldDatepickerControl,
+                                    hrmFormFieldDatepickerControlOwner: formField
+                                ">
+
+                                <hrm-slot name="suffix">
+                                    <i class="hrm-form-field__suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
+                                </hrm-slot>
+
+                                <hrm-slot name="error">
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: $root.formControlErrorStateMatcher($root.date),
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $root.date.error() --><!-- /ko -->
+                                    </div>
+                                </hrm-slot>
+                            </div>
+                        <!-- /ko -->
+
+                        <div class="hrm-button hrm-basic-button hrm-accent-button employee-forecast-page__build-forecast-button">
+                            Построить прогноз
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hrm-scaffold__footer employee-forecast-page__footer">
+                <span class="employee-forecast-page__footer-text" data-bind="html: footerTextHtml"></span>
+
+                <button class="hrm-button hrm-basic-button hrm-primary-button employee-forecast-page__footer-login-button">
+                    <span class="hrm-primary-button__content">Войти/зарегистрироваться</span>
+                    <span class="hrm-primary-button__background hrm-primary-button__hover-background"></span>
+                    <span class="hrm-primary-button__background hrm-primary-button__active-background"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    @@include('../../base/_page-scripts.html')
+    @@include('./_employee-forecast-page.js.html')
+</body>
+</html>

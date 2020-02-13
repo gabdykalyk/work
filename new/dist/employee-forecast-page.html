@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="hrm-page employee-forecast-page hrm-page--initializing" data-bind="childrenComplete: childrenComplete" lang="ru">
+
+<head>
+    <title>Sakura</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="HandheldFriendly" content="true" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <link href="https://fonts.googleapis.com/css?family=Fira+Sans:100,200,300,400,500,600,700,800,900&display=swap&subset=cyrillic" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/css/OverlayScrollbars.min.css" integrity="sha256-zUBmWpj0DsZzFautKgMOtiOkT6ECQ+a6RitMns7+HRM=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+
+<body>
+    <div class="hrm-scaffold">
+        <div class="hrm-scaffold__sidebar" data-bind="component: {name: 'hrm-basic-sidebar'}"></div>
+        <div class="hrm-scaffold__body">
+            <div class="hrm-scaffold__content employee-forecast-page__content">
+                <div class="employee-forecast-page__header">
+                    <span class="employee-forecast-page__title">
+                        Прогноз по сотрудникам
+                    </span>
+
+                    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary
+                                       hrm-button-with-arrow-left-icon employee-forecast-page__back-button">
+                        К мастеру настроек
+                    </button>
+                    <!-- /ko -->
+
+                    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-icon-button--theme_secondary
+                                       hrm-circle-arrow-left-icon-button employee-forecast-page__back-button">
+                    </button>
+                    <!-- /ko -->
+                </div>
+
+                <div class="employee-forecast-page__form">
+                    <div class="employee-forecast-page__form-header">
+                        <!-- ko let: {formField: ko.observable(null)} -->
+                        <div class="employee-forecast-page__date-form-field" data-bind="
+                                component: {
+                                    name: 'hrm-form-field',
+                                    params: {
+                                        hasError: $root.formControlErrorStateMatcher($root.date),
+                                        exportAs: formField
+                                    }
+                                }
+                            ">
+                            <hrm-slot name="label">
+                                <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
+                                    Расчёт на дату
+                                </label>
+                            </hrm-slot>
+
+                            <input data-bind="
+                                    value: $root.date,
+                                    hrmDatepicker,
+                                    hrmFormFieldDatepickerControl,
+                                    hrmFormFieldDatepickerControlOwner: formField
+                                ">
+
+                            <hrm-slot name="suffix">
+                                <i class="hrm-form-field__suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
+                            </hrm-slot>
+
+                            <hrm-slot name="error">
+                                <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: $root.formControlErrorStateMatcher($root.date),
+                                        hrmSlideDuration: 150
+                                    ">
+                                    <!-- ko text: $root.date.error() -->
+                                    <!-- /ko -->
+                                </div>
+                            </hrm-slot>
+                        </div>
+                        <!-- /ko -->
+
+                        <div class="hrm-button hrm-basic-button hrm-accent-button employee-forecast-page__build-forecast-button">
+                            Построить прогноз
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="hrm-scaffold__footer employee-forecast-page__footer">
+                <span class="employee-forecast-page__footer-text" data-bind="html: footerTextHtml"></span>
+
+                <button class="hrm-button hrm-basic-button hrm-primary-button employee-forecast-page__footer-login-button">
+                    <span class="hrm-primary-button__content">Войти/зарегистрироваться</span>
+                    <span class="hrm-primary-button__background hrm-primary-button__hover-background"></span>
+                    <span class="hrm-primary-button__background hrm-primary-button__active-background"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-debug.js" integrity="sha256-M5ZomNNnrnEB2WjSbnty5GWGqq6UuAAVNnWECisgEis=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.12/js/select2.full.min.js" integrity="sha256-vucLmrjdfi9YwjGY/3CQ7HnccFSS/XRS1M/3k/FDXJw=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/i18n/ru.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplebar/5.1.0/simplebar.min.js" integrity="sha256-hFddD6XMIwFba4ITQjpv5WWE557w6O0w9RRfmGjIz4k=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/js/OverlayScrollbars.min.js" integrity="sha256-5Tj3ZUgjHEGwF7TxpOgbPpjhq+WxXvpfb+qr9OxRHtY=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/js/jquery.overlayScrollbars.min.js" integrity="sha256-RE+oy7ofA6XerySMpTlDcg0gFUwHN3n0qQ5fUIZVq/M=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/RobinHerbots/jquery.inputmask@4.0.9/dist/jquery.inputmask.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js" integrity="sha256-AdQN98MVZs44Eq2yTwtoKufhnU+uZ7v2kXnD5vqzZVo=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/popper.js@1"></script>
+    <script src="https://unpkg.com/tippy.js@5"></script>
+    <script src="https://unpkg.com/sticky-events@3.1.1/dist/sticky-events.umd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script src="assets/js/main.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            const $page = $(document.documentElement);
+
+            const ViewModel = function() {
+                this.subscriptions = [];
+
+                this.windowResizeHandler = () => {
+                    this.viewportSize({
+                        width: $(window).width(),
+                        height: $(window).height()
+                    });
+                };
+                this.viewportSize = ko.observable({
+                    width: $(window).width(),
+                    height: $(window).height()
+                });
+
+                this.childrenComplete = function() {
+                    $page.removeClass('hrm-page--initializing');
+                };
+
+                this.date = ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    },
+                    hrmDate: {
+                        params: 'DD.MM.YYYY, dddd',
+                        message: 'Неверный формат даты'
+                    }
+                });
+
+                this.formControlErrorStateMatcher = function(formControl) {
+                    return ko.computed(() => {
+                        return !formControl.isValid();
+                    });
+                };
+
+                this.footerTextHtml = ko.computed(() => {
+                    if (this.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth) {
+                        return 'Авторизация позволит <b>настраивать<br> должности</b> и <b>сохранять параметры</b> таблиц для следующих расчетов';
+                    } else {
+                        return 'Авторизация позволит <b>настраивать должности</b><br> и <b>сохранять параметры</b> таблиц для следующих расчетов';
+                    }
+                });
+
+                (() => {
+                    $(window).on('resize', this.windowResizeHandler);
+                })();
+            };
+
+            const viewModel = new ViewModel();
+
+            ViewModel.prototype.dispose = function() {
+                $(window).off('resize', this.windowResizeHandler);
+                this.subscriptions.forEach(s => s.dispose());
+            };
+
+            ko.applyBindings(
+                viewModel,
+                $page.get()[0]
+            );
+        });
+    </script>
+</body>
+
+</html>
