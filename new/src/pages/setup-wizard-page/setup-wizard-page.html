@@ -159,7 +159,9 @@
                                                     </div>
 
                                                     <!-- ko if: $parent.dishCategories().length > 1 -->
-                                                        <button class="hrm-button setup-wizard-page__dish-categories-selector-item-remove-button"
+                                                        <button class="hrm-button hrm-icon-button hrm-times-icon-button
+                                                                       hrm-icon-button--theme_negative
+                                                                       setup-wizard-page__dish-categories-selector-item-remove-button"
                                                                 title="Удалить"
                                                                 data-bind="click: function () {$root.dishCategoriesStepRemove($index());}">
                                                         </button>
@@ -561,8 +563,7 @@
                                     <div>
                                         <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
                                             <!-- ko let: {table: ko.observable(null), stickySectionWrappers: ko.observableArray([]), categoryRowElements: ko.observableArray([])} -->
-                                                <!-- ko let: {activeCategoryIndex: table() !== null && table().activeCategoryIndex() !== null ? table().activeCategoryIndex() : 0} -->
-                                                    <div class="setup-wizard-page__turnover-selector-table-sticky-section-container"
+                                                <div class="setup-wizard-page__turnover-selector-table-sticky-section-container"
                                                          data-bind="
                                                             hrmTableStickySectionContainer,
                                                             hrmTableStickySectionContainerSectionWrappers: stickySectionWrappers
@@ -571,10 +572,11 @@
                                                         <div class="hrm-table__sticky-section-rail">
                                                             <div class="setup-wizard-page__turnover-selector-table-sticky-header-wrapper"
                                                                  data-bind="hrmTableStickySectionWrapper: stickySectionWrappers">
-                                                                <table class="hrm-table__sticky-section
-                                                                              hrm-table__sticky-section--position_top
-                                                                              setup-wizard-page__turnover-selector-table
-                                                                              setup-wizard-page__turnover-selector-table-sticky-header"
+                                                                <!-- ko let: {activeCategoryIndex: table() !== null && table().activeCategoryIndex() !== null ? table().activeCategoryIndex() : 0} -->
+                                                                    <table class="hrm-table__sticky-section
+                                                                                  hrm-table__sticky-section--position_top
+                                                                                  setup-wizard-page__turnover-selector-table
+                                                                                  setup-wizard-page__turnover-selector-table-sticky-header"
                                                                        data-bind="hrmTable, using: $root.formModel().dishCategories()[activeCategoryIndex]">
                                                                 <thead>
                                                                     <tr>
@@ -662,6 +664,7 @@
                                                                     </tr>
                                                                 </tbody>
                                                                 </table>
+                                                                <!-- /ko -->
                                                             </div>
                                                         </div>
                                                         <table data-bind="
@@ -812,7 +815,6 @@
                                                         </tbody>
                                                         </table>
                                                     </div>
-                                                <!-- /ko -->
                                             <!-- /ko -->
                                         <!-- /ko -->
 
@@ -1061,6 +1063,9 @@
                                         data-bind="
                                             click: function () { $root.turnoverStepSubmit(); },
                                             attr: {disabled: isTurnoverCalculated() && $root.isTurnoverStepSubmitted() && !$root.isTurnoverStepValid()},
+                                            css: {
+                                                'setup-wizard-page__turnover-tab-pane-calculate-button': !isTurnoverCalculated()
+                                            },
                                             text: !isTurnoverCalculated() ? 'Рассчитать' : 'Далее'
                                         ">
                                 </button>
@@ -1125,7 +1130,9 @@
                                                     </div>
 
                                                     <!-- ko if: $parent.positions().length > 1 -->
-                                                        <button class="hrm-button setup-wizard-page__positions-selector-item-remove-button"
+                                                        <button class="hrm-button hrm-icon-button hrm-times-icon-button
+                                                                       hrm-icon-button--theme_negative
+                                                                       setup-wizard-page__positions-selector-item-remove-button"
                                                                 title="Удалить"
                                                                 data-bind="click: function () {$root.positionsStepRemove($index());}">
                                                         </button>
@@ -1410,7 +1417,8 @@
                                         data-bind="click: function () { $root.back(); }">
                                     Назад
                                 </button>
-                                <button class="hrm-button hrm-basic-button hrm-accent-button setup-wizard-page__tab-pane-actions-button"
+                                <button class="hrm-button hrm-basic-button hrm-accent-button
+                                               setup-wizard-page__tab-pane-actions-button setup-wizard-page__workload-type-tab-pane-build-forecast-button"
                                         data-bind="
                                             click: function () { $root.workloadTypeStepSubmit(); },
                                             attr: {disabled: $root.isWorkloadTypeStepSubmitted() && !$root.isWorkloadTypeStepValid()}

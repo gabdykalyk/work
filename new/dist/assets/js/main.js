@@ -1,7 +1,7 @@
 "use strict";
 
 var HRM_BREAKPOINTS = {
-  tableMaxWidth: 1219,
+  tabletMaxWidth: 1219,
   mobileMaxWidth: 767
 };
 ko.validation.init({
@@ -523,7 +523,9 @@ ko.components.register('hrm-form-field-error', {
 });
 ko.bindingHandlers.hrmFormFieldInputControl = {
   init: function init(element, valueAccessor, allBindings) {
+    var subscriptions = [];
     var formField = allBindings.get('hrmFormFieldInputControlOwner');
+    var value = allBindings.get('value') || allBindings.get('textInput');
     var $wrapper = $(formField().controlWrapperElement());
     var $element = $(element);
     $element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_input']);
@@ -552,11 +554,21 @@ ko.bindingHandlers.hrmFormFieldInputControl = {
     $element.on('input change', valueHandler);
     formField().focused($element.is(':focus'));
     formField().hasValue($element.val() !== '');
+
+    if (value !== undefined && ko.isObservable(value)) {
+      subscriptions.push(value.subscribe(function (v) {
+        formField().hasValue(v !== '');
+      }));
+    }
+
     ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
       $wrapper.off('click', wrapperClickHandler);
       $element.off('focus', focusHandler);
       $element.off('blur', blurHandler);
       $element.off('input change', valueHandler);
+      subscriptions.forEach(function (s) {
+        return s.dispose();
+      });
     });
   }
 };
@@ -874,13 +886,15 @@ ko.bindingHandlers.hrmTable = {
 
       this._subscriptions = [];
       this._windowResizeHandler = null;
+      this._clickHandler = null;
       this._errorSubscription = null;
       this._error = error;
       this._isTabletOrMobile = null;
-      this.element = element;
-      this.focused = ko.observable(false);
       this._errorTippyInstance = null;
       this._errorTippyClickHandler = null;
+      this.element = element;
+      this.focused = ko.observable(false);
+      this.click = new ko.subscribable();
 
       this._init();
     }
@@ -891,7 +905,16 @@ ko.bindingHandlers.hrmTable = {
         var _this = this;
 
         var $element = $(this.element);
+        var $content = $element.find('.hrm-table__editable-cell-content');
         $element.addClass('hrm-table__editable-cell');
+
+        this._clickHandler = function (event) {
+          if (event.target === $element[0] || $content.length > 0 && event.target === $content[0]) {
+            _this.click.notifySubscribers();
+          }
+        };
+
+        $element.on('click', this._clickHandler);
 
         this._subscriptions.push(this.focused.subscribe(function (focused) {
           $element.toggleClass('hrm-table__editable-cell--focused', focused);
@@ -994,10 +1017,10 @@ ko.bindingHandlers.hrmTable = {
     }, {
       key: "_onWindowResize",
       value: function _onWindowResize(width, height) {
-        var isTableOrMobile = width <= HRM_BREAKPOINTS.tableMaxWidth;
+        var isTabletOrMobile = width <= HRM_BREAKPOINTS.tabletMaxWidth;
 
-        if (this._isTabletOrMobile !== isTableOrMobile) {
-          this._isTabletOrMobile = isTableOrMobile;
+        if (this._isTabletOrMobile !== isTabletOrMobile) {
+          this._isTabletOrMobile = isTabletOrMobile;
 
           this._updateErrorView();
         }
@@ -1063,6 +1086,7 @@ ko.bindingHandlers.hrmTable = {
     function ViewModel(element, owner) {
       _classCallCheck(this, ViewModel);
 
+      this._subscriptions = [];
       this._focusHandler = null;
       this._blurHandler = null;
       this.element = element;
@@ -1089,6 +1113,11 @@ ko.bindingHandlers.hrmTable = {
 
         $element.on('focus', this._focusHandler);
         $element.on('blur', this._blurHandler);
+
+        this._subscriptions.push(ko.unwrap(this._owner).click.subscribe(function () {
+          $element.focus();
+        }));
+
         ko.unwrap(this._owner).focused($element.is(':focus'));
       }
     }, {
@@ -1097,6 +1126,10 @@ ko.bindingHandlers.hrmTable = {
         var $element = $(this.element);
         $element.off('focus', this._focusHandler);
         $element.off('blur', this._blurHandler);
+
+        this._subscriptions.forEach(function (s) {
+          return s.dispose();
+        });
       }
     }]);
 
@@ -1172,6 +1205,10 @@ ko.bindingHandlers.hrmTable = {
         $element.on('select2:opening', this._openingHandler);
         $element.on('select2:close', this._closeHandler);
         selectionFocused(select2Instance.$selection.is(':focus'));
+
+        this._subscriptions.push(ko.unwrap(this._owner).click.subscribe(function () {
+          select2Instance.open();
+        }));
       }
     }, {
       key: "_destroy",

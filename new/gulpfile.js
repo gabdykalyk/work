@@ -38,7 +38,6 @@ function compileHtml () {
 			prefix: '@@',
 			basepath: '@file'
 		}))
-		.pipe(prettyHtml())
 		.pipe(rename({dirname: ''}))
 		.pipe(gulp.dest(config.dist));
 }
@@ -67,7 +66,7 @@ function compileStyles() {
 function compileScripts() {
 	let bundle = 'main.js';
 	if (prod) bundle = 'main.min.js';
-	return gulp.src(config.src + '/**/*.js')
+	return gulp.src([config.src + '/**/*.js', '!' + config.src + '/assets/**/*'])
 		.pipe(plumber())
 		.pipe(gulpif(!prod, sourcemaps.init()))
 		.pipe(babel({

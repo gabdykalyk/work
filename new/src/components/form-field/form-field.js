@@ -100,7 +100,10 @@ ko.components.register('hrm-form-field-error', {
 
 ko.bindingHandlers.hrmFormFieldInputControl = {
     init: function(element, valueAccessor, allBindings) {
+        const subscriptions = [];
+
         const formField = allBindings.get('hrmFormFieldInputControlOwner');
+        const value = allBindings.get('value') || allBindings.get('textInput');
         const $wrapper = $(formField().controlWrapperElement());
 
         const $element = $(element);
@@ -123,11 +126,18 @@ ko.bindingHandlers.hrmFormFieldInputControl = {
         formField().focused($element.is(':focus'));
         formField().hasValue($element.val() !== '');
 
+        if (value !== undefined && ko.isObservable(value)) {
+            subscriptions.push(value.subscribe(v => {
+                formField().hasValue(v !== '');
+            }));
+        }
+
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             $wrapper.off('click', wrapperClickHandler);
             $element.off('focus', focusHandler);
             $element.off('blur', blurHandler);
             $element.off('input change', valueHandler);
+            subscriptions.forEach(s => s.dispose());
         });
     }
 };

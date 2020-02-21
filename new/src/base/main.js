@@ -1,5 +1,5 @@
 const HRM_BREAKPOINTS = {
-    tableMaxWidth: 1219,
+    tabletMaxWidth: 1219,
     mobileMaxWidth: 767
 };
 

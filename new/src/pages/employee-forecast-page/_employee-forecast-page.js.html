@@ -2,7 +2,7 @@
     $(function () {
         const $page = $(document.documentElement);
 
-        const ViewModel = function () {
+        const ViewModel = function (positions) {
             this.subscriptions = [];
 
             this.windowResizeHandler = () => {
@@ -26,55 +26,122 @@
 
             this.isBuilt = ko.observable(false);
 
+            this.isEmployeesCalculated = ko.observable(false);
+
+            this.createPositionFormModel = function (data) {
+                return {
+                    ...data,
+                    units: ko.observable(data.units.toString()),
+                    workload: ko.observable(data.workload),
+                    employees: ko.observableArray(data.employees.map(e => this.createPositionEmployeeFormModel(e))),
+                    rate: ko.observable('')
+                };
+            };
+
+            this.createPositionEmployeeFormModel = function (data) {
+                const workingIntervals = ko.observableArray(data.workingIntervals.map(v => this.createPositionEmployeeWorkingIntervalFormModel(v)));
+
+                return {
+                    ...data,
+                    workingIntervals,
+                    rate: ko.observable(data.rate),
+                    returnRate: data.returnRate,
+                    salaryBulk: ko.observable(data.salaryBulk),
+                    bonus: ko.observable(data.bonus),
+                    fine: ko.observable(data.fine),
+                    workingIntervalsValidationObject: ko.observable().extend({
+                        validation: {
+                            validator: () => {
+                                return workingIntervals().every(i => i.value.isValid());
+                            }
+                        }
+                    })
+                };
+            };
+
+            this.createPositionEmployeeWorkingIntervalFormModel = function (value) {
+                return {
+                    value: ko.observable(value).extend({
+                        required: {
+                            message: 'Обязательное поле'
+                        },
+                        validation: {
+                            validator: value => {
+                                if (!/^\d\d:\d\d – \d\d:\d\d$/.test(value)) {
+                                    return false;
+                                } else {
+                                    const boundaries = value.split(' – ');
+
+                                    if (boundaries[0] === boundaries[1]) {
+                                        return false;
+                                    }
+
+                                    return boundaries.every(b => moment(b, 'HH:mm', true).isValid());
+                                }
+                            },
+                            message: 'Неверный формат интервала'
+                        }
+                    })
+                };
+            };
+
             this.formModel = ko.validatedObservable({
-                positions: ko.observable([
-                    {
-                        name: 'Повар-пицмейкер',
-                        workloadType: 1,
-                        categories: null,
-                        units: ko.observable(1),
-                        workload: ko.observable(90),
-                        employeeCount: 3,
-                        estimatedHours: 36
-                    },
-                    {
-                        name: 'Повар-сушист',
-                        workloadType: 2,
-                        categories: [
-                            {name: 'Роллы открытые'},
-                            {name: 'Роллы закрытые'},
-                            {name: 'Гунканы'},
-                            {name: 'Суши'},
-                            {name: 'Сашими'}
-                        ],
-                        units: ko.observable(2),
-                        workload: ko.observable(10000),
-                        employeeCount: 3,
-                        estimatedHours: 36
-                    },
-                    {
-                        name: 'Мороженщик',
-                        workloadType: 1,
-                        categories: null,
-                        units: ko.observable(3),
-                        workload: ko.observable(2.2),
-                        employeeCount: 3,
-                        estimatedHours: 36
-                    }
-                ])
+                positions: ko.observable(positions.map(p => this.createPositionFormModel(p)))
             });
 
             this.buildForecast = function () {
                 this.isBuilt(true);
             };
 
+            this.calculateEmployees = function () {
+                this.isEmployeesCalculated(true);
+            };
+
+            this.recalculateEmployees = function () {
+                this.isEmployeesCalculated(false);
+
+                this.formModel().positions().forEach((position, index) => {
+                    position.employees(positions[index].employees.map(e => this.createPositionEmployeeFormModel(e)));
+                });
+
+                this.isEmployeesCalculated(true);
+            };
+
             this.formControlErrorStateMatcher = function (formControl) {
-                return ko.computed(() => {
+                return ko.pureComputed(() => {
                     return !formControl.isValid();
                 });
             };
 
-            this.footerTextHtml = ko.computed(() => {
+            this.addWorkingInterval = function (employee) {
+                employee.workingIntervals.push(this.createPositionEmployeeWorkingIntervalFormModel(''));
+            };
+
+            this.addEmployee = function (position) {
+                const index = Math.floor(Math.random() * 1000);
+
+                position.employees.push(this.createPositionEmployeeFormModel({
+                    name: position.name + ' #' + index,
+                    workingIntervals: [''],
+                    rate: position.rate() !== '' ? position.rate() : 600,
+                    returnRate: 30,
+                    salaryBulk: 7200,
+                    bonus: 100,
+                    fine: 20
+                }));
+            };
+
+            this.onRateInput = function (position) {
+                position.employees().forEach(employee => {
+                    employee.rate(position.rate());
+                });
+            };
+
+            this.onEmployeeRateInput = function (position) {
+                position.rate('');
+            };
+
+            this.footerTextHtml = ko.pureComputed(() => {
                if (this.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth) {
                    return 'Авторизация позволит <b>настраивать<br> должности</b> и <b>сохранять параметры</b> таблиц для следующих расчетов';
                } else {
@@ -89,8 +156,87 @@
                 }
             };
 
+            this.getEmployeeWorkingHours = function (employee) {
+                return ko.pureComputed(() => {
+                    if (employee.workingIntervalsValidationObject.isValid()) {
+                        return employee.workingIntervals().reduce((minutes, interval) => {
+                            const boundaries = interval.value().split(' – ').map(b => moment(b, 'HH:mm'));
+
+                            if (boundaries[0].isAfter(boundaries[1])) {
+                                boundaries[1].add(1, 'd');
+                            }
+
+                            return minutes + boundaries[1].diff(boundaries[0], 'minutes');
+                        }, 0);
+                    } else {
+                        return 0;
+                    }
+                });
+            };
+
+            this.getEmployeeSalaryBulk = function (employee) {
+                return ko.pureComputed(() => {
+                    const minutes = this.getEmployeeWorkingHours(employee)();
+
+                    return this.unmaskDecimal(employee.rate()) * (minutes / 60);
+                });
+            };
+
+            this.getEmployeeSalary = function (employee) {
+                return ko.pureComputed(() => {
+                    const bulk = this.getEmployeeSalaryBulk(employee)();
+                    const bonus = this.unmaskDecimal(employee.bonus());
+                    const fine = this.unmaskDecimal(employee.fine());
+
+                    return this.unmaskDecimal(bulk + bonus - fine);
+                });
+            };
+
+            this.getPositionMaxWorkingIntervalCount = function (position) {
+                return ko.pureComputed(() => {
+                    return Math.max(...position.employees().map(e => e.workingIntervals().length));
+                });
+            };
+
             this.getCategoriesTooltipText = function (categories) {
                 return categories.map(c => c.name).join(', ');
+            };
+
+            this.getUnitsSuffixHtml = function (units) {
+                switch (units) {
+                    case '1': return 'шт.';
+                    case '2': return '<i class="far fa-ruble-sign"></i>';
+                    case '3': return 'ч.';
+                }
+            };
+
+            this.formatDecimal = function (value) {
+                return Inputmask.format(value, {alias: 'decimal', digits: '2', groupSeparator: ' ', autoGroup: true, allowMinus: false}).replace('.00', '');
+            };
+
+            this.unmaskDecimal = function (value) {
+                const result = Inputmask.unmask(value, {alias: 'decimal', digits: '2', groupSeparator: ' ', autoGroup: true, allowMinus: false, unmaskAsNumber: true});
+
+                if (result === '') {
+                    return 0;
+                }
+
+                return result;
+            };
+
+            this.editableCellControlErrorExtractor = function (control) {
+                return ko.pureComputed(() => {
+                    return !control.isValid() ? {message: control.error()} : null;
+                });
+            };
+
+            this.formatDuration = function (minutes) {
+                let h = Math.floor(minutes / 60).toString();
+                h = h.length === 1 ? '0' + h : h;
+                let m = (minutes % 60).toString();
+                m = m.length === 1 ? '0' + m : m;
+
+                return h + ':' + m;
             };
 
             (() => {
@@ -98,7 +244,98 @@
             })();
         };
 
-        const viewModel = new ViewModel();
+        const viewModel = new ViewModel([
+            {
+                name: 'Повар-пицмейкер',
+                workloadType: 1,
+                categories: null,
+                units: 1,
+                workload: 90,
+                employees: [
+                    {
+                        name: 'Повар-пицмейкер #1',
+                        workingIntervals: ['11:00 – 23:00', '00:00 – 05:00'],
+                        rate: 600,
+                        returnRate: 30,
+                        salaryBulk: 7200,
+                        bonus: 100,
+                        fine: 20
+                    }
+                ],
+                estimatedHours: 36
+            },
+            {
+                name: 'Повар-сушист',
+                workloadType: 2,
+                categories: [
+                    {name: 'Роллы открытые'},
+                    {name: 'Роллы закрытые'},
+                    {name: 'Гунканы'},
+                    {name: 'Суши'},
+                    {name: 'Сашими'}
+                ],
+                units: 2,
+                workload: 10000,
+                employees: [
+                    {
+                        name: 'Повар-сушист #1',
+                        workingIntervals: ['11:00 – 23:00'],
+                        rate: 600,
+                        returnRate: 10000,
+                        salaryBulk: 7200,
+                        bonus: 100,
+                        fine: 20
+                    },
+                    {
+                        name: 'Повар-сушист #2',
+                        workingIntervals: ['11:00 – 23:00'],
+                        rate: 600,
+                        returnRate: 10000,
+                        salaryBulk: 7200,
+                        bonus: 100,
+                        fine: 20
+                    },
+                    {
+                        name: 'Повар-сушист #3',
+                        workingIntervals: ['11:00 – 23:00'],
+                        rate: 600,
+                        returnRate: 10000,
+                        salaryBulk: 7200,
+                        bonus: 100,
+                        fine: 20
+                    }
+                ],
+                estimatedHours: 36
+            },
+            {
+                name: 'Мороженщик',
+                workloadType: 1,
+                categories: null,
+                units: 3,
+                workload: 2.2,
+                employees: [
+                    {
+                        name: 'Мороженщик #1',
+                        workingIntervals: ['11:00 – 23:00'],
+                        rate: 600,
+                        returnRate: 10000,
+                        salaryBulk: 7200,
+                        bonus: 100,
+                        fine: 20
+                    },
+                    {
+                        name: 'Мороженщик #2',
+                        workingIntervals: ['11:00 – 23:00'],
+                        rate: 600,
+                        returnRate: 10000,
+                        salaryBulk: 7200,
+                        bonus: 100,
+                        fine: 20
+                    }
+                ],
+                estimatedHours: 36
+            }
+        ]);
 
         ViewModel.prototype.dispose = function() {
             $(window).off('resize', this.windowResizeHandler);
