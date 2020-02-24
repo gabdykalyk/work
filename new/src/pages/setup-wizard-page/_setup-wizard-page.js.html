@@ -6,7 +6,7 @@
                 this._subscriptions = [];
                 this.element = element;
                 this._categoryRowElements = categoryRowElements;
-                this._windowScrollHandler = () => {
+                this._bodyScrollHandler = () => {
                     this._updateActiveCategoryIndex();
                 };
                 this.activeCategoryIndex = ko.observable(null);
@@ -23,7 +23,7 @@
                         this._updateActiveCategoryIndex();
                     }));
 
-                    $(window).on('scroll', this._windowScrollHandler);
+                    $('.hrm-scaffold__body').on('scroll', this._bodyScrollHandler);
 
                     this._updateActiveCategoryIndex();
                 }
@@ -31,7 +31,7 @@
 
             _destroy() {
                 this._subscriptions.forEach(s => s.dispose());
-                $(window).off('scroll', this._windowScrollHandler);
+                $('.hrm-scaffold__body').off('scroll', this._bodyScrollHandler);
             }
 
             _updateActiveCategoryIndex() {
@@ -264,11 +264,17 @@
                 isTurnoverCalculated: ko.observable(false),
                 intervalStart: ko.observable('08:00').extend({
                     required: true,
-                    hrmTime: true
+                    hrmDate: {
+                        params: 'HH:mm',
+                        message: 'Неверный формат времени'
+                    }
                 }),
                 intervalEnd: ko.observable('20:00').extend({
                     required: true,
-                    hrmTime: true
+                    hrmDate: {
+                        params: 'HH:mm',
+                        message: 'Неверный формат времени'
+                    }
                 }),
                 schedule: [
                     ko.observableArray([]),
@@ -291,7 +297,7 @@
 
             this.isDishCategoriesStepSubmitted = ko.observable(false);
 
-            this.isDishCategoriesStepValid = ko.computed(() => {
+            this.isDishCategoriesStepValid = ko.pureComputed(() => {
                 return this.formModel().dishCategories().every(c => c.value() !== undefined);
             });
 
@@ -304,7 +310,7 @@
             };
 
             this.dishCategoriesStepFormControlErrorStateMatcher = function (formControl) {
-                return ko.computed(() => {
+                return ko.pureComputed(() => {
                     return this.isDishCategoriesStepSubmitted() && !formControl.isValid();
                 });
             };
@@ -320,16 +326,16 @@
             this.scheduleStepLastValidIntervalStart = ko.observable(this.formModel().intervalStart());
             this.scheduleStepLastValidIntervalEnd = ko.observable(this.formModel().intervalEnd());
 
-            this.isScheduleStepIntervalValid = ko.computed(() => {
+            this.isScheduleStepIntervalValid = ko.pureComputed(() => {
                 return this.formModel().intervalStart.isValid() &&
                        this.formModel().intervalEnd.isValid();
             });
 
-            this.isScheduleStepValid = ko.computed(() => {
+            this.isScheduleStepValid = ko.pureComputed(() => {
                 return this.isScheduleStepIntervalValid() && this.formModel().schedule.some(weekday => weekday().length > 0);
             });
 
-            this.scheduleStepUsedIntervalStart = ko.computed(() => {
+            this.scheduleStepUsedIntervalStart = ko.pureComputed(() => {
                 if (this.isScheduleStepIntervalValid()) {
                     return this.formModel().intervalStart();
                 } else {
@@ -337,7 +343,7 @@
                 }
             });
 
-            this.scheduleStepUsedIntervalEnd = ko.computed(() => {
+            this.scheduleStepUsedIntervalEnd = ko.pureComputed(() => {
                 if (this.isScheduleStepIntervalValid()) {
                     return this.formModel().intervalEnd();
                 } else {
@@ -346,7 +352,7 @@
             });
 
             this.scheduleStepIntervalBoundaryFormControlErrorStateMatcher = function (formControl) {
-                return ko.computed(() => {
+                return ko.pureComputed(() => {
                     return !formControl.isValid();
                 });
             };
@@ -396,7 +402,7 @@
                 this.turnoverStepLastHourTotals()[categoryIndex][hourIndex](hourTotal);
             };
 
-            this.turnoverStepIntervalHours = ko.computed(() => {
+            this.turnoverStepIntervalHours = ko.pureComputed(() => {
                 if (!this.formModel().intervalStart.isValid() || !this.formModel().intervalEnd.isValid()) {
                     return null;
                 }
@@ -597,7 +603,7 @@
             this.turnoverStepCategoriesWithFillingError = ko.observableArray([]);
 
             this.turnoverStepTableCategoryErrorExtractor = function (index) {
-                return ko.computed(() => {
+                return ko.pureComputed(() => {
                     if (this.turnoverStepCategoriesWithFillingError().includes(index)) {
                         return {message: 'Для автоматического заполнения данными, введите хотя бы одно значение'};
                     } else {
@@ -692,7 +698,7 @@
                 }
             };
 
-            this.isTurnoverStepValid = ko.computed(() => {
+            this.isTurnoverStepValid = ko.pureComputed(() => {
                 if (!this.formModel().isTurnoverCalculated()) {
                     return false;
                 }
@@ -830,7 +836,7 @@
 
             this.isPositionsStepSubmitted = ko.observable(false);
 
-            this.isPositionsStepValid = ko.computed(() => {
+            this.isPositionsStepValid = ko.pureComputed(() => {
                 return this.formModel().positions().every(p => p.name() !== '');
             });
 
@@ -843,7 +849,7 @@
             };
 
             this.positionsStepFormControlErrorStateMatcher = function (formControl) {
-                return ko.computed(() => {
+                return ko.pureComputed(() => {
                     return this.isPositionsStepSubmitted() && !formControl.isValid();
                 });
             };
@@ -858,7 +864,7 @@
 
             this.isWorkloadTypeStepSubmitted = ko.observable(false);
 
-            this.isWorkloadTypeStepValid = ko.computed(() => {
+            this.isWorkloadTypeStepValid = ko.pureComputed(() => {
                 return this.formModel().positions().every(position => {
                     return position.workloadType() !== '' &&
                            position.units() !== '' &&
@@ -868,7 +874,7 @@
             });
 
             this.workloadTypeStepFormControlErrorStateMatcher = function (formControl) {
-                return ko.computed(() => {
+                return ko.pureComputed(() => {
                     return this.isWorkloadTypeStepSubmitted() && !formControl.isValid();
                 });
             };
@@ -881,7 +887,7 @@
                 }
             };
 
-            this.maxAvailableStep = ko.computed(() => {
+            this.maxAvailableStep = ko.pureComputed(() => {
                 if (this.formModel().companyType() === null) {
                     return 1;
                 } else if (!this.isDishCategoriesStepValid()) {

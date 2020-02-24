@@ -149,11 +149,11 @@ function hrmFadeAfterAddFactory (duration = 200, delay = 0) {
 }
 
 
-ko.validation.rules['hrmTime'] = {
-    validator: function (val) {
-        return val.length === 5 && moment(val, 'HH:mm').isValid();
+ko.validation.rules['hrmDate'] = {
+    validator: function (val, params) {
+        return moment(val, params, true).isValid();
     },
-    message: 'Неверный формат времени'
+    message: 'Неверный формат даты и времени'
 };
 
 ko.validation.registerExtenders();

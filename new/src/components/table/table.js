@@ -11,20 +11,31 @@ ko.bindingHandlers.hrmTable = {
         constructor(element, error) {
             this._subscriptions = [];
             this._windowResizeHandler = null;
+            this._clickHandler = null;
             this._errorSubscription = null;
             this._error = error;
             this._isTabletOrMobile = null;
-            this.element = element;
-            this.focused = ko.observable(false);
             this._errorTippyInstance = null;
             this._errorTippyClickHandler = null;
+            this.element = element;
+            this.focused = ko.observable(false);
+            this.click = new ko.subscribable();
 
             this._init();
         }
 
         _init() {
             const $element = $(this.element);
+            const $content = $element.find('.hrm-table__editable-cell-content');
             $element.addClass('hrm-table__editable-cell');
+
+            this._clickHandler = event => {
+                if (event.target === $element[0] || ($content.length > 0 && event.target === $content[0])) {
+                    this.click.notifySubscribers();
+                }
+            };
+
+            $element.on('click', this._clickHandler);
 
             this._subscriptions.push(this.focused.subscribe(focused => {
                 $element.toggleClass('hrm-table__editable-cell--focused', focused);
@@ -114,10 +125,10 @@ ko.bindingHandlers.hrmTable = {
         }
 
         _onWindowResize(width, height) {
-            const isTableOrMobile = width <= HRM_BREAKPOINTS.tableMaxWidth;
+            const isTabletOrMobile = width <= HRM_BREAKPOINTS.tabletMaxWidth;
 
-            if (this._isTabletOrMobile !== isTableOrMobile) {
-                this._isTabletOrMobile = isTableOrMobile;
+            if (this._isTabletOrMobile !== isTabletOrMobile) {
+                this._isTabletOrMobile = isTabletOrMobile;
                 this._updateErrorView();
             }
         }
@@ -180,6 +191,7 @@ ko.bindingHandlers.hrmTable = {
 (() => {
     class ViewModel {
         constructor(element, owner) {
+            this._subscriptions = [];
             this._focusHandler = null;
             this._blurHandler = null;
             this.element = element;
@@ -198,6 +210,10 @@ ko.bindingHandlers.hrmTable = {
             $element.on('focus', this._focusHandler);
             $element.on('blur', this._blurHandler);
 
+            this._subscriptions.push(ko.unwrap(this._owner).click.subscribe(() => {
+                $element.focus();
+            }));
+
             ko.unwrap(this._owner).focused($element.is(':focus'));
         }
 
@@ -205,6 +221,7 @@ ko.bindingHandlers.hrmTable = {
             const $element = $(this.element);
             $element.off('focus', this._focusHandler);
             $element.off('blur', this._blurHandler);
+            this._subscriptions.forEach(s => s.dispose());
         }
     }
 
@@ -261,6 +278,10 @@ ko.bindingHandlers.hrmTable = {
             $element.on('select2:close', this._closeHandler);
 
             selectionFocused(select2Instance.$selection.is(':focus'));
+
+            this._subscriptions.push(ko.unwrap(this._owner).click.subscribe(() => {
+                select2Instance.open();
+            }));
         }
 
         _destroy() {
@@ -306,7 +327,11 @@ ko.bindingHandlers.hrmTable = {
             const $element = $(this.element);
             $element.addClass('hrm-table__sticky-section-container');
 
-            this._stickyEvents = new StickyEvents();
+            const scrollableContainer = $('.hrm-scaffold__body').length > 0 ? $('.hrm-scaffold__body')[0] : $('body')[0];
+
+            this._stickyEvents = new StickyEvents({
+                container: scrollableContainer
+            });
 
             this._stickyEvents.addStickies(this._sectionWrappers());
 
