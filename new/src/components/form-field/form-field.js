@@ -1,83 +1,174 @@
-let hrmFormFieldNextId = 0;
+// hrmFormField
+(() => {
+    class HrmFormFieldViewModel {
+        constructor(element, control, label) {
+            this._subscriptions = [];
+            this._$element = $(element);
+            this._control = control;
+            this._label = label;
 
-ko.components.register('hrm-form-field', {
-    viewModel: {
-        createViewModel: function (params, componentInfo) {
-            const $element = $(componentInfo.element);
+            this.element = element;
 
-            $element.addClass(['hrm-form-field']);
+            this._init();
+        }
 
-            if ('noLabel' in params && params.noLabel) {
-                $element.addClass(['hrm-form-field--no-label']);
+        _init() {
+            this._$element.addClass(['hrm-form-field', 'hrm-notransition']);
+
+            this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
+                this._$element.toggleClass('hrm-form-field--has-label', this._label !== undefined);
+
+                this._$element.toggleClass('hrm-form-field--focused', this._control().focused());
+                this._subscriptions.push(this._control().focused.subscribe(focused => {
+                    this._$element.toggleClass('hrm-form-field--focused', focused);
+                }));
+
+                this._$element.toggleClass('hrm-form-field--disabled', this._control().disabled());
+                this._subscriptions.push(this._control().disabled.subscribe(disabled => {
+                    this._$element.toggleClass('hrm-form-field--disabled', disabled);
+                }));
+
+                this._$element.toggleClass('hrm-form-field--should-label-float', this._control().shouldLabelFloat());
+                this._subscriptions.push(this._control().shouldLabelFloat.subscribe(shouldLabelFloat => {
+                    this._$element.toggleClass('hrm-form-field--should-label-float', shouldLabelFloat);
+                }));
+
+                setTimeout(() => {
+                    this._$element.removeClass('hrm-notransition');
+                })
+            }));
+        }
+
+        dispose() {
+            this._subscriptions.forEach(s => s.dispose());
+        }
+    }
+
+    ko.bindingHandlers.hrmFormField = {
+        init: function (element, valueAccessor, allBindings) {
+            const control = allBindings.get('hrmFormFieldControlRef');
+            const label = allBindings.get('hrmFormFieldLabelRef');
+            const viewModel = new HrmFormFieldViewModel(element, control, label);
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                viewModel.dispose();
+            });
+        }
+    };
+})();
+
+// hrmFormFieldLabel
+(() => {
+    class HrmFormFieldLabelViewModel {
+        constructor(element) {
+            this._subscriptions = [];
+            this._$element = $(element);
+
+            this.element = element;
+
+            this._init();
+        }
+
+        _init() {
+            this._$element.addClass('hrm-form-field__label');
+        }
+
+        setFor(id) {
+            this._$element.attr('for', id);
+        }
+
+        dispose() {
+            this._subscriptions.forEach(s => s.dispose());
+        }
+    }
+
+    ko.bindingHandlers.hrmFormFieldLabel = {
+        init: function (element, valueAccessor) {
+            const viewModel = new HrmFormFieldLabelViewModel(element);
+
+            if (valueAccessor() !== undefined) {
+                if (ko.isObservableArray(valueAccessor())) {
+                    valueAccessor().push(viewModel);
+                } else {
+                    valueAccessor()(viewModel);
+                }
             }
 
-            const ViewModel = function () {
-                this.subscriptions = [];
-                this.templateNodes = hrmSplitComponentTemplateNodes(componentInfo.templateNodes);
-                this.element = componentInfo.element;
-                this.controlWrapperElement = ko.observable(null);
-                this.controlId = 'hrm-form-field-control-' + hrmFormFieldNextId++;
-
-                this.hasError = (params !== undefined && 'hasError' in params) ? params.hasError : false;
-                this.focused = ko.observable(false);
-                this.hasValue = ko.observable(false);
-
-                this.afterRender = function () {
-                    $element.toggleClass('hrm-form-field--focused', this.focused());
-                    this.subscriptions.push(this.focused.subscribe(focused => {
-                        $element.toggleClass('hrm-form-field--focused', focused);
-                    }));
-
-                    $element.toggleClass('hrm-form-field--has-value', this.hasValue());
-                    this.subscriptions.push(this.hasValue.subscribe(hasValue => {
-                        $element.toggleClass('hrm-form-field--has-value', hasValue);
-                    }));
-
-                    if (!ko.isObservable(this.hasError)) {
-                        $element.toggleClass('hrm-form-field--has-error', this.hasError);
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                if (valueAccessor() !== undefined) {
+                    if (ko.isObservableArray(valueAccessor())) {
+                        valueAccessor().remove(this);
                     } else {
-                        $element.toggleClass('hrm-form-field--has-error', this.hasError());
-                        this.subscriptions.push(this.hasError.subscribe(hasError => {
-                            $element.toggleClass('hrm-form-field--has-error', hasError);
-                        }));
-                    }
-                };
-
-                if (params !== undefined && 'exportAs' in params) {
-                    if (ko.isObservableArray(params.exportAs)) {
-                        params.exportAs.push(this);
-                    } else {
-                        params.exportAs(this);
+                        valueAccessor()(null);
                     }
                 }
-            };
 
-            ViewModel.prototype.dispose = function() {
-                this.subscriptions.forEach(s => s.dispose());
-
-                if (params !== undefined && 'exportAs' in params) {
-                    if (ko.isObservableArray(params.exportAs)) {
-                        params.exportAs.remove(this);
-                    } else {
-                        params.exportAs(null);
-                    }
-                }
-            };
-
-            return new ViewModel();
+                viewModel.dispose();
+            });
         }
-    },
-    template: `
-        <!-- ko template: {afterRender: function () {afterRender();}} -->
-            <!-- ko template: {nodes: templateNodes.slots['label']} --><!-- /ko -->
-            <div class="hrm-form-field__control-wrapper" data-bind="hrmElement: controlWrapperElement">
-                <!-- ko template: {nodes: templateNodes.main} --><!-- /ko -->
-                <!-- ko template: {nodes: templateNodes.slots['suffix']} --><!-- /ko -->
-            </div>
-            <!-- ko template: {nodes: templateNodes.slots['error']} --><!-- /ko -->
-        <!-- /ko -->
-    `
-});
+    };
+})();
+
+// hrmFormFieldBasis
+(() => {
+    class HrmFormFieldBasisViewModel {
+        constructor(element, control) {
+            this._subscriptions = [];
+            this._$element = $(element);
+            this._control = control;
+            this._clickHandler = null;
+            this._mousedownHandler = null;
+
+            this.element = element;
+
+            this._init();
+        }
+
+        _init() {
+            this._$element.addClass('hrm-form-field__basis');
+
+            this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
+                this._$element.toggleClass('hrm-form-field__basis--focused', this._control().focused());
+                this._subscriptions.push(this._control().focused.subscribe(focused => {
+                    this._$element.toggleClass('hrm-form-field__basis--focused', focused);
+                }));
+
+                this._$element.toggleClass('hrm-form-field__basis--invalid', this._control().errorState());
+                this._subscriptions.push(this._control().errorState.subscribe(errorState => {
+                    this._$element.toggleClass('hrm-form-field__basis--invalid', errorState);
+                }));
+            }));
+
+            this._clickHandler = event => {
+                this._control().onBasisClick(event);
+            };
+
+            this._mousedownHandler = event => {
+                this._control().onBasisMousedown(event);
+            };
+
+            this._$element.on('click', this._clickHandler);
+            this._$element.on('mousedown', this._mousedownHandler);
+        }
+
+        dispose() {
+            this._subscriptions.forEach(s => s.dispose());
+            this._$element.off('click', this._clickHandler);
+            this._$element.off('mousedown', this._mousedownHandler);
+        }
+    }
+
+    ko.bindingHandlers.hrmFormFieldBasis = {
+        init: function (element, valueAccessor, allBindings) {
+            const control = allBindings.get('hrmFormFieldBasisControl');
+            const viewModel = new HrmFormFieldBasisViewModel(element, control);
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                viewModel.dispose();
+            });
+        }
+    };
+})();
 
 ko.components.register('hrm-form-field-error', {
     viewModel: {
@@ -97,190 +188,3 @@ ko.components.register('hrm-form-field-error', {
         </span>
     `
 });
-
-ko.bindingHandlers.hrmFormFieldInputControl = {
-    init: function(element, valueAccessor, allBindings) {
-        const subscriptions = [];
-
-        const formField = allBindings.get('hrmFormFieldInputControlOwner');
-        const value = allBindings.get('value') || allBindings.get('textInput');
-        const $wrapper = $(formField().controlWrapperElement());
-
-        const $element = $(element);
-        $element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_input']);
-        $element.attr('id', formField().controlId);
-
-        const wrapperClickHandler = () => $element.focus();
-        const focusHandler = () => formField().focused(true);
-        const blurHandler = () => formField().focused(false);
-        const valueHandler = event => {
-            const value = event.target.value;
-            formField().hasValue(value !== '');
-        };
-
-        $wrapper.on('click', wrapperClickHandler);
-        $element.on('focus', focusHandler);
-        $element.on('blur', blurHandler);
-        $element.on('input change', valueHandler);
-
-        formField().focused($element.is(':focus'));
-        formField().hasValue($element.val() !== '');
-
-        if (value !== undefined && ko.isObservable(value)) {
-            subscriptions.push(value.subscribe(v => {
-                formField().hasValue(v !== '');
-            }));
-        }
-
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-            $wrapper.off('click', wrapperClickHandler);
-            $element.off('focus', focusHandler);
-            $element.off('blur', blurHandler);
-            $element.off('input change', valueHandler);
-            subscriptions.forEach(s => s.dispose());
-        });
-    }
-};
-
-ko.bindingHandlers.hrmFormFieldSelectControl = {
-    init: function(element, valueAccessor, allBindings) {
-        const subscriptions = [];
-
-        const formField = allBindings.get('hrmFormFieldSelectControlOwner');
-        const $wrapper = $(formField().controlWrapperElement());
-
-        const $element = $(element);
-        const isMultiple = $element.prop('multiple');
-        const select2Instance = $element.data('select2');
-
-        const selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
-        const searchFocused = isMultiple ? ko.observable(select2Instance.selection.$search.is(':focus')) : null;
-        const dropdownOpened = ko.observable(false);
-
-        subscriptions.push(
-            ko.computed(() => selectionFocused() || dropdownOpened() || (searchFocused !== null && searchFocused()))
-                .subscribe(value => formField().focused(value))
-        );
-
-        $element.attr('id', formField().controlId);
-
-        select2Instance.$container.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_select']);
-        select2Instance.$dropdown.children().first().addClass(['hrm-form-field__dropdown']);
-
-        const emptyCheckFn = value => {
-            return value !== '' && value !== undefined && (!(value instanceof Array) || value.length !== 0);
-        };
-
-        const wrapperMousedownHandler = event => {
-            if (event.target !== element &&
-                select2Instance.$container.get()[0] !== event.target &&
-                select2Instance.$container.has(event.target).length === 0) {
-                const isOpen = select2Instance.isOpen();
-
-                setTimeout(() => {
-                    select2Instance.$selection.focus();
-
-                    if (!isOpen) {
-                        select2Instance.open();
-                    }
-                });
-            }
-        };
-        const selectionFocusHandler = () => selectionFocused(true);
-        const selectionBlurHandler = () => selectionFocused(false);
-        const searchFocusHandler = () => searchFocused(true);
-        const searchBlurHandler = () => searchFocused(false);
-        const openingHandler = () => dropdownOpened(true);
-        const closeHandler = () => dropdownOpened(false);
-        const changeHandler = () => {
-            const value = $element.val();
-            formField().hasValue(emptyCheckFn(value));
-        };
-        const searchUpdate = () => {
-            if (isMultiple) {
-                select2Instance.selection.$search.off('focus', searchFocusHandler);
-                select2Instance.selection.$search.off('blur', searchBlurHandler);
-
-                select2Instance.selection.$search.on('focus', searchFocusHandler);
-                select2Instance.selection.$search.on('blur', searchBlurHandler);
-            }
-        };
-
-        select2Instance.$selection.on('focus', selectionFocusHandler);
-        select2Instance.$selection.on('blur', selectionBlurHandler);
-        if (isMultiple) {
-            select2Instance.selection.$search.on('focus', searchFocusHandler);
-            select2Instance.selection.$search.on('blur', searchBlurHandler);
-        }
-        $wrapper.on('mousedown', wrapperMousedownHandler);
-        $element.on('change.select2', changeHandler);
-        $element.on('select2:opening', openingHandler);
-        $element.on('select2:close', closeHandler);
-        $element.on('hrm-select:search-update', searchUpdate);
-
-        formField().hasValue(emptyCheckFn($element.val()));
-
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-            subscriptions.forEach(s => s.dispose());
-            $wrapper.off('mousedown', wrapperMousedownHandler);
-            select2Instance.$selection.off('focus', selectionFocusHandler);
-            select2Instance.$selection.off('blur', selectionBlurHandler);
-            if (isMultiple) {
-                select2Instance.selection.$search.off('focus', searchFocusHandler);
-                select2Instance.selection.$search.off('blur', searchBlurHandler);
-            }
-            $(element).off('change.select2', changeHandler);
-            $element.off('select2:opening', openingHandler);
-            $element.off('select2:close', closeHandler);
-            $element.off('hrm-select:search-update', searchUpdate);
-        });
-    }
-};
-
-ko.bindingHandlers.hrmFormFieldDatepickerControl = {
-    init: function(element, valueAccessor, allBindings) {
-        const formField = allBindings.get('hrmFormFieldDatepickerControlOwner');
-        const $wrapper = $(formField().controlWrapperElement());
-
-        const $element = $(element);
-        $element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_datepicker']);
-        $element.attr('id', formField().controlId);
-
-        const daterangepickerInstance = $element.data('daterangepicker');
-
-        daterangepickerInstance.container.addClass('hrm-form-field__dropdown');
-
-        const wrapperClickHandler = () => $element.focus();
-        const focusHandler = () => formField().focused(true);
-        const blurHandler = () => formField().focused(false);
-        const valueHandler = event => {
-            const value = event.target.value;
-            formField().hasValue(value !== '');
-        };
-
-        $wrapper.on('click', wrapperClickHandler);
-        $element.on('focus', focusHandler);
-        $element.on('blur', blurHandler);
-        $element.on('input change', valueHandler);
-
-        formField().focused($element.is(':focus'));
-        formField().hasValue($element.val() !== '');
-
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
-            $wrapper.off('click', wrapperClickHandler);
-            $element.off('focus', focusHandler);
-            $element.off('blur', blurHandler);
-            $element.off('input change', valueHandler);
-        });
-    }
-};
-
-ko.bindingHandlers.hrmFormFieldLabel = {
-    init: function(element, valueAccessor, allBindings) {
-        const formField = allBindings.get('hrmFormFieldLabelOwner');
-
-        const $element = $(element);
-        $element.addClass('hrm-form-field__label');
-        $element.attr('for', formField().controlId);
-    }
-};

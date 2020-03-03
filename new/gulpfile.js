@@ -70,7 +70,16 @@ function compileScripts() {
 		.pipe(plumber())
 		.pipe(gulpif(!prod, sourcemaps.init()))
 		.pipe(babel({
-			presets: ['@babel/preset-env']
+			presets: [
+				[
+					'@babel/preset-env',
+					{
+						'targets': {
+							'node': '10'
+						}
+					}
+				]
+			]
 		}))
 		.pipe(concat(bundle))
 		.pipe(gulpif(!prod, sourcemaps.write('.')))

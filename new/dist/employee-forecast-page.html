@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="assets/fonts/fontawesome/css/all.css" />
 
 <link rel="stylesheet" href="assets/css/main.css" />
+
 </head>
 
 <body>
@@ -43,43 +44,30 @@
 
                 <div class="employee-forecast-page__form">
                     <div class="employee-forecast-page__form-header">
-                        <!-- ko let: {formField: ko.observable(null)} -->
-                            <div class="employee-forecast-page__date-form-field" data-bind="
-                                component: {
-                                    name: 'hrm-form-field',
-                                    params: {
-                                        hasError: $root.formControlErrorStateMatcher($root.date),
-                                        exportAs: formField
-                                    }
-                                }
-                            ">
-                                <hrm-slot name="label">
-                                    <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                        Расчёт на дату
-                                    </label>
-                                </hrm-slot>
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div class="employee-forecast-page__date-form-field"
+                                 data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                <label data-bind="hrmFormFieldLabel: label">Расчёт на дату</label>
 
-                                <input data-bind="
-                                    value: $root.date,
-                                    hrmDatepicker,
-                                    hrmFormFieldDatepickerControl,
-                                    hrmFormFieldDatepickerControlOwner: formField
-                                ">
-
-                                <hrm-slot name="suffix">
-                                    <i class="hrm-form-field__suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
-                                </hrm-slot>
-
-                                <hrm-slot name="error">
-                                    <div data-bind="
-                                        component: {name: 'hrm-form-field-error'},
-                                        hrmSlide,
-                                        hrmSlideValue: $root.formControlErrorStateMatcher($root.date),
-                                        hrmSlideDuration: 150
+                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                    <input data-bind="
+                                        textInput: $root.date,
+                                        hrmDatepicker,
+                                        hrmFormFieldDatepickerControl: control,
+                                        hrmFormFieldDatepickerControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
                                     ">
-                                        <!-- ko text: $root.date.error() --><!-- /ko -->
-                                    </div>
-                                </hrm-slot>
+
+                                    <i class="hrm-form-field__suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
+                                </div>
+
+                                <div data-bind="
+                                    component: {name: 'hrm-form-field-error'},
+                                    hrmSlide,
+                                    hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                                    hrmSlideDuration: 150
+                                ">
+                                    <!-- ko text: $root.date.error() --><!-- /ko -->
+                                </div>
                             </div>
                         <!-- /ko -->
 
@@ -802,29 +790,24 @@
                                                     <div class="employee-forecast-page__employees-table-position-section-body"
                                                          data-bind="hrmSlide, hrmSlideValue: isOpen() && employees().length > 0">
                                                         <div class="employee-forecast-page__employees-table-position-section-body-header">
-                                                            <!-- ko let: {formField: ko.observable(null)} -->
-                                                                <div class="employee-forecast-page__employees-table-position-section-body-header-rate-form-field" data-bind="
-                                                                    component: {
-                                                                        name: 'hrm-form-field',
-                                                                        params: {exportAs: formField}
-                                                                    }
-                                                                ">
-                                                                    <hrm-slot name="label">
-                                                                        <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                                                            Оклад, <i class="far fa-ruble-sign"></i>/час
-                                                                        </label>
-                                                                    </hrm-slot>
+                                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                                <div class="employee-forecast-page__employees-table-position-section-body-header-rate-form-field"
+                                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                                        Оклад, <i class="far fa-ruble-sign"></i>/час
+                                                                    </label>
 
-                                                                    <input data-bind="
-                                                                        textInput: position.rate,
-                                                                        event: {
-                                                                            input: function () {
-                                                                                $root.onRateInput(position);
-                                                                            }
-                                                                        },
-                                                                        hrmFormFieldInputControl,
-                                                                        hrmFormFieldInputControlOwner: formField
-                                                                    ">
+                                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                        <input data-bind="
+                                                                            textInput: position.rate,
+                                                                            event: {
+                                                                                input: function () {
+                                                                                    $root.onRateInput(position);
+                                                                                }
+                                                                            },
+                                                                            hrmFormFieldInputControl: control
+                                                                        ">
+                                                                    </div>
                                                                 </div>
                                                             <!-- /ko -->
 
@@ -1223,8 +1206,10 @@
 <script src="https://unpkg.com/sticky-events@3.1.1/dist/sticky-events.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 
 <script src="assets/js/main.js"></script>
+
     <script type="text/javascript">
     $(function () {
         const $page = $(document.documentElement);

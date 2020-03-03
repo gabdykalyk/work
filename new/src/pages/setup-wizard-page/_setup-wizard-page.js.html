@@ -204,7 +204,7 @@
                 }
             };
 
-            this.createDishCategoryFormModel = function (value) {
+            this.createDishCategoryFormModel = function (value = '') {
                 return {
                     value: ko.observable(value).extend({
                         required: {
@@ -225,7 +225,7 @@
                 }
             };
 
-            this.createPositionFormModel = function (name) {
+            this.createPositionFormModel = function (name = '') {
                 return {
                     name: ko.observable(name).extend({
                         required: {
@@ -837,7 +837,7 @@
             this.isPositionsStepSubmitted = ko.observable(false);
 
             this.isPositionsStepValid = ko.pureComputed(() => {
-                return this.formModel().positions().every(p => p.name() !== '');
+                return this.formModel().positions().every(p => p.name() !== '' && p.name() !== undefined);
             });
 
             this.positionsStepAdd = function () {
