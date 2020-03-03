@@ -187,18 +187,6 @@ function hrmTemplateIf(condition, data) {
 }
 "use strict";
 
-ko.components.register('hrm-basic-footer', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-basic-footer']);
-      return new function () {}();
-    }
-  },
-  template: "\n        <div class=\"hrm-basic-footer__branding\">\n            <div class=\"hrm-basic-footer__logo\"></div>\n            <span class=\"hrm-basic-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-basic-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
-});
-"use strict";
-
 ko.components.register('hrm-basic-sidebar', {
   viewModel: {
     createViewModel: function createViewModel(params, componentInfo) {
@@ -208,6 +196,18 @@ ko.components.register('hrm-basic-sidebar', {
     }
   },
   template: "\n        <button class=\"hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button\n                       hrm-circle-icon-button--theme_neutral hrm-basic-sidebar__logout-button\"\n                title=\"\u0412\u043E\u0439\u0442\u0438/\u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C\u0441\u044F\">\n        </button>\n        <a class=\"hrm-basic-sidebar__support-link\" href=\"#\" title=\"\u041F\u043E\u043C\u043E\u0449\u044C\"></a>\n    "
+});
+"use strict";
+
+ko.components.register('hrm-basic-footer', {
+  viewModel: {
+    createViewModel: function createViewModel(params, componentInfo) {
+      var $element = $(componentInfo.element);
+      $element.addClass(['hrm-basic-footer']);
+      return new function () {}();
+    }
+  },
+  template: "\n        <div class=\"hrm-basic-footer__branding\">\n            <div class=\"hrm-basic-footer__logo\"></div>\n            <span class=\"hrm-basic-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-basic-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
 });
 "use strict";
 
