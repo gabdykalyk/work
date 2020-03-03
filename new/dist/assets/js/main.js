@@ -852,6 +852,8 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
     _init() {
       this._$element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_input']);
 
+      this._$element.attr('autocomplete', false);
+
       this._$element.attr('id', this.id);
 
       this._control = ko.pureComputed(() => {
