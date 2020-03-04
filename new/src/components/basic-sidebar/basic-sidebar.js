@@ -9,8 +9,7 @@ ko.components.register('hrm-basic-sidebar', {
         }
     },
     template: `
-        <button class="hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button
-                       hrm-circle-icon-button--theme_neutral hrm-basic-sidebar__logout-button"
+        <button class="hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button hrm-basic-sidebar__logout-button"
                 title="Войти/зарегистрироваться">
         </button>
         <a class="hrm-basic-sidebar__support-link" href="#" title="Помощь"></a>

@@ -175,6 +175,23 @@ function hrmExtractComponentParam(params, name, defaultValue) {
 }
 "use strict";
 
+ko.components.register('hrm-basic-sidebar', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-basic-sidebar']);
+      return new function () {}();
+    }
+  },
+  template: `
+        <button class="hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button hrm-basic-sidebar__logout-button"
+                title="Войти/зарегистрироваться">
+        </button>
+        <a class="hrm-basic-sidebar__support-link" href="#" title="Помощь"></a>
+    `
+});
+"use strict";
+
 ko.components.register('hrm-basic-footer', {
   viewModel: {
     createViewModel: function (params, componentInfo) {
@@ -189,24 +206,6 @@ ko.components.register('hrm-basic-footer', {
             <span class="hrm-basic-footer__copyright">© Lookin, 2020</span>
         </div>
         <a class="hrm-basic-footer__support-link" href="#">Техническая поддержка</a>
-    `
-});
-"use strict";
-
-ko.components.register('hrm-basic-sidebar', {
-  viewModel: {
-    createViewModel: function (params, componentInfo) {
-      const $element = $(componentInfo.element);
-      $element.addClass(['hrm-basic-sidebar']);
-      return new function () {}();
-    }
-  },
-  template: `
-        <button class="hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button
-                       hrm-circle-icon-button--theme_neutral hrm-basic-sidebar__logout-button"
-                title="Войти/зарегистрироваться">
-        </button>
-        <a class="hrm-basic-sidebar__support-link" href="#" title="Помощь"></a>
     `
 });
 "use strict";
@@ -851,8 +850,6 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 
     _init() {
       this._$element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_input']);
-
-      this._$element.attr('autocomplete', false);
 
       this._$element.attr('id', this.id);
 
@@ -3083,7 +3080,7 @@ ko.bindingHandlers.hrmTable = {
         interactive: true,
         appendTo: document.body,
         boundary: 'viewport',
-        hideOnClick: this._mode === 'basic',
+        hideOnClick: true,
         trigger: this._mode === 'basic' ? 'mouseenter click' : 'manual',
         onCreate: instance => {
           $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
