@@ -1,6 +1,6 @@
 "use strict";
 
-var HRM_BREAKPOINTS = {
+const HRM_BREAKPOINTS = {
   tabletMaxWidth: 1219,
   mobileMaxWidth: 767
 };
@@ -8,17 +8,12 @@ ko.validation.init({
   insertMessages: false
 });
 moment.locale('ru');
+const HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY = 'hrmSidebarCollapsed';
 "use strict";
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 ko.bindingHandlers.hrmSlide = {
-  init: function init(element, valueAccessor, allBindings) {
-    var value = ko.unwrap(allBindings.get('hrmSlideValue'));
+  init: function (element, valueAccessor, allBindings) {
+    const value = ko.unwrap(allBindings.get('hrmSlideValue'));
 
     if (value) {
       $(element).slideDown(0);
@@ -31,9 +26,9 @@ ko.bindingHandlers.hrmSlide = {
       $(element).removeData('hrmSlide');
     });
   },
-  update: function update(element, valueAccessor, allBindings) {
-    var value = ko.unwrap(allBindings.get('hrmSlideValue'));
-    var duration = allBindings.get('hrmSlideDuration') || 200;
+  update: function (element, valueAccessor, allBindings) {
+    const value = ko.unwrap(allBindings.get('hrmSlideValue'));
+    const duration = allBindings.get('hrmSlideDuration') || 200;
 
     if ($(element).data('hrmSlide') !== value) {
       if (value) {
@@ -47,8 +42,8 @@ ko.bindingHandlers.hrmSlide = {
   }
 };
 ko.bindingHandlers.hrmFade = {
-  init: function init(element, valueAccessor, allBindings) {
-    var value = ko.unwrap(allBindings.get('hrmFadeValue'));
+  init: function (element, valueAccessor, allBindings) {
+    const value = ko.unwrap(allBindings.get('hrmFadeValue'));
 
     if (value) {
       $(element).fadeIn(0);
@@ -61,11 +56,11 @@ ko.bindingHandlers.hrmFade = {
       $(element).removeData('hrmFade');
     });
   },
-  update: function update(element, valueAccessor, allBindings) {
-    var value = ko.unwrap(allBindings.get('hrmFadeValue'));
-    var duration = allBindings.get('hrmFadeDuration') || 200;
-    var inDelay = allBindings.get('hrmFadeInDelay') || 0;
-    var outDelay = allBindings.get('hrmFadeOutDelay') || 0;
+  update: function (element, valueAccessor, allBindings) {
+    const value = ko.unwrap(allBindings.get('hrmFadeValue'));
+    const duration = allBindings.get('hrmFadeDuration') || 200;
+    const inDelay = allBindings.get('hrmFadeInDelay') || 0;
+    const outDelay = allBindings.get('hrmFadeOutDelay') || 0;
 
     if ($(element).data('hrmFade') !== value) {
       if (value) {
@@ -79,7 +74,7 @@ ko.bindingHandlers.hrmFade = {
   }
 };
 ko.bindingHandlers.hrmElement = {
-  init: function init(element, valueAccessor, allBindings) {
+  init: function (element, valueAccessor, allBindings) {
     if (ko.isObservableArray(valueAccessor())) {
       if (allBindings.has('hrmElementIndex')) {
         valueAccessor().splice(allBindings.get('hrmElementIndex'), 0, element);
@@ -100,21 +95,22 @@ ko.bindingHandlers.hrmElement = {
   }
 };
 ko.bindingHandlers.hrmMask = {
-  init: function init(element, valueAccessor, allBindings) {
-    var pattern = allBindings.get('hrmMaskPattern');
-    var options = allBindings.get('hrmMaskOptions');
-    $(element).inputmask(pattern, _objectSpread({
+  init: function (element, valueAccessor, allBindings) {
+    const pattern = allBindings.get('hrmMaskPattern');
+    const options = allBindings.get('hrmMaskOptions');
+    $(element).inputmask(pattern, {
       jitMasking: true,
       showMaskOnFocus: false,
-      showMaskOnHover: false
-    }, options));
+      showMaskOnHover: false,
+      ...options
+    });
   }
 };
 ko.bindingHandlers.hrmTimeAutocompleter = {
-  init: function init(element) {
-    $(element).on('blur', function () {
-      var value = $(element).val();
-      var regExpExecuteResult = /^([0-9]{2}):\s$/.exec(value);
+  init: function (element) {
+    $(element).on('blur', () => {
+      const value = $(element).val();
+      const regExpExecuteResult = /^([0-9]{2}):\s$/.exec(value);
 
       if (regExpExecuteResult !== null && +regExpExecuteResult[1] < 24) {
         $(element).val(regExpExecuteResult[1] + ':00').trigger('change');
@@ -124,58 +120,38 @@ ko.bindingHandlers.hrmTimeAutocompleter = {
 };
 
 function hrmSplitComponentTemplateNodes(nodes) {
-  var result = {
+  const result = {
     main: [],
     slots: {}
   };
-  $(nodes).filter('hrm-slot').each(function (index, slotElement) {
-    var $slot = $(slotElement);
+  $(nodes).filter('hrm-slot').each((index, slotElement) => {
+    const $slot = $(slotElement);
     result.slots[$slot.attr('name')] = $slot.contents();
   });
-  result.main = nodes.filter(function (node) {
+  result.main = nodes.filter(node => {
     return !(node.nodeType === 1 && node.tagName === 'HRM-SLOT');
   });
   return result;
 }
 
-function hrmSlideBeforeRemoveFactory() {
-  var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
-  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  return function (element) {
-    return $(element).delay(delay).slideUp(duration, function () {
-      return $(element).remove();
-    });
-  };
+function hrmSlideBeforeRemoveFactory(duration = 200, delay = 0) {
+  return element => $(element).delay(delay).slideUp(duration, () => $(element).remove());
 }
 
-function hrmSlideAfterAddFactory() {
-  var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
-  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  return function (element) {
-    return $(element).hide().delay(delay).slideDown(duration);
-  };
+function hrmSlideAfterAddFactory(duration = 200, delay = 0) {
+  return element => $(element).hide().delay(delay).slideDown(duration);
 }
 
-function hrmFadeBeforeRemoveFactory() {
-  var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
-  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  return function (element) {
-    return $(element).delay(delay).fadeOut(duration, function () {
-      return $(element).remove();
-    });
-  };
+function hrmFadeBeforeRemoveFactory(duration = 200, delay = 0) {
+  return element => $(element).delay(delay).fadeOut(duration, () => $(element).remove());
 }
 
-function hrmFadeAfterAddFactory() {
-  var duration = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 200;
-  var delay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-  return function (element) {
-    return $(element).hide().delay(delay).fadeIn(duration);
-  };
+function hrmFadeAfterAddFactory(duration = 200, delay = 0) {
+  return element => $(element).hide().delay(delay).fadeIn(duration);
 }
 
 ko.validation.rules['hrmDate'] = {
-  validator: function validator(val, params) {
+  validator: function (val, params) {
     return moment(val, params, true).isValid();
   },
   message: 'Неверный формат даты и времени'
@@ -185,41 +161,63 @@ ko.validation.registerExtenders();
 function hrmTemplateIf(condition, data) {
   return condition ? [data] : undefined;
 }
-"use strict";
 
-ko.components.register('hrm-basic-sidebar', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-basic-sidebar']);
-      return new function () {}();
+function hrmExtractComponentParam(params, name, defaultValue) {
+  if (params !== undefined && name in params) {
+    if (ko.isObservable(params[name])) {
+      return params[name];
+    } else {
+      return ko.observable(params[name]);
     }
-  },
-  template: "\n        <button class=\"hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button\n                       hrm-circle-icon-button--theme_neutral hrm-basic-sidebar__logout-button\"\n                title=\"\u0412\u043E\u0439\u0442\u0438/\u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C\u0441\u044F\">\n        </button>\n        <a class=\"hrm-basic-sidebar__support-link\" href=\"#\" title=\"\u041F\u043E\u043C\u043E\u0449\u044C\"></a>\n    "
-});
+  } else {
+    return ko.observable(defaultValue);
+  }
+}
 "use strict";
 
 ko.components.register('hrm-basic-footer', {
   viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
       $element.addClass(['hrm-basic-footer']);
       return new function () {}();
     }
   },
-  template: "\n        <div class=\"hrm-basic-footer__branding\">\n            <div class=\"hrm-basic-footer__logo\"></div>\n            <span class=\"hrm-basic-footer__copyright\">\xA9 Lookin, 2020</span>\n        </div>\n        <a class=\"hrm-basic-footer__support-link\" href=\"#\">\u0422\u0435\u0445\u043D\u0438\u0447\u0435\u0441\u043A\u0430\u044F \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u043A\u0430</a>\n    "
+  template: `
+        <div class="hrm-basic-footer__branding">
+            <div class="hrm-basic-footer__logo"></div>
+            <span class="hrm-basic-footer__copyright">© Lookin, 2020</span>
+        </div>
+        <a class="hrm-basic-footer__support-link" href="#">Техническая поддержка</a>
+    `
+});
+"use strict";
+
+ko.components.register('hrm-basic-sidebar', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-basic-sidebar']);
+      return new function () {}();
+    }
+  },
+  template: `
+        <button class="hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button
+                       hrm-circle-icon-button--theme_neutral hrm-basic-sidebar__logout-button"
+                title="Войти/зарегистрироваться">
+        </button>
+        <a class="hrm-basic-sidebar__support-link" href="#" title="Помощь"></a>
+    `
 });
 "use strict";
 
 ko.components.register('hrm-checkbox', {
   viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
       $element.addClass(['hrm-checkbox']);
 
-      var ViewModel = function ViewModel() {
-        var _this = this;
-
+      const ViewModel = function () {
         this._subscriptions = [];
 
         if (params !== undefined && 'checked' in params) {
@@ -230,44 +228,45 @@ ko.components.register('hrm-checkbox', {
 
         this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
 
-        (function () {
-          $element.toggleClass('hrm-checkbox--checked', _this.checked());
+        (() => {
+          $element.toggleClass('hrm-checkbox--checked', this.checked());
 
-          _this._subscriptions.push(_this.checked.subscribe(function (checked) {
+          this._subscriptions.push(this.checked.subscribe(checked => {
             $element.toggleClass('hrm-checkbox--checked', checked);
           }));
         })();
       };
 
       ViewModel.prototype.dispose = function () {
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
+        this._subscriptions.forEach(s => s.dispose());
       };
 
       return new ViewModel();
     }
   },
-  template: "\n        <label class=\"hrm-checkbox__layout\">\n            <input data-bind=\"checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}\"\n                   type=\"checkbox\" hidden>\n        </label>\n    "
+  template: `
+        <label class="hrm-checkbox__layout">
+            <input data-bind="checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}"
+                   type="checkbox" hidden>
+        </label>
+    `
 });
-var hrmCheckboxGroupNextId = 0;
+let hrmCheckboxGroupNextId = 0;
 ko.components.register('hrm-checkbox-group', {
   viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
       $element.addClass(['hrm-checkbox-group']);
 
-      var ViewModel = function ViewModel() {
-        var _this2 = this;
-
+      const ViewModel = function () {
         this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
 
-        (function () {
+        (() => {
           if (params !== undefined && 'exportAs' in params) {
             if (ko.isObservableArray(params.exportAs)) {
-              params.exportAs.push(_this2);
+              params.exportAs.push(this);
             } else {
-              params.exportAs(_this2);
+              params.exportAs(this);
             }
           }
         })();
@@ -286,31 +285,23 @@ ko.components.register('hrm-checkbox-group', {
       return new ViewModel();
     }
   },
-  template: "\n        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->\n    "
+  template: `
+        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->
+    `
 });
 ko.bindingHandlers.hrmCheckboxGroupLabel = {
-  init: function init(element, valueAccessor, allBindings) {
-    var checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
-    var $element = $(element);
+  init: function (element, valueAccessor, allBindings) {
+    const checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
+    const $element = $(element);
     $element.addClass('hrm-checkbox-group__label');
     $element.attr('for', checkboxGroup().id);
   }
 };
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-(function () {
-  var HrmDatepickerViewModel =
-  /*#__PURE__*/
-  function () {
-    function HrmDatepickerViewModel(element, value) {
-      _classCallCheck(this, HrmDatepickerViewModel);
-
+(() => {
+  class HrmDatepickerViewModel {
+    constructor(element, value) {
       this._subscriptions = [];
       this._valueSubscription = null;
       this._value = null;
@@ -321,87 +312,75 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       this._init(value);
     }
 
-    _createClass(HrmDatepickerViewModel, [{
-      key: "_init",
-      value: function _init(value) {
-        var _this = this;
-
-        var $element = $(this.element);
-        $element.attr('autocomplete', 'off');
-        $element.daterangepicker({
-          singleDatePicker: true,
-          showDropdown: false,
-          autoUpdateInput: false,
-          locale: {
-            format: 'DD.MM.YYYY, dddd',
-            monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-            daysOfWeek: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-            firstDay: 1
-          }
-        });
-
-        this._applyHandler = function () {
-          var newValue = _this._daterangepicker.startDate.format(_this._daterangepicker.locale.format);
-
-          if (newValue !== $element.val()) {
-            $element.val(newValue).trigger('change');
-          }
-        };
-
-        $element.on('apply.daterangepicker', this._applyHandler);
-        this._daterangepicker = $element.data('daterangepicker');
-
-        this._daterangepicker.container.addClass('hrm-datepicker');
-
-        this._setValue(value);
-      }
-    }, {
-      key: "_setValue",
-      value: function _setValue(value) {
-        var _this2 = this;
-
-        if (this._valueSubscription !== null) {
-          this._valueSubscription.dispose();
-
-          this._valueSubscription = null;
+    _init(value) {
+      const $element = $(this.element);
+      $element.attr('autocomplete', 'off');
+      $element.daterangepicker({
+        singleDatePicker: true,
+        showDropdown: false,
+        autoUpdateInput: false,
+        locale: {
+          format: 'DD.MM.YYYY, dddd',
+          monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+          daysOfWeek: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+          firstDay: 1
         }
+      });
 
-        if (value !== undefined) {
-          if (ko.isObservable(value)) {
-            this._valueSubscription = value.subscribe(function (v) {
-              _this2._daterangepicker.elementChanged();
-            });
-          } else {
+      this._applyHandler = () => {
+        let newValue = this._daterangepicker.startDate.format(this._daterangepicker.locale.format);
+
+        if (newValue !== $element.val()) {
+          $element.val(newValue).trigger('change');
+        }
+      };
+
+      $element.on('apply.daterangepicker', this._applyHandler);
+      this._daterangepicker = $element.data('daterangepicker');
+
+      this._daterangepicker.container.addClass('hrm-datepicker');
+
+      this._setValue(value);
+    }
+
+    _setValue(value) {
+      if (this._valueSubscription !== null) {
+        this._valueSubscription.dispose();
+
+        this._valueSubscription = null;
+      }
+
+      if (value !== undefined) {
+        if (ko.isObservable(value)) {
+          this._valueSubscription = value.subscribe(v => {
             this._daterangepicker.elementChanged();
-          }
+          });
+        } else {
+          this._daterangepicker.elementChanged();
         }
-
-        this._value = value;
       }
-    }, {
-      key: "_destroy",
-      value: function _destroy() {
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
 
-        if (this._valueSubscription !== null) {
-          this._valueSubscription.dispose();
-        }
+      this._value = value;
+    }
 
-        $element.off('apply.daterangepicker', this._applyHandler);
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      if (this._valueSubscription !== null) {
+        this._valueSubscription.dispose();
       }
-    }]);
 
-    return HrmDatepickerViewModel;
-  }();
+      $element.off('apply.daterangepicker', this._applyHandler);
+    }
 
-  var instances = new Map();
-  var previousBindingsList = new Map();
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
   ko.bindingHandlers.hrmDatepicker = {
-    init: function init(element, valueAccessor, allBindings) {
-      var value = allBindings.get('value');
-      var viewModel = new HrmDatepickerViewModel(element, value);
+    init: function (element, valueAccessor, allBindings) {
+      const value = allBindings.get('value');
+      const viewModel = new HrmDatepickerViewModel(element, value);
       instances.set(element, viewModel);
 
       if (valueAccessor() !== undefined) {
@@ -424,9 +403,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         viewModel._destroy();
       });
     },
-    update: function update(element, valueAccessor, allBindings) {
-      var instance = instances.get(element);
-      var previousBindings = previousBindingsList.get(element);
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
 
       if (previousBindings !== undefined) {
         if (previousBindings['value'] !== allBindings.get('value')) {
@@ -440,341 +419,1778 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 })();
 "use strict";
 
-var hrmFormFieldNextId = 0;
-ko.components.register('hrm-form-field', {
-  viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
-      $element.addClass(['hrm-form-field']);
+// hrmDropdownMenu
+(() => {
+  class HrmDropdownMenuViewModel {
+    constructor(element, context, template, placement) {
+      this._subscriptions = [];
+      this._template = template;
+      this._placement = placement;
+      this._context = context;
+      this.element = element;
+      this._tippyInstance = null;
+      this._tooltipClickHandler = null;
 
-      if ('noLabel' in params && params.noLabel) {
-        $element.addClass(['hrm-form-field--no-label']);
+      this._init();
+    }
+
+    _init() {
+      let hidingFlag = false;
+
+      this._tooltipClickHandler = event => {
+        const $target = $(event.target);
+
+        if ($target.is('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)') || $target.parents('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)').length > 0) {
+          this._tippyInstance.hide();
+        }
+      };
+
+      this._tippyInstance = tippy(this.element, {
+        content: this._createContent(document.getElementById(this._template).innerHTML),
+        arrow: false,
+        distance: 7,
+        interactive: true,
+        placement: this._placement !== undefined ? this._placement : 'bottom',
+        appendTo: document.body,
+        boundary: 'viewport',
+        hideOnClick: true,
+        trigger: 'click',
+        onCreate: instance => {
+          $(instance.popperChildren.tooltip).addClass('hrm-dropdown-menu');
+          $(instance.popperChildren.tooltip).on('click', this._tooltipClickHandler);
+        },
+        onShow: () => {
+          return !hidingFlag;
+        },
+        onMount: instance => {
+          $(instance.popperChildren.content).find('.hrm-dropdown-menu__content').overlayScrollbars({});
+          ko.applyBindingsToDescendants(this._context, instance.popperChildren.content);
+          setTimeout(() => {
+            instance.popperInstance.update();
+          });
+        },
+        onHide: () => {
+          hidingFlag = true;
+        },
+        onHidden: instance => {
+          // Хак, чтобы tippy пересоздал содержимое и можно было применить заново биндинги Knockout
+          instance.setContent(this._createContent(document.getElementById(this._template).innerHTML));
+          hidingFlag = false;
+        }
+      });
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._tippyInstance.destroy();
+    }
+
+    _createContent(template) {
+      return $('<div>').addClass('hrm-dropdown-menu__content').append(template).get()[0];
+    }
+
+  }
+
+  ko.bindingHandlers.hrmDropdownMenu = {
+    init: function (element, valueAccessor, allBindings, _, bindingContext) {
+      const template = allBindings.get('hrmDropdownMenuTemplate');
+      const placement = allBindings.get('hrmDropdownMenuPlacement');
+      const viewModel = new HrmDropdownMenuViewModel(element, bindingContext, template, placement);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
       }
 
-      var ViewModel = function ViewModel() {
-        this.subscriptions = [];
-        this.templateNodes = hrmSplitComponentTemplateNodes(componentInfo.templateNodes);
-        this.element = componentInfo.element;
-        this.controlWrapperElement = ko.observable(null);
-        this.controlId = 'hrm-form-field-control-' + hrmFormFieldNextId++;
-        this.hasError = params !== undefined && 'hasError' in params ? params.hasError : false;
-        this.focused = ko.observable(false);
-        this.hasValue = ko.observable(false);
-
-        this.afterRender = function () {
-          $element.toggleClass('hrm-form-field--focused', this.focused());
-          this.subscriptions.push(this.focused.subscribe(function (focused) {
-            $element.toggleClass('hrm-form-field--focused', focused);
-          }));
-          $element.toggleClass('hrm-form-field--has-value', this.hasValue());
-          this.subscriptions.push(this.hasValue.subscribe(function (hasValue) {
-            $element.toggleClass('hrm-form-field--has-value', hasValue);
-          }));
-
-          if (!ko.isObservable(this.hasError)) {
-            $element.toggleClass('hrm-form-field--has-error', this.hasError);
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
           } else {
-            $element.toggleClass('hrm-form-field--has-error', this.hasError());
-            this.subscriptions.push(this.hasError.subscribe(function (hasError) {
-              $element.toggleClass('hrm-form-field--has-error', hasError);
-            }));
-          }
-        };
-
-        if (params !== undefined && 'exportAs' in params) {
-          if (ko.isObservableArray(params.exportAs)) {
-            params.exportAs.push(this);
-          } else {
-            params.exportAs(this);
+            valueAccessor()(null);
           }
         }
-      };
 
-      ViewModel.prototype.dispose = function () {
-        this.subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
-
-        if (params !== undefined && 'exportAs' in params) {
-          if (ko.isObservableArray(params.exportAs)) {
-            params.exportAs.remove(this);
-          } else {
-            params.exportAs(null);
-          }
-        }
-      };
-
-      return new ViewModel();
+        viewModel._destroy();
+      });
     }
-  },
-  template: "\n        <!-- ko template: {afterRender: function () {afterRender();}} -->\n            <!-- ko template: {nodes: templateNodes.slots['label']} --><!-- /ko -->\n            <div class=\"hrm-form-field__control-wrapper\" data-bind=\"hrmElement: controlWrapperElement\">\n                <!-- ko template: {nodes: templateNodes.main} --><!-- /ko -->\n                <!-- ko template: {nodes: templateNodes.slots['suffix']} --><!-- /ko -->\n            </div>\n            <!-- ko template: {nodes: templateNodes.slots['error']} --><!-- /ko -->\n        <!-- /ko -->\n    "
-});
+  };
+})();
+"use strict";
+
+// hrmFormFieldComplexControl
+(() => {
+  let nextId = 0;
+
+  class HrmFormFieldComplexControlViewModel {
+    constructor(element, disabled) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this._disabled = null;
+      this._disabledSubscription = null;
+      this.element = element;
+      this.id = 'hrm-form-field-complex-control-' + nextId++;
+      this.focused = null;
+      this.disabled = null;
+      this.shouldLabelFloat = null;
+      this.errorState = null;
+
+      this._init(disabled);
+    }
+
+    _init(disabled) {
+      this._$element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_complex']);
+
+      this.focused = ko.observable(false);
+      this.disabled = ko.observable(false);
+      this.shouldLabelFloat = ko.observable(true);
+      this.errorState = ko.observable(false);
+
+      this._setDisabled(disabled);
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+    }
+
+    onBasisClick() {}
+
+    onBasisMousedown() {}
+
+    _setDisabled(disabled) {
+      if (this._disabledSubscription !== null) {
+        this._disabledSubscription.dispose();
+      }
+
+      if (ko.isObservable(disabled)) {
+        this._disabledSubscription = disabled.subscribe(disabled => {
+          this._disabled = disabled;
+
+          this._updateDisabled();
+        });
+        this._disabled = disabled();
+      } else {
+        this._disabled = disabled;
+      }
+
+      this._updateDisabled();
+    }
+
+    _updateDisabled() {
+      this.disabled(this._disabled === true);
+    }
+
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
+  ko.bindingHandlers.hrmFormFieldComplexControl = {
+    init: function (element, valueAccessor, allBindings) {
+      const disabled = allBindings.get('hrmFormFieldComplexControlDisabled');
+      const viewModel = new HrmFormFieldComplexControlViewModel(element, disabled);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel.dispose();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['hrmFormFieldComplexControlDisabled'] !== allBindings.get('hrmFormFieldComplexControlDisabled')) {
+          instance._setDisabled(allBindings.get('hrmFormFieldComplexControlDisabled'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
+"use strict";
+
+// hrmFormFieldDatepickerControl
+(() => {
+  let nextId = 0;
+
+  class HrmFormFieldDatepickerControlViewModel {
+    constructor(element, value, textInput, errorStateMatcher) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this._focusChangeHandler = null;
+      this._valueChangeHandler = null;
+      this._mutationObserver = null;
+      this._errorStateMatcher = ko.observable(errorStateMatcher);
+      this._value = ko.observable(value);
+      this._textInput = ko.observable(textInput);
+      this._control = null;
+      this._daterangepickerInstance = null;
+      this.element = element;
+      this.id = 'hrm-form-field-input-control-' + nextId++;
+      this.focused = null;
+      this.disabled = null;
+      this.shouldLabelFloat = null;
+      this.errorState = null;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_input']);
+
+      this._$element.attr('id', this.id);
+
+      this._daterangepickerInstance = this._$element.data('daterangepicker');
+
+      this._daterangepickerInstance.container.addClass('hrm-form-field__dropdown');
+
+      this._control = ko.pureComputed(() => {
+        if (this._value() !== undefined) {
+          return this._value();
+        } else if (this._textInput() !== undefined) {
+          return this._textInput();
+        } else {
+          return null;
+        }
+      });
+      this.focused = ko.observable(this._hasFocus());
+      this.disabled = ko.observable(this._isDisabled());
+      const hasValue = ko.observable(this._hasValue());
+      const hasPlaceholder = ko.observable(this._hasPlaceholder());
+
+      this._focusChangeHandler = () => this.focused(this._hasFocus());
+
+      this._valueChangeHandler = () => hasValue(this._hasValue());
+
+      this._mutationObserver = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'attributes') {
+            hasPlaceholder(this._hasPlaceholder());
+            this.disabled(this._isDisabled());
+          }
+        });
+      });
+
+      this._mutationObserver.observe(this.element, {
+        attributes: true
+      });
+
+      this.shouldLabelFloat = ko.pureComputed(() => {
+        return this.focused() || hasValue() || hasPlaceholder();
+      });
+      this.errorState = ko.pureComputed(() => {
+        const errorStateMatcher = this._errorStateMatcher();
+
+        const control = this._control();
+
+        return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
+      });
+
+      this._$element.on('focus blur', this._focusChangeHandler);
+
+      this._$element.on('input change', this._valueChangeHandler);
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._$element.off('focus blur', this._focusChangeHandler);
+
+      this._$element.off('input change', this._valueChangeHandler);
+
+      this._mutationObserver.disconnect();
+    }
+
+    onBasisClick() {
+      this._$element.focus();
+    }
+
+    onBasisMousedown() {}
+
+    _setValue(value) {
+      if (!ko.isObservable(value)) {
+        throw Error('\'value\' binding have to be observable.');
+      }
+
+      this._value(value);
+    }
+
+    _setTextInput(textInput) {
+      if (!ko.isObservable(textInput)) {
+        throw Error('\'textInput\' binding have to be observable.');
+      }
+
+      this._textInput(textInput);
+    }
+
+    _setErrorStateMatcher(errorStateMatcher) {
+      this._errorStateMatcher(errorStateMatcher);
+    }
+
+    _hasFocus() {
+      return this._$element.is(':focus');
+    }
+
+    _hasValue() {
+      return this._$element.val() !== '';
+    }
+
+    _hasPlaceholder() {
+      return this._$element.attr('placeholder') !== undefined;
+    }
+
+    _isDisabled() {
+      return this._$element.attr('disabled') !== undefined;
+    }
+
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
+  ko.bindingHandlers.hrmFormFieldDatepickerControl = {
+    init: function (element, valueAccessor, allBindings) {
+      const value = allBindings.get('value');
+      const textInput = allBindings.get('textInput');
+      const errorStateMatcher = allBindings.get('hrmFormFieldDatepickerControlErrorStateMatcher');
+      const viewModel = new HrmFormFieldDatepickerControlViewModel(element, value, textInput, errorStateMatcher);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel.dispose();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['value'] !== allBindings.get('value')) {
+          instance._setValue(allBindings.get('value'));
+        }
+      }
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['textInput'] !== allBindings.get('textInput')) {
+          instance._setTextInput(allBindings.get('textInput'));
+        }
+      }
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['hrmFormFieldDatepickerControlErrorStateMatcher'] !== allBindings.get('hrmFormFieldDatepickerControlErrorStateMatcher')) {
+          instance._setErrorStateMatcher(allBindings.get('hrmFormFieldDatepickerControlErrorStateMatcher'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
+"use strict";
+
+// hrmFormFieldInputControl
+(() => {
+  let nextId = 0;
+
+  class HrmFormFieldInputControlViewModel {
+    constructor(element, value, textInput, errorStateMatcher) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this._focusChangeHandler = null;
+      this._valueChangeHandler = null;
+      this._mutationObserver = null;
+      this._errorStateMatcher = ko.observable(errorStateMatcher);
+      this._value = ko.observable(value);
+      this._textInput = ko.observable(textInput);
+      this._control = null;
+      this.element = element;
+      this.id = 'hrm-form-field-input-control-' + nextId++;
+      this.focused = null;
+      this.disabled = null;
+      this.shouldLabelFloat = null;
+      this.errorState = null;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_input']);
+
+      this._$element.attr('autocomplete', false);
+
+      this._$element.attr('id', this.id);
+
+      this._control = ko.pureComputed(() => {
+        if (this._value() !== undefined) {
+          return this._value();
+        } else if (this._textInput() !== undefined) {
+          return this._textInput();
+        } else {
+          return null;
+        }
+      });
+      this.focused = ko.observable(this._hasFocus());
+      this.disabled = ko.observable(this._isDisabled());
+      const hasValue = ko.observable(this._hasValue());
+      const hasPlaceholder = ko.observable(this._hasPlaceholder());
+
+      this._focusChangeHandler = () => this.focused(this._hasFocus());
+
+      this._valueChangeHandler = () => hasValue(this._hasValue());
+
+      this._mutationObserver = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'attributes') {
+            hasPlaceholder(this._hasPlaceholder());
+            this.disabled(this._isDisabled());
+          }
+        });
+      });
+
+      this._mutationObserver.observe(this.element, {
+        attributes: true
+      });
+
+      this.shouldLabelFloat = ko.pureComputed(() => {
+        return this.focused() || hasValue() || hasPlaceholder();
+      });
+      this.errorState = ko.pureComputed(() => {
+        const errorStateMatcher = this._errorStateMatcher();
+
+        const control = this._control();
+
+        return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
+      });
+
+      this._$element.on('focus blur', this._focusChangeHandler);
+
+      this._$element.on('input change', this._valueChangeHandler);
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._$element.off('focus blur', this._focusChangeHandler);
+
+      this._$element.off('input change', this._valueChangeHandler);
+
+      this._mutationObserver.disconnect();
+    }
+
+    onBasisClick() {
+      this._$element.focus();
+    }
+
+    onBasisMousedown() {}
+
+    _setValue(value) {
+      if (!ko.isObservable(value)) {
+        throw Error('\'value\' binding have to be observable.');
+      }
+
+      this._value(value);
+    }
+
+    _setTextInput(textInput) {
+      if (!ko.isObservable(textInput)) {
+        throw Error('\'textInput\' binding have to be observable.');
+      }
+
+      this._textInput(textInput);
+    }
+
+    _setErrorStateMatcher(errorStateMatcher) {
+      this._errorStateMatcher(errorStateMatcher);
+    }
+
+    _hasFocus() {
+      return this._$element.is(':focus');
+    }
+
+    _hasValue() {
+      return this._$element.val() !== '';
+    }
+
+    _hasPlaceholder() {
+      return this._$element.attr('placeholder') !== undefined;
+    }
+
+    _isDisabled() {
+      return this._$element.attr('disabled') !== undefined;
+    }
+
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
+  ko.bindingHandlers.hrmFormFieldInputControl = {
+    init: function (element, valueAccessor, allBindings) {
+      const value = allBindings.get('value');
+      const textInput = allBindings.get('textInput');
+      const errorStateMatcher = allBindings.get('hrmFormFieldInputControlErrorStateMatcher');
+      const viewModel = new HrmFormFieldInputControlViewModel(element, value, textInput, errorStateMatcher);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel.dispose();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['value'] !== allBindings.get('value')) {
+          instance._setValue(allBindings.get('value'));
+        }
+      }
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['textInput'] !== allBindings.get('textInput')) {
+          instance._setTextInput(allBindings.get('textInput'));
+        }
+      }
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['hrmFormFieldInputControlErrorStateMatcher'] !== allBindings.get('hrmFormFieldInputControlErrorStateMatcher')) {
+          instance._setErrorStateMatcher(allBindings.get('hrmFormFieldInputControlErrorStateMatcher'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
+"use strict";
+
+// hrmFormFieldSelectControl
+(() => {
+  let nextId = 0;
+
+  class HrmFormFieldSelectControlViewModel {
+    constructor(element, value, selectedOptions, errorStateMatcher) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this._focusChangeHandler = null;
+      this._valueChangeHandler = null;
+      this._selectionFocusHandler = null;
+      this._selectionBlurHandler = null;
+      this._searchFocusHandler = null;
+      this._searchBlurHandler = null;
+      this._openingHandler = null;
+      this._closeHandler = null;
+      this._searchUpdateHandler = null;
+      this._mutationObserver = null;
+      this._errorStateMatcher = ko.observable(errorStateMatcher);
+      this._value = ko.observable(value);
+      this._selectedOptions = ko.observable(selectedOptions);
+      this._control = null;
+      this._isMultiple = null;
+      this._select2Instance = null;
+      this.element = element;
+      this.id = 'hrm-form-field-select-control-' + nextId++;
+      this.focused = null;
+      this.disabled = null;
+      this.shouldLabelFloat = null;
+      this.errorState = null;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.attr('id', this.id);
+
+      this._select2Instance = this._$element.data('select2');
+
+      this._select2Instance.$container.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_select']);
+
+      this._select2Instance.$dropdown.children().first().addClass(['hrm-form-field__dropdown']);
+
+      this._isMultiple = this._$element.prop('multiple');
+      this._control = ko.pureComputed(() => {
+        if (this._value() !== undefined) {
+          return this._value();
+        } else if (this._selectedOptions() !== undefined) {
+          return this._selectedOptions();
+        } else {
+          return null;
+        }
+      });
+      const selectionFocused = ko.observable(this._select2Instance.$selection.is(':focus'));
+      const searchFocused = this._isMultiple ? ko.observable(this._select2Instance.selection.$search.is(':focus')) : null;
+      const dropdownOpened = ko.observable(false);
+      const hasValue = ko.observable(this._hasValue());
+      const hasPlaceholder = ko.observable(this._hasPlaceholder());
+
+      this._selectionFocusHandler = () => selectionFocused(true);
+
+      this._selectionBlurHandler = () => selectionFocused(false);
+
+      this._searchFocusHandler = () => searchFocused(true);
+
+      this._searchBlurHandler = () => searchFocused(false);
+
+      this._openingHandler = () => dropdownOpened(true);
+
+      this._closeHandler = () => dropdownOpened(false);
+
+      this._valueChangeHandler = () => hasValue(this._hasValue());
+
+      this._searchUpdateHandler = () => {
+        if (this._isMultiple) {
+          this._select2Instance.selection.$search.off('focus', this._searchFocusHandler);
+
+          this._select2Instance.selection.$search.off('blur', this._searchBlurHandler);
+
+          this._select2Instance.selection.$search.on('focus', this._searchFocusHandler);
+
+          this._select2Instance.selection.$search.on('blur', this._searchBlurHandler);
+        }
+      };
+
+      this.focused = ko.pureComputed(() => {
+        return selectionFocused() || dropdownOpened() || searchFocused !== null && searchFocused();
+      });
+      this.disabled = ko.observable(this._isDisabled());
+      this.shouldLabelFloat = ko.pureComputed(() => {
+        return this.focused() || hasValue() || hasPlaceholder();
+      });
+      this.errorState = ko.pureComputed(() => {
+        const errorStateMatcher = this._errorStateMatcher();
+
+        const control = this._control();
+
+        return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
+      });
+
+      this._$element.on('focus blur', this._focusChangeHandler);
+
+      this._$element.on('input change', this._valueChangeHandler);
+
+      this._select2Instance.$selection.on('focus', this._selectionFocusHandler);
+
+      this._select2Instance.$selection.on('blur', this._selectionBlurHandler);
+
+      if (this._isMultiple) {
+        this._select2Instance.selection.$search.on('focus', this._searchFocusHandler);
+
+        this._select2Instance.selection.$search.on('blur', this._searchBlurHandler);
+      }
+
+      this._$element.on('change.select2', this._changeHandler);
+
+      this._$element.on('select2:opening', this._openingHandler);
+
+      this._$element.on('select2:close', this._closeHandler);
+
+      this._$element.on('hrm-select:search-update', this._searchUpdateHandler);
+
+      this._mutationObserver = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+          if (mutation.type === 'attributes') {
+            this.disabled(this._isDisabled());
+          }
+        });
+      });
+
+      this._mutationObserver.observe(this.element, {
+        attributes: true
+      });
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._select2Instance.$selection.off('focus', this._selectionFocusHandler);
+
+      this._select2Instance.$selection.off('blur', this._selectionBlurHandler);
+
+      if (this._isMultiple) {
+        this._select2Instance.selection.$search.off('focus', this._searchFocusHandler);
+
+        this._select2Instance.selection.$search.off('blur', this._searchBlurHandler);
+      }
+
+      this._$element.off('change.select2', this._valueChangeHandler);
+
+      this._$element.off('select2:opening', this._openingHandler);
+
+      this._$element.off('select2:close', this._closeHandler);
+
+      this._$element.off('hrm-select:search-update', this._searchUpdateHandler);
+
+      this._mutationObserver.disconnect();
+    }
+
+    onBasisClick() {}
+
+    onBasisMousedown(event) {
+      if (!this.disabled()) {
+        if (event.target !== this.element && this._select2Instance.$container.get()[0] !== event.target && this._select2Instance.$container.has(event.target).length === 0) {
+          const isOpen = this._select2Instance.isOpen();
+
+          setTimeout(() => {
+            this._select2Instance.$selection.focus();
+
+            if (!isOpen) {
+              this._select2Instance.open();
+            }
+          });
+        }
+      }
+    }
+
+    _setValue(value) {
+      if (!ko.isObservable(value)) {
+        throw Error('\'value\' binding have to be observable.');
+      }
+
+      this._value(value);
+    }
+
+    _setSelectedOptions(selectedOptions) {
+      if (!ko.isObservable(selectedOptions)) {
+        throw Error('\'selectedOptions\' binding have to be observable.');
+      }
+
+      this._selectedOptions(selectedOptions);
+    }
+
+    _setErrorStateMatcher(errorStateMatcher) {
+      this._errorStateMatcher(errorStateMatcher);
+    }
+
+    _hasValue() {
+      const value = this._$element.val();
+
+      return value !== '' && value !== undefined && (!(value instanceof Array) || value.length !== 0);
+    }
+
+    _hasPlaceholder() {
+      return this._select2Instance.options.options.placeholder !== ' ';
+    }
+
+    _isDisabled() {
+      return this._$element.attr('disabled') !== undefined;
+    }
+
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
+  ko.bindingHandlers.hrmFormFieldSelectControl = {
+    init: function (element, valueAccessor, allBindings) {
+      const value = allBindings.get('value');
+      const selectedOptions = allBindings.get('selectedOptions');
+      const errorStateMatcher = allBindings.get('hrmFormFieldSelectControlErrorStateMatcher');
+      const viewModel = new HrmFormFieldSelectControlViewModel(element, value, selectedOptions, errorStateMatcher);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel.dispose();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['value'] !== allBindings.get('value')) {
+          instance._setValue(allBindings.get('value'));
+        }
+      }
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['selectedOptions'] !== allBindings.get('selectedOptions')) {
+          instance._setTextInput(allBindings.get('selectedOptions'));
+        }
+      }
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['hrmFormFieldSelectControlErrorStateMatcher'] !== allBindings.get('hrmFormFieldSelectControlErrorStateMatcher')) {
+          instance._setErrorStateMatcher(allBindings.get('hrmFormFieldSelectControlErrorStateMatcher'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
+"use strict";
+
+// hrmFormField
+(() => {
+  class HrmFormFieldViewModel {
+    constructor(element, control, label) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this._control = control;
+      this._label = label;
+      this.element = element;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.addClass(['hrm-form-field', 'hrm-notransition']);
+
+      this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
+        this._$element.toggleClass('hrm-form-field--has-label', this._label !== undefined);
+
+        this._$element.toggleClass('hrm-form-field--focused', this._control().focused());
+
+        this._subscriptions.push(this._control().focused.subscribe(focused => {
+          this._$element.toggleClass('hrm-form-field--focused', focused);
+        }));
+
+        this._$element.toggleClass('hrm-form-field--disabled', this._control().disabled());
+
+        this._subscriptions.push(this._control().disabled.subscribe(disabled => {
+          this._$element.toggleClass('hrm-form-field--disabled', disabled);
+        }));
+
+        this._$element.toggleClass('hrm-form-field--should-label-float', this._control().shouldLabelFloat());
+
+        this._subscriptions.push(this._control().shouldLabelFloat.subscribe(shouldLabelFloat => {
+          this._$element.toggleClass('hrm-form-field--should-label-float', shouldLabelFloat);
+        }));
+
+        setTimeout(() => {
+          this._$element.removeClass('hrm-notransition');
+        });
+      }));
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+    }
+
+  }
+
+  ko.bindingHandlers.hrmFormField = {
+    init: function (element, valueAccessor, allBindings) {
+      const control = allBindings.get('hrmFormFieldControlRef');
+      const label = allBindings.get('hrmFormFieldLabelRef');
+      const viewModel = new HrmFormFieldViewModel(element, control, label);
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        viewModel.dispose();
+      });
+    }
+  };
+})(); // hrmFormFieldLabel
+
+
+(() => {
+  class HrmFormFieldLabelViewModel {
+    constructor(element) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this.element = element;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.addClass('hrm-form-field__label');
+    }
+
+    setFor(id) {
+      this._$element.attr('for', id);
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+    }
+
+  }
+
+  ko.bindingHandlers.hrmFormFieldLabel = {
+    init: function (element, valueAccessor) {
+      const viewModel = new HrmFormFieldLabelViewModel(element);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel.dispose();
+      });
+    }
+  };
+})(); // hrmFormFieldBasis
+
+
+(() => {
+  class HrmFormFieldBasisViewModel {
+    constructor(element, control) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this._control = control;
+      this._clickHandler = null;
+      this._mousedownHandler = null;
+      this.element = element;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.addClass('hrm-form-field__basis');
+
+      this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
+        this._$element.toggleClass('hrm-form-field__basis--focused', this._control().focused());
+
+        this._subscriptions.push(this._control().focused.subscribe(focused => {
+          this._$element.toggleClass('hrm-form-field__basis--focused', focused);
+        }));
+
+        this._$element.toggleClass('hrm-form-field__basis--invalid', this._control().errorState());
+
+        this._subscriptions.push(this._control().errorState.subscribe(errorState => {
+          this._$element.toggleClass('hrm-form-field__basis--invalid', errorState);
+        }));
+      }));
+
+      this._clickHandler = event => {
+        this._control().onBasisClick(event);
+      };
+
+      this._mousedownHandler = event => {
+        this._control().onBasisMousedown(event);
+      };
+
+      this._$element.on('click', this._clickHandler);
+
+      this._$element.on('mousedown', this._mousedownHandler);
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._$element.off('click', this._clickHandler);
+
+      this._$element.off('mousedown', this._mousedownHandler);
+    }
+
+  }
+
+  ko.bindingHandlers.hrmFormFieldBasis = {
+    init: function (element, valueAccessor, allBindings) {
+      const control = allBindings.get('hrmFormFieldBasisControl');
+      const viewModel = new HrmFormFieldBasisViewModel(element, control);
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        viewModel.dispose();
+      });
+    }
+  };
+})();
+
 ko.components.register('hrm-form-field-error', {
   viewModel: {
-    createViewModel: function createViewModel(params, componentInfo) {
-      var $element = $(componentInfo.element);
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
       $element.addClass(['hrm-form-field__error']);
       return new function () {
         this.templateNodes = hrmSplitComponentTemplateNodes(componentInfo.templateNodes);
       }();
     }
   },
-  template: "\n        <span class=\"hrm-form-field__error-text\">\n            <!-- ko template: {nodes: templateNodes.main} --><!-- /ko -->\n        </span>\n    "
+  template: `
+        <span class="hrm-form-field__error-text">
+            <!-- ko template: {nodes: templateNodes.main} --><!-- /ko -->
+        </span>
+    `
 });
-ko.bindingHandlers.hrmFormFieldInputControl = {
-  init: function init(element, valueAccessor, allBindings) {
-    var subscriptions = [];
-    var formField = allBindings.get('hrmFormFieldInputControlOwner');
-    var value = allBindings.get('value') || allBindings.get('textInput');
-    var $wrapper = $(formField().controlWrapperElement());
-    var $element = $(element);
-    $element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_input']);
-    $element.attr('id', formField().controlId);
-
-    var wrapperClickHandler = function wrapperClickHandler() {
-      return $element.focus();
-    };
-
-    var focusHandler = function focusHandler() {
-      return formField().focused(true);
-    };
-
-    var blurHandler = function blurHandler() {
-      return formField().focused(false);
-    };
-
-    var valueHandler = function valueHandler(event) {
-      var value = event.target.value;
-      formField().hasValue(value !== '');
-    };
-
-    $wrapper.on('click', wrapperClickHandler);
-    $element.on('focus', focusHandler);
-    $element.on('blur', blurHandler);
-    $element.on('input change', valueHandler);
-    formField().focused($element.is(':focus'));
-    formField().hasValue($element.val() !== '');
-
-    if (value !== undefined && ko.isObservable(value)) {
-      subscriptions.push(value.subscribe(function (v) {
-        formField().hasValue(v !== '');
-      }));
-    }
-
-    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-      $wrapper.off('click', wrapperClickHandler);
-      $element.off('focus', focusHandler);
-      $element.off('blur', blurHandler);
-      $element.off('input change', valueHandler);
-      subscriptions.forEach(function (s) {
-        return s.dispose();
-      });
-    });
-  }
-};
-ko.bindingHandlers.hrmFormFieldSelectControl = {
-  init: function init(element, valueAccessor, allBindings) {
-    var subscriptions = [];
-    var formField = allBindings.get('hrmFormFieldSelectControlOwner');
-    var $wrapper = $(formField().controlWrapperElement());
-    var $element = $(element);
-    var isMultiple = $element.prop('multiple');
-    var select2Instance = $element.data('select2');
-    var selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
-    var searchFocused = isMultiple ? ko.observable(select2Instance.selection.$search.is(':focus')) : null;
-    var dropdownOpened = ko.observable(false);
-    subscriptions.push(ko.computed(function () {
-      return selectionFocused() || dropdownOpened() || searchFocused !== null && searchFocused();
-    }).subscribe(function (value) {
-      return formField().focused(value);
-    }));
-    $element.attr('id', formField().controlId);
-    select2Instance.$container.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_select']);
-    select2Instance.$dropdown.children().first().addClass(['hrm-form-field__dropdown']);
-
-    var emptyCheckFn = function emptyCheckFn(value) {
-      return value !== '' && value !== undefined && (!(value instanceof Array) || value.length !== 0);
-    };
-
-    var wrapperMousedownHandler = function wrapperMousedownHandler(event) {
-      if (event.target !== element && select2Instance.$container.get()[0] !== event.target && select2Instance.$container.has(event.target).length === 0) {
-        var isOpen = select2Instance.isOpen();
-        setTimeout(function () {
-          select2Instance.$selection.focus();
-
-          if (!isOpen) {
-            select2Instance.open();
-          }
-        });
-      }
-    };
-
-    var selectionFocusHandler = function selectionFocusHandler() {
-      return selectionFocused(true);
-    };
-
-    var selectionBlurHandler = function selectionBlurHandler() {
-      return selectionFocused(false);
-    };
-
-    var searchFocusHandler = function searchFocusHandler() {
-      return searchFocused(true);
-    };
-
-    var searchBlurHandler = function searchBlurHandler() {
-      return searchFocused(false);
-    };
-
-    var openingHandler = function openingHandler() {
-      return dropdownOpened(true);
-    };
-
-    var closeHandler = function closeHandler() {
-      return dropdownOpened(false);
-    };
-
-    var changeHandler = function changeHandler() {
-      var value = $element.val();
-      formField().hasValue(emptyCheckFn(value));
-    };
-
-    var searchUpdate = function searchUpdate() {
-      if (isMultiple) {
-        select2Instance.selection.$search.off('focus', searchFocusHandler);
-        select2Instance.selection.$search.off('blur', searchBlurHandler);
-        select2Instance.selection.$search.on('focus', searchFocusHandler);
-        select2Instance.selection.$search.on('blur', searchBlurHandler);
-      }
-    };
-
-    select2Instance.$selection.on('focus', selectionFocusHandler);
-    select2Instance.$selection.on('blur', selectionBlurHandler);
-
-    if (isMultiple) {
-      select2Instance.selection.$search.on('focus', searchFocusHandler);
-      select2Instance.selection.$search.on('blur', searchBlurHandler);
-    }
-
-    $wrapper.on('mousedown', wrapperMousedownHandler);
-    $element.on('change.select2', changeHandler);
-    $element.on('select2:opening', openingHandler);
-    $element.on('select2:close', closeHandler);
-    $element.on('hrm-select:search-update', searchUpdate);
-    formField().hasValue(emptyCheckFn($element.val()));
-    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-      subscriptions.forEach(function (s) {
-        return s.dispose();
-      });
-      $wrapper.off('mousedown', wrapperMousedownHandler);
-      select2Instance.$selection.off('focus', selectionFocusHandler);
-      select2Instance.$selection.off('blur', selectionBlurHandler);
-
-      if (isMultiple) {
-        select2Instance.selection.$search.off('focus', searchFocusHandler);
-        select2Instance.selection.$search.off('blur', searchBlurHandler);
-      }
-
-      $(element).off('change.select2', changeHandler);
-      $element.off('select2:opening', openingHandler);
-      $element.off('select2:close', closeHandler);
-      $element.off('hrm-select:search-update', searchUpdate);
-    });
-  }
-};
-ko.bindingHandlers.hrmFormFieldDatepickerControl = {
-  init: function init(element, valueAccessor, allBindings) {
-    var formField = allBindings.get('hrmFormFieldDatepickerControlOwner');
-    var $wrapper = $(formField().controlWrapperElement());
-    var $element = $(element);
-    $element.addClass(['hrm-form-field__control', 'hrm-form-field__control--type_datepicker']);
-    $element.attr('id', formField().controlId);
-    var daterangepickerInstance = $element.data('daterangepicker');
-    daterangepickerInstance.container.addClass('hrm-form-field__dropdown');
-
-    var wrapperClickHandler = function wrapperClickHandler() {
-      return $element.focus();
-    };
-
-    var focusHandler = function focusHandler() {
-      return formField().focused(true);
-    };
-
-    var blurHandler = function blurHandler() {
-      return formField().focused(false);
-    };
-
-    var valueHandler = function valueHandler(event) {
-      var value = event.target.value;
-      formField().hasValue(value !== '');
-    };
-
-    $wrapper.on('click', wrapperClickHandler);
-    $element.on('focus', focusHandler);
-    $element.on('blur', blurHandler);
-    $element.on('input change', valueHandler);
-    formField().focused($element.is(':focus'));
-    formField().hasValue($element.val() !== '');
-    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-      $wrapper.off('click', wrapperClickHandler);
-      $element.off('focus', focusHandler);
-      $element.off('blur', blurHandler);
-      $element.off('input change', valueHandler);
-    });
-  }
-};
-ko.bindingHandlers.hrmFormFieldLabel = {
-  init: function init(element, valueAccessor, allBindings) {
-    var formField = allBindings.get('hrmFormFieldLabelOwner');
-    var $element = $(element);
-    $element.addClass('hrm-form-field__label');
-    $element.attr('for', formField().controlId);
-  }
-};
 "use strict";
 
-ko.bindingHandlers.hrmScrollable = {
-  init: function init(element) {
-    var $element = $(element);
-    $element.addClass('hrm-scrollable__content');
-    $element.overlayScrollbars({
-      className: 'hrm-scrollable'
-    });
+(() => {
+  ko.components.register('hrm-main-sidebar', {
+    viewModel: {
+      createViewModel: function (params, componentInfo) {
+        const $element = $(componentInfo.element);
+        $element.addClass(['hrm-main-sidebar']);
+        return new class {
+          constructor() {
+            this._isCollapsed = hrmExtractComponentParam(params, 'collapsed', false);
+            this._isUserSelected = false;
+            this._isNotificationsSelected = false;
+            this._selectedMenuItemIndex = null;
+            this._selectedDrawerContentName = null;
+            this._$element = $element;
+            this._$collapseToggleElement = this._$element.find('.hrm-main-sidebar__collapse-toggle');
+            this._$user = this._$element.find('.hrm-main-sidebar__user');
+            this._$notifications = this._$element.find('.hrm-main-sidebar__notifications');
+            this._$menuItems = this._$element.find('.hrm-main-sidebar__menu-item');
+            this._$drawer = this._$element.find('.hrm-main-sidebar__drawer');
+            this._$backdrop = this._$element.find('.hrm-main-sidebar__backdrop');
+            this._drawerContents = new Map(this._$element.find('.hrm-main-sidebar__drawer-content').toArray().map(element => {
+              const $element = $(element);
+              return [$element.data('hrm-main-sidebar-drawer-content-name'), $element];
+            }));
+            this.viewportSize = ko.observable({
+              width: $(window).width(),
+              height: $(window).height()
+            });
+
+            this._init();
+          }
+
+          _init() {
+            this._$element.addClass('hrm-notransition');
+
+            this._$element.find('.hrm-main-sidebar__user').on('click', async () => {
+              if (this._isUserSelected) {
+                this.clearSelection();
+              } else {
+                this.selectUser();
+              }
+            });
+
+            this._$element.find('.hrm-main-sidebar__notifications').on('click', async () => {
+              if (this._isNotificationsSelected) {
+                this.clearSelection();
+              } else {
+                this.selectNotifications();
+              }
+            });
+
+            this._$backdrop.on('click', async () => {
+              this.clearSelection();
+            });
+
+            this._$menuItems.each((index, menuItem) => {
+              $(menuItem).on('click', () => {
+                if (this._selectedMenuItemIndex === index) {
+                  this.clearSelection();
+                } else {
+                  this.selectMenuItem(index);
+                }
+              });
+            });
+
+            $(window).on('resize', () => {
+              this.viewportSize({
+                width: $(window).width(),
+                height: $(window).height()
+              });
+            });
+
+            this._$element.toggleClass('hrm-main-sidebar--collapsed', this._isCollapsed());
+
+            this._isCollapsed.subscribe(collapsed => {
+              this._$element.toggleClass('hrm-main-sidebar--collapsed', collapsed);
+            });
+
+            setTimeout(() => {
+              this._$element.removeClass('hrm-notransition');
+            }, 0);
+            this.viewportSize.subscribe(() => {
+              this._$element.addClass('hrm-notransition');
+
+              setTimeout(() => {
+                this._$element.removeClass('hrm-notransition');
+              }, 0);
+            });
+          }
+
+          async selectUser() {
+            if (!this._isUserSelected) {
+              await this.clearSelection();
+
+              this._$user.addClass('hrm-main-sidebar__user--active');
+
+              this._isUserSelected = true;
+              await this._openDrawer('user');
+            }
+          }
+
+          async selectNotifications() {
+            if (!this._isNotificationsSelected) {
+              await this.clearSelection();
+
+              this._$notifications.addClass('hrm-main-sidebar__notifications--active');
+
+              this._isNotificationsSelected = true;
+              await this._openDrawer('notifications');
+            }
+          }
+
+          async selectMenuItem(index) {
+            if (this._selectedMenuItemIndex !== index) {
+              await this.clearSelection();
+
+              this._$menuItems.eq(index).addClass('hrm-main-sidebar__menu-item--active');
+
+              this._selectedMenuItemIndex = index;
+              this._isUserSelected = false;
+              await this._openDrawer(this._$menuItems.eq(index).data('hrm-main-sidebar-drawer-content-name'));
+            }
+          }
+
+          async clearSelection() {
+            if (this._selectedMenuItemIndex !== null) {
+              this._$menuItems.eq(this._selectedMenuItemIndex).removeClass('hrm-main-sidebar__menu-item--active');
+
+              this._selectedMenuItemIndex = null;
+            } else if (this._isUserSelected) {
+              this._$user.removeClass('hrm-main-sidebar__user--active');
+
+              this._isUserSelected = false;
+            } else if (this._isNotificationsSelected) {
+              this._$notifications.removeClass('hrm-main-sidebar__notifications--active');
+
+              this._isNotificationsSelected = false;
+            }
+
+            await this._closeDrawer();
+          }
+
+          async _openDrawer(contentName) {
+            if (this._selectedDrawerContentName !== contentName) {
+              await this._closeDrawer();
+
+              const $drawerContent = this._drawerContents.get(contentName);
+
+              $drawerContent.addClass('hrm-main-sidebar__drawer-content--active');
+
+              this._$drawer.addClass('hrm-main-sidebar__drawer--open');
+
+              this._$backdrop.addClass('hrm-main-sidebar__backdrop--visible');
+
+              if ($drawerContent.data('hrm-main-sidebar-drawer-class') !== undefined) {
+                this._$drawer.addClass($drawerContent.data('hrm-main-sidebar-drawer-class'));
+              }
+
+              this._selectedDrawerContentName = contentName;
+            }
+          }
+
+          async _closeDrawer() {
+            if (this._selectedDrawerContentName !== null) {
+              this._$drawer.removeClass('hrm-main-sidebar__drawer--open');
+
+              this._$backdrop.removeClass('hrm-main-sidebar__backdrop--visible');
+
+              await new Promise(resolve => setTimeout(resolve, 200));
+
+              const $drawerContent = this._drawerContents.get(this._selectedDrawerContentName);
+
+              this._$drawer.removeClass($drawerContent.data('hrm-main-sidebar-drawer-class'));
+
+              $drawerContent.removeClass('hrm-main-sidebar__drawer-content--active');
+              this._selectedDrawerContentName = null;
+            }
+          }
+
+        }();
+      }
+    },
+    template: `
+            <div class="hrm-main-sidebar__content-wrapper">
+                <div class="hrm-main-sidebar__content">
+                    <div class="hrm-main-sidebar__header">
+                        <div class="hrm-main-sidebar__user">
+                            <!--<img class="hrm-main-sidebar__avatar" src="assets/examples/avatar.jpg">-->
+                            <img class="hrm-main-sidebar__avatar" src="assets/img/avatar-placeholder.png">
+        
+                            <div class="hrm-main-sidebar__user-name">
+                                Пётр Петров
+                            </div>
+                        </div>
+        
+                        <div class="hrm-main-sidebar__notifications">
+                            <div class="hrm-main-sidebar__notifications-icon">
+                                <div class="hrm-main-sidebar__notifications-icon-counter">28</div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <ul class="nav hrm-main-sidebar__menu">
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-calculations-item"
+                            data-hrm-main-sidebar-drawer-content-name="calculations">
+                            <span class="hrm-main-sidebar__menu-item-name">Расчёты</span>
+                        </li>
+        
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-hr-item"
+                            data-hrm-main-sidebar-drawer-content-name="hr">
+                            <span class="hrm-main-sidebar__menu-item-name">Кадры</span>
+                        </li>
+        
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-documents-item"
+                            data-hrm-main-sidebar-drawer-content-name="documents">
+                            <span class="hrm-main-sidebar__menu-item-name">Отчёты</span>
+                        </li>
+        
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-reference-item"
+                            data-hrm-main-sidebar-drawer-content-name="reference">
+                            <span class="hrm-main-sidebar__menu-item-name">Справочники</span>
+                        </li>
+        
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-contents-item"
+                            data-hrm-main-sidebar-drawer-content-name="contents">
+                            <span class="hrm-main-sidebar__menu-item-name">Все разделы</span>
+                        </li>
+                    </ul>
+        
+                    <div class="hrm-spacer"></div>
+                    
+                    <div class="hrm-main-sidebar__actions">
+                        <a class="hrm-main-sidebar__settings-link" href="#" title="Настройки"></a>
+        
+                        <a class="hrm-main-sidebar__support-link" href="#" title="Помощь"></a>
+            
+                        <button class="hrm-button hrm-main-sidebar__collapse-toggle"
+                                data-bind="click: function() {_isCollapsed(!_isCollapsed());}">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="hrm-main-sidebar__drawer">
+                <div class="hrm-main-sidebar__drawer-content-wrapper" 
+                     data-bind="hrmScrollable, hrmScrollableDisabled: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth">
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="calculations"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                    </div>
+        
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="hr"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-hr-content'} --><!-- /ko -->
+                    </div >
+        
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="documents"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-documents-content'} --><!-- /ko -->
+                    </div>
+        
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="reference"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-reference-content'} --><!-- /ko -->
+                    </div>
+                    
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="contents"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__contents-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-contents-content'} --><!-- /ko -->
+                    </div>
+                    
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="user">
+                         <!-- ko template: {name: 'hrm-main-sidebar-user-content'} --><!-- /ko -->
+                    </div>
+                    
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="notifications">
+                         <!-- ko template: {name: 'hrm-main-sidebar-notifications-content'} --><!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        
+            <div class="hrm-main-sidebar__backdrop"></div>
+            
+            <script id="hrm-main-sidebar-calculations-content" type="text/html">
+                <div class="hrm-main-sidebar__submenu">
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
+                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
+                </div>
+            </script>
+            
+            <script id="hrm-main-sidebar-hr-content" type="text/html">
+                <div class="hrm-main-sidebar__submenu">
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
+                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
+                </div>
+            </script>
+            
+            <script id="hrm-main-sidebar-documents-content" type="text/html">
+                <div class="hrm-main-sidebar__submenu">
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
+                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
+                </div>
+            </script>
+            
+            <script id="hrm-main-sidebar-reference-content" type="text/html">
+                <div class="hrm-main-sidebar__submenu">
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
+                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
+                </div>
+            </script>
+            
+            <script id="hrm-main-sidebar-user-content" type="text/html">
+                Пользователь
+            </script>
+            
+            <script id="hrm-main-sidebar-notifications-content" type="text/html">
+                Уведомления
+            </script>
+            
+            <script id="hrm-main-sidebar-contents-content" type="text/html">
+                <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                    Все разделы
+                <!-- /ko -->
+                
+                <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                    <div class="hrm-main-sidebar__contents">
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Расчеты
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Кадры
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-hr-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Документы
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-documents-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Справочники
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-reference-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Графики
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Листовки
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Маркетинг
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Штрафы/Премии
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Нарушения
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Плохие отзывы
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Жалобы и предложения
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Зоны доставки
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Инструкции
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Календарь событий
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                <!-- /ko -->
+            </script>
+        `
+  });
+})();
+"use strict";
+
+// hrmScrollable
+(() => {
+  class HrmScrollableViewModel {
+    constructor(element, disabled) {
+      this._subscriptions = [];
+      this._disabledSubscription = null;
+      this._disabled = null;
+      this._overlayScrollbarsInstance = null;
+      this._overlayScrollbarsOptions = {
+        className: 'hrm-scrollable'
+      };
+      this.element = element;
+
+      this._init(disabled);
+    }
+
+    _init(disabled) {
+      this._setDisabled(disabled);
+
+      this._update();
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._disabledSubscription.dispose();
+    }
+
+    _setDisabled(disabled) {
+      if (disabled === undefined) {
+        disabled = false;
+      }
+
+      if (this._disabledSubscription !== null) {
+        this._disabledSubscription.dispose();
+      }
+
+      if (ko.isObservable(disabled)) {
+        this._disabledSubscription = disabled.subscribe(disabled => {
+          this._disabled = disabled;
+
+          this._update();
+        });
+        this._disabled = disabled();
+      } else {
+        this._disabled = disabled;
+
+        this._update();
+      }
+    }
+
+    _update() {
+      const $element = $(this.element);
+
+      if (!this._disabled) {
+        if (this._overlayScrollbarsInstance === null) {
+          $element.overlayScrollbars(this._overlayScrollbarsOptions);
+          this._overlayScrollbarsInstance = $element.overlayScrollbars();
+        }
+      } else {
+        if (this._overlayScrollbarsInstance !== null) {
+          this._overlayScrollbarsInstance.destroy();
+
+          this._overlayScrollbarsInstance = null;
+        }
+      }
+    }
+
   }
-};
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
+  ko.bindingHandlers.hrmScrollable = {
+    init: function (element, valueAccessor, allBindings) {
+      const disabled = allBindings.get('hrmScrollableDisabled');
+      const viewModel = new HrmScrollableViewModel(element, disabled);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['hrmScrollableDisabled'] !== allBindings.get('hrmScrollableDisabled')) {
+          instance._setDisabled(allBindings.get('hrmScrollableDisabled'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
 "use strict";
 
 ko.bindingHandlers.hrmSelect = {
-  init: function init(element, valueAccessor, allBindings) {
-    var $element = $(element);
-    var isMultiple = $element.prop('multiple');
-    var value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
-    var wrapperClass = allBindings.get('hrmSelectClass');
-    var customValuesAllowed = allBindings.has('hrmSelectCustomValuesAllowed') ? allBindings.get('hrmSelectCustomValuesAllowed') : false;
-    var searchEnabled = allBindings.has('hrmSelectSearchEnabled') ? allBindings.get('hrmSelectSearchEnabled') : false;
+  init: function (element, valueAccessor, allBindings) {
+    const $element = $(element);
+    const isMultiple = $element.prop('multiple');
+    const value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
+    const wrapperClass = allBindings.get('hrmSelectClass');
+    const customValuesAllowed = allBindings.has('hrmSelectCustomValuesAllowed') ? allBindings.get('hrmSelectCustomValuesAllowed') : false;
+    const searchEnabled = allBindings.has('hrmSelectSearchEnabled') ? allBindings.get('hrmSelectSearchEnabled') : false;
+    const placeholder = allBindings.has('hrmSelectPlaceholder') ? allBindings.get('hrmSelectPlaceholder') : ' ';
+    const allowClear = allBindings.has('hrmSelectAllowClear') ? allBindings.get('hrmSelectAllowClear') : false;
 
     if (customValuesAllowed && !isMultiple && !searchEnabled) {
       throw Error('You have to enable both options "hrmSelectCustomValuesAllowed" and "hrmSelectSearchEnabled"');
     }
 
-    var options = {
+    const options = {
       minimumResultsForSearch: searchEnabled ? 0 : Infinity,
       language: 'ru',
       width: '100%',
       dropdownAutoWidth: true,
       dropdownCssClass: 'hrm-select__dropdown',
-      placeholder: ' ',
+      placeholder,
+      allowClear,
+      templateSelection: state => $('<span>').addClass('hrm-select__rendered-text').text(state.text),
       tags: customValuesAllowed
     };
 
-    var Select = $.fn.select2.amd.require('jquery.select2');
+    const Select = $.fn.select2.amd.require('jquery.select2');
 
-    var Search = $.fn.select2.amd.require('select2/selection/search');
+    const Search = $.fn.select2.amd.require('select2/selection/search');
 
-    var originalSelectRenderFn = Select.prototype.render;
-    var originalSearchUpdateFn = Search.prototype.update;
+    const originalSelectRenderFn = Select.prototype.render;
+    const originalSearchUpdateFn = Search.prototype.update;
 
     Select.prototype.render = function () {
-      var $container = originalSelectRenderFn.call.apply(originalSelectRenderFn, [this].concat(Array.prototype.slice.call(arguments)));
+      const $container = originalSelectRenderFn.call(this, ...arguments);
       $container.addClass('hrm-select');
 
       if (wrapperClass !== undefined) {
@@ -785,24 +2201,24 @@ ko.bindingHandlers.hrmSelect = {
     };
 
     Search.prototype.update = function () {
-      originalSearchUpdateFn.call.apply(originalSearchUpdateFn, [this].concat(Array.prototype.slice.call(arguments)));
+      originalSearchUpdateFn.call(this, ...arguments);
       $element.trigger('hrm-select:search-update');
     };
 
     $element.select2(options);
     Select.prototype.render = originalSelectRenderFn;
     Search.prototype.update = originalSearchUpdateFn;
-    var select2Instance = $element.data('select2');
+    const select2Instance = $element.data('select2');
     select2Instance.$results.unbind('mousewheel');
-    var $dropdownResultsContainer = $element.data('select2').$results.parent();
+    const $dropdownResultsContainer = $element.data('select2').$results.parent();
     $dropdownResultsContainer.overlayScrollbars({
       callbacks: {
-        onUpdated: function onUpdated() {
+        onUpdated: () => {
           if (select2Instance.$dropdown.is(':visible')) {
             select2Instance.dropdown._positionDropdown(); // Правка бага в Chrome с неправильным синхронным вычислением положения выпадающего списка
 
 
-            setTimeout(function () {
+            setTimeout(() => {
               select2Instance.dropdown._positionDropdown();
             });
           }
@@ -810,19 +2226,19 @@ ko.bindingHandlers.hrmSelect = {
       }
     });
 
-    var openHandler = function openHandler() {
+    const openHandler = () => {
       $dropdownResultsContainer.overlayScrollbars().scroll(0);
     };
 
-    var openingHandler = function openingHandler() {
+    const openingHandler = () => {
       select2Instance.$dropdown.hide().fadeIn(150);
     };
 
-    var isClosingAnimated = false;
+    let isClosingAnimated = false;
 
-    var closingHandler = function closingHandler() {
+    const closingHandler = () => {
       if (!isClosingAnimated) {
-        select2Instance.$dropdown.fadeOut(150, function () {
+        select2Instance.$dropdown.fadeOut(150, () => {
           isClosingAnimated = true;
           select2Instance.close();
         });
@@ -842,13 +2258,13 @@ ko.bindingHandlers.hrmSelect = {
       $element.off('select2:closing', closingHandler);
     });
   },
-  update: function update(element, valueAccessor, allBindings) {
-    var $element = $(element);
-    var isMultiple = $element.prop('multiple');
-    var value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
+  update: function (element, valueAccessor, allBindings) {
+    const $element = $(element);
+    const isMultiple = $element.prop('multiple');
+    const value = !isMultiple ? allBindings.get('value') : allBindings.get('selectedOptions');
 
     if (value !== undefined && ko.isObservable(value)) {
-      value.subscribe(function (v) {
+      value.subscribe(v => {
         $element.trigger('change.select2');
       });
     }
@@ -856,34 +2272,315 @@ ko.bindingHandlers.hrmSelect = {
 };
 "use strict";
 
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+// hrmSwitch
+(() => {
+  let nextId = 0;
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+  class HrmSwitchViewModel {
+    constructor(params, componentInfo) {
+      this._subscriptions = [];
+      this._$element = $(componentInfo.element);
+      this._exportAs = params !== undefined ? params.exportAs : undefined;
+      this.element = componentInfo.element;
+      this.id = 'hrm-switch-' + nextId++;
+      this.checked = hrmExtractComponentParam(params, 'checked', false);
 
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+      this._init();
+    }
 
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+    _init() {
+      this._$element.addClass(['hrm-switch']);
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+      this._$element.toggleClass('hrm-switch--checked', this.checked());
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+      this._subscriptions.push(this.checked.subscribe(checked => {
+        this._$element.toggleClass('hrm-switch--checked', checked);
+      }));
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+      if (this._exportAs !== undefined) {
+        if (ko.isObservableArray(this._exportAs)) {
+          this._exportAs.push(this);
+        } else {
+          this._exportAs(this);
+        }
+      }
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+    }
+
+  }
+
+  ko.components.register('hrm-switch', {
+    viewModel: {
+      createViewModel: function (params, componentInfo) {
+        return new HrmSwitchViewModel(params, componentInfo);
+      }
+    },
+    template: `
+            <label class="hrm-switch__layout">
+                <input data-bind="checked: checked, attr: {id: id}" type="checkbox" hidden>
+            </label>
+        `
+  });
+})(); // hrmSwitchGroup
+
+
+(() => {
+  class HrmSwitchGroupViewModel {
+    constructor(element, control, label) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this._control = control;
+      this._label = label;
+      this.element = element;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.addClass('hrm-switch-group');
+
+      this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'descendantsComplete', () => {
+        this._label().setFor(this._control().id);
+      }));
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+    }
+
+  }
+
+  ko.bindingHandlers.hrmSwitchGroup = {
+    init: function (element, valueAccessor, allBindings, _, bindingContext) {
+      const control = allBindings.get('hrmSwitchGroupControlRef');
+      const label = allBindings.get('hrmSwitchGroupLabelRef');
+      const viewModel = new HrmSwitchGroupViewModel(element, control, label);
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        viewModel.dispose();
+      });
+      const innerBindingContext = ko.bindingEvent.startPossiblyAsyncContentBinding(element, bindingContext);
+      ko.applyBindingsToDescendants(innerBindingContext, element);
+      return {
+        controlsDescendantBindings: true
+      };
+    }
+  };
+})(); // hrmSwitchGroupLabel
+
+
+(() => {
+  class HrmSwitchGroupLabelViewModel {
+    constructor(element) {
+      this._subscriptions = [];
+      this._$element = $(element);
+      this.element = element;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.addClass('hrm-switch-group__label');
+    }
+
+    setFor(id) {
+      this._$element.attr('for', id);
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+    }
+
+  }
+
+  ko.bindingHandlers.hrmSwitchGroupLabel = {
+    init: function (element, valueAccessor) {
+      const viewModel = new HrmSwitchGroupLabelViewModel(element);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel.dispose();
+      });
+    }
+  };
+})();
+"use strict";
+
+class HrmTabGroupItem {
+  constructor(text, disabled = false) {
+    this.text = text;
+    this.disabled = ko.observable(disabled);
+  }
+
+}
+
+ko.components.register('hrm-tab-group', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-tab-group']);
+
+      const HrmTabGroupViewModel = function () {
+        this.moreButtonElementWidth = 33.5;
+        this.itemMargin = 30;
+        this.subscriptions = [];
+        this.element = componentInfo.element;
+
+        this.windowResizeHandler = () => {
+          this.viewportSize({
+            width: $(window).width(),
+            height: $(window).height()
+          });
+          this.updateWidth();
+        };
+
+        this.viewportSize = ko.observable({
+          width: $(window).width(),
+          height: $(window).height()
+        });
+        this.items = params.items;
+        this.activeItem = hrmExtractComponentParam(params, 'activeItem', 0);
+        this.width = ko.observable($element.width());
+        this.itemWidths = ko.pureComputed(() => {
+          const $itemMirror = $('<span>').css({
+            'font-weight': 500,
+            'font-size': '13px',
+            'white-space': 'nowrap'
+          });
+          const $container = $('<div>').css({
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
+            visibility: 'hidden'
+          });
+          $container.appendTo(document.body);
+          $container.append($itemMirror);
+          const result = ko.unwrap(this.items).map(item => {
+            $itemMirror.text(item.text);
+            return $itemMirror.width();
+          });
+          $container.remove();
+          return result;
+        });
+        this.maxFitItem = ko.pureComputed(() => {
+          const itemWidths = this.itemWidths();
+          const width = this.width();
+          let w = 0;
+
+          for (let i = 0; i < itemWidths.length; i++) {
+            if (i > 0) {
+              w += itemWidths[i] + this.itemMargin;
+            } else {
+              w += itemWidths[i];
+            }
+
+            if (w >= width - this.moreButtonElementWidth - this.itemMargin) {
+              return i !== 0 ? i - 1 : null;
+            }
+          }
+
+          return itemWidths.length > 0 ? itemWidths.length - 1 : null;
+        });
+
+        this.updateWidth = function () {
+          this.width($element.width());
+        };
+
+        this.timer = ko.observable(0);
+        setInterval(() => {
+          this.timer(this.timer() + 1);
+        }, 1000);
+
+        (() => {
+          $(window).on('resize', this.windowResizeHandler);
+        })();
+      };
+
+      HrmTabGroupViewModel.prototype.dispose = function () {
+        this.subscriptions.forEach(s => s.dispose());
+        $(window).off('resize', this.windowResizeHandler);
+      };
+
+      return new HrmTabGroupViewModel();
+    }
+  },
+  template: `
+        <div class="hrm-tab-group__content-wrapper">
+            <div class="hrm-tab-group__content">
+                <!-- ko if: items.length > 0 -->
+                    <!-- ko foreach: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth ? items.slice(0, maxFitItem() + 1) : items -->
+                        <div class="hrm-tab-group__item"
+                             data-bind="
+                                click: function() {if (!disabled()) {$component.activeItem($index());}},
+                                css: {
+                                    'hrm-tab-group__item--active': $component.activeItem() === $index(),
+                                    'hrm-tab-group__item--disabled': disabled
+                                },
+                                text: text
+                             ">
+                        </div>
+                    <!-- /ko -->
+                    
+                    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
+                        <!-- ko if: maxFitItem() < items.length - 1 -->
+                            <button class="hrm-button hrm-tab-group__more-button"
+                                    data-bind="
+                                        hrmDropdownMenu,
+                                        hrmDropdownMenuTemplate: 'hrm-tab-group-more-button-dropdown-menu-template',
+                                        hrmDropdownMenuPlacement: 'bottom-end'
+                                    ">
+                                Еще...
+                            </button>
+                            
+                            <script id="hrm-tab-group-more-button-dropdown-menu-template" type="text/html">
+                                <!-- ko foreach: items.slice(maxFitItem() + 1) -->
+                                    <div class="hrm-dropdown-menu__item"
+                                         data-bind="
+                                            text: text,
+                                            click: function() {if (!disabled()) {$component.activeItem($index() + $component.maxFitItem() + 1);}},
+                                            css: {'hrm-dropdown-menu__item--disabled': disabled}
+                                         ">
+                                    </div>
+                                <!-- /ko -->
+                            </script>   
+                        <!-- /ko -->
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+    `
+});
+"use strict";
 
 ko.bindingHandlers.hrmTable = {
-  init: function init(element) {
-    var $element = $(element);
+  init: function (element) {
+    const $element = $(element);
     $element.addClass('hrm-table');
   }
 }; // hrmEditableTableCell
 
-(function () {
-  var ViewModel =
-  /*#__PURE__*/
-  function () {
-    function ViewModel(element, error) {
-      _classCallCheck(this, ViewModel);
-
+(() => {
+  class ViewModel {
+    constructor(element, error) {
       this._subscriptions = [];
       this._windowResizeHandler = null;
       this._clickHandler = null;
@@ -899,148 +2596,137 @@ ko.bindingHandlers.hrmTable = {
       this._init();
     }
 
-    _createClass(ViewModel, [{
-      key: "_init",
-      value: function _init() {
-        var _this = this;
+    _init() {
+      const $element = $(this.element);
+      const $content = $element.find('.hrm-table__editable-cell-content');
+      $element.addClass('hrm-table__editable-cell');
 
-        var $element = $(this.element);
-        var $content = $element.find('.hrm-table__editable-cell-content');
-        $element.addClass('hrm-table__editable-cell');
-
-        this._clickHandler = function (event) {
-          if (event.target === $element[0] || $content.length > 0 && event.target === $content[0]) {
-            _this.click.notifySubscribers();
-          }
-        };
-
-        $element.on('click', this._clickHandler);
-
-        this._subscriptions.push(this.focused.subscribe(function (focused) {
-          $element.toggleClass('hrm-table__editable-cell--focused', focused);
-        }));
-
-        this._windowResizeHandler = function () {
-          _this._onWindowResize($(window).width(), $(window).height());
-        };
-
-        $(window).on('resize', this._windowResizeHandler);
-
-        this._errorTippyClickHandler = function (event) {
-          var $target = $(event.target);
-
-          if ($target.hasClass('hrm-table__editable-cell-error-tooltip-close-button')) {
-            _this._errorTippyInstance.hide();
-          }
-        };
-
-        this._errorTippyInstance = tippy(this.element, {
-          arrow: false,
-          distance: 7,
-          placement: 'bottom',
-          onCreate: function onCreate(instance) {
-            $(instance.popperChildren.tooltip).addClass('hrm-table__editable-cell-error-tooltip');
-            $(instance.popperChildren.tooltip).on('click', _this._errorTippyClickHandler);
-            instance.disable();
-          }
-        });
-
-        this._windowResizeHandler();
-
-        this._setError(this._error);
-      }
-    }, {
-      key: "_destroy",
-      value: function _destroy() {
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
-
-        $(window).off('resize', this._windowResizeHandler);
-        $(this._errorTippyInstance.popperChildren.tooltip).on('click', this._errorTippyClickHandler);
-
-        this._errorTippyInstance.destroy();
-      }
-    }, {
-      key: "_setError",
-      value: function _setError(error) {
-        var _this2 = this;
-
-        if (this._errorSubscription !== null) {
-          this._errorSubscription.dispose();
+      this._clickHandler = event => {
+        if (event.target === $element[0] || $content.length > 0 && event.target === $content[0]) {
+          this.click.notifySubscribers();
         }
+      };
 
-        if (ko.isObservable(error)) {
-          this._errorSubscription = error.subscribe(function (error) {
-            _this2._error = error;
+      $element.on('click', this._clickHandler);
 
-            _this2._updateErrorView();
-          });
-          this._error = error();
-        } else {
+      this._subscriptions.push(this.focused.subscribe(focused => {
+        $element.toggleClass('hrm-table__editable-cell--focused', focused);
+      }));
+
+      this._windowResizeHandler = () => {
+        this._onWindowResize($(window).width(), $(window).height());
+      };
+
+      $(window).on('resize', this._windowResizeHandler);
+
+      this._errorTippyClickHandler = event => {
+        const $target = $(event.target);
+
+        if ($target.hasClass('hrm-table__editable-cell-error-tooltip-close-button')) {
+          this._errorTippyInstance.hide();
+        }
+      };
+
+      this._errorTippyInstance = tippy(this.element, {
+        arrow: false,
+        distance: 7,
+        placement: 'bottom',
+        onCreate: instance => {
+          $(instance.popperChildren.tooltip).addClass('hrm-table__editable-cell-error-tooltip');
+          $(instance.popperChildren.tooltip).on('click', this._errorTippyClickHandler);
+          instance.disable();
+        }
+      });
+
+      this._windowResizeHandler();
+
+      this._setError(this._error);
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      $(window).off('resize', this._windowResizeHandler);
+      $(this._errorTippyInstance.popperChildren.tooltip).on('click', this._errorTippyClickHandler);
+
+      this._errorTippyInstance.destroy();
+    }
+
+    _setError(error) {
+      if (this._errorSubscription !== null) {
+        this._errorSubscription.dispose();
+      }
+
+      if (ko.isObservable(error)) {
+        this._errorSubscription = error.subscribe(error => {
           this._error = error;
+
+          this._updateErrorView();
+        });
+        this._error = error();
+      } else {
+        this._error = error;
+      }
+
+      this._updateErrorView();
+    }
+
+    _updateErrorView() {
+      $(this.element).toggleClass('hrm-table__editable-cell--has-error', !!this._error);
+
+      if (!!this._error && this._error.message !== null) {
+        this._errorTippyInstance.enable();
+
+        this._errorTippyInstance.setContent(this._createErrorTooltipContent(this._error.message));
+
+        if (this._isTabletOrMobile) {
+          this._errorTippyInstance.show(0);
+
+          this._errorTippyInstance.setProps({
+            interactive: true,
+            appendTo: document.body,
+            boundary: 'viewport',
+            hideOnClick: false,
+            trigger: 'manual'
+          });
+        } else {
+          this._errorTippyInstance.setProps({
+            interactive: false,
+            hideOnClick: true,
+            trigger: 'mouseenter'
+          });
         }
+      } else {
+        this._errorTippyInstance.disable();
+      }
+    }
+
+    _onWindowResize(width, height) {
+      const isTabletOrMobile = width <= HRM_BREAKPOINTS.tabletMaxWidth;
+
+      if (this._isTabletOrMobile !== isTabletOrMobile) {
+        this._isTabletOrMobile = isTabletOrMobile;
 
         this._updateErrorView();
       }
-    }, {
-      key: "_updateErrorView",
-      value: function _updateErrorView() {
-        $(this.element).toggleClass('hrm-table__editable-cell--has-error', !!this._error);
+    }
 
-        if (!!this._error && this._error.message !== null) {
-          this._errorTippyInstance.enable();
+    _createErrorTooltipContent(message) {
+      return `
+                <span class="hrm-table__editable-cell-error-tooltip-text">${message}</span>
+                <button class="hrm-button hrm-table__editable-cell-error-tooltip-close-button">
+                </button>
+            `;
+    }
 
-          this._errorTippyInstance.setContent(this._createErrorTooltipContent(this._error.message));
+  }
 
-          if (this._isTabletOrMobile) {
-            this._errorTippyInstance.show(0);
-
-            this._errorTippyInstance.setProps({
-              interactive: true,
-              appendTo: document.body,
-              boundary: 'viewport',
-              hideOnClick: false,
-              trigger: 'manual'
-            });
-          } else {
-            this._errorTippyInstance.setProps({
-              interactive: false,
-              hideOnClick: true,
-              trigger: 'mouseenter'
-            });
-          }
-        } else {
-          this._errorTippyInstance.disable();
-        }
-      }
-    }, {
-      key: "_onWindowResize",
-      value: function _onWindowResize(width, height) {
-        var isTabletOrMobile = width <= HRM_BREAKPOINTS.tabletMaxWidth;
-
-        if (this._isTabletOrMobile !== isTabletOrMobile) {
-          this._isTabletOrMobile = isTabletOrMobile;
-
-          this._updateErrorView();
-        }
-      }
-    }, {
-      key: "_createErrorTooltipContent",
-      value: function _createErrorTooltipContent(message) {
-        return "\n                <span class=\"hrm-table__editable-cell-error-tooltip-text\">".concat(message, "</span>\n                <button class=\"hrm-button hrm-table__editable-cell-error-tooltip-close-button\">\n                </button>\n            ");
-      }
-    }]);
-
-    return ViewModel;
-  }();
-
-  var instances = new Map();
-  var previousBindingsList = new Map();
+  const instances = new Map();
+  const previousBindingsList = new Map();
   ko.bindingHandlers.hrmTableEditableCell = {
-    init: function init(element, valueAccessor, allBindings) {
-      var error = allBindings.get('hrmTableEditableCellError');
-      var viewModel = new ViewModel(element, error);
+    init: function (element, valueAccessor, allBindings) {
+      const error = allBindings.get('hrmTableEditableCellError');
+      const viewModel = new ViewModel(element, error);
       instances.set(element, viewModel);
 
       if (valueAccessor() !== undefined) {
@@ -1063,9 +2749,9 @@ ko.bindingHandlers.hrmTable = {
         viewModel._destroy();
       });
     },
-    update: function update(element, valueAccessor, allBindings) {
-      var instance = instances.get(element);
-      var previousBindings = previousBindingsList.get(element);
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
 
       if (previousBindings !== undefined) {
         if (previousBindings['hrmTableEditableCellError'] !== allBindings.get('hrmTableEditableCellError')) {
@@ -1079,13 +2765,9 @@ ko.bindingHandlers.hrmTable = {
 })(); // hrmEditableTableCellInputControl
 
 
-(function () {
-  var ViewModel =
-  /*#__PURE__*/
-  function () {
-    function ViewModel(element, owner) {
-      _classCallCheck(this, ViewModel);
-
+(() => {
+  class ViewModel {
+    constructor(element, owner) {
       this._subscriptions = [];
       this._focusHandler = null;
       this._blurHandler = null;
@@ -1095,51 +2777,38 @@ ko.bindingHandlers.hrmTable = {
       this._init();
     }
 
-    _createClass(ViewModel, [{
-      key: "_init",
-      value: function _init() {
-        var _this3 = this;
+    _init() {
+      const $element = $(this.element);
+      $element.addClass(['hrm-table__editable-cell-control', 'hrm-table__editable-cell-control--type_input']);
 
-        var $element = $(this.element);
-        $element.addClass(['hrm-table__editable-cell-control', 'hrm-table__editable-cell-control--type_input']);
+      this._focusHandler = () => ko.unwrap(this._owner).focused(true);
 
-        this._focusHandler = function () {
-          return ko.unwrap(_this3._owner).focused(true);
-        };
+      this._blurHandler = () => ko.unwrap(this._owner).focused(false);
 
-        this._blurHandler = function () {
-          return ko.unwrap(_this3._owner).focused(false);
-        };
+      $element.on('focus', this._focusHandler);
+      $element.on('blur', this._blurHandler);
 
-        $element.on('focus', this._focusHandler);
-        $element.on('blur', this._blurHandler);
+      this._subscriptions.push(ko.unwrap(this._owner).click.subscribe(() => {
+        $element.focus();
+      }));
 
-        this._subscriptions.push(ko.unwrap(this._owner).click.subscribe(function () {
-          $element.focus();
-        }));
+      ko.unwrap(this._owner).focused($element.is(':focus'));
+    }
 
-        ko.unwrap(this._owner).focused($element.is(':focus'));
-      }
-    }, {
-      key: "_destroy",
-      value: function _destroy() {
-        var $element = $(this.element);
-        $element.off('focus', this._focusHandler);
-        $element.off('blur', this._blurHandler);
+    _destroy() {
+      const $element = $(this.element);
+      $element.off('focus', this._focusHandler);
+      $element.off('blur', this._blurHandler);
 
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
-      }
-    }]);
+      this._subscriptions.forEach(s => s.dispose());
+    }
 
-    return ViewModel;
-  }();
+  }
 
   ko.bindingHandlers.hrmTableEditableCellInputControl = {
-    init: function init(element, valueAccessor, allBindings) {
-      var owner = allBindings.get('hrmTableEditableCellInputControlOwner');
-      var viewModel = new ViewModel(element, owner);
+    init: function (element, valueAccessor, allBindings) {
+      const owner = allBindings.get('hrmTableEditableCellInputControlOwner');
+      const viewModel = new ViewModel(element, owner);
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         viewModel._destroy();
       });
@@ -1148,13 +2817,9 @@ ko.bindingHandlers.hrmTable = {
 })(); // hrmEditableTableCellSelectControl
 
 
-(function () {
-  var ViewModel =
-  /*#__PURE__*/
-  function () {
-    function ViewModel(element, owner) {
-      _classCallCheck(this, ViewModel);
-
+(() => {
+  class ViewModel {
+    constructor(element, owner) {
       this._subscriptions = [];
       this._selectionFocusHandler = null;
       this._selectionBlurHandler = null;
@@ -1166,73 +2831,52 @@ ko.bindingHandlers.hrmTable = {
       this._init();
     }
 
-    _createClass(ViewModel, [{
-      key: "_init",
-      value: function _init() {
-        var _this4 = this;
+    _init() {
+      const $element = $(this.element);
+      const select2Instance = $element.data('select2');
+      select2Instance.$container.addClass(['hrm-table__editable-cell-control', 'hrm-table__editable-cell-control--type_select']);
+      select2Instance.$dropdown.children().first().addClass(['hrm-table__editable-cell-dropdown']);
+      const selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
+      const dropdownOpened = ko.observable(false);
 
-        var $element = $(this.element);
-        var select2Instance = $element.data('select2');
-        select2Instance.$container.addClass(['hrm-table__editable-cell-control', 'hrm-table__editable-cell-control--type_select']);
-        select2Instance.$dropdown.children().first().addClass(['hrm-table__editable-cell-dropdown']);
-        var selectionFocused = ko.observable(select2Instance.$selection.is(':focus'));
-        var dropdownOpened = ko.observable(false);
+      this._subscriptions.push(ko.computed(() => selectionFocused() || dropdownOpened()).subscribe(value => ko.unwrap(this._owner).focused(value)));
 
-        this._subscriptions.push(ko.computed(function () {
-          return selectionFocused() || dropdownOpened();
-        }).subscribe(function (value) {
-          return ko.unwrap(_this4._owner).focused(value);
-        }));
+      this._selectionFocusHandler = () => selectionFocused(true);
 
-        this._selectionFocusHandler = function () {
-          return selectionFocused(true);
-        };
+      this._selectionBlurHandler = () => selectionFocused(false);
 
-        this._selectionBlurHandler = function () {
-          return selectionFocused(false);
-        };
+      this._openingHandler = () => dropdownOpened(true);
 
-        this._openingHandler = function () {
-          return dropdownOpened(true);
-        };
+      this._closeHandler = () => dropdownOpened(false);
 
-        this._closeHandler = function () {
-          return dropdownOpened(false);
-        };
+      select2Instance.$selection.on('focus', this._selectionFocusHandler);
+      select2Instance.$selection.on('blur', this._selectionBlurHandler);
+      $element.on('select2:opening', this._openingHandler);
+      $element.on('select2:close', this._closeHandler);
+      selectionFocused(select2Instance.$selection.is(':focus'));
 
-        select2Instance.$selection.on('focus', this._selectionFocusHandler);
-        select2Instance.$selection.on('blur', this._selectionBlurHandler);
-        $element.on('select2:opening', this._openingHandler);
-        $element.on('select2:close', this._closeHandler);
-        selectionFocused(select2Instance.$selection.is(':focus'));
+      this._subscriptions.push(ko.unwrap(this._owner).click.subscribe(() => {
+        select2Instance.open();
+      }));
+    }
 
-        this._subscriptions.push(ko.unwrap(this._owner).click.subscribe(function () {
-          select2Instance.open();
-        }));
-      }
-    }, {
-      key: "_destroy",
-      value: function _destroy() {
-        var $element = $(this.element);
-        var select2Instance = $element.data('select2');
-        select2Instance.$selection.off('focus', this._selectionFocusHandler);
-        select2Instance.$selection.off('blur', this._selectionBlurHandler);
-        $element.off('select2:opening', this._openingHandler);
-        $element.off('select2:close', this._closeHandler);
+    _destroy() {
+      const $element = $(this.element);
+      const select2Instance = $element.data('select2');
+      select2Instance.$selection.off('focus', this._selectionFocusHandler);
+      select2Instance.$selection.off('blur', this._selectionBlurHandler);
+      $element.off('select2:opening', this._openingHandler);
+      $element.off('select2:close', this._closeHandler);
 
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
-      }
-    }]);
+      this._subscriptions.forEach(s => s.dispose());
+    }
 
-    return ViewModel;
-  }();
+  }
 
   ko.bindingHandlers.hrmTableEditableCellSelectControl = {
-    init: function init(element, valueAccessor, allBindings) {
-      var owner = allBindings.get('hrmTableEditableCellSelectControlOwner');
-      var viewModel = new ViewModel(element, owner);
+    init: function (element, valueAccessor, allBindings) {
+      const owner = allBindings.get('hrmTableEditableCellSelectControlOwner');
+      const viewModel = new ViewModel(element, owner);
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         viewModel._destroy();
       });
@@ -1241,15 +2885,11 @@ ko.bindingHandlers.hrmTable = {
 })(); // hrmTableStickySectionContainer
 
 
-(function () {
-  var StickyEvents = window['stickyEvents'];
+(() => {
+  const StickyEvents = window['stickyEvents'];
 
-  var ViewModel =
-  /*#__PURE__*/
-  function () {
-    function ViewModel(element, sectionWrappers) {
-      _classCallCheck(this, ViewModel);
-
+  class ViewModel {
+    constructor(element, sectionWrappers) {
       this._subscriptions = [];
       this._sectionWrappers = sectionWrappers;
       this._sectionWrapperElementStuckHandler = null;
@@ -1260,86 +2900,71 @@ ko.bindingHandlers.hrmTable = {
       this._init();
     }
 
-    _createClass(ViewModel, [{
-      key: "_init",
-      value: function _init() {
-        var _this5 = this;
+    _init() {
+      const $element = $(this.element);
+      $element.addClass('hrm-table__sticky-section-container');
+      const scrollableContainer = $('.hrm-scaffold__body').length > 0 ? $('.hrm-scaffold__body')[0] : $('body')[0];
+      this._stickyEvents = new StickyEvents({
+        container: scrollableContainer
+      });
 
-        var $element = $(this.element);
-        $element.addClass('hrm-table__sticky-section-container');
-        var scrollableContainer = $('.hrm-scaffold__body').length > 0 ? $('.hrm-scaffold__body')[0] : $('body')[0];
-        this._stickyEvents = new StickyEvents({
-          container: scrollableContainer
+      this._stickyEvents.addStickies(this._sectionWrappers());
+
+      this._sectionWrapperElementStuckHandler = event => {
+        const wrapper = this._sectionWrappers().find(wrapper => wrapper.element === event.target);
+
+        wrapper.stuck(true);
+      };
+
+      this._sectionWrapperElementUnstuckHandler = event => {
+        const wrapper = this._sectionWrappers().find(wrapper => wrapper.element === event.target);
+
+        wrapper.stuck(false);
+      };
+
+      this._sectionWrappers().forEach(wrapper => {
+        wrapper.element.addEventListener(StickyEvents.STUCK, this._sectionWrapperElementStuckHandler);
+        wrapper.element.addEventListener(StickyEvents.UNSTUCK, this._sectionWrapperElementUnstuckHandler);
+      });
+
+      let lastSectionWrappers = [...this._sectionWrappers()];
+
+      this._subscriptions.push(this._sectionWrappers.subscribe(addedWrapper => {
+        _.difference(lastSectionWrappers, addedWrapper).forEach(removedElement => {
+          removedElement.element.removeEventListener(StickyEvents.STUCK, this._sectionWrapperElementStuckHandler);
+          removedElement.element.removeEventListener(StickyEvents.UNSTUCK, this._sectionWrapperElementUnstuckHandler);
         });
 
-        this._stickyEvents.addStickies(this._sectionWrappers());
+        _.difference(addedWrapper, lastSectionWrappers).forEach(addedWrapper => {
+          addedWrapper.element.addEventListener(StickyEvents.STUCK, this._sectionWrapperElementStuckHandler);
+          addedWrapper.element.addEventListener(StickyEvents.UNSTUCK, this._sectionWrapperElementUnstuckHandler);
 
-        this._sectionWrapperElementStuckHandler = function (event) {
-          var wrapper = _this5._sectionWrappers().find(function (wrapper) {
-            return wrapper.element === event.target;
-          });
+          this._stickyEvents.addSticky(addedWrapper.element);
 
-          wrapper.stuck(true);
-        };
-
-        this._sectionWrapperElementUnstuckHandler = function (event) {
-          var wrapper = _this5._sectionWrappers().find(function (wrapper) {
-            return wrapper.element === event.target;
-          });
-
-          wrapper.stuck(false);
-        };
-
-        this._sectionWrappers().forEach(function (wrapper) {
-          wrapper.element.addEventListener(StickyEvents.STUCK, _this5._sectionWrapperElementStuckHandler);
-          wrapper.element.addEventListener(StickyEvents.UNSTUCK, _this5._sectionWrapperElementUnstuckHandler);
+          $(addedWrapper.element).addClass('sticky-events');
         });
 
-        var lastSectionWrappers = _toConsumableArray(this._sectionWrappers());
+        lastSectionWrappers = [...addedWrapper];
+      }));
+    }
 
-        this._subscriptions.push(this._sectionWrappers.subscribe(function (addedWrapper) {
-          _.difference(lastSectionWrappers, addedWrapper).forEach(function (removedElement) {
-            removedElement.element.removeEventListener(StickyEvents.STUCK, _this5._sectionWrapperElementStuckHandler);
-            removedElement.element.removeEventListener(StickyEvents.UNSTUCK, _this5._sectionWrapperElementUnstuckHandler);
-          });
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
 
-          _.difference(addedWrapper, lastSectionWrappers).forEach(function (addedWrapper) {
-            addedWrapper.element.addEventListener(StickyEvents.STUCK, _this5._sectionWrapperElementStuckHandler);
-            addedWrapper.element.addEventListener(StickyEvents.UNSTUCK, _this5._sectionWrapperElementUnstuckHandler);
+      this._sectionWrappers().forEach(wrapper => {
+        wrapper.element.removeEventListener(StickyEvents.STUCK, this._sectionWrapperElementStuckHandler);
+        wrapper.element.removeEventListener(StickyEvents.UNSTUCK, this._sectionWrapperElementUnstuckHandler);
+      });
 
-            _this5._stickyEvents.addSticky(addedWrapper.element);
+      this._stickyEvents.disableEvents();
+    }
 
-            $(addedWrapper.element).addClass('sticky-events');
-          });
-
-          lastSectionWrappers = _toConsumableArray(addedWrapper);
-        }));
-      }
-    }, {
-      key: "_destroy",
-      value: function _destroy() {
-        var _this6 = this;
-
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
-
-        this._sectionWrappers().forEach(function (wrapper) {
-          wrapper.element.removeEventListener(StickyEvents.STUCK, _this6._sectionWrapperElementStuckHandler);
-          wrapper.element.removeEventListener(StickyEvents.UNSTUCK, _this6._sectionWrapperElementUnstuckHandler);
-        });
-
-        this._stickyEvents.disableEvents();
-      }
-    }]);
-
-    return ViewModel;
-  }();
+  }
 
   ko.bindingHandlers.hrmTableStickySectionContainer = {
-    init: function init(element, valueAccessor, allBindings) {
-      var sectionWrappers = allBindings.get('hrmTableStickySectionContainerSectionWrappers');
-      var viewModel = new ViewModel(element, sectionWrappers);
+    init: function (element, valueAccessor, allBindings) {
+      const sectionWrappers = allBindings.get('hrmTableStickySectionContainerSectionWrappers');
+      const viewModel = new ViewModel(element, sectionWrappers);
 
       if (valueAccessor() !== undefined) {
         if (ko.isObservableArray(valueAccessor())) {
@@ -1365,13 +2990,9 @@ ko.bindingHandlers.hrmTable = {
 })(); // hrmTableStickySectionWrapper
 
 
-(function () {
-  var ViewModel =
-  /*#__PURE__*/
-  function () {
-    function ViewModel(element, sectionWrappers) {
-      _classCallCheck(this, ViewModel);
-
+(() => {
+  class ViewModel {
+    constructor(element, sectionWrappers) {
       this._subscriptions = [];
       this.element = element;
       this.stuck = ko.observable(false);
@@ -1379,32 +3000,25 @@ ko.bindingHandlers.hrmTable = {
       this._init();
     }
 
-    _createClass(ViewModel, [{
-      key: "_init",
-      value: function _init() {
-        var $element = $(this.element);
-        $element.addClass('hrm-table__sticky-section-wrapper');
-        $element.toggleClass('hrm-table__sticky-section-wrapper--stuck', this.stuck());
+    _init() {
+      const $element = $(this.element);
+      $element.addClass('hrm-table__sticky-section-wrapper');
+      $element.toggleClass('hrm-table__sticky-section-wrapper--stuck', this.stuck());
 
-        this._subscriptions.push(this.stuck.subscribe(function (stuck) {
-          $element.toggleClass('hrm-table__sticky-section-wrapper--stuck', stuck);
-        }));
-      }
-    }, {
-      key: "_destroy",
-      value: function _destroy() {
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
-        });
-      }
-    }]);
+      this._subscriptions.push(this.stuck.subscribe(stuck => {
+        $element.toggleClass('hrm-table__sticky-section-wrapper--stuck', stuck);
+      }));
+    }
 
-    return ViewModel;
-  }();
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+    }
+
+  }
 
   ko.bindingHandlers.hrmTableStickySectionWrapper = {
-    init: function init(element, valueAccessor) {
-      var viewModel = new ViewModel(element);
+    init: function (element, valueAccessor) {
+      const viewModel = new ViewModel(element);
 
       if (valueAccessor() !== undefined) {
         if (ko.isObservableArray(valueAccessor())) {
@@ -1430,22 +3044,10 @@ ko.bindingHandlers.hrmTable = {
 })();
 "use strict";
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
 // hrmTooltip
-(function () {
-  var ViewModel =
-  /*#__PURE__*/
-  function () {
-    function ViewModel(element, text) {
-      var mode = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'basic';
-
-      _classCallCheck(this, ViewModel);
-
+(() => {
+  class ViewModel {
+    constructor(element, text, mode = 'basic') {
       this._subscriptions = [];
       this._textSubscription = null;
       this._clickHandler = null;
@@ -1457,109 +3059,95 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
       this._init(text);
     }
 
-    _createClass(ViewModel, [{
-      key: "_init",
-      value: function _init(text) {
-        var _this = this;
+    _init(text) {
+      if (this._mode === 'large') {
+        this._clickHandler = () => {
+          this._tippyInstance.show();
+        };
 
-        if (this._mode === 'large') {
-          this._clickHandler = function () {
-            _this._tippyInstance.show();
-          };
+        $(this.element).on('click', this._clickHandler);
 
-          $(this.element).on('click', this._clickHandler);
+        this._tooltipClickHandler = event => {
+          const $target = $(event.target);
 
-          this._tooltipClickHandler = function (event) {
-            var $target = $(event.target);
-
-            if ($target.hasClass('hrm-tooltip__close-button')) {
-              _this._tippyInstance.hide();
-            }
-          };
-        }
-
-        this._tippyInstance = tippy(this.element, {
-          arrow: false,
-          distance: 7,
-          placement: 'bottom',
-          interactive: true,
-          appendTo: document.body,
-          boundary: 'viewport',
-          hideOnClick: this._mode === 'basic',
-          trigger: this._mode === 'basic' ? 'mouseenter click' : 'manual',
-          onCreate: function onCreate(instance) {
-            $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
-            $(instance.popperChildren.tooltip).addClass(_this._mode === 'basic' ? 'hrm-tooltip--mode_basic' : 'hrm-tooltip--mode_large');
-
-            if (_this._mode === 'large') {
-              $(instance.popperChildren.tooltip).on('click', _this._tooltipClickHandler);
-            }
+          if ($target.hasClass('hrm-tooltip__close-button')) {
+            this._tippyInstance.hide();
           }
-        });
-
-        this._setText(text);
+        };
       }
-    }, {
-      key: "_setText",
-      value: function _setText(text) {
-        var _this2 = this;
 
-        if (this._textSubscription !== null) {
-          this._textSubscription.dispose();
+      this._tippyInstance = tippy(this.element, {
+        arrow: false,
+        distance: 7,
+        placement: 'bottom',
+        interactive: true,
+        appendTo: document.body,
+        boundary: 'viewport',
+        hideOnClick: this._mode === 'basic',
+        trigger: this._mode === 'basic' ? 'mouseenter click' : 'manual',
+        onCreate: instance => {
+          $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
+          $(instance.popperChildren.tooltip).addClass(this._mode === 'basic' ? 'hrm-tooltip--mode_basic' : 'hrm-tooltip--mode_large');
+
+          if (this._mode === 'large') {
+            $(instance.popperChildren.tooltip).on('click', this._tooltipClickHandler);
+          }
         }
+      });
 
-        if (ko.isObservable(text)) {
-          this._textSubscription = text.subscribe(function (text) {
-            _this2._text = text;
+      this._setText(text);
+    }
 
-            _this2._update();
-          });
-          this._text = text();
-        } else {
+    _setText(text) {
+      if (this._textSubscription !== null) {
+        this._textSubscription.dispose();
+      }
+
+      if (ko.isObservable(text)) {
+        this._textSubscription = text.subscribe(text => {
           this._text = text;
-        }
 
-        this._update();
-      }
-    }, {
-      key: "_update",
-      value: function _update() {
-        this._tippyInstance.setContent(this._createContent(this._text, this._mode));
-      }
-    }, {
-      key: "_createContent",
-      value: function _createContent(text, mode) {
-        var result = "<div class=\"hrm-tooltip__text\">".concat(text, "</div>");
-
-        if (mode === 'large') {
-          result += '<button class="hrm-button hrm-tooltip__close-button">Ок</button>';
-        }
-
-        return result;
-      }
-    }, {
-      key: "_destroy",
-      value: function _destroy() {
-        this._subscriptions.forEach(function (s) {
-          return s.dispose();
+          this._update();
         });
-
-        if (this._mode === 'large') {
-          $(this.element).off('click', this._clickHandler);
-        }
+        this._text = text();
+      } else {
+        this._text = text;
       }
-    }]);
 
-    return ViewModel;
-  }();
+      this._update();
+    }
 
-  var instances = new Map();
-  var previousBindingsList = new Map();
+    _update() {
+      this._tippyInstance.setContent(this._createContent(this._text, this._mode));
+    }
+
+    _createContent(text, mode) {
+      let result = `<div class="hrm-tooltip__text">${text}</div>`;
+
+      if (mode === 'large') {
+        result += '<button class="hrm-button hrm-tooltip__close-button">Ок</button>';
+      }
+
+      return result;
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      if (this._mode === 'large') {
+        $(this.element).off('click', this._clickHandler);
+      }
+    }
+
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
   ko.bindingHandlers.hrmTooltip = {
-    init: function init(element, valueAccessor, allBindings) {
-      var text = allBindings.get('hrmTooltipText');
-      var mode = allBindings.get('hrmTooltipMode');
-      var viewModel = new ViewModel(element, text, mode);
+    init: function (element, valueAccessor, allBindings) {
+      const text = allBindings.get('hrmTooltipText');
+      const mode = allBindings.get('hrmTooltipMode');
+      const viewModel = new ViewModel(element, text, mode);
       instances.set(element, viewModel);
 
       if (valueAccessor() !== undefined) {
@@ -1582,9 +3170,9 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
         viewModel._destroy();
       });
     },
-    update: function update(element, valueAccessor, allBindings) {
-      var instance = instances.get(element);
-      var previousBindings = previousBindingsList.get(element);
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
 
       if (previousBindings !== undefined) {
         if (previousBindings['hrmTooltipText'] !== allBindings.get('hrmTooltipText')) {

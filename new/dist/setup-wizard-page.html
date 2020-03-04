@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="assets/fonts/fontawesome/css/all.css" />
 
 <link rel="stylesheet" href="assets/css/main.css" />
+
 </head>
 
 <body>
@@ -87,8 +88,8 @@
                 <div class="setup-wizard-page__tab-container" data-bind="using: formModel">
                     <!-- ko template: {
                         foreach: hrmTemplateIf($root.activeStep() === 1, $data),
-                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                        afterAdd: hrmFadeAfterAddFactory(300, 400),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(300)
                     } -->
                         <div class="setup-wizard-page__tab-pane setup-wizard-page__company-type-tab-pane">
                             <div class="setup-wizard-page__company-type-selector">
@@ -114,8 +115,8 @@
                     <!-- /ko -->
                     <!-- ko template: {
                         foreach: hrmTemplateIf($root.activeStep() === 2, $data),
-                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                        afterAdd: hrmFadeAfterAddFactory(300, 400),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(300)
                     } -->
                         <div class="setup-wizard-page__tab-pane setup-wizard-page__dish-categories-tab-pane">
                             <div class="setup-wizard-page__dish-categories-selector">
@@ -129,55 +130,44 @@
                                     } -->
                                         <div class="setup-wizard-page__dish-categories-selector-item">
                                             <div class="setup-wizard-page__dish-categories-selector-item-content">
-                                                <!-- ko let: {formField: ko.observable(null)} -->
+                                                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                     <div class="setup-wizard-page__dish-categories-selector-item-field" data-bind="
-                                                        component: {
-                                                            name: 'hrm-form-field',
-                                                            params: {
-                                                                hasError: $root.dishCategoriesStepFormControlErrorStateMatcher(value),
-                                                                exportAs: formField
-                                                            }
-                                                        }
+                                                        hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                                                     ">
-                                                        <hrm-slot name="label">
-                                                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                                                Категория
-                                                            </label>
-                                                        </hrm-slot>
+                                                        <label data-bind="hrmFormFieldLabel: label">Категория</label>
 
-                                                        <select data-bind="
-                                                            options: $root.dishCategories,
-                                                            optionsText: 'name',
-                                                            optionsValue: 'id',
-                                                            optionsCaption: '',
-                                                            value: $parent.value,
-                                                            hrmSelect, hrmSelectSearchEnabled: true,
-                                                            hrmFormFieldSelectControl,
-                                                            hrmFormFieldSelectControlOwner: formField
-                                                        ">
-                                                            <option></option>
-                                                        </select>
-
-                                                        <hrm-slot name="error">
-                                                            <div data-bind="
-                                                                component: {name: 'hrm-form-field-error'},
-                                                                hrmSlide,
-                                                                hrmSlideValue: $root.dishCategoriesStepFormControlErrorStateMatcher($parent.value),
-                                                                hrmSlideDuration: 150
+                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                            <select data-bind="
+                                                                options: $root.dishCategories,
+                                                                optionsText: 'name',
+                                                                optionsValue: 'id',
+                                                                optionsCaption: '',
+                                                                value: value,
+                                                                hrmSelect, hrmSelectSearchEnabled: true,
+                                                                hrmFormFieldSelectControl: control,
+                                                                hrmFormFieldSelectControlErrorStateMatcher: $root.dishCategoriesStepFormControlErrorStateMatcher.bind($root)
                                                             ">
-                                                                <!-- ko text: $parents[1].value.error() --><!-- /ko -->
-                                                            </div>
-                                                        </hrm-slot>
-                                                    </div>
+                                                                <option></option>
+                                                            </select>
+                                                        </div>
 
-                                                    <!-- ko if: $parent.dishCategories().length > 1 -->
-                                                        <button class="hrm-button hrm-icon-button hrm-times-icon-button
-                                                                       hrm-icon-button--theme_negative
-                                                                       setup-wizard-page__dish-categories-selector-item-remove-button"
-                                                                title="Удалить"
-                                                                data-bind="click: function () {$root.dishCategoriesStepRemove($index());}">
-                                                        </button>
-                                                    <!-- /ko -->
+                                                        <div data-bind="
+                                                            component: {name: 'hrm-form-field-error'},
+                                                            hrmSlide,
+                                                            hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                                                            hrmSlideDuration: 150
+                                                        ">
+                                                            <!-- ko text: $parent.value.error() --><!-- /ko -->
+                                                        </div>
+                                                    </div>
+                                                <!-- /ko -->
+                                                <!-- ko if: $parent.dishCategories().length > 1 -->
+                                                    <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                   hrm-icon-button--theme_negative
+                                                                   setup-wizard-page__dish-categories-selector-item-remove-button"
+                                                            title="Удалить"
+                                                            data-bind="click: function () {$root.dishCategoriesStepRemove($index());}">
+                                                    </button>
                                                 <!-- /ko -->
                                             </div>
                                         </div>
@@ -209,8 +199,8 @@
                     <!-- /ko -->
                     <!-- ko template: {
                         foreach: hrmTemplateIf($root.activeStep() === 3, $data),
-                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                        afterAdd: hrmFadeAfterAddFactory(300, 400),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(300)
                     } -->
                         <div class="setup-wizard-page__tab-pane setup-wizard-page__schedule-tab-pane">
                             <!-- ko let: {calendar: ko.observable(null)} -->
@@ -224,59 +214,48 @@
                                             </span>
 
                                             <div class="setup-wizard-page__schedule-selector-interval-selector-control">
-                                                <!-- ko let: {formField: ko.observable(null)} -->
+
+                                                <!-- ko let: {control: ko.observable(null)} -->
                                                     <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
                                                                 setup-wizard-page__schedule-selector-interval-selector-control-start-field"
-                                                         data-bind="component: {
-                                                            name: 'hrm-form-field',
-                                                            params: {
-                                                                noLabel: true,
-                                                                exportAs: formField,
-                                                                hasError: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher(intervalStart)
-                                                            }
-                                                         }"
-                                                    >
-                                                        <input data-bind="
-                                                            value: $parent.intervalStart,
-                                                            hrmTimeAutocompleter,
-                                                            hrmMask,
-                                                            hrmMaskPattern: 'datetime',
-                                                            hrmMaskOptions: {
-                                                                inputFormat: 'HH:MM',
-                                                                placeholder: ' '
-                                                            },
-                                                            hrmFormFieldInputControl,
-                                                            hrmFormFieldInputControlOwner: formField
-                                                        " placeholder="00:00">
+                                                         data-bind="hrmFormField, hrmFormFieldControlRef: control">
+                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                            <input data-bind="
+                                                                textInput: intervalStart,
+                                                                hrmTimeAutocompleter,
+                                                                hrmMask,
+                                                                hrmMaskPattern: 'datetime',
+                                                                hrmMaskOptions: {
+                                                                    inputFormat: 'HH:MM',
+                                                                    placeholder: ' '
+                                                                },
+                                                                hrmFormFieldInputControl: control,
+                                                                hrmFormFieldInputControlErrorStateMatcher: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher.bind($root)
+                                                            ">
+                                                        </div>
                                                     </div>
                                                 <!-- /ko -->
 
                                                 <span class="setup-wizard-page__schedule-selector-interval-selector-control-separator">—</span>
 
-                                                <!-- ko let: {formField: ko.observable(null)} -->
+                                                <!-- ko let: {control: ko.observable(null)} -->
                                                     <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
-                                                                    setup-wizard-page__schedule-selector-interval-selector-control-end-field"
-                                                         data-bind="component: {
-                                                            name: 'hrm-form-field',
-                                                            params: {
-                                                                noLabel: true,
-                                                                exportAs: formField,
-                                                                hasError: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher(intervalEnd)
-                                                            }
-                                                         }"
-                                                    >
-                                                        <input data-bind="
-                                                            value: $parent.intervalEnd,
-                                                            hrmTimeAutocompleter,
-                                                            hrmMask,
-                                                            hrmMaskPattern: 'datetime',
-                                                            hrmMaskOptions: {
-                                                                inputFormat: 'HH:MM',
-                                                                placeholder: ' '
-                                                            },
-                                                            hrmFormFieldInputControl,
-                                                            hrmFormFieldInputControlOwner: formField
-                                                        " placeholder="00:00">
+                                                                setup-wizard-page__schedule-selector-interval-selector-control-end-field"
+                                                         data-bind="hrmFormField, hrmFormFieldControlRef: control">
+                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                            <input data-bind="
+                                                                textInput: intervalEnd,
+                                                                hrmTimeAutocompleter,
+                                                                hrmMask,
+                                                                hrmMaskPattern: 'datetime',
+                                                                hrmMaskOptions: {
+                                                                    inputFormat: 'HH:MM',
+                                                                    placeholder: ' '
+                                                                },
+                                                                hrmFormFieldInputControl: control,
+                                                                hrmFormFieldInputControlErrorStateMatcher: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher.bind($root)
+                                                            ">
+                                                        </div>
                                                     </div>
                                                 <!-- /ko -->
                                             </div>
@@ -330,8 +309,8 @@
                     <!-- /ko -->
                     <!-- ko template: {
                         foreach: hrmTemplateIf($root.activeStep() === 4, $data),
-                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                        afterAdd: hrmFadeAfterAddFactory(300, 400),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(300)
                     } -->
                         <div class="setup-wizard-page__tab-pane setup-wizard-page__turnover-tab-pane"
                              data-bind="css: {'setup-wizard-page__turnover-tab-pane--calculated': isTurnoverCalculated}">
@@ -451,26 +430,21 @@
 
                                                             <span class="hrm-spacer"></span>
 
-                                                            <!-- ko let: {formField: ko.observable(null)} -->
+                                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                                 <div class="setup-wizard-page__turnover-selector-table-category-section-header-units-field" data-bind="
-                                                                    component: {
-                                                                        name: 'hrm-form-field',
-                                                                        params: {
-                                                                            noLabel: true,
-                                                                            exportAs: formField
-                                                                        }
-                                                                    }
-                                                                 ">
-                                                                    <select data-bind="
-                                                                        value: $parent.units,
-                                                                        hrmSelect,
-                                                                        hrmFormFieldSelectControl,
-                                                                        hrmFormFieldSelectControlOwner: formField
-                                                                    ">
-                                                                        <option value="1">Штуки</option>
-                                                                        <option value="2">Рубли</option>
-                                                                        <option value="3">Норма времени</option>
-                                                                    </select>
+                                                                    hrmFormField, hrmFormFieldControlRef: control
+                                                                ">
+                                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                        <select data-bind="
+                                                                            value: units,
+                                                                            hrmSelect, hrmSelectSearchEnabled: true,
+                                                                            hrmFormFieldSelectControl: control
+                                                                        ">
+                                                                            <option value="1">Штуки</option>
+                                                                            <option value="2">Рубли</option>
+                                                                            <option value="3">Норма времени</option>
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
                                                             <!-- /ko -->
                                                         </div>
@@ -852,26 +826,21 @@
 
                                                                 <span class="hrm-spacer"></span>
 
-                                                                <!-- ko let: {formField: ko.observable(null)} -->
+                                                                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                                     <div class="setup-wizard-page__turnover-selector-table-category-section-header-units-field" data-bind="
-                                                                        component: {
-                                                                            name: 'hrm-form-field',
-                                                                            params: {
-                                                                                noLabel: true,
-                                                                                exportAs: formField
-                                                                            }
-                                                                        }
+                                                                        hrmFormField, hrmFormFieldControlRef: control
                                                                     ">
-                                                                        <select data-bind="
-                                                                            value: $parent.units,
-                                                                            hrmSelect,
-                                                                            hrmFormFieldSelectControl,
-                                                                            hrmFormFieldSelectControlOwner: formField
-                                                                        ">
-                                                                            <option value="1">Штуки</option>
-                                                                            <option value="2">Рубли</option>
-                                                                            <option value="3">Норма времени</option>
-                                                                        </select>
+                                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                            <select data-bind="
+                                                                                value: units,
+                                                                                hrmSelect, hrmSelectSearchEnabled: true,
+                                                                                hrmFormFieldSelectControl: control
+                                                                            ">
+                                                                                <option value="1">Штуки</option>
+                                                                                <option value="2">Рубли</option>
+                                                                                <option value="3">Норма времени</option>
+                                                                            </select>
+                                                                        </div>
                                                                     </div>
                                                                 <!-- /ko -->
                                                             </div>
@@ -1086,8 +1055,8 @@
                     <!-- /ko -->
                     <!-- ko template: {
                         foreach: hrmTemplateIf($root.activeStep() === 5, $data),
-                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                        afterAdd: hrmFadeAfterAddFactory(300, 400),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(300)
                     } -->
                         <div class="setup-wizard-page__tab-pane setup-wizard-page__positions-tab-pane">
                             <div class="setup-wizard-page__positions-selector">
@@ -1101,54 +1070,44 @@
                                     } -->
                                         <div class="setup-wizard-page__positions-selector-item">
                                             <div class="setup-wizard-page__positions-selector-item-content">
-                                                <!-- ko let: {formField: ko.observable(null)} -->
+                                                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                     <div class="setup-wizard-page__positions-selector-item-field" data-bind="
-                                                        component: {
-                                                            name: 'hrm-form-field',
-                                                            params: {
-                                                                hasError: $root.positionsStepFormControlErrorStateMatcher(name),
-                                                                exportAs: formField
-                                                            }
-                                                        }
+                                                        hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                                                     ">
-                                                        <hrm-slot name="label">
-                                                            <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                                                Должность
-                                                            </label>
-                                                        </hrm-slot>
+                                                        <label data-bind="hrmFormFieldLabel: label">Должность</label>
 
-                                                        <select data-bind="
-                                                            options: _.uniq([...$root.builtinPositionNames, $parent.name()]),
-                                                            optionsCaption: '',
-                                                            value: $parent.name,
-                                                            hrmSelect, hrmSelectSearchEnabled: true,
-                                                            hrmSelectCustomValuesAllowed: true,
-                                                            hrmFormFieldSelectControl,
-                                                            hrmFormFieldSelectControlOwner: formField
-                                                        ">
-                                                            <option></option>
-                                                        </select>
-
-                                                        <hrm-slot name="error">
-                                                            <div data-bind="
-                                                                component: {name: 'hrm-form-field-error'},
-                                                                hrmSlide,
-                                                                hrmSlideValue: $root.positionsStepFormControlErrorStateMatcher($parent.name),
-                                                                hrmSlideDuration: 150
+                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                            <select data-bind="
+                                                                options: _.uniq([...$root.builtinPositionNames, name()]),
+                                                                optionsCaption: '',
+                                                                value: name,
+                                                                hrmSelect, hrmSelectSearchEnabled: true,
+                                                                hrmSelectCustomValuesAllowed: true,
+                                                                hrmFormFieldSelectControl: control,
+                                                                hrmFormFieldSelectControlErrorStateMatcher: $root.positionsStepFormControlErrorStateMatcher.bind($root)
                                                             ">
-                                                                <!-- ko text: $parents[1].name.error() --><!-- /ko -->
-                                                            </div>
-                                                        </hrm-slot>
-                                                    </div>
+                                                                <option></option>
+                                                            </select>
+                                                        </div>
 
-                                                    <!-- ko if: $parent.positions().length > 1 -->
-                                                        <button class="hrm-button hrm-icon-button hrm-times-icon-button
-                                                                       hrm-icon-button--theme_negative
-                                                                       setup-wizard-page__positions-selector-item-remove-button"
-                                                                title="Удалить"
-                                                                data-bind="click: function () {$root.positionsStepRemove($index());}">
-                                                        </button>
-                                                    <!-- /ko -->
+                                                        <div data-bind="
+                                                            component: {name: 'hrm-form-field-error'},
+                                                            hrmSlide,
+                                                            hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                                                            hrmSlideDuration: 150
+                                                        ">
+                                                            <!-- ko text: $parent.name.error() --><!-- /ko -->
+                                                        </div>
+                                                    </div>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $parent.positions().length > 1 -->
+                                                    <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                   hrm-icon-button--theme_negative
+                                                                   setup-wizard-page__positions-selector-item-remove-button"
+                                                            title="Удалить"
+                                                            data-bind="click: function () {$root.positionsStepRemove($index());}">
+                                                    </button>
                                                 <!-- /ko -->
                                             </div>
                                         </div>
@@ -1180,8 +1139,8 @@
                     <!-- /ko -->
                     <!-- ko template: {
                         foreach: hrmTemplateIf($root.activeStep() === 6, $data),
-                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                        afterAdd: hrmFadeAfterAddFactory(300, 400),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(300)
                     } -->
                         <div class="setup-wizard-page__tab-pane setup-wizard-page__workload-type-tab-pane">
                             <div class="setup-wizard-page__workload-type-selector">
@@ -1235,44 +1194,33 @@
                                                 <div class="setup-wizard-page__workload-type-selector-item-control-list"
                                                      data-bind="hrmSlide, hrmSlideValue: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth || isOpen()">
                                                     <div class="setup-wizard-page__workload-type-selector-item-control-list-content">
-                                                        <!-- ko let: {formField: ko.observable(null)} -->
+                                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                             <div class="setup-wizard-page__workload-type-selector-item-workload-type-form-field
                                                                         setup-wizard-page__workload-type-selector-item-control-list-item"
-                                                                 data-bind="component: {
-                                                                     name: 'hrm-form-field',
-                                                                     params: {
-                                                                        hasError: $root.workloadTypeStepFormControlErrorStateMatcher(workloadType),
-                                                                        exportAs: formField
-                                                                     }
-                                                                 }"
-                                                            >
-                                                                <hrm-slot name="label">
-                                                                    <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                                                        Тип нагрузки
-                                                                    </label>
-                                                                </hrm-slot>
+                                                                 data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                                <label data-bind="hrmFormFieldLabel: label">Тип нагрузки</label>
 
-                                                                <select data-bind="
-                                                                    value: $parent.workloadType,
-                                                                    hrmSelect,
-                                                                    hrmFormFieldSelectControl,
-                                                                    hrmFormFieldSelectControlOwner: formField
-                                                                ">
-                                                                    <option></option>
-                                                                    <option value="1">Объём товара по всему предприятию</option>
-                                                                    <option value="2">Объём товара по категориям</option>
-                                                                </select>
-
-                                                                <hrm-slot name="error">
-                                                                    <div data-bind="
-                                                                        component: {name: 'hrm-form-field-error'},
-                                                                        hrmSlide,
-                                                                        hrmSlideValue: $root.workloadTypeStepFormControlErrorStateMatcher($parent.workloadType),
-                                                                        hrmSlideDuration: 150
+                                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                    <select data-bind="
+                                                                        value: workloadType,
+                                                                        hrmSelect,
+                                                                        hrmFormFieldSelectControl: control,
+                                                                        hrmFormFieldSelectControlErrorStateMatcher: $root.workloadTypeStepFormControlErrorStateMatcher.bind($root)
                                                                     ">
-                                                                        <!-- ko text: $parents[1].workloadType.error() --><!-- /ko -->
-                                                                    </div>
-                                                                </hrm-slot>
+                                                                        <option></option>
+                                                                        <option value="1">Объём товара по всему предприятию</option>
+                                                                        <option value="2">Объём товара по категориям</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <div data-bind="
+                                                                    component: {name: 'hrm-form-field-error'},
+                                                                    hrmSlide,
+                                                                    hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                                                                    hrmSlideDuration: 150
+                                                                ">
+                                                                    <!-- ko text: $parent.workloadType.error() --><!-- /ko -->
+                                                                </div>
                                                             </div>
                                                         <!-- /ko -->
 
@@ -1291,129 +1239,94 @@
                                                                 </div>
                                                             <!-- /ko -->
 
-                                                            <!-- ko let: {formField: ko.observable(null)} -->
+                                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                                 <div class="setup-wizard-page__workload-type-selector-item-dish-categories-form-field
                                                                             setup-wizard-page__workload-type-selector-item-control-list-item"
-                                                                     data-bind="component: {
-                                                                         name: 'hrm-form-field',
-                                                                         params: {
-                                                                            hasError: $root.workloadTypeStepFormControlErrorStateMatcher(dishCategories),
-                                                                            exportAs: formField
-                                                                         }
-                                                                     }"
-                                                                >
-                                                                    <hrm-slot name="label">
-                                                                        <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                                                            Категории
-                                                                        </label>
-                                                                    </hrm-slot>
+                                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                                    <label data-bind="hrmFormFieldLabel: label">Категория</label>
 
-                                                                    <select data-bind="
-                                                                        options: $root.dishCategories,
-                                                                        optionsText: 'name',
-                                                                        optionsValue: 'id',
-                                                                        optionsCaption: '',
-                                                                        selectedOptions: $parent.dishCategories,
-                                                                        hrmSelect, hrmSelectSearchEnabled: true,
-                                                                        hrmFormFieldSelectControl,
-                                                                        hrmFormFieldSelectControlOwner: formField
-                                                                    " multiple>
-                                                                        <option></option>
-                                                                    </select>
+                                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                        <select data-bind="
+                                                                            options: $root.dishCategories,
+                                                                            optionsText: 'name',
+                                                                            optionsValue: 'id',
+                                                                            optionsCaption: '',
+                                                                            selectedOptions: dishCategories,
+                                                                            hrmSelect, hrmSelectSearchEnabled: true,
+                                                                            hrmFormFieldSelectControl: control,
+                                                                            hrmFormFieldSelectControlErrorStateMatcher: $root.workloadTypeStepFormControlErrorStateMatcher.bind($root)
+                                                                        " multiple>
+                                                                            <option></option>
+                                                                        </select>
+                                                                    </div>
 
-                                                                    <hrm-slot name="error">
-                                                                        <div data-bind="
-                                                                            component: {name: 'hrm-form-field-error'},
-                                                                            hrmSlide,
-                                                                            hrmSlideValue: $root.workloadTypeStepFormControlErrorStateMatcher($parent.dishCategories),
-                                                                            hrmSlideDuration: 150
-                                                                        ">
-                                                                            <!-- ko text: $parents[1].dishCategories.error() --><!-- /ko -->
-                                                                        </div>
-                                                                    </hrm-slot>
+                                                                    <div data-bind="
+                                                                        component: {name: 'hrm-form-field-error'},
+                                                                        hrmSlide,
+                                                                        hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                                                                        hrmSlideDuration: 150
+                                                                    ">
+                                                                        <!-- ko text: $parent.dishCategories.error() --><!-- /ko -->
+                                                                    </div>
                                                                 </div>
                                                             <!-- /ko -->
                                                         <!-- /ko -->
 
-                                                        <!-- ko let: {formField: ko.observable(null)} -->
+                                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                             <div class="setup-wizard-page__workload-type-selector-item-units-form-field
                                                                         setup-wizard-page__workload-type-selector-item-control-list-item"
-                                                                 data-bind="component: {
-                                                                     name: 'hrm-form-field',
-                                                                     params: {
-                                                                        hasError: $root.workloadTypeStepFormControlErrorStateMatcher(units),
-                                                                        exportAs: formField
-                                                                     }
-                                                                 }"
-                                                            >
-                                                                <hrm-slot name="label">
-                                                                    <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                                                        Единицы
-                                                                    </label>
-                                                                </hrm-slot>
+                                                                 data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                                <label data-bind="hrmFormFieldLabel: label">Единицы</label>
 
-                                                                <select data-bind="
-                                                                        value: $parent.units,
+                                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                    <select data-bind="
+                                                                        value: units,
                                                                         hrmSelect,
-                                                                        hrmFormFieldSelectControl,
-                                                                        hrmFormFieldSelectControlOwner: formField
+                                                                        hrmFormFieldSelectControl: control,
+                                                                        hrmFormFieldSelectControlErrorStateMatcher: $root.workloadTypeStepFormControlErrorStateMatcher.bind($root)
                                                                     ">
-                                                                    <option></option>
-                                                                    <option value="1">Штуки</option>
-                                                                    <option value="2">Рубли</option>
-                                                                    <option value="3">Норма времени</option>
-                                                                </select>
+                                                                        <option></option>
+                                                                        <option value="1">Штуки</option>
+                                                                        <option value="2">Рубли</option>
+                                                                        <option value="3">Норма времени</option>
+                                                                    </select>
+                                                                </div>
 
-                                                                <hrm-slot name="error">
-                                                                    <div data-bind="
-                                                                            component: {name: 'hrm-form-field-error'},
-                                                                            hrmSlide,
-                                                                            hrmSlideValue: $root.workloadTypeStepFormControlErrorStateMatcher($parent.units),
-                                                                            hrmSlideDuration: 150
-                                                                        ">
-                                                                        <!-- ko text: $parents[1].units.error() --><!-- /ko -->
-                                                                    </div>
-                                                                </hrm-slot>
+                                                                <div data-bind="
+                                                                    component: {name: 'hrm-form-field-error'},
+                                                                    hrmSlide,
+                                                                    hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                                                                    hrmSlideDuration: 150
+                                                                ">
+                                                                    <!-- ko text: $parent.units.error() --><!-- /ko -->
+                                                                </div>
                                                             </div>
                                                         <!-- /ko -->
 
-                                                        <!-- ko let: {formField: ko.observable(null)} -->
+                                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                             <div class="setup-wizard-page__workload-type-selector-item-standard-form-field
                                                                         setup-wizard-page__workload-type-selector-item-control-list-item"
-                                                                 data-bind="
-                                                                     component: {
-                                                                         name: 'hrm-form-field',
-                                                                         params: {
-                                                                             hasError: $root.workloadTypeStepFormControlErrorStateMatcher(standard),
-                                                                             exportAs: formField
-                                                                         }
-                                                                     }
-                                                                "
-                                                            >
-                                                                <hrm-slot name="label">
-                                                                    <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                                                        Норматив
-                                                                    </label>
-                                                                </hrm-slot>
+                                                                 data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                                <label data-bind="hrmFormFieldLabel: label">Норматив</label>
 
-                                                                <input data-bind="
-                                                                    textInput: $parent.standard,
-                                                                    hrmMask, hrmMaskPattern: 'decimal',
-                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                    hrmFormFieldInputControl,
-                                                                    hrmFormFieldInputControlOwner: formField
-                                                                ">
-
-                                                                <hrm-slot name="error">
-                                                                    <div data-bind="
-                                                                        component: {name: 'hrm-form-field-error'},
-                                                                        hrmSlide,
-                                                                        hrmSlideValue: $root.workloadTypeStepFormControlErrorStateMatcher($parent.standard),
-                                                                        hrmSlideDuration: 150
+                                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                    <input data-bind="
+                                                                        textInput: standard,
+                                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                        hrmFormFieldInputControl: control,
+                                                                        hrmFormFieldInputControlErrorStateMatcher: $root.workloadTypeStepFormControlErrorStateMatcher.bind($root)
                                                                     ">
-                                                                        <!-- ko text: $parents[1].standard.error() --><!-- /ko -->
-                                                                    </div>
-                                                                </hrm-slot>
+                                                                </div>
+
+                                                                <div data-bind="
+                                                                    component: {name: 'hrm-form-field-error'},
+                                                                    hrmSlide,
+                                                                    hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                                                                    hrmSlideDuration: 150
+                                                                ">
+                                                                    <!-- ko text: $parent.standard.error() --><!-- /ko -->
+                                                                </div>
                                                             </div>
                                                         <!-- /ko -->
                                                     </div>
@@ -1462,8 +1375,10 @@
 <script src="https://unpkg.com/sticky-events@3.1.1/dist/sticky-events.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 
 <script src="assets/js/main.js"></script>
+
     <template id="setup-wizard-page-schedule-selector-calendar-template">
     <div class="setup-wizard-page__schedule-selector-calendar-hour-header">
         <!-- ko foreach: {data: $component.hours, as: 'hour'} -->
@@ -1922,7 +1837,7 @@
                 }
             };
 
-            this.createDishCategoryFormModel = function (value) {
+            this.createDishCategoryFormModel = function (value = '') {
                 return {
                     value: ko.observable(value).extend({
                         required: {
@@ -1943,7 +1858,7 @@
                 }
             };
 
-            this.createPositionFormModel = function (name) {
+            this.createPositionFormModel = function (name = '') {
                 return {
                     name: ko.observable(name).extend({
                         required: {
@@ -2538,6 +2453,21 @@
                 return data;
             };
 
+            this.turnoverStepReset = function () {
+                this.isTurnoverStepSubmitted(false);
+                this.formModel().isTurnoverCalculated(false);
+
+                this.formModel().dishCategories().forEach(category => {
+                    category.week.forEach(weekday => {
+                        weekday.hours(null);
+                    });
+
+                    category.hourTotals(null);
+                });
+
+                this.turnoverStepLastWeekdayTotals([]);
+            };
+
             this.turnoverStepFormatValue = function (value) {
                 return Inputmask.format(value, {alias: 'decimal', digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false}).replace('.00', '');
             };
@@ -2555,7 +2485,7 @@
             this.isPositionsStepSubmitted = ko.observable(false);
 
             this.isPositionsStepValid = ko.pureComputed(() => {
-                return this.formModel().positions().every(p => p.name() !== '');
+                return this.formModel().positions().every(p => p.name() !== '' && p.name() !== undefined);
             });
 
             this.positionsStepAdd = function () {
@@ -2645,33 +2575,19 @@
                 }));
 
                 this.subscriptions.push(this.formModel().dishCategories.subscribe(() => {
-                    this.isTurnoverStepSubmitted(false);
-                    this.formModel().isTurnoverCalculated(false);
+                    this.turnoverStepReset();
+                }));
 
-                    this.formModel().dishCategories().forEach(category => {
-                        category.week.forEach(weekday => {
-                            weekday.hours(null);
-                        });
+                this.subscriptions.push(this.formModel().intervalStart.subscribe(() => {
+                    this.turnoverStepReset();
+                }));
 
-                        category.hourTotals(null);
-                    });
-
-                    this.turnoverStepLastWeekdayTotals([]);
+                this.subscriptions.push(this.formModel().intervalEnd.subscribe(() => {
+                    this.turnoverStepReset();
                 }));
 
                 this.subscriptions.push(...this.formModel().schedule.map(weekday => weekday.subscribe(() => {
-                    this.isTurnoverStepSubmitted(false);
-                    this.formModel().isTurnoverCalculated(false);
-
-                    this.formModel().dishCategories().forEach(category => {
-                        category.week.forEach(weekday => {
-                            weekday.hours(null);
-                        });
-
-                        category.hourTotals(null);
-                    });
-
-                    this.turnoverStepLastWeekdayTotals([]);
+                    this.turnoverStepReset();
                 })));
             })();
         };
@@ -2689,5 +2605,6 @@
         );
     });
 </script>
+
 </body>
 </html>

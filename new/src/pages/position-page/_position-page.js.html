@@ -1,0 +1,218 @@
+<script type="text/javascript">
+    $(function () {
+        const $page = $(document.documentElement);
+
+        const ViewModel = function () {
+            this.dishCategories = [
+                {id: '1', name: 'Пицца'},
+                {id: '2', name: 'Роллы'},
+                {id: '3', name: 'Супы'},
+                {id: '4', name: 'Салаты'},
+                {id: '5', name: 'Закуски'},
+                {id: '6', name: 'Десерты'},
+                {id: '7', name: 'Напитки'}
+            ];
+
+            this.subscriptions = [];
+
+            this.isSidebarCollapsed = ko.observable(localStorage.getItem(HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY) === 'true');
+
+            this.windowResizeHandler = () => {
+                this.viewportSize({width: $(window).width(), height: $(window).height()});
+            };
+            this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
+
+            this.navigationTabs = [
+                new HrmTabGroupItem('Нагрузка'),
+                new HrmTabGroupItem('Расчет ЗП', true),
+                new HrmTabGroupItem('Разряды', true),
+                new HrmTabGroupItem('Специальности', true),
+                new HrmTabGroupItem('Смены', true),
+                new HrmTabGroupItem('Депозит', true),
+                new HrmTabGroupItem('Мат. ценности', true),
+                new HrmTabGroupItem('Договоры', true),
+                new HrmTabGroupItem('Доплаты', true),
+                new HrmTabGroupItem('Подбор персонала', true),
+            ];
+
+            this.activeTab = ko.observable(0);
+
+            this.descendantsComplete = function () {
+                $page.removeClass('hrm-page--initializing');
+            };
+
+            this.isSubmitted = ko.observable(false);
+
+            this.createAdditionalWorkloadItem = function () {
+                const type = ko.observable('');
+
+                return {
+                    type,
+                    factor: ko.observable('').extend({
+                        required: {
+                            message: 'Обязательное поле',
+                            onlyIf: () => {
+                                return type() !== '';
+                            }
+                        }
+                    }),
+                    name: ko.observable('').extend({
+                        required: {
+                            message: 'Обязательное поле',
+                            onlyIf: () => {
+                                return type() !== '';
+                            }
+                        }
+                    })
+                };
+            };
+
+            this.formModel = ko.validatedObservable(null);
+
+            this.formModel({
+                name: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    },
+                    minLength: {
+                        params: 2,
+                        message: 'Должно быть введено хотя бы 2 символа'
+                    }
+                }),
+                workloadType: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                }),
+                productionStandard: {
+                    type: ko.observable('0'),
+                    value: ko.observable('').extend({
+                        required: {
+                            message: 'Обязательное поле'
+                        }
+                    }),
+                    range: {
+                        min: ko.observable('').extend({
+                            required: {
+                                message: 'Обязательное поле'
+                            },
+                            validation: {
+                                validator: value => {
+                                    return this.formModel() !== null &&
+                                        this.unmaskDecimal(this.formModel().productionStandard.range.max()) > this.unmaskDecimal(value);
+                                }
+                            }
+                        }),
+                        max: ko.observable('').extend({
+                            required: {
+                                message: 'Обязательное поле'
+                            },
+                            validation: {
+                                validator: value => {
+                                    return this.formModel() === null ||
+                                        this.unmaskDecimal(this.formModel().productionStandard.range.min()) < this.unmaskDecimal(value);
+                                }
+                            }
+                        })
+                    }
+                },
+                units: ko.observable('1'),
+                standard: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                }),
+                dishCategories: ko.observableArray([]),
+                dishCategoriesExclusionFlag: ko.observable(false),
+                orderTypes: ko.observableArray([]),
+                additionalWorkload: ko.observableArray([
+                    this.createAdditionalWorkloadItem()
+                ])
+            });
+
+            this.submit = function () {
+                this.isSubmitted(true);
+            };
+
+            this.productionStandardFormFieldRangeControlSuffix = ko.pureComputed(() => {
+                switch (this.formModel().units()) {
+                    case '1': return 'штук';
+                    case '2': return 'рублей';
+                    case '3': return 'часов';
+                }
+            });
+
+            this.additionalWorkloadSectionDisabled = ko.pureComputed(() => {
+                return this.formModel().workloadType() === '';
+            });
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+
+            this.additionalWorkloadSectionFormControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !this.additionalWorkloadSectionDisabled() && !formControl.isValid();
+                });
+            };
+
+            this.getUnitsName = function (units) {
+                switch (units) {
+                    case '1': return 'Штуки';
+                    case '2': return 'Рубли';
+                    case '3': return 'Норма времени';
+                }
+            };
+
+            this.removeAdditionalWorkloadItem = function (item) {
+                if (this.formModel().additionalWorkload().length === 1) {
+                    item.type('');
+                    item.factor('');
+                    item.name('');
+                } else {
+                    this.formModel().additionalWorkload.remove(item);
+                }
+            };
+
+            this.addAdditionalWorkloadItem = function () {
+                this.formModel().additionalWorkload.push(this.createAdditionalWorkloadItem());
+            };
+
+            this.formatDecimal = function (value) {
+                return Inputmask.format(value, {alias: 'decimal', digits: '2', groupSeparator: ' ', autoGroup: true, allowMinus: false}).replace('.00', '');
+            };
+
+            this.unmaskDecimal = function (value) {
+                const result = Inputmask.unmask(value, {alias: 'decimal', digits: '2', groupSeparator: ' ', autoGroup: true, allowMinus: false, unmaskAsNumber: true});
+
+                if (result === '') {
+                    return 0;
+                }
+
+                return result;
+            };
+
+            (() => {
+                $(window).on('resize', this.windowResizeHandler);
+
+                this.subscriptions.push(this.isSidebarCollapsed.subscribe(collapsed => {
+                    localStorage.setItem(HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY, collapsed);
+                }))
+            })();
+        };
+
+        const viewModel = new ViewModel();
+
+        ViewModel.prototype.dispose = function() {
+            $(window).off('resize', this.windowResizeHandler);
+            this.subscriptions.forEach(s => s.dispose());
+        };
+
+        ko.applyBindings(
+            viewModel,
+            $page.get()[0]
+        );
+    });
+</script>

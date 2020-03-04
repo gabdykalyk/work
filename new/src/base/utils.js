@@ -161,3 +161,15 @@ ko.validation.registerExtenders();
 function hrmTemplateIf (condition, data) {
     return condition ? [data] : undefined;
 }
+
+function hrmExtractComponentParam(params, name, defaultValue) {
+    if (params !== undefined && name in params) {
+        if (ko.isObservable(params[name])) {
+            return params[name];
+        } else {
+            return ko.observable(params[name]);
+        }
+    } else {
+        return ko.observable(defaultValue);
+    }
+}

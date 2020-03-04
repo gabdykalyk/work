@@ -11,73 +11,53 @@
                 <div class="login-page__form" data-bind="using: formModel()">
                     <div class="login-page__form-logo"></div>
 
-                    <!-- ko let: {formField: ko.observable(null)} -->
+                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                         <div class="login-page__form-field" data-bind="
-                            component: {
-                                name: 'hrm-form-field',
-                                params: {
-                                    hasError: $root.formControlErrorStateMatcher(login),
-                                    exportAs: formField
-                                }
-                            }
+                            hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                         ">
-                            <hrm-slot name="label">
-                                <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                    Логин
-                                </label>
-                            </hrm-slot>
+                            <label data-bind="hrmFormFieldLabel: label">Логин</label>
 
-                            <input data-bind="
-                                textInput: $parent.login,
-                                hrmFormFieldInputControl,
-                                hrmFormFieldInputControlOwner: formField
-                            ">
-
-                            <hrm-slot name="error">
-                                <div data-bind="
-                                    component: {name: 'hrm-form-field-error'},
-                                    hrmSlide,
-                                    hrmSlideValue: $root.formControlErrorStateMatcher($parent.login),
-                                    hrmSlideDuration: 150
+                            <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                <input data-bind="
+                                    textInput: login,
+                                    hrmFormFieldInputControl: control,
+                                    hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
                                 ">
-                                    <!-- ko text: $parents[1].login.error() --><!-- /ko -->
-                                </div>
-                            </hrm-slot>
+                            </div>
+
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: control() !== null ? control().errorState : false,
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $parent.login.error() --><!-- /ko -->
+                            </div>
                         </div>
                     <!-- /ko -->
 
-                    <!-- ko let: {formField: ko.observable(null)} -->
+                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                         <div class="login-page__form-field" data-bind="
-                            component: {
-                                name: 'hrm-form-field',
-                                params: {
-                                    hasError: $root.formControlErrorStateMatcher(password),
-                                    exportAs: formField
-                                }
-                            }
+                            hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                         ">
-                            <hrm-slot name="label">
-                                <label data-bind="hrmFormFieldLabel, hrmFormFieldLabelOwner: formField">
-                                    Пароль
-                                </label>
-                            </hrm-slot>
+                            <label data-bind="hrmFormFieldLabel: label">Пароль</label>
 
-                            <input data-bind="
-                                textInput: $parent.password,
-                                hrmFormFieldInputControl,
-                                hrmFormFieldInputControlOwner: formField
-                            " type="password">
+                            <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                <input data-bind="
+                                    textInput: password,
+                                    hrmFormFieldInputControl: control,
+                                    hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
+                                " type="password">
+                            </div>
 
-                            <hrm-slot name="error">
-                                <div data-bind="
-                                    component: {name: 'hrm-form-field-error'},
-                                    hrmSlide,
-                                    hrmSlideValue: $root.formControlErrorStateMatcher($parent.password),
-                                    hrmSlideDuration: 150
-                                ">
-                                    <!-- ko text: $parents[1].password.error() --><!-- /ko -->
-                                </div>
-                            </hrm-slot>
+                            <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: control() !== null ? control().errorState : false,
+                                hrmSlideDuration: 150
+                            ">
+                                <!-- ko text: $parent.password.error() --><!-- /ko -->
+                            </div>
                         </div>
                     <!-- /ko -->
 

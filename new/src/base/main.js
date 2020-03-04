@@ -6,3 +6,5 @@ const HRM_BREAKPOINTS = {
 ko.validation.init({insertMessages: false});
 
 moment.locale('ru');
+
+const HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY = 'hrmSidebarCollapsed';

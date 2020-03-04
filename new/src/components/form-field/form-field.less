@@ -4,28 +4,29 @@
 @transition-timing-function: cubic-bezier(.4,0,.2,1);
 
 .hrm-form-field {
-    display: inline-block;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
     position: relative;
     padding-top: 21px;
 
     .hrm-form-field__label {
         position: absolute;
+        top: 21px;
 
         transition: transform @transition-duration @transition-timing-function,
                     font-size @transition-duration @transition-timing-function;
+    }
+
+    .hrm-form-field__basis {
+        width: 100%;
     }
 
     .hrm-form-field__error {
         margin-top: 9px;
     }
 
-    .hrm-form-field__suffix {
-        margin-left: 8px;
-        flex-shrink: 0;
-    }
-
-    &--focused,
-    &--has-value {
+    &--should-label-float {
         .hrm-form-field__label {
             transform: translateY(-24px);
 
@@ -33,11 +34,19 @@
         }
     }
 
-    &--no-label {
+    &:not(.hrm-form-field--has-label) {
         padding-top: 0;
     }
 
+    &--disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
     &__label {
+        display: flex;
+        align-items: center;
+
         font-size: 15px;
         color: #8E9CBB;
         line-height: normal;
@@ -48,9 +57,13 @@
         .hrm-form-field--has-value & {
             font-size: 12px;
         }
+
+        .hrm-form-field__label-info-button {
+            margin-left: 9px;
+        }
     }
 
-    &__control-wrapper {
+    &__basis {
         display: flex;
 
         padding-bottom: 13px;
@@ -63,13 +76,22 @@
 
         transition: border-bottom-color @transition-duration @transition-timing-function;
 
-        .hrm-form-field--focused & {
+        &--focused {
             border-bottom-color: #0066FF;
         }
 
-        .hrm-form-field--has-error & {
+        &--invalid {
             border-bottom-color: #FF238D;
         }
+
+        .hrm-form-field__basis-suffix {
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+    }
+
+    &__basis-suffix {
+        cursor: pointer;
     }
 
     &__control {
@@ -111,6 +133,14 @@
                 min-height: 30px !important;
             }
         }
+
+        &--type_complex {
+            display: flex;
+
+            .hrm-form-field__basis {
+                width: unset;
+            }
+        }
     }
 
     &__dropdown {
@@ -121,10 +151,6 @@
         &.daterangepicker {
             margin-top: 21px !important;
         }
-    }
-
-    &__suffix {
-        cursor: pointer;
     }
 
     &__error {
@@ -152,8 +178,22 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
+    &__label-info-button {
+        width: 14px;
+        height: 14px;
+
+        &:before {
+            width: 2px;
+            height: 8px;
+        }
+    }
 }
 
 .hrm-form-field-checkbox-group {
     margin-top: 24px;
+}
+
+.hrm-form-field-switch-group {
+    margin-top: 20px;
 }
