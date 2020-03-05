@@ -190,91 +190,89 @@
                         beforeRemove: hrmFadeBeforeRemoveFactory(300)
                     } -->
                         <div class="setup-wizard-page__tab-pane setup-wizard-page__schedule-tab-pane">
-                            <!-- ko let: {calendar: ko.observable(null)} -->
-                                <div class="setup-wizard-page__schedule-selector">
-                                    <span class="setup-wizard-page__schedule-selector-title">График работы предприятия</span>
+                            <div class="setup-wizard-page__schedule-selector">
+                                <span class="setup-wizard-page__schedule-selector-title">График работы предприятия</span>
 
-                                    <div class="setup-wizard-page__schedule-selector-controls">
-                                        <div class="setup-wizard-page__schedule-selector-interval-selector">
-                                            <span class="setup-wizard-page__schedule-selector-interval-selector-label">
-                                                Задать интервал таблицы
-                                            </span>
+                                <div class="setup-wizard-page__schedule-selector-controls">
+                                    <div class="setup-wizard-page__schedule-selector-interval-selector">
+                                        <span class="setup-wizard-page__schedule-selector-interval-selector-label">
+                                            Задать интервал таблицы
+                                        </span>
 
-                                            <div class="setup-wizard-page__schedule-selector-interval-selector-control">
+                                        <div class="setup-wizard-page__schedule-selector-interval-selector-control">
 
-                                                <!-- ko let: {control: ko.observable(null)} -->
-                                                    <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
-                                                                setup-wizard-page__schedule-selector-interval-selector-control-start-field"
-                                                         data-bind="hrmFormField, hrmFormFieldControlRef: control">
-                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                            <input data-bind="
-                                                                textInput: intervalStart,
-                                                                hrmTimeAutocompleter,
-                                                                hrmMask,
-                                                                hrmMaskPattern: 'datetime',
-                                                                hrmMaskOptions: {
-                                                                    inputFormat: 'HH:MM',
-                                                                    placeholder: ' '
-                                                                },
-                                                                hrmFormFieldInputControl: control,
-                                                                hrmFormFieldInputControlErrorStateMatcher: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher.bind($root)
-                                                            ">
-                                                        </div>
+                                            <!-- ko let: {control: ko.observable(null)} -->
+                                                <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
+                                                            setup-wizard-page__schedule-selector-interval-selector-control-start-field"
+                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control">
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: intervalStart,
+                                                            hrmTimeAutocompleter,
+                                                            hrmMask,
+                                                            hrmMaskPattern: 'datetime',
+                                                            hrmMaskOptions: {
+                                                                inputFormat: 'HH:MM',
+                                                                placeholder: ' '
+                                                            },
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher.bind($root)
+                                                        ">
                                                     </div>
-                                                <!-- /ko -->
+                                                </div>
+                                            <!-- /ko -->
 
-                                                <span class="setup-wizard-page__schedule-selector-interval-selector-control-separator">—</span>
+                                            <span class="setup-wizard-page__schedule-selector-interval-selector-control-separator">—</span>
 
-                                                <!-- ko let: {control: ko.observable(null)} -->
-                                                    <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
-                                                                setup-wizard-page__schedule-selector-interval-selector-control-end-field"
-                                                         data-bind="hrmFormField, hrmFormFieldControlRef: control">
-                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                            <input data-bind="
-                                                                textInput: intervalEnd,
-                                                                hrmTimeAutocompleter,
-                                                                hrmMask,
-                                                                hrmMaskPattern: 'datetime',
-                                                                hrmMaskOptions: {
-                                                                    inputFormat: 'HH:MM',
-                                                                    placeholder: ' '
-                                                                },
-                                                                hrmFormFieldInputControl: control,
-                                                                hrmFormFieldInputControlErrorStateMatcher: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher.bind($root)
-                                                            ">
-                                                        </div>
+                                            <!-- ko let: {control: ko.observable(null)} -->
+                                                <div class="setup-wizard-page__schedule-selector-interval-selector-control-field
+                                                            setup-wizard-page__schedule-selector-interval-selector-control-end-field"
+                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control">
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: intervalEnd,
+                                                            hrmTimeAutocompleter,
+                                                            hrmMask,
+                                                            hrmMaskPattern: 'datetime',
+                                                            hrmMaskOptions: {
+                                                                inputFormat: 'HH:MM',
+                                                                placeholder: ' '
+                                                            },
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $root.scheduleStepIntervalBoundaryFormControlErrorStateMatcher.bind($root)
+                                                        ">
                                                     </div>
-                                                <!-- /ko -->
-                                            </div>
+                                                </div>
+                                            <!-- /ko -->
                                         </div>
-
-                                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
-                                                       hrm-button-with-check-icon setup-wizard-page__schedule-selector-pick-all-button"
-                                                data-bind="click: function() {calendar().pickAll();}">
-                                            Заполнить автоматически
-                                        </button>
                                     </div>
 
-                                    <div data-bind="component: {
-                                        name: 'setup-wizard-page-schedule-selector-calendar',
-                                        params: {
-                                            value: schedule,
-                                            intervalStart: $root.scheduleStepUsedIntervalStart,
-                                            intervalEnd: $root.scheduleStepUsedIntervalEnd,
-                                            exportAs: calendar
-                                        }
-                                    }">
-                                    </div>
-
-                                    <div class="setup-wizard-page__schedule-selector-actions">
-                                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
-                                                    hrm-button-with-times-icon setup-wizard-page__schedule-selector-action"
-                                             data-bind="click: function() {calendar().clear();}">
-                                            Очистить
-                                        </button>
-                                    </div>
+                                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive
+                                                   hrm-button-with-check-icon setup-wizard-page__schedule-selector-pick-all-button"
+                                            data-bind="click: function() {$root.scheduleStepFill();}">
+                                        Заполнить автоматически
+                                    </button>
                                 </div>
-                            <!-- /ko -->
+
+                                <div data-bind="component: {
+                                    name: 'setup-wizard-page-schedule-selector-calendar',
+                                    params: {
+                                        value: schedule,
+                                        intervalStart: $root.scheduleStepUsedIntervalStart,
+                                        intervalEnd: $root.scheduleStepUsedIntervalEnd,
+                                        exportAs: $root.scheduleStepCalendar
+                                    }
+                                }">
+                                </div>
+
+                                <div class="setup-wizard-page__schedule-selector-actions">
+                                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                                hrm-button-with-times-icon setup-wizard-page__schedule-selector-action"
+                                         data-bind="click: function() {$root.scheduleStepCalendar().clear();}">
+                                        Очистить
+                                    </button>
+                                </div>
+                            </div>
 
                             <div class="setup-wizard-page__tab-pane-actions">
                                 <button class="hrm-button hrm-basic-button setup-wizard-page__tab-pane-actions-button"
@@ -310,7 +308,7 @@
                                 </span>
 
                                 <!-- ko template: {
-                                    foreach: hrmTemplateIf(!isTurnoverCalculated(), $data),
+                                    foreach: hrmTemplateIf(!isTurnoverCalculated() && !$root.isTurnoverStepCalculating(), $data),
                                     afterAdd: hrmFadeAfterAddFactory(200, 200),
                                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                                 } -->
@@ -363,7 +361,7 @@
                                                                 <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
                                                                     data-bind="
                                                                         hrmTableEditableCell: editableCell,
-                                                                        hrmTableEditableCellError: weekday === 1 ? $root.turnoverStepTableCategoryErrorExtractor(dishCategoryIndex()) : null
+                                                                        hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
                                                                     ">
                                                                     <input data-bind="
                                                                         textInput: $parent.week[weekday - 1].weekdayTotal,
@@ -386,7 +384,10 @@
 
                                                         <!-- ko let: {editableCell: ko.observable(null)} -->
                                                             <td class="setup-wizard-page__turnover-selector-table-week-total-cell"
-                                                                data-bind="hrmTableEditableCell: editableCell">
+                                                                data-bind="
+                                                                    hrmTableEditableCell: editableCell,
+                                                                    hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor(weekTotal)
+                                                                ">
                                                                 <input data-bind="
                                                                     value: weekTotal,
                                                                     event: {
@@ -424,7 +425,7 @@
                                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                                         <select data-bind="
                                                                             value: units,
-                                                                            hrmSelect, hrmSelectSearchEnabled: true,
+                                                                            hrmSelect,
                                                                             hrmFormFieldSelectControl: control
                                                                         ">
                                                                             <option value="1">Штуки</option>
@@ -453,7 +454,10 @@
                                                                         <tr>
                                                                             <!-- ko let: {editableCell: ko.observable(null)} -->
                                                                                 <td class="setup-wizard-page__turnover-selector-table-category-section-table-week-total-cell"
-                                                                                    data-bind="hrmTableEditableCell: editableCell">
+                                                                                    data-bind="
+                                                                                        hrmTableEditableCell: editableCell,
+                                                                                        hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor(weekTotal)
+                                                                                    ">
                                                                                     <input data-bind="
                                                                                         value: weekTotal,
                                                                                         event: {
@@ -474,50 +478,50 @@
 
                                                                 <div class="hrm-table__scrollable-wrapper">
                                                                     <table class="setup-wizard-page__turnover-selector-table-category-section-table"
-                                                                       data-bind="hrmTable">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Пн</th>
-                                                                            <th>Вт</th>
-                                                                            <th>Ср</th>
-                                                                            <th>Чт</th>
-                                                                            <th>Пт</th>
-                                                                            <th>Сб</th>
-                                                                            <th>Вс</th>
-                                                                        </tr>
-                                                                    </thead>
+                                                                           data-bind="hrmTable">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Пн</th>
+                                                                                <th>Вт</th>
+                                                                                <th>Ср</th>
+                                                                                <th>Чт</th>
+                                                                                <th>Пт</th>
+                                                                                <th>Сб</th>
+                                                                                <th>Вс</th>
+                                                                            </tr>
+                                                                        </thead>
 
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
-                                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                                    <td class="setup-wizard-page__turnover-selector-table-category-section-table-weekday-cell"
-                                                                                        data-bind="
-                                                                                            hrmTableEditableCell: editableCell,
-                                                                                            hrmTableEditableCellError: weekday === 1 ? $root.turnoverStepTableCategoryErrorExtractor(dishCategoryIndex()) : null
-                                                                                        "
-                                                                                    >
-                                                                                        <input data-bind="
-                                                                                            textInput: $parent.week[weekday - 1].weekdayTotal,
-                                                                                            event: {
-                                                                                                input: function() {
-                                                                                                    $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
+                                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                                        <td class="setup-wizard-page__turnover-selector-table-category-section-table-weekday-cell"
+                                                                                            data-bind="
+                                                                                                hrmTableEditableCell: editableCell,
+                                                                                                hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
+                                                                                            "
+                                                                                        >
+                                                                                            <input data-bind="
+                                                                                                textInput: $parent.week[weekday - 1].weekdayTotal,
+                                                                                                event: {
+                                                                                                    input: function() {
+                                                                                                        $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                                                    },
+                                                                                                    change: function() {
+                                                                                                        $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
+                                                                                                    }
                                                                                                 },
-                                                                                                change: function() {
-                                                                                                    $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
-                                                                                                }
-                                                                                            },
-                                                                                            hrmMask, hrmMaskPattern: 'decimal',
-                                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
-                                                                                            hrmTableEditableCellInputControl,
-                                                                                            hrmTableEditableCellInputControlOwner: editableCell
-                                                                                        " placeholder="0">
-                                                                                    </td>
+                                                                                                hrmMask, hrmMaskPattern: 'decimal',
+                                                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
+                                                                                                hrmTableEditableCellInputControl,
+                                                                                                hrmTableEditableCellInputControlOwner: editableCell
+                                                                                            " placeholder="0">
+                                                                                        </td>
+                                                                                    <!-- /ko -->
                                                                                 <!-- /ko -->
-                                                                            <!-- /ko -->
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -529,7 +533,7 @@
                                 <!-- /ko -->
 
                                 <!-- ko template: {
-                                    foreach: hrmTemplateIf(isTurnoverCalculated(), $data),
+                                    foreach: hrmTemplateIf(isTurnoverCalculated() && !$root.isTurnoverStepCalculating(), $data),
                                     afterAdd: hrmFadeAfterAddFactory(200, 200),
                                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                                 } -->
@@ -537,20 +541,20 @@
                                         <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
                                             <!-- ko let: {table: ko.observable(null), stickySectionWrappers: ko.observableArray([]), categoryRowElements: ko.observableArray([])} -->
                                                 <div class="setup-wizard-page__turnover-selector-table-sticky-section-container"
-                                                         data-bind="
-                                                            hrmTableStickySectionContainer,
-                                                            hrmTableStickySectionContainerSectionWrappers: stickySectionWrappers
-                                                         "
-                                                    >
-                                                        <div class="hrm-table__sticky-section-rail">
-                                                            <div class="setup-wizard-page__turnover-selector-table-sticky-header-wrapper"
-                                                                 data-bind="hrmTableStickySectionWrapper: stickySectionWrappers">
-                                                                <!-- ko let: {activeCategoryIndex: table() !== null && table().activeCategoryIndex() !== null ? table().activeCategoryIndex() : 0} -->
-                                                                    <table class="hrm-table__sticky-section
-                                                                                  hrm-table__sticky-section--position_top
-                                                                                  setup-wizard-page__turnover-selector-table
-                                                                                  setup-wizard-page__turnover-selector-table-sticky-header"
-                                                                       data-bind="hrmTable, using: $root.formModel().dishCategories()[activeCategoryIndex]">
+                                                     data-bind="
+                                                        hrmTableStickySectionContainer,
+                                                        hrmTableStickySectionContainerSectionWrappers: stickySectionWrappers
+                                                     "
+                                                >
+                                                    <div class="hrm-table__sticky-section-rail">
+                                                        <div class="setup-wizard-page__turnover-selector-table-sticky-header-wrapper"
+                                                             data-bind="hrmTableStickySectionWrapper: stickySectionWrappers">
+                                                            <!-- ko let: {activeCategoryIndex: table() !== null && table().activeCategoryIndex() !== null ? table().activeCategoryIndex() : 0} -->
+                                                                <table class="hrm-table__sticky-section
+                                                                              hrm-table__sticky-section--position_top
+                                                                              setup-wizard-page__turnover-selector-table
+                                                                              setup-wizard-page__turnover-selector-table-sticky-header"
+                                                                   data-bind="hrmTable, using: $root.formModel().dishCategories()[activeCategoryIndex]">
                                                                 <thead>
                                                                     <tr>
                                                                         <th class="setup-wizard-page__turnover-selector-table-units-head-cell">
@@ -577,27 +581,29 @@
 
                                                                 <tbody>
                                                                     <tr class="setup-wizard-page__turnover-selector-table-week-row">
-                                                                        <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                            <td class="setup-wizard-page__turnover-selector-table-units-cell"
-                                                                                data-bind="hrmTableEditableCell: editableCell">
-                                                                                <select data-bind="
-                                                                                    value: units,
-                                                                                    hrmSelect,
-                                                                                    hrmTableEditableCellSelectControl,
-                                                                                    hrmTableEditableCellSelectControlOwner: editableCell
-                                                                                ">
-                                                                                    <option value="1">Штуки</option>
-                                                                                    <option value="2">Рубли</option>
-                                                                                    <option value="3">Норма времени</option>
-                                                                                </select>
-                                                                            </td>
+                                                                        <!-- ko with: $root.formModel().dishCategories()[activeCategoryIndex] -->
+                                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                                <td class="setup-wizard-page__turnover-selector-table-units-cell"
+                                                                                    data-bind="hrmTableEditableCell: editableCell">
+                                                                                    <select data-bind="
+                                                                                        value: units,
+                                                                                        hrmSelect,
+                                                                                        hrmTableEditableCellSelectControl,
+                                                                                        hrmTableEditableCellSelectControlOwner: editableCell
+                                                                                    ">
+                                                                                        <option value="1">Штуки</option>
+                                                                                        <option value="2">Рубли</option>
+                                                                                        <option value="3">Норма времени</option>
+                                                                                    </select>
+                                                                                </td>
+                                                                            <!-- /ko -->
                                                                         <!-- /ko -->
                                                                         <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
                                                                             <!-- ko let: {editableCell: ko.observable(null)} -->
                                                                                 <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
                                                                                     data-bind="
                                                                                     hrmTableEditableCell: editableCell,
-                                                                                    hrmTableEditableCellError: weekday === 1 ? $root.turnoverStepTableCategoryErrorExtractor(activeCategoryIndex) : null
+                                                                                    hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor($parentContext.activeCategoryIndex, weekday)
                                                                                 ">
                                                                                     <input data-bind="
                                                                                         textInput: $parent.week[weekday - 1].weekdayTotal,
@@ -619,7 +625,10 @@
                                                                         <!-- /ko -->
                                                                         <!-- ko let: {editableCell: ko.observable(null)} -->
                                                                             <td class="setup-wizard-page__turnover-selector-table-week-total-cell"
-                                                                                data-bind="hrmTableEditableCell: editableCell">
+                                                                                data-bind="
+                                                                                    hrmTableEditableCell: editableCell,
+                                                                                    hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor(weekTotal)
+                                                                                ">
                                                                                 <input data-bind="
                                                                                     value: weekTotal,
                                                                                     event: {
@@ -637,62 +646,62 @@
                                                                     </tr>
                                                                 </tbody>
                                                                 </table>
-                                                                <!-- /ko -->
-                                                            </div>
+                                                            <!-- /ko -->
                                                         </div>
-                                                        <table data-bind="
-                                                            hrmTable,
-                                                            setupWizardPageTurnoverSelectorTable: table,
-                                                            setupWizardPageTurnoverSelectorTableCategoryRowElements: categoryRowElements
-                                                        ">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="setup-wizard-page__turnover-selector-table-units-head-cell">
-                                                                    Единица измерения
-                                                                </th>
-                                                                <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Пн</th>
-                                                                <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Вт</th>
-                                                                <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Ср</th>
-                                                                <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Чт</th>
-                                                                <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Пт</th>
-                                                                <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Сб</th>
-                                                                <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Вс</th>
-                                                                <th class="setup-wizard-page__turnover-selector-table-week-total-head-cell">
-                                                                    За неделю
-                                                                </th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody data-bind="foreach: {data: dishCategories, as: 'dishCategory'}">
-                                                            <tr class="setup-wizard-page__turnover-selector-table-category-row"
-                                                                data-bind="hrmElement: categoryRowElements, hrmElementIndex: dishCategoryIndex()">
-                                                                <td class="setup-wizard-page__turnover-selector-table-category-name-cell"
-                                                                    data-bind="text: $root.getDishCategory(value()).name" colspan="9">
-                                                                </td>
-                                                            </tr>
+                                                    </div>
+                                                    <table data-bind="
+                                                        hrmTable,
+                                                        setupWizardPageTurnoverSelectorTable: table,
+                                                        setupWizardPageTurnoverSelectorTableCategoryRowElements: categoryRowElements
+                                                    ">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="setup-wizard-page__turnover-selector-table-units-head-cell">
+                                                                Единица измерения
+                                                            </th>
+                                                            <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Пн</th>
+                                                            <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Вт</th>
+                                                            <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Ср</th>
+                                                            <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Чт</th>
+                                                            <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Пт</th>
+                                                            <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Сб</th>
+                                                            <th class="setup-wizard-page__turnover-selector-table-weekday-head-cell">Вс</th>
+                                                            <th class="setup-wizard-page__turnover-selector-table-week-total-head-cell">
+                                                                За неделю
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody data-bind="foreach: {data: dishCategories, as: 'dishCategory'}">
+                                                        <tr class="setup-wizard-page__turnover-selector-table-category-row"
+                                                            data-bind="hrmElement: categoryRowElements, hrmElementIndex: dishCategoryIndex()">
+                                                            <td class="setup-wizard-page__turnover-selector-table-category-name-cell"
+                                                                data-bind="text: $root.getDishCategory(value()).name" colspan="9">
+                                                            </td>
+                                                        </tr>
 
-                                                            <tr class="setup-wizard-page__turnover-selector-table-week-row">
+                                                        <tr class="setup-wizard-page__turnover-selector-table-week-row">
+                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                <td class="setup-wizard-page__turnover-selector-table-units-cell"
+                                                                    data-bind="hrmTableEditableCell: editableCell">
+                                                                    <select data-bind="
+                                                                        value: units,
+                                                                        hrmSelect,
+                                                                        hrmTableEditableCellSelectControl,
+                                                                        hrmTableEditableCellSelectControlOwner: editableCell
+                                                                    ">
+                                                                        <option value="1">Штуки</option>
+                                                                        <option value="2">Рубли</option>
+                                                                        <option value="3">Норма времени</option>
+                                                                    </select>
+                                                                </td>
+                                                            <!-- /ko -->
+                                                            <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
                                                                 <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                    <td class="setup-wizard-page__turnover-selector-table-units-cell"
-                                                                        data-bind="hrmTableEditableCell: editableCell">
-                                                                        <select data-bind="
-                                                                            value: units,
-                                                                            hrmSelect,
-                                                                            hrmTableEditableCellSelectControl,
-                                                                            hrmTableEditableCellSelectControlOwner: editableCell
+                                                                    <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
+                                                                        data-bind="
+                                                                            hrmTableEditableCell: editableCell,
+                                                                            hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
                                                                         ">
-                                                                            <option value="1">Штуки</option>
-                                                                            <option value="2">Рубли</option>
-                                                                            <option value="3">Норма времени</option>
-                                                                        </select>
-                                                                    </td>
-                                                                <!-- /ko -->
-                                                                <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
-                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                        <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
-                                                                            data-bind="
-                                                                                hrmTableEditableCell: editableCell,
-                                                                                hrmTableEditableCellError: weekday === 1 ? $root.turnoverStepTableCategoryErrorExtractor(dishCategoryIndex()) : null
-                                                                            ">
                                                                         <input data-bind="
                                                                             textInput: $parent.week[weekday - 1].weekdayTotal,
                                                                             event: {
@@ -709,12 +718,15 @@
                                                                             hrmTableEditableCellInputControlOwner: editableCell
                                                                         " placeholder="0">
                                                                     </td>
-                                                                    <!-- /ko -->
                                                                 <!-- /ko -->
+                                                            <!-- /ko -->
 
-                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                    <td class="setup-wizard-page__turnover-selector-table-week-total-cell"
-                                                                        data-bind="hrmTableEditableCell: editableCell">
+                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                <td class="setup-wizard-page__turnover-selector-table-week-total-cell"
+                                                                    data-bind="
+                                                                        hrmTableEditableCell: editableCell,
+                                                                        hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor(weekTotal)
+                                                                    ">
                                                                     <input data-bind="
                                                                         value: weekTotal,
                                                                         event: {
@@ -728,66 +740,72 @@
                                                                         hrmTableEditableCellInputControlOwner: editableCell
                                                                     " placeholder="0">
                                                                 </td>
+                                                            <!-- /ko -->
+                                                        </tr>
+
+                                                        <!-- ko foreach: {data: $root.turnoverStepIntervalHours, as: 'hour'} -->
+                                                            <tr class="setup-wizard-page__turnover-selector-table-hour-row">
+                                                                <!-- ko let: {data: $root.turnoverStepGetHourLabelData(hourIndex())} -->
+                                                                    <td class="setup-wizard-page__turnover-selector-table-hour-label-cell">
+                                                                        <span data-bind="text: data.start.hour"></span><sup class="setup-wizard-page__turnover-selector-table-hour-label-minute" data-bind="text: data.start.minute"></sup>–<span data-bind="text: data.end.hour"></span><sup class="setup-wizard-page__turnover-selector-table-hour-label-minute" data-bind="text: data.end.minute"></sup>
+                                                                    </td>
                                                                 <!-- /ko -->
-                                                            </tr>
+                                                                <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
+                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                        <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] !== null -->
+                                                                            <td class="setup-wizard-page__turnover-selector-table-hour-cell"
+                                                                                data-bind="
+                                                                                    hrmTableEditableCell: editableCell,
+                                                                                    hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor($parents[1].week[weekday - 1].hours()[hourIndex()])
+                                                                                ">
+                                                                                <input data-bind="
+                                                                                    textInput: $parents[1].week[weekday - 1].hours()[hourIndex()],
+                                                                                    event: {
+                                                                                        input: function() {
+                                                                                            $root.onTurnoverStepHourInput($parentContext.dishCategoryIndex(), weekdayIndex(), hourIndex());
+                                                                                        }
+                                                                                    },
+                                                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
+                                                                                    hrmTableEditableCellInputControl,
+                                                                                    hrmTableEditableCellInputControlOwner: editableCell,
+                                                                                " placeholder="0">
+                                                                            </td>
+                                                                        <!-- /ko -->
 
-                                                            <!-- ko foreach: {data: $root.turnoverStepIntervalHours, as: 'hour'} -->
-                                                                <tr class="setup-wizard-page__turnover-selector-table-hour-row">
-                                                                    <!-- ko let: {data: $root.turnoverStepGetHourLabelData(hourIndex())} -->
-                                                                        <td class="setup-wizard-page__turnover-selector-table-hour-label-cell">
-                                                                            <span data-bind="text: data.start.hour"></span><sup class="setup-wizard-page__turnover-selector-table-hour-label-minute" data-bind="text: data.start.minute"></sup>–<span data-bind="text: data.end.hour"></span><sup class="setup-wizard-page__turnover-selector-table-hour-label-minute" data-bind="text: data.end.minute"></sup>
-                                                                        </td>
-                                                                    <!-- /ko -->
-                                                                    <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
-                                                                        <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                            <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] !== null -->
-                                                                                <td class="setup-wizard-page__turnover-selector-table-hour-cell"
-                                                                                    data-bind="hrmTableEditableCell: editableCell">
-                                                                                    <input data-bind="
-                                                                                        textInput: $parents[1].week[weekday - 1].hours()[hourIndex()],
-                                                                                        event: {
-                                                                                            input: function() {
-                                                                                                $root.onTurnoverStepHourInput($parentContext.dishCategoryIndex(), weekdayIndex(), hourIndex());
-                                                                                            }
-                                                                                        },
-                                                                                        hrmMask, hrmMaskPattern: 'decimal',
-                                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
-                                                                                        hrmTableEditableCellInputControl,
-                                                                                        hrmTableEditableCellInputControlOwner: editableCell,
-                                                                                    " placeholder="0">
-                                                                                </td>
-                                                                            <!-- /ko -->
-
-                                                                            <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] === null -->
-                                                                                <td class="setup-wizard-page__turnover-selector-table-hour-cell
-                                                                                           setup-wizard-page__turnover-selector-table-hour-cell--disabled">
-                                                                                </td>
-                                                                            <!-- /ko -->
+                                                                        <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] === null -->
+                                                                            <td class="setup-wizard-page__turnover-selector-table-hour-cell
+                                                                                       setup-wizard-page__turnover-selector-table-hour-cell--disabled">
+                                                                            </td>
                                                                         <!-- /ko -->
                                                                     <!-- /ko -->
+                                                                <!-- /ko -->
 
-                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                        <td class="setup-wizard-page__turnover-selector-table-hour-total-cell"
-                                                                            data-bind="hrmTableEditableCell: editableCell">
-                                                                            <input data-bind="
-                                                                                value: $parent.hourTotals()[hourIndex()],
-                                                                                event: {
-                                                                                    change: function() {
-                                                                                        $root.onTurnoverStepHourTotalChange($parentContext.dishCategoryIndex(), hourIndex());
-                                                                                    }
-                                                                                },
-                                                                                hrmMask, hrmMaskPattern: 'decimal',
-                                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
-                                                                                hrmTableEditableCellInputControl,
-                                                                                hrmTableEditableCellInputControlOwner: editableCell
-                                                                            " placeholder="0">
-                                                                        </td>
-                                                                    <!-- /ko -->
-                                                                </tr>
-                                                            <!-- /ko -->
-                                                        </tbody>
-                                                        </table>
-                                                    </div>
+                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                    <td class="setup-wizard-page__turnover-selector-table-hour-total-cell"
+                                                                        data-bind="
+                                                                            hrmTableEditableCell: editableCell,
+                                                                            hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor($parent.hourTotals()[hourIndex()])
+                                                                        ">
+                                                                        <input data-bind="
+                                                                            value: $parent.hourTotals()[hourIndex()],
+                                                                            event: {
+                                                                                change: function() {
+                                                                                    $root.onTurnoverStepHourTotalChange($parentContext.dishCategoryIndex(), hourIndex());
+                                                                                }
+                                                                            },
+                                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
+                                                                            hrmTableEditableCellInputControl,
+                                                                            hrmTableEditableCellInputControlOwner: editableCell
+                                                                        " placeholder="0">
+                                                                    </td>
+                                                                <!-- /ko -->
+                                                            </tr>
+                                                        <!-- /ko -->
+                                                    </tbody>
+                                                    </table>
+                                                </div>
                                             <!-- /ko -->
                                         <!-- /ko -->
 
@@ -853,7 +871,10 @@
 
                                                                                 <!-- ko let: {editableCell: ko.observable(null)} -->
                                                                                     <td class="setup-wizard-page__turnover-selector-table-category-section-table-week-total-cell"
-                                                                                        data-bind="hrmTableEditableCell: editableCell">
+                                                                                        data-bind="
+                                                                                            hrmTableEditableCell: editableCell,
+                                                                                            hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor(weekTotal)
+                                                                                        ">
                                                                                         <input data-bind="
                                                                                             value: weekTotal,
                                                                                             event: {
@@ -880,7 +901,10 @@
 
                                                                                     <!-- ko let: {editableCell: ko.observable(null)} -->
                                                                                         <td class="setup-wizard-page__turnover-selector-table-category-section-table-hour-total-cell"
-                                                                                            data-bind="hrmTableEditableCell: editableCell">
+                                                                                            data-bind="
+                                                                                                hrmTableEditableCell: editableCell,
+                                                                                                hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor($parent.hourTotals()[hourIndex()])
+                                                                                            ">
                                                                                             <input data-bind="
                                                                                                 value: $parent.hourTotals()[hourIndex()],
                                                                                                 event: {
@@ -922,7 +946,7 @@
                                                                                             <td class="setup-wizard-page__turnover-selector-table-category-section-table-weekday-cell"
                                                                                                 data-bind="
                                                                                                     hrmTableEditableCell: editableCell,
-                                                                                                    hrmTableEditableCellError: weekday === 1 ? $root.turnoverStepTableCategoryErrorExtractor(dishCategoryIndex()) : null
+                                                                                                    hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
                                                                                                 "
                                                                                             >
                                                                                                 <input data-bind="
@@ -951,7 +975,10 @@
                                                                                             <!-- ko let: {editableCell: ko.observable(null)} -->
                                                                                                 <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] !== null -->
                                                                                                     <td class="setup-wizard-page__turnover-selector-table-hour-cell"
-                                                                                                        data-bind="hrmTableEditableCell: editableCell">
+                                                                                                        data-bind="
+                                                                                                            hrmTableEditableCell: editableCell,
+                                                                                                            hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor($parents[1].week[weekday - 1].hours()[hourIndex()])
+                                                                                                        ">
                                                                                                             <input data-bind="
                                                                                                                 textInput: $parents[1].week[weekday - 1].hours()[hourIndex()],
                                                                                                                 event: {
@@ -996,6 +1023,16 @@
                                 <!-- /ko -->
 
                                 <!-- ko template: {
+                                    foreach: hrmTemplateIf($root.isTurnoverStepCalculating(), $data),
+                                    afterAdd: hrmFadeAfterAddFactory(200, 200),
+                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                } -->
+                                    <div>
+                                        Производится рассчёт...
+                                    </div>
+                                <!-- /ko -->
+
+                                <!-- ko template: {
                                     foreach: hrmTemplateIf(!($root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth && isTurnoverCalculated()), $data),
                                     afterAdd: hrmFadeAfterAddFactory(200, 200),
                                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
@@ -1030,7 +1067,7 @@
                                 <button class="hrm-button hrm-basic-button hrm-accent-button setup-wizard-page__tab-pane-actions-button"
                                         data-bind="
                                             click: function () { $root.turnoverStepSubmit(); },
-                                            attr: {disabled: isTurnoverCalculated() && $root.isTurnoverStepSubmitted() && !$root.isTurnoverStepValid()},
+                                            attr: {disabled: $root.isTurnoverStepSubmitted() && !$root.isTurnoverStepValid()},
                                             css: {
                                                 'setup-wizard-page__turnover-tab-pane-calculate-button': !isTurnoverCalculated()
                                             },

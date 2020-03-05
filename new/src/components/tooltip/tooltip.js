@@ -36,7 +36,7 @@
                 interactive: true,
                 appendTo: document.body,
                 boundary: 'viewport',
-                hideOnClick: this._mode === 'basic',
+                hideOnClick: true,
                 trigger: this._mode === 'basic' ? 'mouseenter click' : 'manual',
                 onCreate: instance => {
                     $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
