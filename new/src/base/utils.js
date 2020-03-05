@@ -173,3 +173,15 @@ function hrmExtractComponentParam(params, name, defaultValue) {
         return ko.observable(defaultValue);
     }
 }
+
+ko.bindingHandlers.hrmLog = {
+    update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+        console.group('hrmLog');
+        console.info('element', element);
+        console.info('valueAccessor', valueAccessor());
+        console.info('allBindings', allBindings());
+        console.info('viewModel', viewModel);
+        console.info('bindingContext', bindingContext);
+        console.groupEnd('hrmLog');
+    }
+};
