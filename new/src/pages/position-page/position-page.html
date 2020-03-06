@@ -37,404 +37,60 @@
 
                 <!-- ko template: {
                     foreach: hrmTemplateIf($root.activeTab() === 0, $data),
-                    afterAdd: hrmFadeAfterAddFactory(100, 100),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                    afterAdd: hrmFadeAfterAddFactory(200, 200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
                 } -->
-                    <div class="position-page__tab-pane position-page__workload-tab-pane"
-                         data-bind="using: formModel">
-                        <div class="position-page__workload-tab-pane-section">
-                            <div class="position-page__workload-tab-pane-section-row">
-                                <div class="position-page__workload-tab-pane-section-row-content">
-                                    <div class="position-page__workload-tab-pane-section-row-item
-                                                position-page__workload-tab-pane-section-row-name-item">
-                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                            <div data-bind="
-                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-                                            ">
-                                                <label data-bind="hrmFormFieldLabel: label">
-                                                    Название должности
-
-                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                            data-bind="hrmTooltip, hrmTooltipText: 'Название должности'">
-                                                    </button>
-                                                </label>
-
-                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                    <input data-bind="
-                                                        textInput: name,
-                                                        hrmFormFieldInputControl: control,
-                                                        hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
-                                                    " placeholder="Введите название">
-                                                </div>
-
-                                                <div data-bind="
-                                                    component: {name: 'hrm-form-field-error'},
-                                                    hrmSlide,
-                                                    hrmSlideValue: control() !== null ? control().errorState : false,
-                                                    hrmSlideDuration: 150
-                                                ">
-                                                    <!-- ko text: $parent.name.error() --><!-- /ko -->
-                                                </div>
-                                            </div>
-                                        <!-- /ko -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="position-page__workload-tab-pane-section">
-                            <span class="position-page__workload-tab-pane-section-title">Основная нагрузка</span>
-
-                            <div class="position-page__workload-tab-pane-section-row">
-                                <div class="position-page__workload-tab-pane-section-row-content">
-                                    <div class="position-page__workload-tab-pane-section-row-item
-                                                position-page__workload-tab-pane-section-row-workload-type-item">
-                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                            <div data-bind="
-                                               hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-                                            ">
-                                                <label data-bind="hrmFormFieldLabel: label">
-                                                    Тип нагрузки
-
-                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                            data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'">
-                                                    </button>
-                                                </label>
-
-                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                    <select data-bind="
-                                                        value: workloadType,
-                                                        hrmSelect, hrmSelectPlaceholder: 'Выберите тип', hrmSelectAllowClear: true,
-                                                        hrmFormFieldSelectControl: control,
-                                                        hrmFormFieldSelectControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
-                                                    ">
-                                                        <option></option>
-                                                        <option value="0">Объём товара по всему предприятию</option>
-                                                        <option value="1">Объём товара по категориям</option>
-                                                        <option value="2">Оборот филиала</option>
-                                                        <option value="3">Оборот филиала по типу заказа</option>
-                                                        <option value="4">Оборот филиала по категориям</option>
-                                                        <option value="5">Оборот товаров, закреплённых за сотрудником</option>
-                                                        <option value="6">Количество заказов, закрепленных за сотрудником</option>
-                                                        <option value="7">Количество заказов, произведенных в филиале</option>
-                                                        <option value="8">Количество заказов по типу заказа, произведенных в филиале</option>
-                                                        <option value="9">Оплата за смену</option>
-                                                        <option value="10">Оплата за час</option>
-                                                    </select>
-                                                </div>
-
-                                                <div data-bind="
-                                                    component: {name: 'hrm-form-field-error'},
-                                                    hrmSlide,
-                                                    hrmSlideValue: control() !== null ? control().errorState : false,
-                                                    hrmSlideDuration: 150
-                                                ">
-                                                    <!-- ko text: $parent.workloadType.error() --><!-- /ko -->
-                                                </div>
-                                            </div>
-                                        <!-- /ko -->
-                                    </div>
-
-                                    <!-- ko template: {
-                                        foreach: hrmTemplateIf(['1', '4'].includes(workloadType()), $data),
-                                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
-                                    } -->
-                                        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth -->
-                                            <div class="position-page__workload-tab-pane-section-row-wrapper"></div>
-                                        <!-- /ko -->
-
-                                        <div class="position-page__workload-tab-pane-section-row-item
-                                                    position-page__workload-tab-pane-section-row-dish-categories-item">
+                    <!-- ko let: {'$tab': $root.workloadTabViewModel} -->
+                        <div class="position-page__tab-pane position-page__workload-tab-pane"
+                             data-bind="using: $tab.formModel">
+                            <div class="position-page__section">
+                                <div class="position-page__section-row position-page__workload-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__workload-tab-pane-section-row-name-item">
                                             <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                 <div data-bind="
-                                                   hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                                                 ">
                                                     <label data-bind="hrmFormFieldLabel: label">
-                                                       Категории
+                                                        Название должности
 
                                                         <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
                                                                        hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                                data-bind="hrmTooltip, hrmTooltipText: 'Категории'">
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Название должности'">
                                                         </button>
                                                     </label>
 
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                        <select data-bind="
-                                                            options: $root.dishCategories,
-                                                            optionsText: 'name',
-                                                            optionsValue: 'id',
-                                                            optionsCaption: '',
-                                                            selectedOptions: dishCategories,
-                                                            hrmSelect, hrmSelectSearchEnabled: true,
-                                                            hrmFormFieldSelectControl: control
-                                                        " multiple>
-                                                            <option></option>
-                                                        </select>
+                                                        <input data-bind="
+                                                            textInput: name,
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="Введите название">
                                                     </div>
-                                                </div>
-                                            <!-- /ko -->
-                                        </div>
 
-                                        <div class="position-page__workload-tab-pane-section-row-item
-                                                    position-page__workload-tab-pane-section-row-dish-categories-exclusion-flag-item">
-                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                                <div class="hrm-form-field-switch-group"
-                                                     data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
-                                                    <div data-bind="component: {name: 'hrm-switch', params: {checked: dishCategoriesExclusionFlag, exportAs: control}}"></div>
-                                                    <label data-bind="hrmSwitchGroupLabel: label">
-                                                        Все категории, кроме указанных
-                                                    </label>
-                                                </div>
-                                            <!-- /ko -->
-                                        </div>
-                                    <!-- /ko -->
-
-                                    <!-- ko template: {
-                                        foreach: hrmTemplateIf(['3', '8'].includes(workloadType()), $data),
-                                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
-                                    } -->
-                                        <div class="position-page__workload-tab-pane-section-row-item
-                                                    position-page__workload-tab-pane-section-row-order-types-item">
-                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                                <div data-bind="
-                                                   hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-                                                ">
-                                                    <label data-bind="hrmFormFieldLabel: label">
-                                                        Тип заказа
-
-                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                                data-bind="hrmTooltip, hrmTooltipText: 'Тип заказа'">
-                                                        </button>
-                                                    </label>
-
-                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                        <select data-bind="
-                                                            selectedOptions: orderTypes,
-                                                            hrmSelect, hrmSelectSearchEnabled: true,
-                                                            hrmFormFieldSelectControl: control
-                                                        " multiple>
-                                                            <option></option>
-                                                            <option value="0">Зал</option>
-                                                            <option value="1">Доставка</option>
-                                                            <option value="2">Самовызов</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            <!-- /ko -->
-                                        </div>
-                                    <!-- /ko -->
-                                </div>
-                            </div>
-
-                            <!-- ko template: {
-                                foreach: hrmTemplateIf(
-                                    ['0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(workloadType()),
-                                    $data
-                                ),
-                                afterAdd: hrmFadeAfterAddFactory(100, 100),
-                                beforeRemove: hrmFadeBeforeRemoveFactory(100)
-                            } -->
-                            <div class="position-page__workload-tab-pane-section-row">
-                                <div class="position-page__workload-tab-pane-section-row-content">
-                                    <div class="position-page__workload-tab-pane-section-row-item
-                                                position-page__workload-tab-pane-section-row-units-item">
-                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                            <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-                                                <label data-bind="hrmFormFieldLabel: label">
-                                                    Единицы
-
-                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                            data-bind="hrmTooltip, hrmTooltipText: 'Единицы'">
-                                                    </button>
-                                                </label>
-
-                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                    <select data-bind="
-                                                        value: units,
-                                                        hrmSelect,
-                                                        hrmFormFieldSelectControl: control
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
                                                     ">
-                                                        <option></option>
-                                                        <option value="1">Штуки</option>
-                                                        <option value="2">Рубли</option>
-                                                        <option value="3">Норма времени</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        <!-- /ko -->
-                                    </div>
-
-                                    <div class="position-page__workload-tab-pane-section-row-item
-                                                position-page__workload-tab-pane-section-row-standard-item">
-                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                            <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-                                                <label data-bind="hrmFormFieldLabel: label">
-                                                    Норматив
-
-                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                            data-bind="hrmTooltip, hrmTooltipText: 'Норматив'">
-                                                    </button>
-                                                </label>
-
-                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                    <input data-bind="
-                                                        textInput: standard,
-                                                        hrmMask, hrmMaskPattern: 'decimal',
-                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                        hrmFormFieldInputControl: control,
-                                                        hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
-                                                    " placeholder="0">
-                                                </div>
-
-                                                <div data-bind="
-                                                    component: {name: 'hrm-form-field-error'},
-                                                    hrmSlide,
-                                                    hrmSlideValue: control() !== null ? control().errorState : false,
-                                                    hrmSlideDuration: 150
-                                                ">
-                                                    <!-- ko text: $parent.standard.error() --><!-- /ko -->
-                                                </div>
-                                            </div>
-                                        <!-- /ko -->
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- /ko -->
-
-                            <div class="position-page__workload-tab-pane-section-row">
-                                <div class="position-page__workload-tab-pane-section-row-content">
-                                    <div class="position-page__workload-tab-pane-section-row-item
-                                                position-page__workload-tab-pane-section-row-production-standard-item">
-                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                            <div class="position-page__workload-tab-pane-production-standard-form-field" data-bind="
-                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-                                            ">
-                                                <label data-bind="hrmFormFieldLabel: label">
-                                                    Норматив выработки
-
-                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                            data-bind="hrmTooltip, hrmTooltipText: 'Норматив выработки'">
-                                                    </button>
-                                                </label>
-
-                                                <div data-bind="hrmFormFieldComplexControl: control">
-                                                    <div class="hrm-radio-group position-page__workload-tab-pane-production-standard-form-field-type-control">
-                                                        <div class="hrm-radio-group__radio">
-                                                            <input class="hrm-radio-group__radio-input" data-bind="checked: productionStandard.type"
-                                                                   type="radio" value="0" id="position-page-production-standard-type-number-radio" checked/>
-                                                            <label class="hrm-radio-group__radio-label" for="position-page-production-standard-type-number-radio">
-                                                                Число
-                                                            </label>
-                                                        </div>
-
-                                                        <div class="hrm-radio-group__radio">
-                                                            <input class="hrm-radio-group__radio-input" data-bind="checked: productionStandard.type"
-                                                                   type="radio" value="1" id="position-page-production-standard-type-range-radio"/>
-                                                            <label class="hrm-radio-group__radio-label" for="position-page-production-standard-type-range-radio">
-                                                                Диапазон
-                                                            </label>
-                                                        </div>
+                                                        <!-- ko text: $parent.name.error() --><!-- /ko -->
                                                     </div>
-
-                                                    <!-- ko template: {
-                                                        foreach: hrmTemplateIf(productionStandard.type() === '0', $data),
-                                                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
-                                                    } -->
-                                                        <!-- ko let: {control: ko.observable(null)} -->
-                                                            <div class="position-page__workload-tab-pane-production-standard-form-field-value-control"
-                                                                 data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                                <input data-bind="
-                                                                    textInput: productionStandard.value,
-                                                                    hrmFormFieldInputControl: control,
-                                                                    hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
-                                                                " placeholder="0">
-                                                            </div>
-                                                        <!-- /ko -->
-                                                    <!-- /ko -->
-
-                                                    <!-- ko template: {
-                                                        foreach: hrmTemplateIf(productionStandard.type() === '1', $data),
-                                                        afterAdd: hrmFadeAfterAddFactory(100, 100),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(100)
-                                                    } -->
-                                                        <div class="position-page__workload-tab-pane-production-standard-form-field-range-control">
-                                                            <!-- ko let: {control: ko.observable(null)} -->
-                                                                <div class="position-page__workload-tab-pane-production-standard-form-field-range-control-min-control"
-                                                                     data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                                    <input data-bind="
-                                                                        textInput: productionStandard.range.min,
-                                                                        hrmMask, hrmMaskPattern: 'decimal',
-                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                        hrmFormFieldInputControl: control,
-                                                                        hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
-                                                                    " placeholder="0">
-                                                                </div>
-                                                            <!-- /ko -->
-
-                                                            <span class="position-page__workload-tab-pane-production-standard-form-field-range-control-separator">—</span>
-
-                                                            <!-- ko let: {control: ko.observable(null)} -->
-                                                                <div class="position-page__workload-tab-pane-production-standard-form-field-range-control-max-control"
-                                                                     data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                                    <input data-bind="
-                                                                        textInput: productionStandard.range.max,
-                                                                        hrmMask, hrmMaskPattern: 'decimal',
-                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                        hrmFormFieldInputControl: control,
-                                                                        hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher.bind($root)
-                                                                    " placeholder="0">
-                                                                </div>
-                                                            <!-- /ko -->
-
-                                                            <span class="position-page__workload-tab-pane-production-standard-form-field-range-control-suffix"
-                                                                  data-bind="text: $root.productionStandardFormFieldRangeControlSuffix">
-                                                            </span>
-                                                        </div>
-                                                    <!-- /ko -->
                                                 </div>
-
-                                                <div data-bind="
-                                                    component: {name: 'hrm-form-field-error'},
-                                                    hrmSlide,
-                                                    hrmSlideValue: control() !== null ? control().errorState : false,
-                                                    hrmSlideDuration: 150
-                                                ">
-                                                    <!-- ko text: $parent.workloadType.error() --><!-- /ko -->
-                                                </div>
-                                            </div>
-                                        <!-- /ko -->
+                                            <!-- /ko -->
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="position-page__workload-tab-pane-section"
-                             data-bind="css:{'position-page__workload-tab-pane-section--disabled': $root.additionalWorkloadSectionDisabled}">
-                            <span class="position-page__workload-tab-pane-section-title">
-                                Дополнительная нагрузка
-                                <span class="position-page__workload-tab-pane-section-title-postscript">необязательно</span>
-                            </span>
+                            <div class="position-page__section">
+                                <span class="position-page__section-title">Основная нагрузка</span>
 
-                            <!-- ko foreach: {
-                                data: additionalWorkload,
-                                afterAdd: hrmFadeAfterAddFactory(100),
-                                beforeRemove: hrmFadeBeforeRemoveFactory(100)}
-                            -->
-                                <div class="position-page__workload-tab-pane-section-row
-                                            position-page__workload-tab-pane-section-additional-workload-row"
-                                     data-bind="css:{'position-page__workload-tab-pane-section-additional-workload-row--type_other': type() === '2'}">
-                                    <div class="position-page__workload-tab-pane-section-row-content">
-                                        <div class="position-page__workload-tab-pane-section-row-item
-                                                    position-page__workload-tab-pane-section-row-additional-workload-type-item">
+                                <div class="position-page__section-row position-page__workload-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__workload-tab-pane-section-row-workload-type-item">
                                             <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                 <div data-bind="
                                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
@@ -450,181 +106,860 @@
 
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                         <select data-bind="
-                                                            value: type,
+                                                            value: workloadType,
                                                             hrmSelect, hrmSelectPlaceholder: 'Выберите тип', hrmSelectAllowClear: true,
                                                             hrmFormFieldSelectControl: control,
-                                                            attr: {disabled: $root.additionalWorkloadSectionDisabled}
+                                                            hrmFormFieldSelectControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                         ">
                                                             <option></option>
                                                             <option value="0">Объём товара по всему предприятию</option>
                                                             <option value="1">Объём товара по категориям</option>
-                                                            <option value="2">Другое</option>
+                                                            <option value="2">Оборот филиала</option>
+                                                            <option value="3">Оборот филиала по типу заказа</option>
+                                                            <option value="4">Оборот филиала по категориям</option>
+                                                            <option value="5">Оборот товаров, закреплённых за сотрудником</option>
+                                                            <option value="6">Количество заказов, закрепленных за сотрудником</option>
+                                                            <option value="7">Количество заказов, произведенных в филиале</option>
+                                                            <option value="8">Количество заказов по типу заказа, произведенных в филиале</option>
+                                                            <option value="9">Оплата за смену</option>
+                                                            <option value="10">Оплата за час</option>
                                                         </select>
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.workloadType.error() --><!-- /ko -->
                                                     </div>
                                                 </div>
                                             <!-- /ko -->
                                         </div>
 
                                         <!-- ko template: {
-                                            foreach: hrmTemplateIf(type() === '2' && !$root.additionalWorkloadSectionDisabled(), $data),
+                                            foreach: hrmTemplateIf(['1', '4'].includes(workloadType()), $data),
                                             afterAdd: hrmFadeAfterAddFactory(100, 100),
                                             beforeRemove: hrmFadeBeforeRemoveFactory(100)
                                         } -->
-                                            <div class="position-page__workload-tab-pane-section-row-item
-                                                        position-page__workload-tab-pane-section-row-additional-name-item">
+                                            <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth -->
+                                                <div class="position-page__section-row-wrapper"></div>
+                                            <!-- /ko -->
+
+                                            <div class="position-page__section-row-item
+                                                        position-page__workload-tab-pane-section-row-dish-categories-item">
                                                 <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                     <div data-bind="
                                                        hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                                                     ">
                                                         <label data-bind="hrmFormFieldLabel: label">
-                                                            Название
+                                                           Категории
 
                                                             <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
                                                                            hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Название'">
+                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Категории'">
                                                             </button>
                                                         </label>
 
                                                         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                            <input data-bind="
-                                                                textInput: name,
-                                                                hrmFormFieldInputControl: control,
-                                                                hrmFormFieldInputControlErrorStateMatcher: $root.additionalWorkloadSectionFormControlErrorStateMatcher.bind($root),
-                                                                attr: {disabled: $root.additionalWorkloadSectionDisabled}
-                                                            ">
+                                                            <select data-bind="
+                                                                options: $root.dishCategories,
+                                                                optionsText: 'name',
+                                                                optionsValue: 'id',
+                                                                optionsCaption: '',
+                                                                selectedOptions: dishCategories,
+                                                                hrmSelect, hrmSelectSearchEnabled: true,
+                                                                hrmFormFieldSelectControl: control
+                                                            " multiple>
+                                                                <option></option>
+                                                            </select>
                                                         </div>
+                                                    </div>
+                                                <!-- /ko -->
+                                            </div>
 
-                                                        <div data-bind="
-                                                            component: {name: 'hrm-form-field-error'},
-                                                            hrmSlide,
-                                                            hrmSlideValue: control() !== null ? control().errorState : false,
-                                                            hrmSlideDuration: 150
-                                                        ">
-                                                            <!-- ko text: $parent.name.error() --><!-- /ko -->
-                                                        </div>
+                                            <div class="position-page__section-row-item
+                                                        position-page__workload-tab-pane-section-row-dish-categories-exclusion-flag-item">
+                                                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                    <div class="hrm-form-field-switch-group"
+                                                         data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                                        <div data-bind="component: {name: 'hrm-switch', params: {checked: dishCategoriesExclusionFlag, exportAs: control}}"></div>
+                                                        <label data-bind="hrmSwitchGroupLabel: label">
+                                                            Все категории, кроме указанных
+                                                        </label>
                                                     </div>
                                                 <!-- /ko -->
                                             </div>
                                         <!-- /ko -->
 
                                         <!-- ko template: {
-                                            foreach: hrmTemplateIf(type() !== '' && !$root.additionalWorkloadSectionDisabled(), $data),
+                                            foreach: hrmTemplateIf(['3', '8'].includes(workloadType()), $data),
                                             afterAdd: hrmFadeAfterAddFactory(100, 100),
                                             beforeRemove: hrmFadeBeforeRemoveFactory(100)
                                         } -->
-                                            <div class="position-page__workload-tab-pane-section-row-item
-                                                        position-page__workload-tab-pane-section-row-additional-factor-item">
+                                            <div class="position-page__section-row-item
+                                                        position-page__workload-tab-pane-section-row-order-types-item">
                                                 <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                                     <div data-bind="
                                                        hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                                                     ">
                                                         <label data-bind="hrmFormFieldLabel: label">
-                                                            Коэффициент
+                                                            Тип заказа
 
                                                             <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
                                                                            hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент'">
+                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Тип заказа'">
                                                             </button>
                                                         </label>
 
                                                         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                            <input data-bind="
-                                                                textInput: factor,
-                                                                hrmMask, hrmMaskPattern: 'decimal',
-                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                hrmFormFieldInputControl: control,
-                                                                hrmFormFieldInputControlErrorStateMatcher: $root.additionalWorkloadSectionFormControlErrorStateMatcher.bind($root),
-                                                                attr: {disabled: $root.additionalWorkloadSectionDisabled}
-                                                            " placeholder="0">
-                                                        </div>
-
-                                                        <div data-bind="
-                                                            component: {name: 'hrm-form-field-error'},
-                                                            hrmSlide,
-                                                            hrmSlideValue: control() !== null ? control().errorState : false,
-                                                            hrmSlideDuration: 150
-                                                        ">
-                                                            <!-- ko text: $parent.factor.error() --><!-- /ko -->
+                                                            <select data-bind="
+                                                                selectedOptions: orderTypes,
+                                                                hrmSelect, hrmSelectSearchEnabled: true,
+                                                                hrmFormFieldSelectControl: control
+                                                            " multiple>
+                                                                <option></option>
+                                                                <option value="0">Зал</option>
+                                                                <option value="1">Доставка</option>
+                                                                <option value="2">Самовызов</option>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 <!-- /ko -->
                                             </div>
-                                        <!-- /ko -->
-
-                                        <!-- ko template: {
-                                            foreach: hrmTemplateIf(!['', '2'].includes(type()) && !$root.additionalWorkloadSectionDisabled(), $data),
-                                            afterAdd: hrmFadeAfterAddFactory(100, 100),
-                                            beforeRemove: hrmFadeBeforeRemoveFactory(100)
-                                        } -->
-                                            <div class="position-page__workload-tab-pane-section-row-item
-                                                        position-page__workload-tab-pane-section-row-additional-units-item">
-                                                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                                    <div class="position-page__workload-tab-pane-additional-units-form-field" data-bind="
-                                                       hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-                                                    ">
-                                                        <label data-bind="hrmFormFieldLabel: label">
-                                                            Единицы
-                                                        </label>
-
-                                                        <div data-bind="
-                                                            hrmFormFieldComplexControl: control,
-                                                            hrmFormFieldComplexControlDisabled: $root.additionalWorkloadSectionDisabled,
-                                                            text: $root.getUnitsName($parents[1].units())
-                                                        ">
-                                                            Норма времени
-                                                        </div>
-                                                    </div>
-                                                <!-- /ko -->
-                                            </div>
-                                        <!-- /ko -->
-
-                                        <!-- ko template: {
-                                            foreach: hrmTemplateIf($parent.additionalWorkload()[0].type() !== '' && !$root.additionalWorkloadSectionDisabled(), $data),
-                                            afterAdd: hrmFadeAfterAddFactory(100, 100),
-                                            beforeRemove: hrmFadeBeforeRemoveFactory(100)
-                                        } -->
-                                            <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
-                                                <button class="hrm-button hrm-button-with-icon hrm-button-with-trash-icon
-                                                               hrm-button-with-icon--theme_negative position-page__workload-tab-pane-section-additional-workload-row-remove-button"
-                                                        data-bind="click: function () {$root.removeAdditionalWorkloadItem($data);}">
-                                                    Удалить
-                                                </button>
-                                            <!-- /ko -->
-
-                                            <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-                                                <button class="hrm-button hrm-icon-button hrm-trash-icon-button
-                                                               hrm-icon-button--theme_negative position-page__workload-tab-pane-section-additional-workload-row-remove-button"
-                                                        title="Удалить"
-                                                        data-bind="click: function () {$root.removeAdditionalWorkloadItem($data);}">
-                                                </button>
-                                            <!-- /ko -->
                                         <!-- /ko -->
                                     </div>
                                 </div>
-                            <!-- /ko -->
 
-                            <!-- ko if: additionalWorkload()[additionalWorkload().length - 1].type() !== '' && !$root.additionalWorkloadSectionDisabled() -->
-                                <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
-                                               hrm-button-with-plus-icon position-page__workload-tab-pane-add-additional-workload-item"
-                                        data-bind="click: function () {$root.addAdditionalWorkloadItem();}">
-                                    Добавить нагрузку
+                                <!-- ko template: {
+                                    foreach: hrmTemplateIf(
+                                        ['0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(workloadType()),
+                                        $data
+                                    ),
+                                    afterAdd: hrmFadeAfterAddFactory(100, 100),
+                                    beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                                } -->
+                                <div class="position-page__section-row position-page__workload-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__workload-tab-pane-section-row-units-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        Единицы
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Единицы'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <select data-bind="
+                                                            value: units,
+                                                            hrmSelect,
+                                                            hrmFormFieldSelectControl: control
+                                                        ">
+                                                            <option></option>
+                                                            <option value="1">Штуки</option>
+                                                            <option value="2">Рубли</option>
+                                                            <option value="3">Норма времени</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+
+                                        <div class="position-page__section-row-item
+                                                    position-page__workload-tab-pane-section-row-standard-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        Норматив
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Норматив'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: standard,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="0">
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.standard.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /ko -->
+
+                                <div class="position-page__section-row position-page__workload-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__workload-tab-pane-section-row-production-standard-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div class="position-page__workload-tab-pane-production-standard-form-field" data-bind="
+                                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                                ">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        Норматив выработки
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Норматив выработки'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldComplexControl: control">
+                                                        <div class="hrm-radio-group position-page__workload-tab-pane-production-standard-form-field-type-control">
+                                                            <div class="hrm-radio-group__radio">
+                                                                <input class="hrm-radio-group__radio-input" data-bind="checked: productionStandard.type"
+                                                                       type="radio" value="0" id="position-page-production-standard-type-number-radio" checked/>
+                                                                <label class="hrm-radio-group__radio-label" for="position-page-production-standard-type-number-radio">
+                                                                    Число
+                                                                </label>
+                                                            </div>
+
+                                                            <div class="hrm-radio-group__radio">
+                                                                <input class="hrm-radio-group__radio-input" data-bind="checked: productionStandard.type"
+                                                                       type="radio" value="1" id="position-page-production-standard-type-range-radio"/>
+                                                                <label class="hrm-radio-group__radio-label" for="position-page-production-standard-type-range-radio">
+                                                                    Диапазон
+                                                                </label>
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- ko template: {
+                                                            foreach: hrmTemplateIf(productionStandard.type() === '0', $data),
+                                                            afterAdd: hrmFadeAfterAddFactory(100, 100),
+                                                            beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                                                        } -->
+                                                            <!-- ko let: {control: ko.observable(null)} -->
+                                                                <div class="position-page__workload-tab-pane-production-standard-form-field-value-control"
+                                                                     data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                    <input data-bind="
+                                                                        textInput: productionStandard.value,
+                                                                        hrmFormFieldInputControl: control,
+                                                                        hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                                    " placeholder="0">
+                                                                </div>
+                                                            <!-- /ko -->
+                                                        <!-- /ko -->
+
+                                                        <!-- ko template: {
+                                                            foreach: hrmTemplateIf(productionStandard.type() === '1', $data),
+                                                            afterAdd: hrmFadeAfterAddFactory(100, 100),
+                                                            beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                                                        } -->
+                                                            <div class="position-page__workload-tab-pane-production-standard-form-field-range-control">
+                                                                <!-- ko let: {control: ko.observable(null)} -->
+                                                                    <div class="position-page__workload-tab-pane-production-standard-form-field-range-control-min-control"
+                                                                         data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                        <input data-bind="
+                                                                            textInput: productionStandard.range.min,
+                                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                            hrmFormFieldInputControl: control,
+                                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                                        " placeholder="0">
+                                                                    </div>
+                                                                <!-- /ko -->
+
+                                                                <span class="position-page__workload-tab-pane-production-standard-form-field-range-control-separator">—</span>
+
+                                                                <!-- ko let: {control: ko.observable(null)} -->
+                                                                    <div class="position-page__workload-tab-pane-production-standard-form-field-range-control-max-control"
+                                                                         data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                        <input data-bind="
+                                                                            textInput: productionStandard.range.max,
+                                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                            hrmFormFieldInputControl: control,
+                                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                                        " placeholder="0">
+                                                                    </div>
+                                                                <!-- /ko -->
+
+                                                                <span class="position-page__workload-tab-pane-production-standard-form-field-range-control-suffix"
+                                                                      data-bind="text: $tab.productionStandardFormFieldRangeControlSuffix">
+                                                                </span>
+                                                            </div>
+                                                        <!-- /ko -->
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.workloadType.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-page__section position-page__workload-tab-pane-additional-workload-section"
+                                 data-bind="css:{'position-page__workload-tab-pane-section--disabled': $tab.additionalWorkloadSectionDisabled}">
+                                <span class="position-page__section-title">
+                                    Дополнительная нагрузка
+                                    <span class="position-page__section-title-postscript">необязательно</span>
+                                </span>
+
+                                <!-- ko foreach: {
+                                    data: additionalWorkload,
+                                    afterAdd: hrmFadeAfterAddFactory(100),
+                                    beforeRemove: hrmFadeBeforeRemoveFactory(100)}
+                                -->
+                                    <div class="position-page__section-row position-page__workload-tab-pane-section-row
+                                                position-page__workload-tab-pane-additional-workload-section-row"
+                                         data-bind="css:{'position-page__workload-tab-pane-additional-workload-section-row--type_other': type() === '2'}">
+                                        <div class="position-page__section-row-content">
+                                            <div class="position-page__section-row-item
+                                                        position-page__workload-tab-pane-additional-workload-section-row-workload-type-item">
+                                                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                    <div data-bind="
+                                                       hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                                    ">
+                                                        <label data-bind="hrmFormFieldLabel: label">
+                                                            Тип нагрузки
+
+                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                           hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'">
+                                                            </button>
+                                                        </label>
+
+                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                            <select data-bind="
+                                                                value: type,
+                                                                hrmSelect, hrmSelectPlaceholder: 'Выберите тип', hrmSelectAllowClear: true,
+                                                                hrmFormFieldSelectControl: control,
+                                                                attr: {disabled: $tab.additionalWorkloadSectionDisabled}
+                                                            ">
+                                                                <option></option>
+                                                                <option value="0">Объём товара по всему предприятию</option>
+                                                                <option value="1">Объём товара по категориям</option>
+                                                                <option value="2">Другое</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                <!-- /ko -->
+                                            </div>
+
+                                            <!-- ko template: {
+                                                foreach: hrmTemplateIf(type() === '2' && !$tab.additionalWorkloadSectionDisabled(), $data),
+                                                afterAdd: hrmFadeAfterAddFactory(100, 100),
+                                                beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                                            } -->
+                                                <div class="position-page__section-row-item
+                                                            position-page__workload-tab-pane-additional-workload-section-row-name-item">
+                                                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                        <div data-bind="
+                                                           hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                                        ">
+                                                            <label data-bind="hrmFormFieldLabel: label">
+                                                                Название
+
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Название'">
+                                                                </button>
+                                                            </label>
+
+                                                            <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                <input data-bind="
+                                                                    textInput: name,
+                                                                    hrmFormFieldInputControl: control,
+                                                                    hrmFormFieldInputControlErrorStateMatcher: $tab.additionalWorkloadSectionFormControlErrorStateMatcher.bind($tab),
+                                                                    attr: {disabled: $tab.additionalWorkloadSectionDisabled}
+                                                                ">
+                                                            </div>
+
+                                                            <div data-bind="
+                                                                component: {name: 'hrm-form-field-error'},
+                                                                hrmSlide,
+                                                                hrmSlideValue: control() !== null ? control().errorState : false,
+                                                                hrmSlideDuration: 150
+                                                            ">
+                                                                <!-- ko text: $parent.name.error() --><!-- /ko -->
+                                                            </div>
+                                                        </div>
+                                                    <!-- /ko -->
+                                                </div>
+                                            <!-- /ko -->
+
+                                            <!-- ko template: {
+                                                foreach: hrmTemplateIf(type() !== '' && !$tab.additionalWorkloadSectionDisabled(), $data),
+                                                afterAdd: hrmFadeAfterAddFactory(100, 100),
+                                                beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                                            } -->
+                                                <div class="position-page__section-row-item
+                                                            position-page__workload-tab-pane-additional-workload-section-row-factor-item">
+                                                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                        <div data-bind="
+                                                           hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                                        ">
+                                                            <label data-bind="hrmFormFieldLabel: label">
+                                                                Коэффициент
+
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент'">
+                                                                </button>
+                                                            </label>
+
+                                                            <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                                <input data-bind="
+                                                                    textInput: factor,
+                                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                    hrmFormFieldInputControl: control,
+                                                                    hrmFormFieldInputControlErrorStateMatcher: $tab.additionalWorkloadSectionFormControlErrorStateMatcher.bind($tab),
+                                                                    attr: {disabled: $tab.additionalWorkloadSectionDisabled}
+                                                                " placeholder="0">
+                                                            </div>
+
+                                                            <div data-bind="
+                                                                component: {name: 'hrm-form-field-error'},
+                                                                hrmSlide,
+                                                                hrmSlideValue: control() !== null ? control().errorState : false,
+                                                                hrmSlideDuration: 150
+                                                            ">
+                                                                <!-- ko text: $parent.factor.error() --><!-- /ko -->
+                                                            </div>
+                                                        </div>
+                                                    <!-- /ko -->
+                                                </div>
+                                            <!-- /ko -->
+
+                                            <!-- ko template: {
+                                                foreach: hrmTemplateIf(!['', '2'].includes(type()) && !$tab.additionalWorkloadSectionDisabled(), $data),
+                                                afterAdd: hrmFadeAfterAddFactory(100, 100),
+                                                beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                                            } -->
+                                                <div class="position-page__section-row-item
+                                                            position-page__workload-tab-pane-additional-workload-section-row-units-item">
+                                                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                        <div class="position-page__workload-tab-pane-additional-units-form-field" data-bind="
+                                                           hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                                        ">
+                                                            <label data-bind="hrmFormFieldLabel: label">
+                                                                Единицы
+                                                            </label>
+
+                                                            <div data-bind="
+                                                                hrmFormFieldComplexControl: control,
+                                                                hrmFormFieldComplexControlDisabled: $tab.additionalWorkloadSectionDisabled,
+                                                                text: $root.getUnitsName($parents[1].units())
+                                                            ">
+                                                                Норма времени
+                                                            </div>
+                                                        </div>
+                                                    <!-- /ko -->
+                                                </div>
+                                            <!-- /ko -->
+
+                                            <!-- ko template: {
+                                                foreach: hrmTemplateIf($parent.additionalWorkload()[0].type() !== '' && !$tab.additionalWorkloadSectionDisabled(), $data),
+                                                afterAdd: hrmFadeAfterAddFactory(100, 100),
+                                                beforeRemove: hrmFadeBeforeRemoveFactory(100)
+                                            } -->
+                                                <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                                    <button class="hrm-button hrm-button-with-icon hrm-button-with-trash-icon
+                                                                   hrm-button-with-icon--theme_negative position-page__workload-tab-pane-additional-workload-section-row-remove-button"
+                                                            data-bind="click: function () {$tab.removeAdditionalWorkloadItem($data);}">
+                                                        Удалить
+                                                    </button>
+                                                <!-- /ko -->
+
+                                                <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                                                    <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                   hrm-icon-button--theme_negative position-page__workload-tab-pane-additional-workload-section-row-remove-button"
+                                                            title="Удалить"
+                                                            data-bind="click: function () {$tab.removeAdditionalWorkloadItem($data);}">
+                                                    </button>
+                                                <!-- /ko -->
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                <!-- /ko -->
+
+                                <!-- ko if: additionalWorkload()[additionalWorkload().length - 1].type() !== '' && !$tab.additionalWorkloadSectionDisabled() -->
+                                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                                   hrm-button-with-plus-icon"
+                                            data-bind="click: function () {$tab.addAdditionalWorkloadItem();}">
+                                        Добавить нагрузку
+                                    </button>
+                                <!-- /ko -->
+                            </div>
+
+                            <div class="position-page__tab-pane-action-list">
+                                <button class="hrm-button hrm-basic-button
+                                               position-page__tab-pane-action-list-item position-page__cancel-button">
+                                    Отменить
                                 </button>
-                            <!-- /ko -->
-                        </div>
 
-                        <div class="position-page__workload-tab-pane-action-list">
-                            <button class="hrm-button hrm-basic-button
-                                           position-page__workload-tab-pane-action-list-item position-page__workload-tab-pane-cancel-button">
-                                Отменить
-                            </button>
-
-                            <button class="hrm-button hrm-basic-button hrm-accent-button
-                                           position-page__workload-tab-pane-action-list-item position-page__workload-tab-pane-save-button"
-                                    data-bind="click: function() {$root.submit()}">
-                                Сохранить
-                            </button>
+                                <button class="hrm-button hrm-basic-button hrm-accent-button
+                                               position-page__tab-pane-action-list-item position-page__save-button"
+                                        data-bind="
+                                            click: function() {$tab.submit()},
+                                            attr: {disabled: $tab.isSubmitted() && !$tab.isValid()}
+                                        ">
+                                    Сохранить
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko template: {
+                    foreach: hrmTemplateIf($root.activeTab() === 1, $data),
+                    afterAdd: hrmFadeAfterAddFactory(200, 200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <!-- ko let: {'$tab': $root.salaryTabViewModel} -->
+                        <div class="position-page__tab-pane position-page__salary-tab-pane"
+                             data-bind="using: $tab.formModel">
+                            <div class="position-page__section">
+                                <div class="position-page__section-row position-page__salary-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__salary-tab-pane-section-row-bulk-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div class="position-page__salary-tab-pane-bulk-form-field"
+                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        <span>Фикс. дневной оклад, <i class="far fa-ruble-sign"></i></span>
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Фикс. дневной оклад, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: bulk,
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="0">
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.bulk.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-page__section">
+                                <span class="position-page__section-title">
+                                    Премирование
+                                    <span class="position-page__section-title-postscript">необязательно</span>
+                                </span>
+
+                                <div class="position-page__section-row position-page__salary-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__salary-tab-pane-section-row-bonus-rate-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div class="position-page__salary-tab-pane-bonus-rate-form-field"
+                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        <span>Ставка премии, <i class="far fa-ruble-sign"></i></span>
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Ставка премии, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: bonus.rate,
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="0">
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.bonus.rate.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+
+                                        <div class="position-page__section-row-item
+                                                    position-page__salary-tab-pane-section-row-bonus-sum-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div class="position-page__salary-tab-pane-bonus-sum-form-field"  data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        <span>Сумма переработки, <i class="far fa-ruble-sign"></i></span>
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Сумма переработки'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: bonus.sum,
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="0">
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.bonus.sum.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+
+                                            <span class="position-page__salary-tab-pane-section-row-bonus-sum-item-suffix">рублей</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="position-page__section-row position-page__salary-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__salary-tab-pane-section-row-bonus-max-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div class="position-page__salary-tab-pane-bonus-max-form-field"
+                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        <span>Максимальная премия, <i class="far fa-ruble-sign"></i></span>
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Максимальная премия, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: bonus.max,
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="0">
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.bonus.max.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-page__section">
+                                <span class="position-page__section-title">
+                                    Депремирование
+                                    <span class="position-page__section-title-postscript">необязательно</span>
+                                </span>
+
+                                <div class="position-page__section-row position-page__salary-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__salary-tab-pane-section-row-fine-rate-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div class="position-page__salary-tab-pane-fine-rate-form-field"
+                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        <span>Ставка штрафа, <i class="far fa-ruble-sign"></i></span>
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Ставка штрафа, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: fine.rate,
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="0">
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.fine.rate.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+
+                                        <div class="position-page__section-row-item
+                                                    position-page__salary-tab-pane-section-row-fine-sum-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div class="position-page__salary-tab-pane-fine-sum-form-field"  data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        <span>Сумма недоработки, <i class="far fa-ruble-sign"></i></span>
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Сумма недоработки'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: fine.sum,
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="0">
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.fine.sum.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+
+                                            <span class="position-page__salary-tab-pane-section-row-fine-sum-item-suffix">рублей</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="position-page__section-row position-page__salary-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__salary-tab-pane-section-row-fine-max-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                <div class="position-page__salary-tab-pane-fine-max-form-field"
+                                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                    <label data-bind="hrmFormFieldLabel: label">
+                                                        <span>Максимальный штраф, <i class="far fa-ruble-sign"></i></span>
+
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Максимальный штраф, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                        </button>
+                                                    </label>
+
+                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                        <input data-bind="
+                                                            textInput: fine.max,
+                                                            hrmFormFieldInputControl: control,
+                                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                        " placeholder="0">
+                                                    </div>
+
+                                                    <div data-bind="
+                                                        component: {name: 'hrm-form-field-error'},
+                                                        hrmSlide,
+                                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                                        hrmSlideDuration: 150
+                                                    ">
+                                                        <!-- ko text: $parent.fine.max.error() --><!-- /ko -->
+                                                    </div>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-page__section">
+                                <span class="position-page__section-title">
+                                    Премиальный счёт
+                                    <span class="position-page__section-title-postscript">необязательно</span>
+                                </span>
+
+                                <div class="position-page__section-row position-page__salary-tab-pane-section-row">
+                                    <div class="position-page__section-row-content">
+                                        <div class="position-page__section-row-item
+                                                    position-page__salary-tab-pane-section-row-premium-account-item">
+                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                    <div class="hrm-form-field-switch-group position-page__salary-tab-pane-section-row-premium-account-item-switch-group"
+                                                         data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                                        <div data-bind="component: {name: 'hrm-switch', params: {checked: premiumAccount, exportAs: control}}"></div>
+                                                        <label data-bind="hrmSwitchGroupLabel: label">
+                                                            Начислять премирование/депремирование на премиальный счет
+
+                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                           hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Начислять премирование/депремирование на премиальный счет'">
+                                                            </button>
+                                                        </label>
+                                                    </div>
+                                                <!-- /ko -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="position-page__tab-pane-action-list">
+                                <button class="hrm-button hrm-basic-button
+                                               position-page__tab-pane-action-list-item position-page__cancel-button"
+                                        data-bind="click: function() {$tab.cancel();}">
+                                    Отменить
+                                </button>
+
+                                <button class="hrm-button hrm-basic-button hrm-accent-button
+                                               position-page__tab-pane-action-list-item position-page__save-button"
+                                        data-bind="click: function() {$tab.submit();}">
+                                    Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    <!-- /ko -->
                 <!-- /ko -->
             </div>
         </div>
