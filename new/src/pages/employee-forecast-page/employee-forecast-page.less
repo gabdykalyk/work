@@ -13,8 +13,7 @@
     }
 
     .employee-forecast-page__positions-table {
-        max-width: 1060px;
-        width: 100%;
+        width: calc((100% - 30px) / 12 * 11);
         margin-top: 28px;
     }
 
@@ -120,8 +119,7 @@
 
         .employee-forecast-page__employees-table-fixed-section-container {
             margin-top: 16px;
-            max-width: 1060px;
-            width: 100%;
+            width: calc((100% - 30px) / 12 * 11);
         }
 
         .employee-forecast-page__form-employees-section-additional-actions-list {
@@ -199,16 +197,17 @@
     }
 
     &__employees-table-employee-row {
-        & > td {
-            padding-top: 14px !important;
-            padding-bottom: 14px !important;
+        &--multi-interval {
+            & > td {
+                padding-top: 14px !important;
+                padding-bottom: 14px !important;
 
-            .hrm-table__editable-cell-content {
-                margin-top: -14px;
-                margin-bottom: -14px;
-                height: calc(100% + 28px);
-                padding-top: 14px;
-                padding-bottom: 14px;
+                .hrm-table__editable-cell-control {
+                    margin-top: -14px;
+                    margin-bottom: -14px;
+                    padding-top: 14px;
+                    padding-bottom: 14px;
+                }
             }
         }
     }
@@ -236,7 +235,9 @@
     }
 
     &__employees-table-employee-name-cell {
-        vertical-align: top !important;
+        .employee-forecast-page__employees-table-employee-row--multi-interval & {
+            vertical-align: top !important;
+        }
     }
 
     &__employees-table-employee {
@@ -280,8 +281,11 @@
     &__employees-table-return-rate-cell,
     &__employees-table-salary-bulk-cell,
     &__employees-table-salary-cell {
-        vertical-align: top !important;
         text-align: end;
+
+        .employee-forecast-page__employees-table-employee-row--multi-interval & {
+            vertical-align: top !important;
+        }
     }
 
     &__employees-table-salary-cell {
@@ -292,10 +296,12 @@
     &__employees-table-rate-cell,
     &__employees-table-bonus-cell,
     &__employees-table-fine-cell {
-        vertical-align: top !important;
-
         .hrm-table__editable-cell-control {
             text-align: end;
+        }
+
+        .employee-forecast-page__employees-table-employee-row--multi-interval & {
+            vertical-align: top !important;
         }
     }
 
@@ -348,6 +354,7 @@
 
         .employee-forecast-page__positions-table {
             max-width: unset;
+            width: 100%;
         }
 
         &__content {
@@ -361,6 +368,11 @@
         }
 
         &__form-employees-section {
+            .employee-forecast-page__employees-table-fixed-section-container {
+                margin-top: 16px;
+                width: 100%;
+            }
+
             .employee-forecast-page__employees-table-fixed-section-container {
                 max-width: unset;
             }
@@ -523,6 +535,19 @@
             .employee-forecast-page__positions-table-fixed-section {
                 width: 108px;
             }
+
+            .employee-forecast-page__positions-table-workload-type-cell {
+                max-width: 180px;
+
+                .hrm-table__cell-content {
+                    align-items: flex-start;
+                    width: 100%;
+                    max-height: calc(40px - 14px);
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: inline-block;
+                }
+            }
         }
 
         &__positions-table-fixed-section {
@@ -681,7 +706,7 @@
         &__employees-table-position-section-body-header-rate-form-field {
             padding-top: 20px;
 
-            .hrm-form-field__control-wrapper {
+            .hrm-form-field__basis {
                 padding-bottom: 8px;
             }
 

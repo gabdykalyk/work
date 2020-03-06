@@ -257,30 +257,33 @@
                                     <div class="position-page__section-row-content">
                                         <div class="position-page__section-row-item
                                                     position-page__workload-tab-pane-section-row-units-item">
-                                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                                <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-                                                    <label data-bind="hrmFormFieldLabel: label">
-                                                        Единицы
+                                            <!-- ko with: {value: ['6', '7'].includes(workloadType()) ? '1' : units} -->
+                                                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                                    <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                                        <label data-bind="hrmFormFieldLabel: label">
+                                                            Единицы
 
-                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                                data-bind="hrmTooltip, hrmTooltipText: 'Единицы'">
-                                                        </button>
-                                                    </label>
+                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                           hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Единицы'">
+                                                            </button>
+                                                        </label>
 
-                                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                                        <select data-bind="
-                                                            value: units,
-                                                            hrmSelect,
-                                                            hrmFormFieldSelectControl: control
-                                                        ">
-                                                            <option></option>
-                                                            <option value="1">Штуки</option>
-                                                            <option value="2">Рубли</option>
-                                                            <option value="3">Норма времени</option>
-                                                        </select>
+                                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                            <select data-bind="
+                                                                value: value,
+                                                                hrmSelect,
+                                                                hrmFormFieldSelectControl: control,
+                                                                attr: {disabled: ['6', '7'].includes($parent.workloadType())}
+                                                            ">
+                                                                <option></option>
+                                                                <option value="1">Штуки</option>
+                                                                <option value="2">Рубли</option>
+                                                                <option value="3">Норма времени</option>
+                                                            </select>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                <!-- /ko -->
                                             <!-- /ko -->
                                         </div>
 
@@ -1120,6 +1123,10 @@
             };
 
             this.productionStandardFormFieldRangeControlSuffix = ko.pureComputed(() => {
+                if (['6', '7'].includes(this.formModel().workloadType())) {
+                    return 'штук';
+                }
+
                 switch (this.formModel().units()) {
                     case '1': return 'штук';
                     case '2': return 'рублей';
