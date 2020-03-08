@@ -688,7 +688,11 @@
                         const values = this.turnoverStepPreCalculatedDishCategoryValues()[categoryIndex];
 
                         category.week.forEach((weekday, weekdayIndex) => {
-                            weekday.hours().forEach((hour, hourIndex) => hour(values.week[weekdayIndex].hours[hourIndex]));
+                            weekday.hours().forEach((hour, hourIndex) => {
+                                if (hour !== null) {
+                                    hour(values.week[weekdayIndex].hours[hourIndex])
+                                }
+                            });
                             weekday.weekdayTotal(values.week[weekdayIndex].weekdayTotal);
                         });
 
@@ -783,7 +787,7 @@
 
                                 this.turnoverStepPreCalculatedDishCategoryValues.push({
                                     week: category.week.map(weekday => ({
-                                        hours: weekday.hours().map(hour => hour()),
+                                        hours: weekday.hours().map(hour => hour !== null ? hour() : null),
                                         weekdayTotal: weekday.weekdayTotal()
                                     })),
                                     weekTotal: category.weekTotal(),
@@ -997,7 +1001,7 @@
                     this.turnoverStepReset();
                 })));
 
-/*                this.companyTypeStepSelect(1);
+                /*this.companyTypeStepSelect(1);
                 this.formModel().dishCategories()[0].value('1');
                 this.dishCategoriesStepAdd();
                 this.dishCategoriesStepAdd();
@@ -1010,7 +1014,7 @@
                     category.weekTotal(100);
                     this.onTurnoverStepWeekTotalChange(categoryIndex);
                 });
-                //this.turnoverStepSubmit();*/
+                this.turnoverStepSubmit();*/
             })();
         };
 
