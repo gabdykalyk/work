@@ -110,7 +110,11 @@
         const $page = $(document.documentElement);
 
         const ViewModel = function () {
+            this.subscriptions = [];
+
             this.isFormSubmitted = ko.observable(false);
+
+            this.loginError = ko.observable(null);
 
             this.formModel = ko.validatedObservable({
                 login: ko.observable('').extend({
@@ -121,8 +125,18 @@
                 password: ko.observable('').extend({
                     required: {
                         message: 'Обязательное поле'
+                    },
+                    validation: {
+                        validator: () => {
+                            return this.loginError() === null;
+                        },
+                        message: 'Неправильный логин и/или пароль'
                     }
                 })
+            });
+
+            this.isValid = ko.pureComputed(() => {
+                return this.formModel().login() !== '' && this.formModel().password() !== '';
             });
 
             this.formControlErrorStateMatcher = function (formControl) {
@@ -137,7 +151,27 @@
 
             this.submitForm = function () {
                 this.isFormSubmitted(true);
-            }
+
+                if (this.isValid()) {
+                    if (this.formModel().login() !== '123456' || this.formModel().password() !== '123456') {
+                        this.loginError({message: 'Неправильный логин и/или пароль'});
+                    }
+                }
+            };
+
+            (() => {
+                this.subscriptions.push(this.formModel().login.subscribe(() => {
+                    this.loginError(null);
+                }));
+
+                this.subscriptions.push(this.formModel().password.subscribe(() => {
+                    this.loginError(null);
+                }));
+            })();
+        };
+
+        ViewModel.prototype.dispose = function() {
+            this.subscriptions.forEach(s => s.dispose());
         };
 
         const viewModel = new ViewModel();
@@ -148,5 +182,6 @@
         );
     });
 </script>
+
 </body>
 </html>
