@@ -1,0 +1,100 @@
+@import '../../base/_variables.less';
+
+.hrm-basic-modal-dialog {
+    flex-direction: column;
+    position: relative;
+    align-items: flex-start;
+    margin: 0;
+    flex-grow: 0;
+    align-self: center;
+    min-height: unset;
+    padding: 32px 30px 36px;
+
+    background: #FFFFFF;
+    box-shadow: 0 4px 16px rgba(0, 15, 38, 0.25);
+    border-radius: 6px;
+
+    .hrm-basic-modal-dialog__close-button {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+    }
+
+    .hrm-basic-modal-dialog__header {
+        margin-bottom: 22px;
+    }
+
+    .hrm-basic-modal-dialog__action-list {
+        margin-top: 32px;
+        width: 100%;
+    }
+
+    &__title {
+        font-weight: 500;
+        font-size: 18px;
+        line-height: 120%;
+    }
+
+    &__close-button {
+        @background-svg: '
+            <svg width="11" height="10" viewBox="0 0 11 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.06826 10C4.5181 10 4.0721 9.5512 4.0721 8.99759L4.07112 1.00241C4.07112 0.448795 4.51711 0 5.06728 0C5.61744 0 6.06344 0.448796 6.06344 1.00241L6.06442 8.99759C6.06442 9.5512 5.61843 10 5.06826 10Z" fill="#8E9CBB"/>
+                <path d="M10.0713 5.00858C10.0713 4.45496 9.62529 4.00617 9.07513 4.00617L1.06745 4.00618C0.517284 4.00618 0.0712891 4.45497 0.0712891 5.00859C0.0712891 5.56221 0.517284 6.011 1.06745 6.011L9.07513 6.01099C9.62529 6.01099 10.0713 5.5622 10.0713 5.00858Z" fill="#8E9CBB"/>
+            </svg>
+        ';
+
+        width: 11px;
+        height: 10px;
+
+        @escaped-background-svg: escape(@background-svg);
+        background-image: url('data:image/svg+xml,@{escaped-background-svg}');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        transform: rotate(45deg);
+    }
+
+    &__action-list {
+        display: flex;
+        justify-content: center;
+
+        .hrm-basic-modal-dialog__action-list-item {
+            &:not(:first-child) {
+                margin-left: 10px;
+            }
+        }
+    }
+}
+
+@media (max-width: @mobile-max-width) {
+    .hrm-basic-modal-dialog {
+        align-self: flex-start;
+        padding-right: 20px;
+        padding-left: 20px;
+
+        border-radius: 0;
+
+        .hrm-basic-modal-dialog__header {
+            margin-bottom: 26px;
+        }
+
+        .hrm-basic-modal-dialog__action-list {
+            margin-right: -20px;
+            margin-left: -20px;
+            margin-bottom: -36px;
+            width: calc(100% + 40px);
+        }
+
+        &__title {
+            font-size: 15px;
+        }
+
+        &__action-list {
+            .hrm-basic-modal-dialog__action-list-item {
+                flex-grow: 1;
+                margin: 0 !important;
+
+                border-radius: 0;
+            }
+        }
+    }
+}

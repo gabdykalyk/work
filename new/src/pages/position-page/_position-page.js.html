@@ -2,10 +2,8 @@
     $(function () {
         const $page = $(document.documentElement);
 
-        const WorkloadTabViewModel = function (save) {
-            this.isSubmitted = ko.observable(false);
-
-            this.createAdditionalWorkloadItem = function () {
+        const FormModel = function () {
+            this.createAdditionalWorkloadFormModel = function () {
                 const type = ko.observable('');
 
                 return {
@@ -29,9 +27,30 @@
                 };
             };
 
-            this.formModel = ko.validatedObservable(null, {deep: true, live: true});
+            this.createRankFormModel = function (data) {
+                return {
+                    number: ko.observable(data.number),
+                    salaryBulk: ko.observable(data.salaryBulk),
+                    documentsRequired: ko.observable(data.documentsRequired),
+                    productionStandardFactor: ko.observable(data.productionStandardFactor),
+                    bonusFactor: ko.observable(data.bonusFactor),
+                    fineFactor: ko.observable(data.fineFactor),
+                    bonusIncreasePeriod: ko.observable(data.bonusIncreasePeriod),
+                    conditions: ko.observableArray(data.conditions.map(c => {
+                        return {...c}
+                    })),
+                    increaseRankShiftCount: ko.observable(data.increaseRankShiftCount),
+                    bonusAndFineCommonAbsoluteSum: ko.observable(data.bonusAndFineCommonAbsoluteSum),
+                    bonusAndFineAssignedAbsoluteSum: ko.observable(data.bonusAndFineAssignedAbsoluteSum),
+                    bonusAndFineCalculatedAbsoluteSum: ko.observable(data.bonusAndFineCalculatedAbsoluteSum),
+                    bonusAndFineAssignedRelativeSum: ko.observable(data.bonusAndFineAssignedRelativeSum),
+                    bonusAndFineCalculatedRelativeSum: ko.observable(data.bonusAndFineCalculatedRelativeSum)
+                }
+            };
 
-            this.formModel({
+            this.value = ko.validatedObservable(null, {deep: true, live: true});
+
+            this.value({
                 name: ko.observable('').extend({
                     required: {
                         message: 'Обязательное поле'
@@ -52,7 +71,7 @@
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => {
-                                return this.formModel() === null || this.formModel().productionStandard.type() === '0';
+                                return this.value() === null || this.value().productionStandard.type() === '0';
                             }
                         }
                     }),
@@ -61,14 +80,14 @@
                             required: {
                                 message: 'Обязательное поле',
                                 onlyIf: () => {
-                                    return this.formModel() === null || this.formModel().productionStandard.type() === '1';
+                                    return this.value() === null || this.value().productionStandard.type() === '1';
                                 }
                             },
                             validation: {
                                 validator: value => {
                                     return value === '' || (
-                                        this.formModel() !== null &&
-                                        this.unmaskDecimal(this.formModel().productionStandard.range.max()) > this.unmaskDecimal(value)
+                                        this.value() !== null &&
+                                        this.unmaskDecimal(this.value().productionStandard.range.max()) > this.unmaskDecimal(value)
                                     );
                                 }
                             }
@@ -77,14 +96,14 @@
                             required: {
                                 message: 'Обязательное поле',
                                 onlyIf: () => {
-                                    return this.formModel() === null || this.formModel().productionStandard.type() === '1';
+                                    return this.value() === null || this.value().productionStandard.type() === '1';
                                 }
                             },
                             validation: {
                                 validator: value => {
                                     return value === '' || (
-                                        this.formModel() !== null &&
-                                        this.unmaskDecimal(this.formModel().productionStandard.range.min()) < this.unmaskDecimal(value)
+                                        this.value() !== null &&
+                                        this.unmaskDecimal(this.value().productionStandard.range.min()) < this.unmaskDecimal(value)
                                     );
                                 }
                             }
@@ -96,8 +115,8 @@
                     required: {
                         message: 'Обязательное поле',
                         onlyIf: () => {
-                            return this.formModel() === null ||
-                                ['0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(this.formModel().workloadType());
+                            return this.value() === null ||
+                                ['0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(this.value().workloadType());
                         }
                     }
                 }),
@@ -105,63 +124,26 @@
                 dishCategoriesExclusionFlag: ko.observable(false),
                 orderTypes: ko.observableArray([]),
                 additionalWorkload: ko.observableArray([
-                    this.createAdditionalWorkloadItem()
-                ])
+                    this.createAdditionalWorkloadFormModel()
+                ]),
+                bulk: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                }),
+                bonus: {
+                    rate: ko.observable(''),
+                    sum: ko.observable(''),
+                    max: ko.observable('')
+                },
+                fine: {
+                    rate: ko.observable(''),
+                    sum: ko.observable(''),
+                    max: ko.observable('')
+                },
+                premiumAccount: ko.observable(false),
+                ranks: ko.observableArray([])
             });
-
-            this.isValid = ko.pureComputed(() => {
-                return this.formModel.isValid();
-            });
-
-            this.submit = function () {
-                this.isSubmitted(true);
-
-                if (this.isValid()) {
-                    save();
-                }
-            };
-
-            this.productionStandardFormFieldRangeControlSuffix = ko.pureComputed(() => {
-                if (['6', '7'].includes(this.formModel().workloadType())) {
-                    return 'штук';
-                }
-
-                switch (this.formModel().units()) {
-                    case '1': return 'штук';
-                    case '2': return 'рублей';
-                    case '3': return 'часов';
-                }
-            });
-
-            this.additionalWorkloadSectionDisabled = ko.pureComputed(() => {
-                return this.formModel().workloadType() === '';
-            });
-
-            this.formControlErrorStateMatcher = function (formControl) {
-                return ko.pureComputed(() => {
-                    return this.isSubmitted() && !formControl.isValid();
-                });
-            };
-
-            this.additionalWorkloadSectionFormControlErrorStateMatcher = function (formControl) {
-                return ko.pureComputed(() => {
-                    return this.isSubmitted() && !this.additionalWorkloadSectionDisabled() && !formControl.isValid();
-                });
-            };
-
-            this.removeAdditionalWorkloadItem = function (item) {
-                if (this.formModel().additionalWorkload().length === 1) {
-                    item.type('');
-                    item.factor('');
-                    item.name('');
-                } else {
-                    this.formModel().additionalWorkload.remove(item);
-                }
-            };
-
-            this.addAdditionalWorkloadItem = function () {
-                this.formModel().additionalWorkload.push(this.createAdditionalWorkloadItem());
-            };
 
             this.formatDecimal = function (value) {
                 return Inputmask.format(value, {alias: 'decimal', digits: '2', groupSeparator: ' ', autoGroup: true, allowMinus: false}).replace('.00', '');
@@ -178,29 +160,88 @@
             };
         };
 
-        const SalaryTabViewModel = function (save) {
+        const WorkloadTabViewModel = function (formModel, save) {
             this.isSubmitted = ko.observable(false);
 
-            this.formModel = ko.validatedObservable(null, {deep: true, live: true});
+            this.formModel = formModel;
 
-            this.formModel({
-                bulk: ko.observable('').extend({
-                    required: {
-                        message: 'Обязательное поле'
+            const validationObject = ko.validatedObservable({
+                name: this.formModel.value().name,
+                workloadType: this.formModel.value().workloadType,
+                units: this.formModel.value().units,
+                productionStandard: {
+                    type: this.formModel.value().productionStandard.type,
+                    value: this.formModel.value().productionStandard.value,
+                    range: {
+                        min: this.formModel.value().productionStandard.range.min,
+                        max: this.formModel.value().productionStandard.range.max
                     }
-                }),
-                bonus: {
-                    rate: ko.observable(''),
-                    sum: ko.observable(''),
-                    max: ko.observable('')
                 },
-                fine: {
-                    rate: ko.observable(''),
-                    sum: ko.observable(''),
-                    max: ko.observable('')
-                },
-                premiumAccount: ko.observable(false)
+                standard: this.formModel.value().standard,
+                dishCategories: this.formModel.value().dishCategories,
+                orderTypes: this.formModel.value().orderTypes,
+                additionalWorkload: this.formModel.value().additionalWorkload,
+            }, {deep: true, live: true});
+
+            this.isValid = ko.pureComputed(() => {
+                return validationObject.isValid();
             });
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    save();
+                }
+            };
+
+            this.productionStandardFormFieldRangeControlSuffix = ko.pureComputed(() => {
+                if (['6', '7'].includes(this.formModel.value().workloadType())) {
+                    return 'штук';
+                }
+
+                switch (this.formModel.value().units()) {
+                    case '1': return 'штук';
+                    case '2': return 'рублей';
+                    case '3': return 'часов';
+                }
+            });
+
+            this.additionalWorkloadSectionDisabled = ko.pureComputed(() => {
+                return this.formModel.value().workloadType() === '';
+            });
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+
+            this.additionalWorkloadSectionFormControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !this.additionalWorkloadSectionDisabled() && !formControl.isValid();
+                });
+            };
+
+            this.removeAdditionalWorkloadItem = function (item) {
+                if (this.formModel.value().additionalWorkload().length === 1) {
+                    item.type('');
+                    item.factor('');
+                    item.name('');
+                } else {
+                    this.formModel.value().additionalWorkload.remove(item);
+                }
+            };
+
+            this.addAdditionalWorkloadItem = function () {
+                this.formModel.value().additionalWorkload.push(this.formModel.createAdditionalWorkloadItem());
+            };
+        };
+
+        const SalaryTabViewModel = function (formModel, save) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formModel = formModel;
 
             this.lastFormModelValue = {
                 bulk: '',
@@ -218,18 +259,18 @@
             };
 
             this.isValid = ko.pureComputed(() => {
-                return this.formModel.isValid();
+                return this.formModel.value().bulk.isValid();
             });
 
             this.cancel = function () {
-                this.formModel().bulk(this.lastFormModelValue.bulk);
-                this.formModel().bonus.rate(this.lastFormModelValue.bonus.rate);
-                this.formModel().bonus.sum(this.lastFormModelValue.bonus.sum);
-                this.formModel().bonus.max(this.lastFormModelValue.bonus.max);
-                this.formModel().fine.rate(this.lastFormModelValue.fine.rate);
-                this.formModel().fine.sum(this.lastFormModelValue.fine.sum);
-                this.formModel().fine.max(this.lastFormModelValue.fine.max);
-                this.formModel().premiumAccount(this.lastFormModelValue.premiumAccount);
+                this.formModel.value().bulk(this.lastFormModelValue.bulk);
+                this.formModel.value().bonus.rate(this.lastFormModelValue.bonus.rate);
+                this.formModel.value().bonus.sum(this.lastFormModelValue.bonus.sum);
+                this.formModel.value().bonus.max(this.lastFormModelValue.bonus.max);
+                this.formModel.value().fine.rate(this.lastFormModelValue.fine.rate);
+                this.formModel.value().fine.sum(this.lastFormModelValue.fine.sum);
+                this.formModel.value().fine.max(this.lastFormModelValue.fine.max);
+                this.formModel.value().premiumAccount(this.lastFormModelValue.premiumAccount);
             };
 
             this.submit = function () {
@@ -237,22 +278,159 @@
 
                 if (this.isValid()) {
                     this.lastFormModelValue = {
-                        bulk: this.formModel().bulk(),
+                        bulk: this.formModel.value().bulk(),
                         bonus: {
-                            rate: this.formModel().bonus.rate(),
-                            sum: this.formModel().bonus.sum(),
-                            max: this.formModel().bonus.max()
+                            rate: this.formModel.value().bonus.rate(),
+                            sum: this.formModel.value().bonus.sum(),
+                            max: this.formModel.value().bonus.max()
                         },
                         fine: {
-                            rate: this.formModel().fine.rate(),
-                            sum: this.formModel().fine.sum(),
-                            max: this.formModel().fine.max()
+                            rate: this.formModel.value().fine.rate(),
+                            sum: this.formModel.value().fine.sum(),
+                            max: this.formModel.value().fine.max()
                         },
-                        premiumAccount: this.formModel().premiumAccount()
+                        premiumAccount: this.formModel.value().premiumAccount()
                     };
 
                     save();
                 }
+            };
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+        };
+
+        const RanksTabViewModel = function (formModel, modalOpens, save) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+                return {
+                    ranks: this.formModel.value().ranks().map(rank => ({
+                        number: rank.number(),
+                        salaryBulk: rank.salaryBulk(),
+                        documentsRequired: rank.documentsRequired(),
+                        productionStandardFactor: rank.productionStandardFactor(),
+                        bonusFactor: rank.bonusFactor(),
+                        fineFactor: rank.fineFactor(),
+                        bonusIncreasePeriod: rank.bonusIncreasePeriod(),
+                        increaseRankShiftCount: rank.increaseRankShiftCount(),
+                        conditions: rank.conditions(),
+                        bonusAndFineCommonAbsoluteSum: rank.bonusAndFineCommonAbsoluteSum(),
+                        bonusAndFineAssignedAbsoluteSum: rank.bonusAndFineAssignedAbsoluteSum(),
+                        bonusAndFineCalculatedAbsoluteSum: rank.bonusAndFineCalculatedAbsoluteSum(),
+                        bonusAndFineAssignedRelativeSum: rank.bonusAndFineAssignedRelativeSum(),
+                        bonusAndFineCalculatedRelativeSum: rank.bonusAndFineCalculatedRelativeSum(),
+                    }))
+                }
+            });
+
+            this.lastFormModelValue = this.formModelValue();
+
+            this.isValid = ko.pureComputed(() => {
+                return this.formModel.value().ranks.isValid();
+            });
+
+            this.cancel = function () {
+                this.formModel.value().ranks(this.lastFormModelValue.ranks.map(r => {
+                    return this.formModel.createRankFormModel(r)
+                }));
+            };
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    this.lastFormModelValue = this.formModelValue();
+
+                    save();
+                }
+            };
+
+            this.edit = function (rank) {
+                const open = {
+                    dialogTemplateName: 'position-page-rank-modal-content-template',
+                    data: {
+                        mode: 'edit',
+                        data: {
+                            number: rank.number(),
+                            salaryBulk: rank.salaryBulk(),
+                            documentsRequired: rank.documentsRequired(),
+                            productionStandardFactor: rank.productionStandardFactor(),
+                            bonusFactor: rank.bonusFactor(),
+                            fineFactor: rank.fineFactor(),
+                            bonusIncreasePeriod: rank.bonusIncreasePeriod(),
+                            increaseRankShiftCount: rank.increaseRankShiftCount(),
+                            conditions: rank.conditions(),
+                            bonusAndFineCommonAbsoluteSum: rank.bonusAndFineCommonAbsoluteSum(),
+                            bonusAndFineAssignedAbsoluteSum: rank.bonusAndFineAssignedAbsoluteSum(),
+                            bonusAndFineCalculatedAbsoluteSum: rank.bonusAndFineCalculatedAbsoluteSum(),
+                            bonusAndFineAssignedRelativeSum: rank.bonusAndFineAssignedRelativeSum(),
+                            bonusAndFineCalculatedRelativeSum: rank.bonusAndFineCalculatedRelativeSum(),
+                        },
+                        delete: () => {
+                            modalOpens.remove(open);
+                            this.delete(rank);
+                        },
+                        salaryBulk: this.formModel.value().bulk()
+                    },
+                    options: {
+                        modalClass: 'position-page__rank-modal'
+                    },
+                    close: result => {
+                        if (result !== undefined) {
+                            rank.number(result.number);
+                            rank.salaryBulk(result.salaryBulk);
+                            rank.documentsRequired(result.documentsRequired);
+                            rank.productionStandardFactor(result.productionStandardFactor);
+                            rank.bonusFactor(result.bonusFactor);
+                            rank.fineFactor(result.fineFactor);
+                            rank.bonusIncreasePeriod(result.bonusIncreasePeriod);
+                            rank.increaseRankShiftCount(result.increaseRankShiftCount);
+                            rank.conditions(result.conditions);
+                            rank.bonusAndFineCommonAbsoluteSum(result.bonusAndFineCommonAbsoluteSum);
+                            rank.bonusAndFineAssignedAbsoluteSum(result.bonusAndFineAssignedAbsoluteSum);
+                            rank.bonusAndFineCalculatedAbsoluteSum(result.bonusAndFineCalculatedAbsoluteSum);
+                            rank.bonusAndFineAssignedRelativeSum(result.bonusAndFineAssignedRelativeSum);
+                            rank.bonusAndFineCalculatedRelativeSum(result.bonusAndFineCalculatedRelativeSum);
+                        }
+                    }
+                };
+
+                modalOpens.push(open);
+            };
+
+            this.create = function () {
+                modalOpens.push({
+                    dialogTemplateName: 'position-page-rank-modal-content-template',
+                    data: {
+                        mode: 'create',
+                        salaryBulk: this.formModel.value().bulk()
+                    },
+                    options: {
+                        modalClass: 'position-page__rank-modal'
+                    },
+                    close: result => {
+                        if (result !== undefined) {
+                            this.formModel.value().ranks.splice(0, 0, this.formModel.createRankFormModel(result));
+                        }
+                    }
+                });
+            };
+
+            this.delete = function (rank) {
+                modalOpens.push({
+                    dialogTemplateName: 'position-page-delete-rank-modal-content-template',
+                    close: result => {
+                        if (result !== undefined) {
+                            this.formModel.value().ranks.remove(rank);
+                        }
+                    }
+                });
             };
 
             this.formControlErrorStateMatcher = function (formControl) {
@@ -272,6 +450,8 @@
                 {id: '6', name: 'Десерты'},
                 {id: '7', name: 'Напитки'}
             ];
+
+            this.modalOpens = ko.observableArray([]);
 
             this.subscriptions = [];
 
@@ -297,12 +477,18 @@
 
             this.activeTab = ko.observable(0);
 
-            this.workloadTabViewModel = new WorkloadTabViewModel(() => {
+            this.formModel = new FormModel();
+
+            this.workloadTabViewModel = new WorkloadTabViewModel(this.formModel, () => {
                 this.activeTab(1);
             });
 
-            this.salaryTabViewModel = new SalaryTabViewModel(() => {
+            this.salaryTabViewModel = new SalaryTabViewModel(this.formModel, () => {
                 this.activeTab(2);
+            });
+
+            this.ranksTabViewModel = new RanksTabViewModel(this.formModel, this.modalOpens, () => {
+                this.activeTab(3);
             });
 
             this.descendantsComplete = function () {
@@ -320,16 +506,18 @@
             this.updateTabActivities = function () {
                 const isWorkloadTabPassed = this.workloadTabViewModel.isValid() && this.workloadTabViewModel.isSubmitted();
                 const isSalaryTabPassed = this.salaryTabViewModel.isValid() && this.salaryTabViewModel.isSubmitted();
+                const isRanksTabPassed = this.ranksTabViewModel.isValid() && this.ranksTabViewModel.isSubmitted();
                 this.navigationTabs[1].disabled(!isWorkloadTabPassed);
 
                 this.navigationTabs[2].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
+
+                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
             };
 
             this.formatDecimal = function (value) {
@@ -366,12 +554,21 @@
                 this.subscriptions.push(this.salaryTabViewModel.isValid.subscribe(() => {
                     this.updateTabActivities();
                 }));
+                this.subscriptions.push(this.ranksTabViewModel.isSubmitted.subscribe(() => {
+                    this.updateTabActivities();
+                }));
+                this.subscriptions.push(this.ranksTabViewModel.isValid.subscribe(() => {
+                    this.updateTabActivities();
+                }));
 
                 // Раскомментировать, чтобы заполнить первую вкладку тестовыми данными:
-                /*this.workloadTabViewModel.formModel().name('Администратор филиала');
-                this.workloadTabViewModel.formModel().workloadType('10');
-                this.workloadTabViewModel.formModel().productionStandard.value('2000');
-                this.workloadTabViewModel.submit();*/
+                /*this.formModel.value().name('Администратор филиала');
+                this.formModel.value().workloadType('10');
+                this.formModel.value().productionStandard.value('2000');
+                this.workloadTabViewModel.submit();
+                this.formModel.value().bulk(1);
+                this.salaryTabViewModel.submit();
+                this.ranksTabViewModel.create();*/
             })();
         };
 

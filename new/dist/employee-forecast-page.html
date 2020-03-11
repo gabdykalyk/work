@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <link rel="stylesheet" href="assets/fonts/fontawesome/css/all.css" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
 <link rel="stylesheet" href="assets/css/main.css" />
 
@@ -272,78 +273,80 @@
                                 </table>
 
                                 <div class="hrm-table__scrollable-wrapper">
-                                    <table class="employee-forecast-page__positions-table-table"
-                                           data-bind="hrmTable">
-                                        <tbody>
-                                        <tr>
-                                            <!-- ko foreach: formModel().positions -->
-                                                <td colspan="2" data-bind="text: name"></td>
-                                            <!-- /ko -->
-                                        </tr>
-                                        <tr>
-                                            <!-- ko foreach: formModel().positions -->
-                                                <td class="employee-forecast-page__positions-table-workload-type-cell" colspan="2">
-                                                    <div class="hrm-table__cell-content">
-                                                        <!-- ko text: $root.getWorkloadTypeName(workloadType) --><!-- /ko -->
-                                                        <!-- ko if: workloadType === 2 -->
-                                                            <span class="employee-forecast-page__positions-table-categories-count"
-                                                                  data-bind="text: categories.length, hrmTooltip, hrmTooltipText: $root.getCategoriesTooltipText(categories)">
-                                                            </span>
-                                                        <!-- /ko -->
-                                                    </div>
-                                                </td>
-                                            <!-- /ko -->
-                                        </tr>
-
-                                        <tr>
-                                            <!-- ko foreach: formModel().positions -->
-                                                <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                    <td data-bind="hrmTableEditableCell: editableCell">
-                                                        <select data-bind="
-                                                            value: units,
-                                                            hrmSelect,
-                                                            hrmTableEditableCellSelectControl,
-                                                            hrmTableEditableCellSelectControlOwner: editableCell
-                                                        ">
-                                                            <option value="1">Штуки</option>
-                                                            <option value="2">Рубли</option>
-                                                            <option value="3">Норма времени</option>
-                                                        </select>
+                                    <div class="hrm-table__scrollable-wrapper-content">
+                                        <table class="employee-forecast-page__positions-table-table"
+                                               data-bind="hrmTable">
+                                            <tbody>
+                                            <tr>
+                                                <!-- ko foreach: formModel().positions -->
+                                                    <td colspan="2" data-bind="text: name"></td>
+                                                <!-- /ko -->
+                                            </tr>
+                                            <tr>
+                                                <!-- ko foreach: formModel().positions -->
+                                                    <td class="employee-forecast-page__positions-table-workload-type-cell" colspan="2">
+                                                        <div class="hrm-table__cell-content">
+                                                            <!-- ko text: $root.getWorkloadTypeName(workloadType) --><!-- /ko -->
+                                                            <!-- ko if: workloadType === 2 -->
+                                                                <span class="employee-forecast-page__positions-table-categories-count"
+                                                                      data-bind="text: categories.length, hrmTooltip, hrmTooltipText: $root.getCategoriesTooltipText(categories)">
+                                                                </span>
+                                                            <!-- /ko -->
+                                                        </div>
                                                     </td>
                                                 <!-- /ko -->
+                                            </tr>
 
-                                                <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                    <td class="employee-forecast-page__positions-table-workload-cell"
-                                                        data-bind="hrmTableEditableCell: editableCell">
-                                                        <input data-bind="
-                                                            value: workload,
-                                                            hrmMask, hrmMaskPattern: 'decimal',
-                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                            hrmTableEditableCellInputControl,
-                                                            hrmTableEditableCellInputControlOwner: editableCell
-                                                        " placeholder="0">
+                                            <tr>
+                                                <!-- ko foreach: formModel().positions -->
+                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                        <td data-bind="hrmTableEditableCell: editableCell">
+                                                            <select data-bind="
+                                                                value: units,
+                                                                hrmSelect,
+                                                                hrmTableEditableCellSelectControl,
+                                                                hrmTableEditableCellSelectControlOwner: editableCell
+                                                            ">
+                                                                <option value="1">Штуки</option>
+                                                                <option value="2">Рубли</option>
+                                                                <option value="3">Норма времени</option>
+                                                            </select>
+                                                        </td>
+                                                    <!-- /ko -->
+
+                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                        <td class="employee-forecast-page__positions-table-workload-cell"
+                                                            data-bind="hrmTableEditableCell: editableCell">
+                                                            <input data-bind="
+                                                                value: workload,
+                                                                hrmMask, hrmMaskPattern: 'decimal',
+                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                hrmTableEditableCellInputControl,
+                                                                hrmTableEditableCellInputControlOwner: editableCell
+                                                            " placeholder="0">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+                                            </tr>
+
+                                            <tr>
+                                                <!-- ko foreach: formModel().positions -->
+                                                    <td class="employee-forecast-page__positions-table-estimated-hours-cell"
+                                                        data-bind="text: estimatedHours" colspan="2">
                                                     </td>
                                                 <!-- /ko -->
-                                            <!-- /ko -->
-                                        </tr>
+                                            </tr>
 
-                                        <tr>
-                                            <!-- ko foreach: formModel().positions -->
-                                                <td class="employee-forecast-page__positions-table-estimated-hours-cell"
-                                                    data-bind="text: estimatedHours" colspan="2">
-                                                </td>
-                                            <!-- /ko -->
-                                        </tr>
-
-                                        <tr>
-                                            <!-- ko foreach: formModel().positions -->
-                                                <td class="employee-forecast-page__positions-table-estimated-hours-cell"
-                                                    data-bind="text: estimatedHours" colspan="2">
-                                                </td>
-                                            <!-- /ko -->
-                                        </tr>
-                                        </tbody>
-                                    </table>
+                                            <tr>
+                                                <!-- ko foreach: formModel().positions -->
+                                                    <td class="employee-forecast-page__positions-table-estimated-hours-cell"
+                                                        data-bind="text: estimatedHours" colspan="2">
+                                                    </td>
+                                                <!-- /ko -->
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         <!-- /ko -->
@@ -440,217 +443,121 @@
                                         <!-- /ko -->
 
                                         <div class="hrm-table__scrollable-wrapper">
-                                            <table class="employee-forecast-page__employees-table" data-bind="hrmTable">
-                                                <thead>
-                                                <tr>
-                                                    <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
-                                                        <th class="employee-forecast-page__employees-table-name-head-cell">
-                                                            Сотрудник
-                                                        </th>
-                                                    <!-- /ko -->
-                                                    <th class="employee-forecast-page__employees-table-working-intervals-head-cell">
-                                                        <div class="hrm-table__head-cell-content">
-                                                            Начало/конец работы
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Начало/конец работы'">
-                                                            </button>
-                                                        </div>
-                                                    </th>
-                                                    <th class="employee-forecast-page__employees-table-working-hours-head-cell">
-                                                        <div class="hrm-table__head-cell-content">
-                                                            Рабочее время
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Рабочее время'">
-                                                            </button>
-                                                        </div>
-                                                    </th>
-                                                    <th class="employee-forecast-page__employees-table-rate-head-cell">
-                                                        <div class="hrm-table__head-cell-content">
-                                                            <span>Оклад, <i class="far fa-ruble-sign"></i>/час</span>
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Оклад, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;/час'">
-                                                            </button>
-                                                        </div>
-                                                    </th>
-                                                    <th class="employee-forecast-page__employees-table-return-rate-head-cell">
-                                                        <div class="hrm-table__head-cell-content">
-                                                            Норматив выручки
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Норматив выручки'">
-                                                            </button>
-                                                        </div>
-                                                    </th>
-
-                                                    <th class="employee-forecast-page__employees-table-salary-bulk-head-cell">
-                                                        <div class="hrm-table__head-cell-content">
-                                                            <span>Основная часть зп, <i class="far fa-ruble-sign"></i></span>
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Основная часть зп, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
-                                                            </button>
-                                                        </div>
-                                                    </th>
-
-                                                    <th class="employee-forecast-page__employees-table-bonus-head-cell">
-                                                        <div class="hrm-table__head-cell-content">
-                                                            <span>Премия, <i class="far fa-ruble-sign"></i></span>
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Прем., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
-                                                            </button>
-                                                        </div>
-                                                    </th>
-
-                                                    <th class="employee-forecast-page__employees-table-fine-head-cell">
-                                                        <div class="hrm-table__head-cell-content">
-                                                            <span>Депрем, <i class="far fa-ruble-sign"></i></span>
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Депрем, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
-                                                            </button>
-                                                        </div>
-                                                    </th>
-
-                                                    <th class="employee-forecast-page__employees-table-salary-head-cell">
-                                                        <div class="hrm-table__head-cell-content">
-                                                            <span>К выплате, <i class="far fa-ruble-sign"></i></span>
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'К выплате, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
-                                                            </button>
-                                                        </div>
-                                                    </th>
-                                                </tr>
-                                                </thead>
-
-                                                <tbody>
-                                                <!-- ko foreach: {data: formModel().positions, as: 'position'} -->
-                                                    <tr class="employee-forecast-page__employees-table-position-row">
+                                            <div class="hrm-table__scrollable-wrapper-content">
+                                                <table class="employee-forecast-page__employees-table" data-bind="hrmTable">
+                                                    <thead>
+                                                    <tr>
                                                         <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
-                                                            <td class="employee-forecast-page__employees-table-position-name-cell" colspan="3">
-                                                                <div class="hrm-table__cell-content">
-                                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-plus-icon-button
-                                                                                   hrm-circle-icon-button--theme_neutral employee-forecast-page__employees-table-position-name-cell-add-button"
-                                                                            data-bind="click: function() {$root.addEmployee(position);}" title="Добавить сотрудника">
-                                                                    </button>
-                                                                    <span class="employee-forecast-page__employees-table-position-name-cell-name"
-                                                                          data-bind="text: name">
-                                                                    </span>
-                                                                </div>
-                                                            </td>
+                                                            <th class="employee-forecast-page__employees-table-name-head-cell">
+                                                                Сотрудник
+                                                            </th>
                                                         <!-- /ko -->
-                                                        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth -->
-                                                            <td colspan="2"></td>
-                                                        <!-- /ko -->
-                                                        <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                            <td class="employee-forecast-page__employees-table-rate-cell"
-                                                                data-bind="hrmTableEditableCell: editableCell">
-                                                                <input data-bind="
-                                                                    textInput: rate,
-                                                                    event: {
-                                                                        input: function () {
-                                                                            $root.onRateInput(position);
-                                                                        }
-                                                                    },
-                                                                    hrmMask, hrmMaskPattern: 'decimal',
-                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                    hrmTableEditableCellInputControl,
-                                                                    hrmTableEditableCellInputControlOwner: editableCell
-                                                                " placeholder="0">
-                                                            </td>
-                                                        <!-- /ko -->
-                                                        <td class="employee-forecast-page__employees-table-statistics-cell" colspan="5">
-                                                            ФОТ — <b>34%</b>, норматив выработки — <b>90%</b>
-                                                        </td>
+                                                        <th class="employee-forecast-page__employees-table-working-intervals-head-cell">
+                                                            <div class="hrm-table__head-cell-content">
+                                                                Начало/конец работы
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Начало/конец работы'">
+                                                                </button>
+                                                            </div>
+                                                        </th>
+                                                        <th class="employee-forecast-page__employees-table-working-hours-head-cell">
+                                                            <div class="hrm-table__head-cell-content">
+                                                                Рабочее время
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Рабочее время'">
+                                                                </button>
+                                                            </div>
+                                                        </th>
+                                                        <th class="employee-forecast-page__employees-table-rate-head-cell">
+                                                            <div class="hrm-table__head-cell-content">
+                                                                <span>Оклад, <i class="far fa-ruble-sign"></i>/час</span>
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Оклад, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;/час'">
+                                                                </button>
+                                                            </div>
+                                                        </th>
+                                                        <th class="employee-forecast-page__employees-table-return-rate-head-cell">
+                                                            <div class="hrm-table__head-cell-content">
+                                                                Норматив выручки
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Норматив выручки'">
+                                                                </button>
+                                                            </div>
+                                                        </th>
+
+                                                        <th class="employee-forecast-page__employees-table-salary-bulk-head-cell">
+                                                            <div class="hrm-table__head-cell-content">
+                                                                <span>Основная часть зп, <i class="far fa-ruble-sign"></i></span>
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Основная часть зп, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                                </button>
+                                                            </div>
+                                                        </th>
+
+                                                        <th class="employee-forecast-page__employees-table-bonus-head-cell">
+                                                            <div class="hrm-table__head-cell-content">
+                                                                <span>Премия, <i class="far fa-ruble-sign"></i></span>
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Прем., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                                </button>
+                                                            </div>
+                                                        </th>
+
+                                                        <th class="employee-forecast-page__employees-table-fine-head-cell">
+                                                            <div class="hrm-table__head-cell-content">
+                                                                <span>Депрем, <i class="far fa-ruble-sign"></i></span>
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Депрем, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                                </button>
+                                                            </div>
+                                                        </th>
+
+                                                        <th class="employee-forecast-page__employees-table-salary-head-cell">
+                                                            <div class="hrm-table__head-cell-content">
+                                                                <span>К выплате, <i class="far fa-ruble-sign"></i></span>
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                               hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'К выплате, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                                </button>
+                                                            </div>
+                                                        </th>
                                                     </tr>
-                                                    <!-- ko foreach: {
-                                                        data: employees,
-                                                        as: 'employee',
-                                                        afterAdd: hrmFadeAfterAddFactory(200),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                    } -->
-                                                        <tr class="employee-forecast-page__employees-table-employee-row"
-                                                            data-bind="
-                                                                css: {
-                                                                    'employee-forecast-page__employees-table-employee-row--multi-interval': employee.workingIntervals().length > 1
-                                                                }
-                                                            "
-                                                        >
+                                                    </thead>
+
+                                                    <tbody>
+                                                    <!-- ko foreach: {data: formModel().positions, as: 'position'} -->
+                                                        <tr class="employee-forecast-page__employees-table-position-row">
                                                             <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
-                                                                <td class="employee-forecast-page__employees-table-employee-name-cell"
-                                                                    data-bind="attr: {rowspan: employee.workingIntervals().length}">
-                                                                    <div class="employee-forecast-page__employees-table-employee">
-                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button
-                                                                                       hrm-circle-icon-button--theme_secondary
-                                                                                       employee-forecast-page__employees-table-employee-remove-button"
-                                                                                data-bind="click: function() {position.employees.remove(employee);}" title="Удалить сотрудника">
+                                                                <td class="employee-forecast-page__employees-table-position-name-cell" colspan="3">
+                                                                    <div class="hrm-table__cell-content">
+                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-plus-icon-button
+                                                                                       hrm-circle-icon-button--theme_neutral employee-forecast-page__employees-table-position-name-cell-add-button"
+                                                                                data-bind="click: function() {$root.addEmployee(position);}" title="Добавить сотрудника">
                                                                         </button>
-                                                                        <span class="employee-forecast-page__employees-table-employee-name"
+                                                                        <span class="employee-forecast-page__employees-table-position-name-cell-name"
                                                                               data-bind="text: name">
                                                                         </span>
                                                                     </div>
                                                                 </td>
                                                             <!-- /ko -->
-                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                <td class="employee-forecast-page__employees-table-interval-cell"
-                                                                    data-bind="
-                                                                        hrmTableEditableCell: editableCell,
-                                                                        hrmTableEditableCellError: $root.editableCellControlErrorExtractor(employee.workingIntervals()[0].value),
-                                                                    ">
-                                                                    <div class="hrm-table__cell-content hrm-table__editable-cell-content">
-                                                                        <input data-bind="
-                                                                            textInput: employee.workingIntervals()[0].value,
-                                                                            hrmMask,
-                                                                            hrmMaskPattern: '99:99 – 99:99',
-                                                                            hrmTableEditableCellInputControl,
-                                                                            hrmTableEditableCellInputControlOwner: editableCell
-                                                                        " placeholder="00:00 - 00:00">
-                                                                        <div class="employee-forecast-page__employees-table-interval-cell-actions">
-                                                                            <!-- ko if: employee.workingIntervals().length > 1 -->
-                                                                                <button class="hrm-button hrm-icon-button hrm-times-icon-button
-                                                                                               hrm-icon-button--theme_negative
-                                                                                               employee-forecast-page__employees-table-interval-cell-remove-button"
-                                                                                        data-bind="
-                                                                                            click: function () {employee.workingIntervals.splice(0, 1);},
-                                                                                            attr: {title: 'Удалить интервал ' + employee.workingIntervals()[0].value()}
-                                                                                        ">
-                                                                                </button>
-                                                                            <!-- /ko -->
-
-                                                                            <div class="hrm-spacer"></div>
-
-                                                                            <!-- ko if: employee.workingIntervals().length === 1 -->
-                                                                                <button class="hrm-button hrm-icon-button hrm-plus-icon-button
-                                                                                               hrm-icon-button--theme_positive
-                                                                                               employee-forecast-page__employees-table-interval-cell-add-button"
-                                                                                        title="Добавить рабочий интервал"
-                                                                                        data-bind="click: function () {$root.addWorkingInterval(employee);}">
-                                                                                </button>
-                                                                            <!-- /ko -->
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
+                                                            <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth -->
+                                                                <td colspan="2"></td>
                                                             <!-- /ko -->
-                                                            <td class="employee-forecast-page__employees-table-working-hours-cell"
-                                                                data-bind="
-                                                                    text: $root.formatDuration($root.getEmployeeWorkingHours(employee)()),
-                                                                    attr: {rowspan: employee.workingIntervals().length}
-                                                                ">
-                                                            </td>
                                                             <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                <td class="employee-forecast-page__employees-table-rate-cell" data-bind="
-                                                                    hrmTableEditableCell: editableCell,
-                                                                    attr: {rowspan: employee.workingIntervals().length}
-                                                                ">
+                                                                <td class="employee-forecast-page__employees-table-rate-cell"
+                                                                    data-bind="hrmTableEditableCell: editableCell">
                                                                     <input data-bind="
-                                                                        textInput: employee.rate,
+                                                                        textInput: rate,
                                                                         event: {
                                                                             input: function () {
-                                                                                $root.onEmployeeRateInput(position);
+                                                                                $root.onRateInput(position);
                                                                             }
                                                                         },
                                                                         hrmMask, hrmMaskPattern: 'decimal',
@@ -660,52 +567,16 @@
                                                                     " placeholder="0">
                                                                 </td>
                                                             <!-- /ko -->
-                                                            <td class="employee-forecast-page__employees-table-return-rate-cell"
-                                                                data-bind="
-                                                                    html: returnRate + ' ' + $root.getUnitsSuffixHtml(position.units()),
-                                                                    attr: {rowspan: employee.workingIntervals().length}
-                                                                ">
-                                                            </td>
-                                                            <td class="employee-forecast-page__employees-table-salary-bulk-cell"
-                                                                data-bind="text: $root.formatDecimal($root.getEmployeeSalaryBulk(employee)()), attr: {rowspan: employee.workingIntervals().length}">
-                                                            </td>
-                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                <td class="employee-forecast-page__employees-table-bonus-cell" data-bind="
-                                                                    hrmTableEditableCell: editableCell,
-                                                                    attr: {rowspan: employee.workingIntervals().length}
-                                                                ">
-                                                                    <input data-bind="
-                                                                        textInput: employee.bonus,
-                                                                        hrmMask, hrmMaskPattern: 'decimal',
-                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                        hrmTableEditableCellInputControl,
-                                                                        hrmTableEditableCellInputControlOwner: editableCell
-                                                                    " placeholder="0">
-                                                                </td>
-                                                            <!-- /ko -->
-                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                <td class="employee-forecast-page__employees-table-fine-cell" data-bind="
-                                                                    hrmTableEditableCell: editableCell,
-                                                                    attr: {rowspan: employee.workingIntervals().length}
-                                                                ">
-                                                                    <input data-bind="
-                                                                        textInput: employee.fine,
-                                                                        hrmMask, hrmMaskPattern: 'decimal',
-                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                        hrmTableEditableCellInputControl,
-                                                                        hrmTableEditableCellInputControlOwner: editableCell
-                                                                    " placeholder="0">
-                                                                </td>
-                                                            <!-- /ko -->
-                                                            <td class="employee-forecast-page__employees-table-salary-cell"
-                                                                data-bind="
-                                                                    text: $root.formatDecimal($root.getEmployeeSalary(employee)()),
-                                                                    attr: {rowspan: employee.workingIntervals().length}
-                                                                ">
+                                                            <td class="employee-forecast-page__employees-table-statistics-cell" colspan="5">
+                                                                ФОТ — <b>34%</b>, норматив выработки — <b>90%</b>
                                                             </td>
                                                         </tr>
-
-                                                        <!-- ko foreach: {data: workingIntervals().slice(1), as: 'workingInterval'} -->
+                                                        <!-- ko foreach: {
+                                                            data: employees,
+                                                            as: 'employee',
+                                                            afterAdd: hrmFadeAfterAddFactory(200),
+                                                            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                        } -->
                                                             <tr class="employee-forecast-page__employees-table-employee-row"
                                                                 data-bind="
                                                                     css: {
@@ -713,33 +584,50 @@
                                                                     }
                                                                 "
                                                             >
+                                                                <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
+                                                                    <td class="employee-forecast-page__employees-table-employee-name-cell"
+                                                                        data-bind="attr: {rowspan: employee.workingIntervals().length}">
+                                                                        <div class="employee-forecast-page__employees-table-employee">
+                                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button
+                                                                                           hrm-circle-icon-button--theme_secondary
+                                                                                           employee-forecast-page__employees-table-employee-remove-button"
+                                                                                    data-bind="click: function() {position.employees.remove(employee);}" title="Удалить сотрудника">
+                                                                            </button>
+                                                                            <span class="employee-forecast-page__employees-table-employee-name"
+                                                                                  data-bind="text: name">
+                                                                            </span>
+                                                                        </div>
+                                                                    </td>
+                                                                <!-- /ko -->
                                                                 <!-- ko let: {editableCell: ko.observable(null)} -->
                                                                     <td class="employee-forecast-page__employees-table-interval-cell"
                                                                         data-bind="
                                                                             hrmTableEditableCell: editableCell,
-                                                                            hrmTableEditableCellError: $root.editableCellControlErrorExtractor(workingInterval.value),
+                                                                            hrmTableEditableCellError: $root.editableCellControlErrorExtractor(employee.workingIntervals()[0].value),
                                                                         ">
                                                                         <div class="hrm-table__cell-content hrm-table__editable-cell-content">
                                                                             <input data-bind="
-                                                                                textInput: workingInterval.value,
+                                                                                textInput: employee.workingIntervals()[0].value,
                                                                                 hrmMask,
                                                                                 hrmMaskPattern: '99:99 – 99:99',
                                                                                 hrmTableEditableCellInputControl,
                                                                                 hrmTableEditableCellInputControlOwner: editableCell
                                                                             " placeholder="00:00 - 00:00">
                                                                             <div class="employee-forecast-page__employees-table-interval-cell-actions">
-                                                                                <button class="hrm-button hrm-icon-button hrm-times-icon-button
-                                                                                               hrm-icon-button--theme_negative
-                                                                                               employee-forecast-page__employees-table-interval-cell-remove-button"
-                                                                                        data-bind="
-                                                                                            click: function () {employee.workingIntervals.remove(workingInterval);},
-                                                                                            attr: {title: 'Удалить интервал ' + workingInterval.value()}
-                                                                                        ">
-                                                                                </button>
+                                                                                <!-- ko if: employee.workingIntervals().length > 1 -->
+                                                                                    <button class="hrm-button hrm-icon-button hrm-times-icon-button
+                                                                                                   hrm-icon-button--theme_negative
+                                                                                                   employee-forecast-page__employees-table-interval-cell-remove-button"
+                                                                                            data-bind="
+                                                                                                click: function () {employee.workingIntervals.splice(0, 1);},
+                                                                                                attr: {title: 'Удалить интервал ' + employee.workingIntervals()[0].value()}
+                                                                                            ">
+                                                                                    </button>
+                                                                                <!-- /ko -->
 
                                                                                 <div class="hrm-spacer"></div>
 
-                                                                                <!-- ko if: employee.workingIntervals().length === workingIntervalIndex() + 2  -->
+                                                                                <!-- ko if: employee.workingIntervals().length === 1 -->
                                                                                     <button class="hrm-button hrm-icon-button hrm-plus-icon-button
                                                                                                    hrm-icon-button--theme_positive
                                                                                                    employee-forecast-page__employees-table-interval-cell-add-button"
@@ -751,12 +639,129 @@
                                                                         </div>
                                                                     </td>
                                                                 <!-- /ko -->
+                                                                <td class="employee-forecast-page__employees-table-working-hours-cell"
+                                                                    data-bind="
+                                                                        text: $root.formatDuration($root.getEmployeeWorkingHours(employee)()),
+                                                                        attr: {rowspan: employee.workingIntervals().length}
+                                                                    ">
+                                                                </td>
+                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                    <td class="employee-forecast-page__employees-table-rate-cell" data-bind="
+                                                                        hrmTableEditableCell: editableCell,
+                                                                        attr: {rowspan: employee.workingIntervals().length}
+                                                                    ">
+                                                                        <input data-bind="
+                                                                            textInput: employee.rate,
+                                                                            event: {
+                                                                                input: function () {
+                                                                                    $root.onEmployeeRateInput(position);
+                                                                                }
+                                                                            },
+                                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                            hrmTableEditableCellInputControl,
+                                                                            hrmTableEditableCellInputControlOwner: editableCell
+                                                                        " placeholder="0">
+                                                                    </td>
+                                                                <!-- /ko -->
+                                                                <td class="employee-forecast-page__employees-table-return-rate-cell"
+                                                                    data-bind="
+                                                                        html: returnRate + ' ' + $root.getUnitsSuffixHtml(position.units()),
+                                                                        attr: {rowspan: employee.workingIntervals().length}
+                                                                    ">
+                                                                </td>
+                                                                <td class="employee-forecast-page__employees-table-salary-bulk-cell"
+                                                                    data-bind="text: $root.formatDecimal($root.getEmployeeSalaryBulk(employee)()), attr: {rowspan: employee.workingIntervals().length}">
+                                                                </td>
+                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                    <td class="employee-forecast-page__employees-table-bonus-cell" data-bind="
+                                                                        hrmTableEditableCell: editableCell,
+                                                                        attr: {rowspan: employee.workingIntervals().length}
+                                                                    ">
+                                                                        <input data-bind="
+                                                                            textInput: employee.bonus,
+                                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                            hrmTableEditableCellInputControl,
+                                                                            hrmTableEditableCellInputControlOwner: editableCell
+                                                                        " placeholder="0">
+                                                                    </td>
+                                                                <!-- /ko -->
+                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                    <td class="employee-forecast-page__employees-table-fine-cell" data-bind="
+                                                                        hrmTableEditableCell: editableCell,
+                                                                        attr: {rowspan: employee.workingIntervals().length}
+                                                                    ">
+                                                                        <input data-bind="
+                                                                            textInput: employee.fine,
+                                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                            hrmTableEditableCellInputControl,
+                                                                            hrmTableEditableCellInputControlOwner: editableCell
+                                                                        " placeholder="0">
+                                                                    </td>
+                                                                <!-- /ko -->
+                                                                <td class="employee-forecast-page__employees-table-salary-cell"
+                                                                    data-bind="
+                                                                        text: $root.formatDecimal($root.getEmployeeSalary(employee)()),
+                                                                        attr: {rowspan: employee.workingIntervals().length}
+                                                                    ">
+                                                                </td>
                                                             </tr>
+
+                                                            <!-- ko foreach: {data: workingIntervals().slice(1), as: 'workingInterval'} -->
+                                                                <tr class="employee-forecast-page__employees-table-employee-row"
+                                                                    data-bind="
+                                                                        css: {
+                                                                            'employee-forecast-page__employees-table-employee-row--multi-interval': employee.workingIntervals().length > 1
+                                                                        }
+                                                                    "
+                                                                >
+                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                        <td class="employee-forecast-page__employees-table-interval-cell"
+                                                                            data-bind="
+                                                                                hrmTableEditableCell: editableCell,
+                                                                                hrmTableEditableCellError: $root.editableCellControlErrorExtractor(workingInterval.value),
+                                                                            ">
+                                                                            <div class="hrm-table__cell-content hrm-table__editable-cell-content">
+                                                                                <input data-bind="
+                                                                                    textInput: workingInterval.value,
+                                                                                    hrmMask,
+                                                                                    hrmMaskPattern: '99:99 – 99:99',
+                                                                                    hrmTableEditableCellInputControl,
+                                                                                    hrmTableEditableCellInputControlOwner: editableCell
+                                                                                " placeholder="00:00 - 00:00">
+                                                                                <div class="employee-forecast-page__employees-table-interval-cell-actions">
+                                                                                    <button class="hrm-button hrm-icon-button hrm-times-icon-button
+                                                                                                   hrm-icon-button--theme_negative
+                                                                                                   employee-forecast-page__employees-table-interval-cell-remove-button"
+                                                                                            data-bind="
+                                                                                                click: function () {employee.workingIntervals.remove(workingInterval);},
+                                                                                                attr: {title: 'Удалить интервал ' + workingInterval.value()}
+                                                                                            ">
+                                                                                    </button>
+
+                                                                                    <div class="hrm-spacer"></div>
+
+                                                                                    <!-- ko if: employee.workingIntervals().length === workingIntervalIndex() + 2  -->
+                                                                                        <button class="hrm-button hrm-icon-button hrm-plus-icon-button
+                                                                                                       hrm-icon-button--theme_positive
+                                                                                                       employee-forecast-page__employees-table-interval-cell-add-button"
+                                                                                                title="Добавить рабочий интервал"
+                                                                                                data-bind="click: function () {$root.addWorkingInterval(employee);}">
+                                                                                        </button>
+                                                                                    <!-- /ko -->
+                                                                                </div>
+                                                                            </div>
+                                                                        </td>
+                                                                    <!-- /ko -->
+                                                                </tr>
+                                                            <!-- /ko -->
                                                         <!-- /ko -->
                                                     <!-- /ko -->
-                                                <!-- /ko -->
-                                                </tbody>
-                                            </table>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 <!-- /ko -->
@@ -941,224 +946,226 @@
                                                                 </table>
 
                                                                 <div class="hrm-table__scrollable-wrapper">
-                                                                    <table class="employee-forecast-page__employees-table-position-section-table"
-                                                                           data-bind="hrmTable">
-                                                                        <tbody>
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <td class="employee-forecast-page__employees-table-employee-name-cell"
-                                                                                        data-bind="text: name">
-                                                                                    </td>
-                                                                                <!-- /ko -->
-                                                                            </tr>
-
-                                                                            <!-- ko foreach: {data: _.range($root.getPositionMaxWorkingIntervalCount(position)()), as: 'workingIntervalIndex'} -->
+                                                                    <div class="hrm-table__scrollable-wrapper-content">
+                                                                        <table class="employee-forecast-page__employees-table-position-section-table"
+                                                                               data-bind="hrmTable">
+                                                                            <tbody>
                                                                                 <tr>
                                                                                     <!-- ko foreach: {
-                                                                                        data: position.employees,
+                                                                                        data: employees,
                                                                                         as: 'employee',
                                                                                         afterAdd: hrmFadeAfterAddFactory(200),
                                                                                         beforeRemove: hrmFadeBeforeRemoveFactory(200)
                                                                                     } -->
-                                                                                        <!-- ko if: workingIntervalIndex < workingIntervals().length -->
-                                                                                            <!-- ko let: {
-                                                                                                editableCell: ko.observable(null),
-                                                                                                workingInterval: workingIntervals()[workingIntervalIndex]
-                                                                                            } -->
-                                                                                                <td class="employee-forecast-page__employees-table-interval-cell"
-                                                                                                    data-bind="
-                                                                                                        hrmTableEditableCell: editableCell,
-                                                                                                        hrmTableEditableCellError: $root.editableCellControlErrorExtractor(workingInterval.value),
-                                                                                                        css: {'employee-forecast-page__employees-table-interval-cell--single-line': $root.getPositionMaxWorkingIntervalCount(position)() === 1}
-                                                                                                    ">
-                                                                                                    <div class="hrm-table__cell-content hrm-table__editable-cell-content">
-                                                                                                        <input data-bind="
-                                                                                                            textInput: workingInterval.value,
-                                                                                                            hrmMask,
-                                                                                                            hrmMaskPattern: '99:99 – 99:99',
-                                                                                                            hrmTableEditableCellInputControl,
-                                                                                                            hrmTableEditableCellInputControlOwner: editableCell
-                                                                                                        " placeholder="00:00 - 00:00">
-                                                                                                        <div class="employee-forecast-page__employees-table-interval-cell-actions">
-                                                                                                            <!-- ko if: employee.workingIntervals().length > 1 -->
-                                                                                                                <button class="hrm-button hrm-icon-button hrm-times-icon-button
-                                                                                                                               hrm-icon-button--theme_negative
-                                                                                                                               employee-forecast-page__employees-table-interval-cell-remove-button"
-                                                                                                                        data-bind="
-                                                                                                                            click: function () {employee.workingIntervals.remove(workingInterval);},
-                                                                                                                            attr: {title: 'Удалить интервал ' + workingInterval.value()}
-                                                                                                                        ">
-                                                                                                                </button>
-                                                                                                            <!-- /ko -->
+                                                                                        <td class="employee-forecast-page__employees-table-employee-name-cell"
+                                                                                            data-bind="text: name">
+                                                                                        </td>
+                                                                                    <!-- /ko -->
+                                                                                </tr>
 
-                                                                                                            <div class="hrm-spacer"></div>
+                                                                                <!-- ko foreach: {data: _.range($root.getPositionMaxWorkingIntervalCount(position)()), as: 'workingIntervalIndex'} -->
+                                                                                    <tr>
+                                                                                        <!-- ko foreach: {
+                                                                                            data: position.employees,
+                                                                                            as: 'employee',
+                                                                                            afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                        } -->
+                                                                                            <!-- ko if: workingIntervalIndex < workingIntervals().length -->
+                                                                                                <!-- ko let: {
+                                                                                                    editableCell: ko.observable(null),
+                                                                                                    workingInterval: workingIntervals()[workingIntervalIndex]
+                                                                                                } -->
+                                                                                                    <td class="employee-forecast-page__employees-table-interval-cell"
+                                                                                                        data-bind="
+                                                                                                            hrmTableEditableCell: editableCell,
+                                                                                                            hrmTableEditableCellError: $root.editableCellControlErrorExtractor(workingInterval.value),
+                                                                                                            css: {'employee-forecast-page__employees-table-interval-cell--single-line': $root.getPositionMaxWorkingIntervalCount(position)() === 1}
+                                                                                                        ">
+                                                                                                        <div class="hrm-table__cell-content hrm-table__editable-cell-content">
+                                                                                                            <input data-bind="
+                                                                                                                textInput: workingInterval.value,
+                                                                                                                hrmMask,
+                                                                                                                hrmMaskPattern: '99:99 – 99:99',
+                                                                                                                hrmTableEditableCellInputControl,
+                                                                                                                hrmTableEditableCellInputControlOwner: editableCell
+                                                                                                            " placeholder="00:00 - 00:00">
+                                                                                                            <div class="employee-forecast-page__employees-table-interval-cell-actions">
+                                                                                                                <!-- ko if: employee.workingIntervals().length > 1 -->
+                                                                                                                    <button class="hrm-button hrm-icon-button hrm-times-icon-button
+                                                                                                                                   hrm-icon-button--theme_negative
+                                                                                                                                   employee-forecast-page__employees-table-interval-cell-remove-button"
+                                                                                                                            data-bind="
+                                                                                                                                click: function () {employee.workingIntervals.remove(workingInterval);},
+                                                                                                                                attr: {title: 'Удалить интервал ' + workingInterval.value()}
+                                                                                                                            ">
+                                                                                                                    </button>
+                                                                                                                <!-- /ko -->
 
-                                                                                                            <!-- ko if: employee.workingIntervals().length === workingIntervalIndex + 1  -->
-                                                                                                                <button class="hrm-button hrm-icon-button hrm-plus-icon-button
-                                                                                                                               hrm-icon-button--theme_positive
-                                                                                                                               employee-forecast-page__employees-table-interval-cell-add-button"
-                                                                                                                        title="Добавить рабочий интервал"
-                                                                                                                        data-bind="click: function () {$root.addWorkingInterval(employee);}">
-                                                                                                                </button>
-                                                                                                            <!-- /ko -->
+                                                                                                                <div class="hrm-spacer"></div>
+
+                                                                                                                <!-- ko if: employee.workingIntervals().length === workingIntervalIndex + 1  -->
+                                                                                                                    <button class="hrm-button hrm-icon-button hrm-plus-icon-button
+                                                                                                                                   hrm-icon-button--theme_positive
+                                                                                                                                   employee-forecast-page__employees-table-interval-cell-add-button"
+                                                                                                                            title="Добавить рабочий интервал"
+                                                                                                                            data-bind="click: function () {$root.addWorkingInterval(employee);}">
+                                                                                                                    </button>
+                                                                                                                <!-- /ko -->
+                                                                                                            </div>
                                                                                                         </div>
-                                                                                                    </div>
-                                                                                                </td>
+                                                                                                    </td>
+                                                                                                <!-- /ko -->
+                                                                                            <!-- /ko -->
+
+                                                                                            <!-- ko if: workingIntervalIndex >= workingIntervals().length -->
+                                                                                                <td class="employee-forecast-page__employees-table-interval-cell"></td>
                                                                                             <!-- /ko -->
                                                                                         <!-- /ko -->
+                                                                                    </tr>
+                                                                                <!-- /ko -->
 
-                                                                                        <!-- ko if: workingIntervalIndex >= workingIntervals().length -->
-                                                                                            <td class="employee-forecast-page__employees-table-interval-cell"></td>
+                                                                                <tr>
+                                                                                    <!-- ko foreach: {
+                                                                                        data: employees,
+                                                                                        as: 'employee',
+                                                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                    } -->
+                                                                                        <td class="employee-forecast-page__employees-table-working-hours-cell"
+                                                                                            data-bind="text: $root.formatDuration($root.getEmployeeWorkingHours(employee)())">
+                                                                                        </td>
+                                                                                    <!-- /ko -->
+                                                                                </tr>
+
+                                                                                <tr>
+                                                                                    <!-- ko foreach: {
+                                                                                        data: employees,
+                                                                                        as: 'employee',
+                                                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                    } -->
+                                                                                        <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                                            <td class="employee-forecast-page__employees-table-rate-cell"
+                                                                                                data-bind="hrmTableEditableCell: editableCell">
+                                                                                                <input data-bind="
+                                                                                                    textInput: employee.rate,
+                                                                                                    event: {
+                                                                                                        input: function () {
+                                                                                                            $root.onEmployeeRateInput(position);
+                                                                                                        }
+                                                                                                    },
+                                                                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                                                    hrmTableEditableCellInputControl,
+                                                                                                    hrmTableEditableCellInputControlOwner: editableCell
+                                                                                                " placeholder="0">
+                                                                                            </td>
                                                                                         <!-- /ko -->
                                                                                     <!-- /ko -->
                                                                                 </tr>
-                                                                            <!-- /ko -->
 
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <td class="employee-forecast-page__employees-table-working-hours-cell"
-                                                                                        data-bind="text: $root.formatDuration($root.getEmployeeWorkingHours(employee)())">
-                                                                                    </td>
-                                                                                <!-- /ko -->
-                                                                            </tr>
-
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                                        <td class="employee-forecast-page__employees-table-rate-cell"
-                                                                                            data-bind="hrmTableEditableCell: editableCell">
-                                                                                            <input data-bind="
-                                                                                                textInput: employee.rate,
-                                                                                                event: {
-                                                                                                    input: function () {
-                                                                                                        $root.onEmployeeRateInput(position);
-                                                                                                    }
-                                                                                                },
-                                                                                                hrmMask, hrmMaskPattern: 'decimal',
-                                                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                                                hrmTableEditableCellInputControl,
-                                                                                                hrmTableEditableCellInputControlOwner: editableCell
-                                                                                            " placeholder="0">
+                                                                                <tr>
+                                                                                    <!-- ko foreach: {
+                                                                                        data: employees,
+                                                                                        as: 'employee',
+                                                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                    } -->
+                                                                                        <td class="employee-forecast-page__employees-table-return-rate-cell"
+                                                                                            data-bind="html: returnRate + ' ' + $root.getUnitsSuffixHtml(position.units())">
                                                                                         </td>
                                                                                     <!-- /ko -->
-                                                                                <!-- /ko -->
-                                                                            </tr>
+                                                                                </tr>
 
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <td class="employee-forecast-page__employees-table-return-rate-cell"
-                                                                                        data-bind="html: returnRate + ' ' + $root.getUnitsSuffixHtml(position.units())">
-                                                                                    </td>
-                                                                                <!-- /ko -->
-                                                                            </tr>
-
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <td class="employee-forecast-page__employees-table-salary-bulk-cell"
-                                                                                        data-bind="text: $root.formatDecimal($root.getEmployeeSalaryBulk(employee)())">
-                                                                                    </td>
-                                                                                <!-- /ko -->
-                                                                            </tr>
-
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                                        <td class="employee-forecast-page__employees-table-bonus-cell"
-                                                                                            data-bind="hrmTableEditableCell: editableCell">
-                                                                                            <input data-bind="
-                                                                                                textInput: employee.bonus,
-                                                                                                hrmMask, hrmMaskPattern: 'decimal',
-                                                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                                                hrmTableEditableCellInputControl,
-                                                                                                hrmTableEditableCellInputControlOwner: editableCell
-                                                                                            " placeholder="0">
+                                                                                <tr>
+                                                                                    <!-- ko foreach: {
+                                                                                        data: employees,
+                                                                                        as: 'employee',
+                                                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                    } -->
+                                                                                        <td class="employee-forecast-page__employees-table-salary-bulk-cell"
+                                                                                            data-bind="text: $root.formatDecimal($root.getEmployeeSalaryBulk(employee)())">
                                                                                         </td>
                                                                                     <!-- /ko -->
-                                                                                <!-- /ko -->
-                                                                            </tr>
+                                                                                </tr>
 
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                                        <td class="employee-forecast-page__employees-table-fine-cell"
-                                                                                            data-bind="hrmTableEditableCell: editableCell">
-                                                                                            <input data-bind="
-                                                                                                textInput: employee.fine,
-                                                                                                hrmMask, hrmMaskPattern: 'decimal',
-                                                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                                                                hrmTableEditableCellInputControl,
-                                                                                                hrmTableEditableCellInputControlOwner: editableCell
-                                                                                            " placeholder="0">
+                                                                                <tr>
+                                                                                    <!-- ko foreach: {
+                                                                                        data: employees,
+                                                                                        as: 'employee',
+                                                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                    } -->
+                                                                                        <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                                            <td class="employee-forecast-page__employees-table-bonus-cell"
+                                                                                                data-bind="hrmTableEditableCell: editableCell">
+                                                                                                <input data-bind="
+                                                                                                    textInput: employee.bonus,
+                                                                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                                                    hrmTableEditableCellInputControl,
+                                                                                                    hrmTableEditableCellInputControlOwner: editableCell
+                                                                                                " placeholder="0">
+                                                                                            </td>
+                                                                                        <!-- /ko -->
+                                                                                    <!-- /ko -->
+                                                                                </tr>
+
+                                                                                <tr>
+                                                                                    <!-- ko foreach: {
+                                                                                        data: employees,
+                                                                                        as: 'employee',
+                                                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                    } -->
+                                                                                        <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                                            <td class="employee-forecast-page__employees-table-fine-cell"
+                                                                                                data-bind="hrmTableEditableCell: editableCell">
+                                                                                                <input data-bind="
+                                                                                                    textInput: employee.fine,
+                                                                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                                                                    hrmTableEditableCellInputControl,
+                                                                                                    hrmTableEditableCellInputControlOwner: editableCell
+                                                                                                " placeholder="0">
+                                                                                            </td>
+                                                                                        <!-- /ko -->
+                                                                                    <!-- /ko -->
+                                                                                </tr>
+
+                                                                                <tr>
+                                                                                    <!-- ko foreach: {
+                                                                                        data: employees,
+                                                                                        as: 'employee',
+                                                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                    } -->
+                                                                                        <td class="employee-forecast-page__employees-table-salary-cell"
+                                                                                            data-bind="text: $root.formatDecimal($root.getEmployeeSalary(employee)())">
                                                                                         </td>
                                                                                     <!-- /ko -->
-                                                                                <!-- /ko -->
-                                                                            </tr>
+                                                                                </tr>
 
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <td class="employee-forecast-page__employees-table-salary-cell"
-                                                                                        data-bind="text: $root.formatDecimal($root.getEmployeeSalary(employee)())">
-                                                                                    </td>
-                                                                                <!-- /ko -->
-                                                                            </tr>
-
-                                                                            <tr>
-                                                                                <!-- ko foreach: {
-                                                                                    data: employees,
-                                                                                    as: 'employee',
-                                                                                    afterAdd: hrmFadeAfterAddFactory(200),
-                                                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                                                } -->
-                                                                                    <td class="employee-forecast-page__employees-table-remove-cell">
-                                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button
-                                                                                                       hrm-circle-icon-button--theme_secondary"
-                                                                                                data-bind="click: function() {position.employees.remove(employee);}" title="Удалить сотрудника">
-                                                                                        </button>
-                                                                                    </td>
-                                                                                <!-- /ko -->
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
+                                                                                <tr>
+                                                                                    <!-- ko foreach: {
+                                                                                        data: employees,
+                                                                                        as: 'employee',
+                                                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                                                    } -->
+                                                                                        <td class="employee-forecast-page__employees-table-remove-cell">
+                                                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button
+                                                                                                           hrm-circle-icon-button--theme_secondary"
+                                                                                                    data-bind="click: function() {position.employees.remove(employee);}" title="Удалить сотрудника">
+                                                                                            </button>
+                                                                                        </td>
+                                                                                    <!-- /ko -->
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         <!-- /ko -->
@@ -1212,6 +1219,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 <script src="assets/js/main.js"></script>
 

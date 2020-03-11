@@ -42,7 +42,7 @@
                 } -->
                     <!-- ko let: {'$tab': $root.workloadTabViewModel} -->
                         <div class="position-page__tab-pane position-page__workload-tab-pane"
-                             data-bind="using: $tab.formModel">
+                             data-bind="using: $tab.formModel.value">
                             <div class="position-page__section">
                                 <div class="position-page__section-row position-page__workload-tab-pane-section-row">
                                     <div class="position-page__section-row-content">
@@ -642,7 +642,7 @@
                 } -->
                     <!-- ko let: {'$tab': $root.salaryTabViewModel} -->
                         <div class="position-page__tab-pane position-page__salary-tab-pane"
-                             data-bind="using: $tab.formModel">
+                             data-bind="using: $tab.formModel.value">
                             <div class="position-page__section">
                                 <div class="position-page__section-row position-page__salary-tab-pane-section-row">
                                     <div class="position-page__section-row-content">
@@ -930,19 +930,19 @@
                                         <div class="position-page__section-row-item
                                                     position-page__salary-tab-pane-section-row-premium-account-item">
                                             <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                                    <div class="hrm-form-field-switch-group position-page__salary-tab-pane-section-row-premium-account-item-switch-group"
-                                                         data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
-                                                        <div data-bind="component: {name: 'hrm-switch', params: {checked: premiumAccount, exportAs: control}}"></div>
-                                                        <label data-bind="hrmSwitchGroupLabel: label">
-                                                            Начислять премирование/депремирование на премиальный счет
+                                                <div class="hrm-form-field-switch-group position-page__salary-tab-pane-section-row-premium-account-item-switch-group"
+                                                     data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                                    <div data-bind="component: {name: 'hrm-switch', params: {checked: premiumAccount, exportAs: control}}"></div>
+                                                    <label data-bind="hrmSwitchGroupLabel: label">
+                                                        Начислять премирование/депремирование на премиальный счет
 
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Начислять премирование/депремирование на премиальный счет'">
-                                                            </button>
-                                                        </label>
-                                                    </div>
-                                                <!-- /ko -->
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Начислять премирование/депремирование на премиальный счет'">
+                                                        </button>
+                                                    </label>
+                                                </div>
+                                            <!-- /ko -->
                                         </div>
                                     </div>
                                 </div>
@@ -964,10 +964,239 @@
                         </div>
                     <!-- /ko -->
                 <!-- /ko -->
+
+                <!-- ko template: {
+                    foreach: hrmTemplateIf($root.activeTab() === 2, $data),
+                    afterAdd: hrmFadeAfterAddFactory(200, 200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <!-- ko let: {'$tab': $root.ranksTabViewModel} -->
+                        <div class="position-page__tab-pane position-page__ranks-tab-pane"
+                             data-bind="using: $tab.formModel.value">
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                           hrm-button-with-plus-icon position-page__ranks-tab-pane-add-button position-page__ranks-tab-pane-first-add-button"
+                                    data-bind="click: function() {$tab.create();}">
+                                Добавить разряд
+                            </button>
+
+                            <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                                <div class="row">
+                                    <div class="col-12 col-xl-9">
+                                        <table class="position-page__ranks-tab-pane-table" data-bind="hrmTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="position-page__ranks-tab-pane-table-number-head-cell">
+                                                        № разряда
+                                                    </th>
+                                                    <th>Фикс. дневной оклад сотрудника, <i class="far fa-ruble-sign"></i></th>
+                                                    <th>Коэффициент норматива выработки</th>
+                                                    <th>Коэффициент для расчета премии</th>
+                                                    <th>Коэффициент для расчета штрафа</th>
+                                                    <th class="position-page__ranks-tab-pane-table-actions-head-cell"></th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <!-- ko foreach: {
+                                                    data: ranks,
+                                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                } -->
+                                                    <tr>
+                                                        <td class="position-page__ranks-tab-pane-table-number-cell"
+                                                            data-bind="text: number">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-salary-bulk-cell"
+                                                            data-bind="text: $root.formatDecimal(salaryBulk())">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-production-standard-cell"
+                                                            data-bind="text: $root.formatDecimal(productionStandardFactor())">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-bonus-factory-cell"
+                                                            data-bind="text: $root.formatDecimal(bonusFactor())">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-fine-factory-cell"
+                                                            data-bind="text: $root.formatDecimal(fineFactor())">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-actions-cell">
+                                                            <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
+                                                                           hrm-icon-button--theme_secondary"
+                                                                    title="Редактировать"
+                                                                    data-bind="click: function () {$tab.edit($data);}">
+                                                            </button><!--
+                                                            --><button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                           hrm-icon-button--theme_negative position-page__ranks-tab-pane-table-delete-button"
+                                                                    title="Удалить"
+                                                                    data-bind="click: function () {$tab.delete($data);}">
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <!-- /ko -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+
+                            <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                <div class="hrm-table__scrollable-wrapper position-page__ranks-tab-pane-table-scrollable-wrapper">
+                                    <div class="hrm-table__scrollable-wrapper-content">
+                                        <table class="position-page__ranks-tab-pane-table" data-bind="hrmTable">
+                                            <tbody>
+                                                <tr>
+                                                    <th class="position-page__ranks-tab-pane-table-number-head-cell">
+                                                        № разряда
+                                                    </th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-number-cell"
+                                                            data-bind="text: number">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Фикс. дневной оклад сотрудника, <i class="far fa-ruble-sign"></i></th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-salary-bulk-cell"
+                                                            data-bind="text: $root.formatDecimal(salaryBulk())">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Коэффициент норматива выработки</th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-production-standard-cell"
+                                                            data-bind="text: $root.formatDecimal(productionStandardFactor())">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Коэффициент для расчета премии</th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-bonus-factory-cell"
+                                                            data-bind="text: $root.formatDecimal(bonusFactor())">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Коэффициент для расчета штрафа</th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-fine-factory-cell"
+                                                            data-bind="text: $root.formatDecimal(fineFactor())">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th class="position-page__ranks-tab-pane-table-actions-head-cell"></th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-actions-cell">
+                                                            <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
+                                                                               hrm-icon-button--theme_secondary"
+                                                                    title="Редактировать"
+                                                                    data-bind="click: function () {$tab.edit($data);}">
+                                                            </button>
+
+                                                            <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                               hrm-icon-button--theme_negative position-page__ranks-tab-pane-table-delete-button"
+                                                                    title="Удалить"
+                                                                    data-bind="click: function () {$tab.delete($data);}">
+                                                            </button>
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                           hrm-button-with-plus-icon position-page__ranks-tab-pane-add-button position-page__ranks-tab-pane-second-add-button"
+                                    data-bind="click: function() {$tab.create();}">
+                                Добавить разряд
+                            </button>
+
+                            <div class="position-page__tab-pane-action-list">
+                                <button class="hrm-button hrm-basic-button
+                                               position-page__tab-pane-action-list-item position-page__cancel-button"
+                                        data-bind="click: function() {$tab.cancel();}">
+                                    Отменить
+                                </button>
+
+                                <button class="hrm-button hrm-basic-button hrm-accent-button
+                                               position-page__tab-pane-action-list-item position-page__save-button"
+                                        data-bind="click: function() {$tab.submit();}">
+                                    Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    <!-- /ko -->
+                <!-- /ko -->
             </div>
         </div>
     </div>
+
+    <script type="text/html" id="position-page-delete-rank-modal-content-template">
+        <div data-bind="component: {
+            name: 'positions-page-delete-rank-modal-dialog',
+            params: {data, modalElement, cancel: function () {close();}, submit: function () {close(true);}}
+        }" role="document">
+        </div>
+    </script>
+
+    <script type="text/html" id="position-page-rank-modal-content-template">
+        <div class="position-page__rank-modal-dialog-wrapper">
+            <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                <div class="position-page__rank-modal-dialog-wrapper-actions">
+                    <button class="hrm-button position-page__rank-modal-dialog-wrapper-close-button"
+                            data-bind="click: close">
+                    </button>
+                </div>
+            <!-- /ko -->
+
+            <div data-bind="component: { name: 'position-page__rank-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function ($data) { close($data); } } }" role="document"></div>
+        </div>
+    </script>
+
+    <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
+
     @@include('../../base/_page-scripts.html')
+    @@include('./components/delete-rank-modal-dialog/_delete-rank-modal-dialog.js.html')
+    @@include('./components/rank-modal-dialog/_rank-modal-dialog.js.html')
     @@include('./_position-page.js.html')
 </body>
 </html>
