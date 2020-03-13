@@ -1,14 +1,23 @@
 "use strict";
 
 const HRM_BREAKPOINTS = {
-  tabletMaxWidth: 1219,
+  tabletMaxWidth: 1200,
   mobileMaxWidth: 767
 };
 ko.validation.init({
   insertMessages: false
 });
 moment.locale('ru');
-const HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY = 'hrmSidebarCollapsed';
+const HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY = 'hrmSidebarCollapsed'; // Fix stacking modals
+
+$(document).on('hidden.bs.modal', function (event) {
+  //const scrollbarWidth = $(event.target).data("bs.modal")._scrollbarWidth;
+  if ($('.modal:visible').length) {
+    $('body').addClass('modal-open'); //$('body').css('padding-right', scrollbarWidth);
+  }
+
+  $('.modal:visible').last().focus();
+});
 "use strict";
 
 ko.bindingHandlers.hrmSlide = {
@@ -1298,11 +1307,12 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 // hrmFormField
 (() => {
   class HrmFormFieldViewModel {
-    constructor(element, control, label) {
+    constructor(element, control, label, fixedLabel) {
       this._subscriptions = [];
       this._$element = $(element);
       this._control = control;
       this._label = label;
+      this._fixedLabel = fixedLabel;
       this.element = element;
 
       this._init();
@@ -1310,6 +1320,8 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 
     _init() {
       this._$element.addClass(['hrm-form-field', 'hrm-notransition']);
+
+      this._$element.toggleClass('hrm-form-field--fixed-label', this._fixedLabel !== undefined);
 
       this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
         this._$element.toggleClass('hrm-form-field--has-label', this._label !== undefined);
@@ -1348,7 +1360,8 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
     init: function (element, valueAccessor, allBindings) {
       const control = allBindings.get('hrmFormFieldControlRef');
       const label = allBindings.get('hrmFormFieldLabelRef');
-      const viewModel = new HrmFormFieldViewModel(element, control, label);
+      const fixedLabel = allBindings.get('hrmFormFieldFixedLabel');
+      const viewModel = new HrmFormFieldViewModel(element, control, label, fixedLabel);
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         viewModel.dispose();
       });
@@ -2048,6 +2061,102 @@ ko.components.register('hrm-form-field-error', {
         `
   });
 })();
+"use strict";
+
+ko.bindingHandlers.hrmModalContainerModalWrapper = {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = $.extend({
+      closeOnBackdropClick: true,
+      escapePress: 'close'
+    }, allBindings()['hrmModalContainerModalWrapperOptions']);
+    const close = allBindings()['hrmModalContainerModalWrapperClose'];
+    const $element = $(element);
+    const $modal = $element.find('.hrm-modal');
+    $modal.appendTo('body');
+    $modal.modal({
+      backdrop: false,
+      keyboard: false,
+      focus: true
+    });
+
+    if ('modalClass' in options) {
+      $modal.addClass(options.modalClass);
+    }
+
+    $modal.keyup(event => {
+      if (event.keyCode === 27) {
+        if (options.escapePress === 'close') {
+          close.call(viewModel);
+        } else if (options.escapePress instanceof Function) {
+          options.escapePress();
+        }
+      }
+    });
+
+    if (options.closeOnBackdropClick) {
+      $modal.on('click', event => {
+        if (event.target === $modal.get()[0]) {
+          close.call(viewModel);
+        }
+      });
+    }
+
+    const innerBindingContext = ko.bindingEvent.startPossiblyAsyncContentBinding($modal.get()[0], bindingContext);
+    ko.applyBindings(innerBindingContext, $modal.get()[0]);
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      $modal.modal('hide').remove();
+    });
+  }
+};
+ko.components.register('hrm-modal-container', {
+  viewModel: {
+    createViewModel: function (params) {
+      const viewModel = new function () {
+        this.opens = params.opens;
+
+        this.close = function (open, value) {
+          this.opens.remove(open);
+
+          if ('close' in open) {
+            open.close(value);
+          }
+        };
+      }();
+      viewModel.initializing = ko.observable(true);
+
+      viewModel.onInit = function () {
+        viewModel.initializing(false);
+      };
+
+      return viewModel;
+    }
+  },
+  template: `
+        <!-- ko template: {afterRender: onInit} -->
+            <!-- ko foreach: opens -->
+                <!-- ko let: {modalElement: ko.observable()} -->
+                    <div data-bind="
+                         hrmModalContainerModalWrapper,
+                         hrmModalContainerModalWrapperOptions: $data.options,
+                         hrmModalContainerModalWrapperClose: function (value) {$component.close($data, value);}
+                    ">
+                        <div class="modal hrm-modal" role="dialog" tabindex="1" data-bind="element: modalElement">
+                            <!-- ko template: {
+                                name: dialogTemplateName,
+                                data: {
+                                    data: $data.data,
+                                    modalElement: modalElement(),
+                                    close: function (value) {$component.close($data, value);}
+                                }
+                            } -->
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                <!-- /ko -->
+            <!-- /ko -->
+        <!-- /ko -->
+    `
+});
 "use strict";
 
 // hrmScrollable

@@ -1,11 +1,12 @@
 // hrmFormField
 (() => {
     class HrmFormFieldViewModel {
-        constructor(element, control, label) {
+        constructor(element, control, label, fixedLabel) {
             this._subscriptions = [];
             this._$element = $(element);
             this._control = control;
             this._label = label;
+            this._fixedLabel = fixedLabel;
 
             this.element = element;
 
@@ -14,6 +15,7 @@
 
         _init() {
             this._$element.addClass(['hrm-form-field', 'hrm-notransition']);
+            this._$element.toggleClass('hrm-form-field--fixed-label', this._fixedLabel !== undefined);
 
             this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
                 this._$element.toggleClass('hrm-form-field--has-label', this._label !== undefined);
@@ -48,7 +50,8 @@
         init: function (element, valueAccessor, allBindings) {
             const control = allBindings.get('hrmFormFieldControlRef');
             const label = allBindings.get('hrmFormFieldLabelRef');
-            const viewModel = new HrmFormFieldViewModel(element, control, label);
+            const fixedLabel = allBindings.get('hrmFormFieldFixedLabel');
+            const viewModel = new HrmFormFieldViewModel(element, control, label, fixedLabel);
 
             ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
                 viewModel.dispose();

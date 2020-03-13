@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <link rel="stylesheet" href="assets/fonts/fontawesome/css/all.css" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
 <link rel="stylesheet" href="assets/css/main.css" />
 
@@ -55,7 +56,7 @@
                 } -->
                     <!-- ko let: {'$tab': $root.workloadTabViewModel} -->
                         <div class="position-page__tab-pane position-page__workload-tab-pane"
-                             data-bind="using: $tab.formModel">
+                             data-bind="using: $tab.formModel.value">
                             <div class="position-page__section">
                                 <div class="position-page__section-row position-page__workload-tab-pane-section-row">
                                     <div class="position-page__section-row-content">
@@ -655,7 +656,7 @@
                 } -->
                     <!-- ko let: {'$tab': $root.salaryTabViewModel} -->
                         <div class="position-page__tab-pane position-page__salary-tab-pane"
-                             data-bind="using: $tab.formModel">
+                             data-bind="using: $tab.formModel.value">
                             <div class="position-page__section">
                                 <div class="position-page__section-row position-page__salary-tab-pane-section-row">
                                     <div class="position-page__section-row-content">
@@ -943,19 +944,19 @@
                                         <div class="position-page__section-row-item
                                                     position-page__salary-tab-pane-section-row-premium-account-item">
                                             <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                                    <div class="hrm-form-field-switch-group position-page__salary-tab-pane-section-row-premium-account-item-switch-group"
-                                                         data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
-                                                        <div data-bind="component: {name: 'hrm-switch', params: {checked: premiumAccount, exportAs: control}}"></div>
-                                                        <label data-bind="hrmSwitchGroupLabel: label">
-                                                            Начислять премирование/депремирование на премиальный счет
+                                                <div class="hrm-form-field-switch-group position-page__salary-tab-pane-section-row-premium-account-item-switch-group"
+                                                     data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                                    <div data-bind="component: {name: 'hrm-switch', params: {checked: premiumAccount, exportAs: control}}"></div>
+                                                    <label data-bind="hrmSwitchGroupLabel: label">
+                                                        Начислять премирование/депремирование на премиальный счет
 
-                                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                                           hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                                    data-bind="hrmTooltip, hrmTooltipText: 'Начислять премирование/депремирование на премиальный счет'">
-                                                            </button>
-                                                        </label>
-                                                    </div>
-                                                <!-- /ko -->
+                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                       hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                                data-bind="hrmTooltip, hrmTooltipText: 'Начислять премирование/депремирование на премиальный счет'">
+                                                        </button>
+                                                    </label>
+                                                </div>
+                                            <!-- /ko -->
                                         </div>
                                     </div>
                                 </div>
@@ -977,9 +978,236 @@
                         </div>
                     <!-- /ko -->
                 <!-- /ko -->
+
+                <!-- ko template: {
+                    foreach: hrmTemplateIf($root.activeTab() === 2, $data),
+                    afterAdd: hrmFadeAfterAddFactory(200, 200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <!-- ko let: {'$tab': $root.ranksTabViewModel} -->
+                        <div class="position-page__tab-pane position-page__ranks-tab-pane"
+                             data-bind="using: $tab.formModel.value">
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                           hrm-button-with-plus-icon position-page__ranks-tab-pane-add-button position-page__ranks-tab-pane-first-add-button"
+                                    data-bind="click: function() {$tab.create();}">
+                                Добавить разряд
+                            </button>
+
+                            <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                                <div class="row">
+                                    <div class="col-12 col-xl-9">
+                                        <table class="position-page__ranks-tab-pane-table" data-bind="hrmTable">
+                                            <thead>
+                                                <tr>
+                                                    <th class="position-page__ranks-tab-pane-table-number-head-cell">
+                                                        № разряда
+                                                    </th>
+                                                    <th>Фикс. дневной оклад сотрудника, <i class="far fa-ruble-sign"></i></th>
+                                                    <th>Коэффициент норматива выработки</th>
+                                                    <th>Коэффициент для расчета премии</th>
+                                                    <th>Коэффициент для расчета штрафа</th>
+                                                    <th class="position-page__ranks-tab-pane-table-actions-head-cell"></th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <!-- ko foreach: {
+                                                    data: ranks,
+                                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                } -->
+                                                    <tr>
+                                                        <td class="position-page__ranks-tab-pane-table-number-cell"
+                                                            data-bind="text: number">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-salary-bulk-cell"
+                                                            data-bind="text: $root.formatDecimal(salaryBulk())">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-production-standard-cell"
+                                                            data-bind="text: $root.formatDecimal(productionStandardFactor())">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-bonus-factory-cell"
+                                                            data-bind="text: $root.formatDecimal(bonusFactor())">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-fine-factory-cell"
+                                                            data-bind="text: $root.formatDecimal(fineFactor())">
+                                                        </td>
+                                                        <td class="position-page__ranks-tab-pane-table-actions-cell">
+                                                            <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
+                                                                           hrm-icon-button--theme_secondary"
+                                                                    title="Редактировать"
+                                                                    data-bind="click: function () {$tab.edit($data);}">
+                                                            </button><!--
+                                                            --><button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                           hrm-icon-button--theme_negative position-page__ranks-tab-pane-table-delete-button"
+                                                                    title="Удалить"
+                                                                    data-bind="click: function () {$tab.delete($data);}">
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                <!-- /ko -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+
+                            <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                <div class="hrm-table__scrollable-wrapper position-page__ranks-tab-pane-table-scrollable-wrapper">
+                                    <div class="hrm-table__scrollable-wrapper-content">
+                                        <table class="position-page__ranks-tab-pane-table" data-bind="hrmTable">
+                                            <tbody>
+                                                <tr>
+                                                    <th class="position-page__ranks-tab-pane-table-number-head-cell">
+                                                        № разряда
+                                                    </th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-number-cell"
+                                                            data-bind="text: number">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Фикс. дневной оклад сотрудника, <i class="far fa-ruble-sign"></i></th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-salary-bulk-cell"
+                                                            data-bind="text: $root.formatDecimal(salaryBulk())">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Коэффициент норматива выработки</th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-production-standard-cell"
+                                                            data-bind="text: $root.formatDecimal(productionStandardFactor())">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Коэффициент для расчета премии</th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-bonus-factory-cell"
+                                                            data-bind="text: $root.formatDecimal(bonusFactor())">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th>Коэффициент для расчета штрафа</th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-fine-factory-cell"
+                                                            data-bind="text: $root.formatDecimal(fineFactor())">
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+
+                                                <tr>
+                                                    <th class="position-page__ranks-tab-pane-table-actions-head-cell"></th>
+
+                                                    <!-- ko foreach: {
+                                                        data: ranks,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <td class="position-page__ranks-tab-pane-table-actions-cell">
+                                                            <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
+                                                                               hrm-icon-button--theme_secondary"
+                                                                    title="Редактировать"
+                                                                    data-bind="click: function () {$tab.edit($data);}">
+                                                            </button>
+
+                                                            <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                               hrm-icon-button--theme_negative position-page__ranks-tab-pane-table-delete-button"
+                                                                    title="Удалить"
+                                                                    data-bind="click: function () {$tab.delete($data);}">
+                                                            </button>
+                                                        </td>
+                                                    <!-- /ko -->
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                           hrm-button-with-plus-icon position-page__ranks-tab-pane-add-button position-page__ranks-tab-pane-second-add-button"
+                                    data-bind="click: function() {$tab.create();}">
+                                Добавить разряд
+                            </button>
+
+                            <div class="position-page__tab-pane-action-list">
+                                <button class="hrm-button hrm-basic-button
+                                               position-page__tab-pane-action-list-item position-page__cancel-button"
+                                        data-bind="click: function() {$tab.cancel();}">
+                                    Отменить
+                                </button>
+
+                                <button class="hrm-button hrm-basic-button hrm-accent-button
+                                               position-page__tab-pane-action-list-item position-page__save-button"
+                                        data-bind="click: function() {$tab.submit();}">
+                                    Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    <!-- /ko -->
+                <!-- /ko -->
             </div>
         </div>
     </div>
+
+    <script type="text/html" id="position-page-delete-rank-modal-content-template">
+        <div data-bind="component: {
+            name: 'positions-page-delete-rank-modal-dialog',
+            params: {data, modalElement, cancel: function () {close();}, submit: function () {close(true);}}
+        }" role="document">
+        </div>
+    </script>
+
+    <script type="text/html" id="position-page-rank-modal-content-template">
+        <div class="position-page__rank-modal-dialog-wrapper">
+            <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                <div class="position-page__rank-modal-dialog-wrapper-actions">
+                    <button class="hrm-button position-page__rank-modal-dialog-wrapper-close-button"
+                            data-bind="click: close">
+                    </button>
+                </div>
+            <!-- /ko -->
+
+            <div data-bind="component: { name: 'position-page__rank-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function ($data) { close($data); } } }" role="document"></div>
+        </div>
+    </script>
+
+    <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
+
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-debug.js" integrity="sha256-M5ZomNNnrnEB2WjSbnty5GWGqq6UuAAVNnWECisgEis=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
@@ -997,16 +1225,851 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
 <script src="assets/js/main.js"></script>
+
+    <script type="text/javascript">
+    $(function () {
+        ko.components.register('positions-page-delete-rank-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'position-page__delete-rank-modal-dialog',
+                        'position-page__delete-rank-modal-dialog--initializing'
+                    ]);
+
+                    const viewModel = new (function () {
+                        this.initializing = ko.observable(true);
+
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        this.submit = function () {
+                            if ('submit' in params) {
+                                params.submit();
+                            }
+                        };
+
+                        this.afterRender = function () {
+                            $element.removeClass('position-page__delete-rank-modal-dialog--initializing');
+                            this.initializing(false);
+                        }.bind(this);
+                    });
+
+                    return viewModel;
+                }
+            },
+            template: `
+                <!-- ko template: { afterRender: afterRender } -->
+                    <button class="hrm-button hrm-basic-modal-dialog__close-button"
+                            data-bind="click: function() { cancel(); }" aria-label="Close">
+                    </button>
+
+                    <div class="hrm-basic-modal-dialog__header">
+                        <h2 class="hrm-basic-modal-dialog__title">Удалить разряд</h2>
+                    </div>
+
+                    <div class="hrm-basic-modal-dialog__body">
+                        Разряд будет удален без возможности восстановления.
+                    </div>
+
+                    <div class="hrm-basic-modal-dialog__action-list">
+                        <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+                                       position-page__delete-rank-modal-dialog-cancel-button"
+                                data-bind="click: function() {cancel();}">
+                            Отменить
+                        </button>
+
+                        <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+                                       position-page__delete-rank-modal-dialog-submit-button"
+                                data-bind="click: function() {submit();}">
+                            Удалить
+                        </button>
+                    </div>
+                <!-- /ko -->
+            `
+        });
+    });
+</script>
+
+    <template id="position-page-rank-modal-dialog-template">
+    <!-- ko template: { afterRender: afterRender } -->
+        <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+            <button class="hrm-button position-page__rank-modal-dialog-close-button"
+                    data-bind="click: function() {cancel();}" aria-label="Close">
+            </button>
+        <!-- /ko -->
+
+        <!-- ko if: !isLoading() -->
+            <div class="position-page__rank-modal-dialog-header">
+                <span class="position-page__rank-modal-dialog-title"
+                      data-bind="text: mode === 'create' ? 'Новый разряд' : 'Редактировать разряд'">
+                </span>
+
+                <!-- ko if: mode === 'edit' -->
+                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                   hrm-button-with-times-icon position-page__rank-modal-dialog-delete-button"
+                            data-bind="click: function() {onDelete();}">
+                        Удалить разряд
+                    </button>
+                <!-- /ko -->
+            </div>
+
+            <!-- ko using: formModel -->
+                <div class="hrm-section">
+                    <div class="row position-page__rank-modal-dialog-row">
+                        <div class="col-4 col-md-2 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Номер
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Номер'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: number,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.number.error() --><!-- /ko -->
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        <span>Фикс. оклад в час, <i class="far fa-ruble-sign"></i></span>
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Фикс. оклад в час, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: salaryBulk,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.salaryBulk.error() --><!-- /ko -->
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="col-12 col-md-7 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div class="hrm-form-field-switch-group position-page__rank-modal-dialog-documents-required-switch-group"
+                                     data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                    <div data-bind="component: {name: 'hrm-switch', params: {checked: documentsRequired, exportAs: control}}"></div>
+                                    <label data-bind="hrmSwitchGroupLabel: label">
+                                        Для смены разряда нужно наличие обязательных документов с неистекшим сроком годности
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Для смены разряда нужно наличие обязательных документов с неистекшим сроком годности'">
+                                        </button>
+                                    </label>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+
+                    <div class="row position-page__rank-modal-dialog-row">
+                        <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                    hrmFormFieldFixedLabel: true
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Коэффициент норматива выработки
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент норматива выработки'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: productionStandardFactor,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.productionStandardFactor.error() --><!-- /ko -->
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                    hrmFormFieldFixedLabel: true
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Коэффициент расчета премии
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент расчета премии'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: bonusFactor,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                    hrmFormFieldFixedLabel: true
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Коэффициент расчета штрафа
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент расчета штрафа'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: fineFactor,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+
+                    <div class="row position-page__rank-modal-dialog-row">
+                        <div class="col-12 col-md-6 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Период увеличения норматива премии
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Период увеличения норматива премии'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <select data-bind="
+                                            value: bonusIncreasePeriod,
+                                            hrmSelect, hrmSelectAllowClear: true,
+                                            hrmFormFieldSelectControl: control
+                                        ">
+                                            <option></option>
+                                            <option value="1">Неделя</option>
+                                            <option value="2">Месяц</option>
+                                            <option value="3">Год</option>
+                                        </select>
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.productionStandardFactor.error() --><!-- /ko -->
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hrm-section">
+                    <div class="hrm-section__header">
+                        <span class="hrm-section__title">Дополнительные настройки</span>
+                        <span class="hrm-section__postscript">необязательно</span>
+                    </div>
+
+                    <!-- ko foreach: {
+                            data: conditions,
+                            afterAdd: hrmFadeAfterAddFactory(200),
+                            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                        } -->
+                            <div class="position-page__rank-modal-dialog-condition">
+                                <div class="row position-page__rank-modal-dialog-row position-page__rank-modal-dialog-condition-row">
+                                    <div class="col-4 col-md-2 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Выработка
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Выработка'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <input class="position-page__rank-modal-dialog-condition-production-form-control" data-bind="
+                                                        textInput: production,
+                                                        hrmMask, hrmMaskPattern: '99:99',
+                                                        hrmFormFieldInputControl: control,
+                                                        hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                                    " placeholder="00:00">
+                                                </div>
+
+                                                <div data-bind="
+                                                    component: {name: 'hrm-form-field-error'},
+                                                    hrmSlide,
+                                                    hrmSlideValue: control() !== null ? control().errorState : false,
+                                                    hrmSlideDuration: 150
+                                                ">
+                                                    <!-- ko text: $parent.production.error() --><!-- /ko -->
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Коэффициент выработки
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент выработки'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <input data-bind="
+                                                        textInput: productionFactor,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Коэффициент премии
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент премии'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <input data-bind="
+                                                        textInput: bonusFactor,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-12 col-md-1 position-page__rank-modal-dialog-row-item position-page__rank-modal-dialog-condition-row-remove-button-item">
+                                        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                            <button class="hrm-button hrm-button-with-icon hrm-button-with-trash-icon
+                                                           hrm-button-with-icon--theme_negative position-page__rank-modal-dialog-condition-row-remove-button"
+                                                    data-bind="click: function () {$component.removeCondition($data);}">
+                                                Удалить
+                                            </button>
+                                        <!-- /ko -->
+
+                                        <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                                            <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                           hrm-icon-button--theme_negative position-page__rank-modal-dialog-condition-row-remove-button"
+                                                    title="Удалить"
+                                                    data-bind="click: function () {$component.removeCondition($data);}">
+                                            </button>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                   hrm-button-with-plus-icon position-page__rank-modal-dialog-add-condition-button"
+                            data-bind="click: function() {$component.addCondition();}">
+                        Добавить условие
+                    </button>
+                </div>
+
+                <!-- ko let: {isOpen: ko.observable(false)} -->
+                    <div class="hrm-section position-page__rank-modal-dialog-change-rank-recommendations-section">
+                        <div class="hrm-section__header">
+                            <!-- ko if: $component.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                <button class="hrm-button hrm-circle-icon-button
+                                               hrm-circle-icon-button--theme_neutral
+                                               hrm-circle-arrow-down-icon-button
+                                               position-page__rank-modal-dialog-change-rank-recommendations-section-toggle-button"
+                                        data-bind="click: function() {isOpen(!isOpen());}">
+                                </button>
+                            <!-- /ko -->
+
+                            <div class="position-page__rank-modal-dialog-change-rank-recommendations-section-header-text"
+                                 data-bind="click: function() {isOpen(!isOpen());}">
+                                <span class="hrm-section__title">Рекомендации по повышению или понижению разрядов</span>
+                                <span class="hrm-section__postscript">необязательно</span>
+                            </div>
+                        </div>
+
+                        <div data-bind="hrmSlide, hrmSlideValue: isOpen() || $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth">
+                            <div class="row position-page__rank-modal-dialog-row">
+                                <div class="col-7 col-md-3 position-page__rank-modal-dialog-row-item">
+                                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                        <div data-bind="
+                                            hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                            hrmFormFieldFixedLabel: true
+                                        ">
+                                            <label data-bind="hrmFormFieldLabel: label">
+                                                Миним. кол-во смен для получения разряда
+
+                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                               hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                        data-bind="hrmTooltip, hrmTooltipText: 'Миним. кол-во смен для получения разряда'">
+                                                </button>
+                                            </label>
+
+                                            <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                <input data-bind="
+                                                    textInput: fineFactor,
+                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                    hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                    hrmFormFieldInputControl: control,
+                                                ">
+                                            </div>
+                                        </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+
+                            <div class="hrm-section hrm-section--sub-section position-page__rank-modal-dialog-bonus-and-fine-sum-section">
+                                <div class="hrm-section__header">
+                                    <span class="hrm-section__title">Суммы штрафов и премий</span>
+                                </div>
+
+                                <div class="row position-page__rank-modal-dialog-row">
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Общая, абсол., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Общая, абсол., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineCommonAbsoluteSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Назначенных, абсол., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Назначенных, абсол., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineAssignedAbsoluteSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Рассчитанных, абсол., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Рассчитанных, абсол., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineCalculatedAbsoluteSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+
+                                <div class="row position-page__rank-modal-dialog-row">
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Назначенных, относит., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Назначенных, относит., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineAssignedRelativeSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Рассчитанных, относит., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Рассчитанных, относит., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineCalculatedRelativeSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <div class="position-page__rank-modal-dialog-action-list">
+                    <button class="hrm-button hrm-basic-button
+                                   position-page__rank-modal-dialog-action-list-item position-page__rank-modal-dialog-cancel-button"
+                            data-bind="click: function() {$component.cancel();}">
+                        Отменить
+                    </button>
+
+                    <button class="hrm-button hrm-basic-button hrm-accent-button
+                                   position-page__rank-modal-dialog-action-list-item position-page__rank-modal-dialog-save-button"
+                            data-bind="click: function() {$component.save();}">
+                        Сохранить
+                    </button>
+                </div>
+            <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: isLoading() -->
+            Загрузка...
+        <!-- /ko -->
+    <!-- /ko -->
+</template>
+
+
+<script type="text/javascript">
+    ko.components.register('position-page__rank-modal-dialog', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+
+                return new (function () {
+                    this.windowResizeHandler = () => {
+                        this.viewportSize({width: $(window).width(), height: $(window).height()});
+                    };
+                    this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
+
+                    this.initializing = ko.observable(true);
+
+                    this.mode = params.data.mode;
+                    this.data = params.data.data;
+
+                    this.isSubmitted = ko.observable(true);
+                    this.isLoading = ko.observable(true);
+
+                    this.createConditionFormModel = function (production, productionFactor, bonusFactor) {
+                        const pf = ko.observable(productionFactor);
+                        const bf = ko.observable(bonusFactor);
+
+                        return {
+                            production: ko.observable(production).extend({
+                                required: {
+                                    message: 'Обязательное поле',
+                                    onlyIf: () => {
+                                        return pf() !== '' || bf() !== '';
+                                    }
+                                }
+                            }),
+                            productionFactor: pf,
+                            bonusFactor: bf
+                        }
+                    };
+
+                    this.formModel = ko.validatedObservable({
+                        number: ko.observable(this.mode === 'edit' ? this.data.number : '').extend({
+                            required: {
+                                message: 'Обязательное поле'
+                            }
+                        }),
+                        salaryBulk: ko.observable(this.mode === 'edit' ? this.data.salaryBulk : params.data.salaryBulk).extend({
+                            required: {
+                                message: 'Обязательное поле'
+                            }
+                        }),
+                        documentsRequired: ko.observable(this.mode === 'edit' ? this.data.documentsRequired : false),
+                        productionStandardFactor: ko.observable(this.mode === 'edit' ? this.data.productionStandardFactor : '1'),
+                        bonusFactor: ko.observable(this.mode === 'edit' ? this.data.bonusFactor : '1'),
+                        fineFactor: ko.observable(this.mode === 'edit' ? this.data.fineFactor : '1'),
+                        bonusIncreasePeriod: ko.observable(this.mode === 'edit' ? this.data.bonusIncreasePeriod : ''),
+                        conditions: ko.observableArray(this.mode === 'edit' ? this.data.conditions.map(c => {
+                            return this.createConditionFormModel(c.production, c.productionFactor, c.bonusFactor);
+                        }) : []),
+                        increaseRankShiftCount: ko.observable(this.mode === 'edit' ? this.data.increaseRankShiftCount : ''),
+                        bonusAndFineCommonAbsoluteSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineCommonAbsoluteSum : ''),
+                        bonusAndFineAssignedAbsoluteSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineAssignedAbsoluteSum : ''),
+                        bonusAndFineCalculatedAbsoluteSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineCalculatedAbsoluteSum : ''),
+                        bonusAndFineAssignedRelativeSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineAssignedRelativeSum : ''),
+                        bonusAndFineCalculatedRelativeSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineCalculatedRelativeSum : ''),
+                    });
+
+                    this.formControlErrorStateMatcher = function (formControl) {
+                        return ko.pureComputed(() => {
+                            return this.isSubmitted() && !formControl.isValid();
+                        });
+                    };
+
+                    this.onDelete = function () {
+                        if ('delete' in params.data) {
+                            params.data.delete();
+                        }
+                    };
+
+                    this.save = function () {
+                        this.isSubmitted(true);
+
+                        if (this.formModel.isValid()) {
+                            params.submit({
+                                number: this.formModel().number(),
+                                salaryBulk: this.formModel().salaryBulk(),
+                                documentsRequired: this.formModel().documentsRequired(),
+                                productionStandardFactor: this.formModel().productionStandardFactor(),
+                                bonusFactor: this.formModel().bonusFactor(),
+                                fineFactor: this.formModel().fineFactor(),
+                                bonusIncreasePeriod: this.formModel().bonusIncreasePeriod(),
+                                increaseRankShiftCount: this.formModel().increaseRankShiftCount(),
+                                conditions: this.formModel().conditions().map(c => ({
+                                    production: c.production(),
+                                    productionFactor: c.productionFactor(),
+                                    bonusFactor: c.bonusFactor()
+                                })),
+                                bonusAndFineCommonAbsoluteSum: this.formModel().bonusAndFineCommonAbsoluteSum(),
+                                bonusAndFineAssignedAbsoluteSum: this.formModel().bonusAndFineAssignedAbsoluteSum(),
+                                bonusAndFineCalculatedAbsoluteSum: this.formModel().bonusAndFineCalculatedAbsoluteSum(),
+                                bonusAndFineAssignedRelativeSum: this.formModel().bonusAndFineAssignedRelativeSum(),
+                                bonusAndFineCalculatedRelativeSum: this.formModel().bonusAndFineCalculatedRelativeSum()
+                            })
+                        }
+                    };
+
+                    this.cancel = function () {
+                        params.cancel();
+                    };
+
+                    this.addCondition = function () {
+                        this.formModel().conditions.push(this.createConditionFormModel('', '', ''));
+                    };
+
+                    this.removeCondition = function (condition) {
+                        this.formModel().conditions.remove(condition);
+                    };
+
+                    this.afterRender = function () {
+                        $element.removeClass('position-page__rank-modal-dialog--initializing');
+                        this.initializing(false);
+                    }.bind(this);
+
+                    this.dispose = function () {
+                        $(window).off('resize', this.windowResizeHandler);
+                    };
+
+                    (() => {
+                        $element.addClass([
+                            'position-page__rank-modal-dialog',
+                            'position-page__rank-modal-dialog--initializing'
+                        ]);
+
+                        $(window).on('resize', this.windowResizeHandler);
+
+                        setTimeout(() => {
+                            this.isLoading(false);
+                        }, 1000)
+                    })();
+                });
+            }
+        },
+        template: { element: 'position-page-rank-modal-dialog-template' }
+    });
+</script>
 
     <script type="text/javascript">
     $(function () {
         const $page = $(document.documentElement);
 
-        const WorkloadTabViewModel = function (save) {
-            this.isSubmitted = ko.observable(false);
-
-            this.createAdditionalWorkloadItem = function () {
+        const FormModel = function () {
+            this.createAdditionalWorkloadFormModel = function () {
                 const type = ko.observable('');
 
                 return {
@@ -1030,9 +2093,30 @@
                 };
             };
 
-            this.formModel = ko.validatedObservable(null, {deep: true, live: true});
+            this.createRankFormModel = function (data) {
+                return {
+                    number: ko.observable(data.number),
+                    salaryBulk: ko.observable(data.salaryBulk),
+                    documentsRequired: ko.observable(data.documentsRequired),
+                    productionStandardFactor: ko.observable(data.productionStandardFactor),
+                    bonusFactor: ko.observable(data.bonusFactor),
+                    fineFactor: ko.observable(data.fineFactor),
+                    bonusIncreasePeriod: ko.observable(data.bonusIncreasePeriod),
+                    conditions: ko.observableArray(data.conditions.map(c => {
+                        return {...c}
+                    })),
+                    increaseRankShiftCount: ko.observable(data.increaseRankShiftCount),
+                    bonusAndFineCommonAbsoluteSum: ko.observable(data.bonusAndFineCommonAbsoluteSum),
+                    bonusAndFineAssignedAbsoluteSum: ko.observable(data.bonusAndFineAssignedAbsoluteSum),
+                    bonusAndFineCalculatedAbsoluteSum: ko.observable(data.bonusAndFineCalculatedAbsoluteSum),
+                    bonusAndFineAssignedRelativeSum: ko.observable(data.bonusAndFineAssignedRelativeSum),
+                    bonusAndFineCalculatedRelativeSum: ko.observable(data.bonusAndFineCalculatedRelativeSum)
+                }
+            };
 
-            this.formModel({
+            this.value = ko.validatedObservable(null, {deep: true, live: true});
+
+            this.value({
                 name: ko.observable('').extend({
                     required: {
                         message: 'Обязательное поле'
@@ -1053,7 +2137,7 @@
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => {
-                                return this.formModel() === null || this.formModel().productionStandard.type() === '0';
+                                return this.value() === null || this.value().productionStandard.type() === '0';
                             }
                         }
                     }),
@@ -1062,14 +2146,14 @@
                             required: {
                                 message: 'Обязательное поле',
                                 onlyIf: () => {
-                                    return this.formModel() === null || this.formModel().productionStandard.type() === '1';
+                                    return this.value() === null || this.value().productionStandard.type() === '1';
                                 }
                             },
                             validation: {
                                 validator: value => {
                                     return value === '' || (
-                                        this.formModel() !== null &&
-                                        this.unmaskDecimal(this.formModel().productionStandard.range.max()) > this.unmaskDecimal(value)
+                                        this.value() !== null &&
+                                        this.unmaskDecimal(this.value().productionStandard.range.max()) > this.unmaskDecimal(value)
                                     );
                                 }
                             }
@@ -1078,14 +2162,14 @@
                             required: {
                                 message: 'Обязательное поле',
                                 onlyIf: () => {
-                                    return this.formModel() === null || this.formModel().productionStandard.type() === '1';
+                                    return this.value() === null || this.value().productionStandard.type() === '1';
                                 }
                             },
                             validation: {
                                 validator: value => {
                                     return value === '' || (
-                                        this.formModel() !== null &&
-                                        this.unmaskDecimal(this.formModel().productionStandard.range.min()) < this.unmaskDecimal(value)
+                                        this.value() !== null &&
+                                        this.unmaskDecimal(this.value().productionStandard.range.min()) < this.unmaskDecimal(value)
                                     );
                                 }
                             }
@@ -1097,8 +2181,8 @@
                     required: {
                         message: 'Обязательное поле',
                         onlyIf: () => {
-                            return this.formModel() === null ||
-                                ['0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(this.formModel().workloadType());
+                            return this.value() === null ||
+                                ['0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(this.value().workloadType());
                         }
                     }
                 }),
@@ -1106,63 +2190,26 @@
                 dishCategoriesExclusionFlag: ko.observable(false),
                 orderTypes: ko.observableArray([]),
                 additionalWorkload: ko.observableArray([
-                    this.createAdditionalWorkloadItem()
-                ])
+                    this.createAdditionalWorkloadFormModel()
+                ]),
+                bulk: ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                }),
+                bonus: {
+                    rate: ko.observable(''),
+                    sum: ko.observable(''),
+                    max: ko.observable('')
+                },
+                fine: {
+                    rate: ko.observable(''),
+                    sum: ko.observable(''),
+                    max: ko.observable('')
+                },
+                premiumAccount: ko.observable(false),
+                ranks: ko.observableArray([])
             });
-
-            this.isValid = ko.pureComputed(() => {
-                return this.formModel.isValid();
-            });
-
-            this.submit = function () {
-                this.isSubmitted(true);
-
-                if (this.isValid()) {
-                    save();
-                }
-            };
-
-            this.productionStandardFormFieldRangeControlSuffix = ko.pureComputed(() => {
-                if (['6', '7'].includes(this.formModel().workloadType())) {
-                    return 'штук';
-                }
-
-                switch (this.formModel().units()) {
-                    case '1': return 'штук';
-                    case '2': return 'рублей';
-                    case '3': return 'часов';
-                }
-            });
-
-            this.additionalWorkloadSectionDisabled = ko.pureComputed(() => {
-                return this.formModel().workloadType() === '';
-            });
-
-            this.formControlErrorStateMatcher = function (formControl) {
-                return ko.pureComputed(() => {
-                    return this.isSubmitted() && !formControl.isValid();
-                });
-            };
-
-            this.additionalWorkloadSectionFormControlErrorStateMatcher = function (formControl) {
-                return ko.pureComputed(() => {
-                    return this.isSubmitted() && !this.additionalWorkloadSectionDisabled() && !formControl.isValid();
-                });
-            };
-
-            this.removeAdditionalWorkloadItem = function (item) {
-                if (this.formModel().additionalWorkload().length === 1) {
-                    item.type('');
-                    item.factor('');
-                    item.name('');
-                } else {
-                    this.formModel().additionalWorkload.remove(item);
-                }
-            };
-
-            this.addAdditionalWorkloadItem = function () {
-                this.formModel().additionalWorkload.push(this.createAdditionalWorkloadItem());
-            };
 
             this.formatDecimal = function (value) {
                 return Inputmask.format(value, {alias: 'decimal', digits: '2', groupSeparator: ' ', autoGroup: true, allowMinus: false}).replace('.00', '');
@@ -1179,29 +2226,88 @@
             };
         };
 
-        const SalaryTabViewModel = function (save) {
+        const WorkloadTabViewModel = function (formModel, save) {
             this.isSubmitted = ko.observable(false);
 
-            this.formModel = ko.validatedObservable(null, {deep: true, live: true});
+            this.formModel = formModel;
 
-            this.formModel({
-                bulk: ko.observable('').extend({
-                    required: {
-                        message: 'Обязательное поле'
+            const validationObject = ko.validatedObservable({
+                name: this.formModel.value().name,
+                workloadType: this.formModel.value().workloadType,
+                units: this.formModel.value().units,
+                productionStandard: {
+                    type: this.formModel.value().productionStandard.type,
+                    value: this.formModel.value().productionStandard.value,
+                    range: {
+                        min: this.formModel.value().productionStandard.range.min,
+                        max: this.formModel.value().productionStandard.range.max
                     }
-                }),
-                bonus: {
-                    rate: ko.observable(''),
-                    sum: ko.observable(''),
-                    max: ko.observable('')
                 },
-                fine: {
-                    rate: ko.observable(''),
-                    sum: ko.observable(''),
-                    max: ko.observable('')
-                },
-                premiumAccount: ko.observable(false)
+                standard: this.formModel.value().standard,
+                dishCategories: this.formModel.value().dishCategories,
+                orderTypes: this.formModel.value().orderTypes,
+                additionalWorkload: this.formModel.value().additionalWorkload,
+            }, {deep: true, live: true});
+
+            this.isValid = ko.pureComputed(() => {
+                return validationObject.isValid();
             });
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    save();
+                }
+            };
+
+            this.productionStandardFormFieldRangeControlSuffix = ko.pureComputed(() => {
+                if (['6', '7'].includes(this.formModel.value().workloadType())) {
+                    return 'штук';
+                }
+
+                switch (this.formModel.value().units()) {
+                    case '1': return 'штук';
+                    case '2': return 'рублей';
+                    case '3': return 'часов';
+                }
+            });
+
+            this.additionalWorkloadSectionDisabled = ko.pureComputed(() => {
+                return this.formModel.value().workloadType() === '';
+            });
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+
+            this.additionalWorkloadSectionFormControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !this.additionalWorkloadSectionDisabled() && !formControl.isValid();
+                });
+            };
+
+            this.removeAdditionalWorkloadItem = function (item) {
+                if (this.formModel.value().additionalWorkload().length === 1) {
+                    item.type('');
+                    item.factor('');
+                    item.name('');
+                } else {
+                    this.formModel.value().additionalWorkload.remove(item);
+                }
+            };
+
+            this.addAdditionalWorkloadItem = function () {
+                this.formModel.value().additionalWorkload.push(this.formModel.createAdditionalWorkloadItem());
+            };
+        };
+
+        const SalaryTabViewModel = function (formModel, save) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formModel = formModel;
 
             this.lastFormModelValue = {
                 bulk: '',
@@ -1219,18 +2325,18 @@
             };
 
             this.isValid = ko.pureComputed(() => {
-                return this.formModel.isValid();
+                return this.formModel.value().bulk.isValid();
             });
 
             this.cancel = function () {
-                this.formModel().bulk(this.lastFormModelValue.bulk);
-                this.formModel().bonus.rate(this.lastFormModelValue.bonus.rate);
-                this.formModel().bonus.sum(this.lastFormModelValue.bonus.sum);
-                this.formModel().bonus.max(this.lastFormModelValue.bonus.max);
-                this.formModel().fine.rate(this.lastFormModelValue.fine.rate);
-                this.formModel().fine.sum(this.lastFormModelValue.fine.sum);
-                this.formModel().fine.max(this.lastFormModelValue.fine.max);
-                this.formModel().premiumAccount(this.lastFormModelValue.premiumAccount);
+                this.formModel.value().bulk(this.lastFormModelValue.bulk);
+                this.formModel.value().bonus.rate(this.lastFormModelValue.bonus.rate);
+                this.formModel.value().bonus.sum(this.lastFormModelValue.bonus.sum);
+                this.formModel.value().bonus.max(this.lastFormModelValue.bonus.max);
+                this.formModel.value().fine.rate(this.lastFormModelValue.fine.rate);
+                this.formModel.value().fine.sum(this.lastFormModelValue.fine.sum);
+                this.formModel.value().fine.max(this.lastFormModelValue.fine.max);
+                this.formModel.value().premiumAccount(this.lastFormModelValue.premiumAccount);
             };
 
             this.submit = function () {
@@ -1238,22 +2344,159 @@
 
                 if (this.isValid()) {
                     this.lastFormModelValue = {
-                        bulk: this.formModel().bulk(),
+                        bulk: this.formModel.value().bulk(),
                         bonus: {
-                            rate: this.formModel().bonus.rate(),
-                            sum: this.formModel().bonus.sum(),
-                            max: this.formModel().bonus.max()
+                            rate: this.formModel.value().bonus.rate(),
+                            sum: this.formModel.value().bonus.sum(),
+                            max: this.formModel.value().bonus.max()
                         },
                         fine: {
-                            rate: this.formModel().fine.rate(),
-                            sum: this.formModel().fine.sum(),
-                            max: this.formModel().fine.max()
+                            rate: this.formModel.value().fine.rate(),
+                            sum: this.formModel.value().fine.sum(),
+                            max: this.formModel.value().fine.max()
                         },
-                        premiumAccount: this.formModel().premiumAccount()
+                        premiumAccount: this.formModel.value().premiumAccount()
                     };
 
                     save();
                 }
+            };
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+        };
+
+        const RanksTabViewModel = function (formModel, modalOpens, save) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+                return {
+                    ranks: this.formModel.value().ranks().map(rank => ({
+                        number: rank.number(),
+                        salaryBulk: rank.salaryBulk(),
+                        documentsRequired: rank.documentsRequired(),
+                        productionStandardFactor: rank.productionStandardFactor(),
+                        bonusFactor: rank.bonusFactor(),
+                        fineFactor: rank.fineFactor(),
+                        bonusIncreasePeriod: rank.bonusIncreasePeriod(),
+                        increaseRankShiftCount: rank.increaseRankShiftCount(),
+                        conditions: rank.conditions(),
+                        bonusAndFineCommonAbsoluteSum: rank.bonusAndFineCommonAbsoluteSum(),
+                        bonusAndFineAssignedAbsoluteSum: rank.bonusAndFineAssignedAbsoluteSum(),
+                        bonusAndFineCalculatedAbsoluteSum: rank.bonusAndFineCalculatedAbsoluteSum(),
+                        bonusAndFineAssignedRelativeSum: rank.bonusAndFineAssignedRelativeSum(),
+                        bonusAndFineCalculatedRelativeSum: rank.bonusAndFineCalculatedRelativeSum(),
+                    }))
+                }
+            });
+
+            this.lastFormModelValue = this.formModelValue();
+
+            this.isValid = ko.pureComputed(() => {
+                return this.formModel.value().ranks.isValid();
+            });
+
+            this.cancel = function () {
+                this.formModel.value().ranks(this.lastFormModelValue.ranks.map(r => {
+                    return this.formModel.createRankFormModel(r)
+                }));
+            };
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    this.lastFormModelValue = this.formModelValue();
+
+                    save();
+                }
+            };
+
+            this.edit = function (rank) {
+                const open = {
+                    dialogTemplateName: 'position-page-rank-modal-content-template',
+                    data: {
+                        mode: 'edit',
+                        data: {
+                            number: rank.number(),
+                            salaryBulk: rank.salaryBulk(),
+                            documentsRequired: rank.documentsRequired(),
+                            productionStandardFactor: rank.productionStandardFactor(),
+                            bonusFactor: rank.bonusFactor(),
+                            fineFactor: rank.fineFactor(),
+                            bonusIncreasePeriod: rank.bonusIncreasePeriod(),
+                            increaseRankShiftCount: rank.increaseRankShiftCount(),
+                            conditions: rank.conditions(),
+                            bonusAndFineCommonAbsoluteSum: rank.bonusAndFineCommonAbsoluteSum(),
+                            bonusAndFineAssignedAbsoluteSum: rank.bonusAndFineAssignedAbsoluteSum(),
+                            bonusAndFineCalculatedAbsoluteSum: rank.bonusAndFineCalculatedAbsoluteSum(),
+                            bonusAndFineAssignedRelativeSum: rank.bonusAndFineAssignedRelativeSum(),
+                            bonusAndFineCalculatedRelativeSum: rank.bonusAndFineCalculatedRelativeSum(),
+                        },
+                        delete: () => {
+                            modalOpens.remove(open);
+                            this.delete(rank);
+                        },
+                        salaryBulk: this.formModel.value().bulk()
+                    },
+                    options: {
+                        modalClass: 'position-page__rank-modal'
+                    },
+                    close: result => {
+                        if (result !== undefined) {
+                            rank.number(result.number);
+                            rank.salaryBulk(result.salaryBulk);
+                            rank.documentsRequired(result.documentsRequired);
+                            rank.productionStandardFactor(result.productionStandardFactor);
+                            rank.bonusFactor(result.bonusFactor);
+                            rank.fineFactor(result.fineFactor);
+                            rank.bonusIncreasePeriod(result.bonusIncreasePeriod);
+                            rank.increaseRankShiftCount(result.increaseRankShiftCount);
+                            rank.conditions(result.conditions);
+                            rank.bonusAndFineCommonAbsoluteSum(result.bonusAndFineCommonAbsoluteSum);
+                            rank.bonusAndFineAssignedAbsoluteSum(result.bonusAndFineAssignedAbsoluteSum);
+                            rank.bonusAndFineCalculatedAbsoluteSum(result.bonusAndFineCalculatedAbsoluteSum);
+                            rank.bonusAndFineAssignedRelativeSum(result.bonusAndFineAssignedRelativeSum);
+                            rank.bonusAndFineCalculatedRelativeSum(result.bonusAndFineCalculatedRelativeSum);
+                        }
+                    }
+                };
+
+                modalOpens.push(open);
+            };
+
+            this.create = function () {
+                modalOpens.push({
+                    dialogTemplateName: 'position-page-rank-modal-content-template',
+                    data: {
+                        mode: 'create',
+                        salaryBulk: this.formModel.value().bulk()
+                    },
+                    options: {
+                        modalClass: 'position-page__rank-modal'
+                    },
+                    close: result => {
+                        if (result !== undefined) {
+                            this.formModel.value().ranks.splice(0, 0, this.formModel.createRankFormModel(result));
+                        }
+                    }
+                });
+            };
+
+            this.delete = function (rank) {
+                modalOpens.push({
+                    dialogTemplateName: 'position-page-delete-rank-modal-content-template',
+                    close: result => {
+                        if (result !== undefined) {
+                            this.formModel.value().ranks.remove(rank);
+                        }
+                    }
+                });
             };
 
             this.formControlErrorStateMatcher = function (formControl) {
@@ -1273,6 +2516,8 @@
                 {id: '6', name: 'Десерты'},
                 {id: '7', name: 'Напитки'}
             ];
+
+            this.modalOpens = ko.observableArray([]);
 
             this.subscriptions = [];
 
@@ -1298,12 +2543,18 @@
 
             this.activeTab = ko.observable(0);
 
-            this.workloadTabViewModel = new WorkloadTabViewModel(() => {
+            this.formModel = new FormModel();
+
+            this.workloadTabViewModel = new WorkloadTabViewModel(this.formModel, () => {
                 this.activeTab(1);
             });
 
-            this.salaryTabViewModel = new SalaryTabViewModel(() => {
+            this.salaryTabViewModel = new SalaryTabViewModel(this.formModel, () => {
                 this.activeTab(2);
+            });
+
+            this.ranksTabViewModel = new RanksTabViewModel(this.formModel, this.modalOpens, () => {
+                this.activeTab(3);
             });
 
             this.descendantsComplete = function () {
@@ -1321,16 +2572,18 @@
             this.updateTabActivities = function () {
                 const isWorkloadTabPassed = this.workloadTabViewModel.isValid() && this.workloadTabViewModel.isSubmitted();
                 const isSalaryTabPassed = this.salaryTabViewModel.isValid() && this.salaryTabViewModel.isSubmitted();
+                const isRanksTabPassed = this.ranksTabViewModel.isValid() && this.ranksTabViewModel.isSubmitted();
                 this.navigationTabs[1].disabled(!isWorkloadTabPassed);
 
                 this.navigationTabs[2].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
+
+                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
             };
 
             this.formatDecimal = function (value) {
@@ -1367,12 +2620,21 @@
                 this.subscriptions.push(this.salaryTabViewModel.isValid.subscribe(() => {
                     this.updateTabActivities();
                 }));
+                this.subscriptions.push(this.ranksTabViewModel.isSubmitted.subscribe(() => {
+                    this.updateTabActivities();
+                }));
+                this.subscriptions.push(this.ranksTabViewModel.isValid.subscribe(() => {
+                    this.updateTabActivities();
+                }));
 
                 // Раскомментировать, чтобы заполнить первую вкладку тестовыми данными:
-                /*this.workloadTabViewModel.formModel().name('Администратор филиала');
-                this.workloadTabViewModel.formModel().workloadType('10');
-                this.workloadTabViewModel.formModel().productionStandard.value('2000');
-                this.workloadTabViewModel.submit();*/
+                /*this.formModel.value().name('Администратор филиала');
+                this.formModel.value().workloadType('10');
+                this.formModel.value().productionStandard.value('2000');
+                this.workloadTabViewModel.submit();
+                this.formModel.value().bulk(1);
+                this.salaryTabViewModel.submit();
+                this.ranksTabViewModel.create();*/
             })();
         };
 

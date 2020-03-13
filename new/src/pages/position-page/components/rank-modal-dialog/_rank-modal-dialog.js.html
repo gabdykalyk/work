@@ -1,0 +1,145 @@
+@@include('./_rank-modal-dialog.html')
+
+<script type="text/javascript">
+    ko.components.register('position-page__rank-modal-dialog', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+
+                return new (function () {
+                    this.windowResizeHandler = () => {
+                        this.viewportSize({width: $(window).width(), height: $(window).height()});
+                    };
+                    this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
+
+                    this.initializing = ko.observable(true);
+
+                    this.mode = params.data.mode;
+                    this.data = params.data.data;
+
+                    this.isSubmitted = ko.observable(true);
+                    this.isLoading = ko.observable(true);
+
+                    this.createConditionFormModel = function (production, productionFactor, bonusFactor) {
+                        const pf = ko.observable(productionFactor);
+                        const bf = ko.observable(bonusFactor);
+
+                        return {
+                            production: ko.observable(production).extend({
+                                required: {
+                                    message: 'Обязательное поле',
+                                    onlyIf: () => {
+                                        return pf() !== '' || bf() !== '';
+                                    }
+                                }
+                            }),
+                            productionFactor: pf,
+                            bonusFactor: bf
+                        }
+                    };
+
+                    this.formModel = ko.validatedObservable({
+                        number: ko.observable(this.mode === 'edit' ? this.data.number : '').extend({
+                            required: {
+                                message: 'Обязательное поле'
+                            }
+                        }),
+                        salaryBulk: ko.observable(this.mode === 'edit' ? this.data.salaryBulk : params.data.salaryBulk).extend({
+                            required: {
+                                message: 'Обязательное поле'
+                            }
+                        }),
+                        documentsRequired: ko.observable(this.mode === 'edit' ? this.data.documentsRequired : false),
+                        productionStandardFactor: ko.observable(this.mode === 'edit' ? this.data.productionStandardFactor : '1'),
+                        bonusFactor: ko.observable(this.mode === 'edit' ? this.data.bonusFactor : '1'),
+                        fineFactor: ko.observable(this.mode === 'edit' ? this.data.fineFactor : '1'),
+                        bonusIncreasePeriod: ko.observable(this.mode === 'edit' ? this.data.bonusIncreasePeriod : ''),
+                        conditions: ko.observableArray(this.mode === 'edit' ? this.data.conditions.map(c => {
+                            return this.createConditionFormModel(c.production, c.productionFactor, c.bonusFactor);
+                        }) : []),
+                        increaseRankShiftCount: ko.observable(this.mode === 'edit' ? this.data.increaseRankShiftCount : ''),
+                        bonusAndFineCommonAbsoluteSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineCommonAbsoluteSum : ''),
+                        bonusAndFineAssignedAbsoluteSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineAssignedAbsoluteSum : ''),
+                        bonusAndFineCalculatedAbsoluteSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineCalculatedAbsoluteSum : ''),
+                        bonusAndFineAssignedRelativeSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineAssignedRelativeSum : ''),
+                        bonusAndFineCalculatedRelativeSum: ko.observable(this.mode === 'edit' ? this.data.bonusAndFineCalculatedRelativeSum : ''),
+                    });
+
+                    this.formControlErrorStateMatcher = function (formControl) {
+                        return ko.pureComputed(() => {
+                            return this.isSubmitted() && !formControl.isValid();
+                        });
+                    };
+
+                    this.onDelete = function () {
+                        if ('delete' in params.data) {
+                            params.data.delete();
+                        }
+                    };
+
+                    this.save = function () {
+                        this.isSubmitted(true);
+
+                        if (this.formModel.isValid()) {
+                            params.submit({
+                                number: this.formModel().number(),
+                                salaryBulk: this.formModel().salaryBulk(),
+                                documentsRequired: this.formModel().documentsRequired(),
+                                productionStandardFactor: this.formModel().productionStandardFactor(),
+                                bonusFactor: this.formModel().bonusFactor(),
+                                fineFactor: this.formModel().fineFactor(),
+                                bonusIncreasePeriod: this.formModel().bonusIncreasePeriod(),
+                                increaseRankShiftCount: this.formModel().increaseRankShiftCount(),
+                                conditions: this.formModel().conditions().map(c => ({
+                                    production: c.production(),
+                                    productionFactor: c.productionFactor(),
+                                    bonusFactor: c.bonusFactor()
+                                })),
+                                bonusAndFineCommonAbsoluteSum: this.formModel().bonusAndFineCommonAbsoluteSum(),
+                                bonusAndFineAssignedAbsoluteSum: this.formModel().bonusAndFineAssignedAbsoluteSum(),
+                                bonusAndFineCalculatedAbsoluteSum: this.formModel().bonusAndFineCalculatedAbsoluteSum(),
+                                bonusAndFineAssignedRelativeSum: this.formModel().bonusAndFineAssignedRelativeSum(),
+                                bonusAndFineCalculatedRelativeSum: this.formModel().bonusAndFineCalculatedRelativeSum()
+                            })
+                        }
+                    };
+
+                    this.cancel = function () {
+                        params.cancel();
+                    };
+
+                    this.addCondition = function () {
+                        this.formModel().conditions.push(this.createConditionFormModel('', '', ''));
+                    };
+
+                    this.removeCondition = function (condition) {
+                        this.formModel().conditions.remove(condition);
+                    };
+
+                    this.afterRender = function () {
+                        $element.removeClass('position-page__rank-modal-dialog--initializing');
+                        this.initializing(false);
+                    }.bind(this);
+
+                    this.dispose = function () {
+                        $(window).off('resize', this.windowResizeHandler);
+                    };
+
+                    (() => {
+                        $element.addClass([
+                            'position-page__rank-modal-dialog',
+                            'position-page__rank-modal-dialog--initializing'
+                        ]);
+
+                        $(window).on('resize', this.windowResizeHandler);
+
+                        setTimeout(() => {
+                            this.isLoading(false);
+                        }, 1000)
+                    })();
+                });
+            }
+        },
+        template: { element: 'position-page-rank-modal-dialog-template' }
+    });
+</script>

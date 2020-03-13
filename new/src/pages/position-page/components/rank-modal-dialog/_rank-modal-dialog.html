@@ -1,0 +1,617 @@
+<template id="position-page-rank-modal-dialog-template">
+    <!-- ko template: { afterRender: afterRender } -->
+        <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+            <button class="hrm-button position-page__rank-modal-dialog-close-button"
+                    data-bind="click: function() {cancel();}" aria-label="Close">
+            </button>
+        <!-- /ko -->
+
+        <!-- ko if: !isLoading() -->
+            <div class="position-page__rank-modal-dialog-header">
+                <span class="position-page__rank-modal-dialog-title"
+                      data-bind="text: mode === 'create' ? 'Новый разряд' : 'Редактировать разряд'">
+                </span>
+
+                <!-- ko if: mode === 'edit' -->
+                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                   hrm-button-with-times-icon position-page__rank-modal-dialog-delete-button"
+                            data-bind="click: function() {onDelete();}">
+                        Удалить разряд
+                    </button>
+                <!-- /ko -->
+            </div>
+
+            <!-- ko using: formModel -->
+                <div class="hrm-section">
+                    <div class="row position-page__rank-modal-dialog-row">
+                        <div class="col-4 col-md-2 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Номер
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Номер'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: number,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.number.error() --><!-- /ko -->
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        <span>Фикс. оклад в час, <i class="far fa-ruble-sign"></i></span>
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Фикс. оклад в час, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: salaryBulk,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.salaryBulk.error() --><!-- /ko -->
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="col-12 col-md-7 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div class="hrm-form-field-switch-group position-page__rank-modal-dialog-documents-required-switch-group"
+                                     data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                    <div data-bind="component: {name: 'hrm-switch', params: {checked: documentsRequired, exportAs: control}}"></div>
+                                    <label data-bind="hrmSwitchGroupLabel: label">
+                                        Для смены разряда нужно наличие обязательных документов с неистекшим сроком годности
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Для смены разряда нужно наличие обязательных документов с неистекшим сроком годности'">
+                                        </button>
+                                    </label>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+
+                    <div class="row position-page__rank-modal-dialog-row">
+                        <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                    hrmFormFieldFixedLabel: true
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Коэффициент норматива выработки
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент норматива выработки'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: productionStandardFactor,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.productionStandardFactor.error() --><!-- /ko -->
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                    hrmFormFieldFixedLabel: true
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Коэффициент расчета премии
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент расчета премии'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: bonusFactor,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                    hrmFormFieldFixedLabel: true
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Коэффициент расчета штрафа
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент расчета штрафа'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: fineFactor,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control,
+                                            hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+
+                    <div class="row position-page__rank-modal-dialog-row">
+                        <div class="col-12 col-md-6 position-page__rank-modal-dialog-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Период увеличения норматива премии
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Период увеличения норматива премии'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <select data-bind="
+                                            value: bonusIncreasePeriod,
+                                            hrmSelect, hrmSelectAllowClear: true,
+                                            hrmFormFieldSelectControl: control
+                                        ">
+                                            <option></option>
+                                            <option value="1">Неделя</option>
+                                            <option value="2">Месяц</option>
+                                            <option value="3">Год</option>
+                                        </select>
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.productionStandardFactor.error() --><!-- /ko -->
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hrm-section">
+                    <div class="hrm-section__header">
+                        <span class="hrm-section__title">Дополнительные настройки</span>
+                        <span class="hrm-section__postscript">необязательно</span>
+                    </div>
+
+                    <!-- ko foreach: {
+                            data: conditions,
+                            afterAdd: hrmFadeAfterAddFactory(200),
+                            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                        } -->
+                            <div class="position-page__rank-modal-dialog-condition">
+                                <div class="row position-page__rank-modal-dialog-row position-page__rank-modal-dialog-condition-row">
+                                    <div class="col-4 col-md-2 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Выработка
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Выработка'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <input class="position-page__rank-modal-dialog-condition-production-form-control" data-bind="
+                                                        textInput: production,
+                                                        hrmMask, hrmMaskPattern: '99:99',
+                                                        hrmFormFieldInputControl: control,
+                                                        hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                                    " placeholder="00:00">
+                                                </div>
+
+                                                <div data-bind="
+                                                    component: {name: 'hrm-form-field-error'},
+                                                    hrmSlide,
+                                                    hrmSlideValue: control() !== null ? control().errorState : false,
+                                                    hrmSlideDuration: 150
+                                                ">
+                                                    <!-- ko text: $parent.production.error() --><!-- /ko -->
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Коэффициент выработки
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент выработки'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <input data-bind="
+                                                        textInput: productionFactor,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Коэффициент премии
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент премии'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <input data-bind="
+                                                        textInput: bonusFactor,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-12 col-md-1 position-page__rank-modal-dialog-row-item position-page__rank-modal-dialog-condition-row-remove-button-item">
+                                        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                            <button class="hrm-button hrm-button-with-icon hrm-button-with-trash-icon
+                                                           hrm-button-with-icon--theme_negative position-page__rank-modal-dialog-condition-row-remove-button"
+                                                    data-bind="click: function () {$component.removeCondition($data);}">
+                                                Удалить
+                                            </button>
+                                        <!-- /ko -->
+
+                                        <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                                            <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                           hrm-icon-button--theme_negative position-page__rank-modal-dialog-condition-row-remove-button"
+                                                    title="Удалить"
+                                                    data-bind="click: function () {$component.removeCondition($data);}">
+                                            </button>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                   hrm-button-with-plus-icon position-page__rank-modal-dialog-add-condition-button"
+                            data-bind="click: function() {$component.addCondition();}">
+                        Добавить условие
+                    </button>
+                </div>
+
+                <!-- ko let: {isOpen: ko.observable(false)} -->
+                    <div class="hrm-section position-page__rank-modal-dialog-change-rank-recommendations-section">
+                        <div class="hrm-section__header">
+                            <!-- ko if: $component.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                <button class="hrm-button hrm-circle-icon-button
+                                               hrm-circle-icon-button--theme_neutral
+                                               hrm-circle-arrow-down-icon-button
+                                               position-page__rank-modal-dialog-change-rank-recommendations-section-toggle-button"
+                                        data-bind="click: function() {isOpen(!isOpen());}">
+                                </button>
+                            <!-- /ko -->
+
+                            <div class="position-page__rank-modal-dialog-change-rank-recommendations-section-header-text"
+                                 data-bind="click: function() {isOpen(!isOpen());}">
+                                <span class="hrm-section__title">Рекомендации по повышению или понижению разрядов</span>
+                                <span class="hrm-section__postscript">необязательно</span>
+                            </div>
+                        </div>
+
+                        <div data-bind="hrmSlide, hrmSlideValue: isOpen() || $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth">
+                            <div class="row position-page__rank-modal-dialog-row">
+                                <div class="col-7 col-md-3 position-page__rank-modal-dialog-row-item">
+                                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                        <div data-bind="
+                                            hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                            hrmFormFieldFixedLabel: true
+                                        ">
+                                            <label data-bind="hrmFormFieldLabel: label">
+                                                Миним. кол-во смен для получения разряда
+
+                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                               hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                        data-bind="hrmTooltip, hrmTooltipText: 'Миним. кол-во смен для получения разряда'">
+                                                </button>
+                                            </label>
+
+                                            <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                <input data-bind="
+                                                    textInput: fineFactor,
+                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                    hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                    hrmFormFieldInputControl: control,
+                                                ">
+                                            </div>
+                                        </div>
+                                    <!-- /ko -->
+                                </div>
+                            </div>
+
+                            <div class="hrm-section hrm-section--sub-section position-page__rank-modal-dialog-bonus-and-fine-sum-section">
+                                <div class="hrm-section__header">
+                                    <span class="hrm-section__title">Суммы штрафов и премий</span>
+                                </div>
+
+                                <div class="row position-page__rank-modal-dialog-row">
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Общая, абсол., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Общая, абсол., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineCommonAbsoluteSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Назначенных, абсол., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Назначенных, абсол., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineAssignedAbsoluteSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Рассчитанных, абсол., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Рассчитанных, абсол., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineCalculatedAbsoluteSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+
+                                <div class="row position-page__rank-modal-dialog-row">
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Назначенных, относит., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Назначенных, относит., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineAssignedRelativeSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+
+                                    <div class="col-8 col-md-3 position-page__rank-modal-dialog-row-item">
+                                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                            <div data-bind="
+                                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label,
+                                                hrmFormFieldFixedLabel: true
+                                            ">
+                                                <label data-bind="hrmFormFieldLabel: label">
+                                                    Рассчитанных, относит., <i class="far fa-ruble-sign"></i>
+
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Рассчитанных, относит., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                    </button>
+                                                </label>
+
+                                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                    <span class="hrm-form-field__basis-prefix">></span>
+
+                                                    <input data-bind="
+                                                        textInput: bonusAndFineCalculatedRelativeSum,
+                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                        hrmFormFieldInputControl: control
+                                                    " placeholder="0">
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <div class="position-page__rank-modal-dialog-action-list">
+                    <button class="hrm-button hrm-basic-button
+                                   position-page__rank-modal-dialog-action-list-item position-page__rank-modal-dialog-cancel-button"
+                            data-bind="click: function() {$component.cancel();}">
+                        Отменить
+                    </button>
+
+                    <button class="hrm-button hrm-basic-button hrm-accent-button
+                                   position-page__rank-modal-dialog-action-list-item position-page__rank-modal-dialog-save-button"
+                            data-bind="click: function() {$component.save();}">
+                        Сохранить
+                    </button>
+                </div>
+            <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: isLoading() -->
+            Загрузка...
+        <!-- /ko -->
+    <!-- /ko -->
+</template>
