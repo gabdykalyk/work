@@ -663,6 +663,8 @@
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                         <input data-bind="
                                                             textInput: bulk,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                                                             hrmFormFieldInputControl: control,
                                                             hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                         " placeholder="0">
@@ -708,6 +710,8 @@
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                         <input data-bind="
                                                             textInput: bonus.rate,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                                                             hrmFormFieldInputControl: control,
                                                             hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                         " placeholder="0">
@@ -741,6 +745,8 @@
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                         <input data-bind="
                                                             textInput: bonus.sum,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                                                             hrmFormFieldInputControl: control,
                                                             hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                         " placeholder="0">
@@ -781,6 +787,8 @@
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                         <input data-bind="
                                                             textInput: bonus.max,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                                                             hrmFormFieldInputControl: control,
                                                             hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                         " placeholder="0">
@@ -826,6 +834,8 @@
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                         <input data-bind="
                                                             textInput: fine.rate,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                                                             hrmFormFieldInputControl: control,
                                                             hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                         " placeholder="0">
@@ -859,6 +869,8 @@
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                         <input data-bind="
                                                             textInput: fine.sum,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                                                             hrmFormFieldInputControl: control,
                                                             hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                         " placeholder="0">
@@ -899,6 +911,8 @@
                                                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                         <input data-bind="
                                                             textInput: fine.max,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                                                             hrmFormFieldInputControl: control,
                                                             hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                         " placeholder="0">
@@ -957,7 +971,10 @@
 
                                 <button class="hrm-button hrm-basic-button hrm-accent-button
                                                position-page__tab-pane-action-list-item position-page__save-button"
-                                        data-bind="click: function() {$tab.submit();}">
+                                        data-bind="
+                                            click: function() {$tab.submit();},
+                                            attr: {disabled: $tab.isSubmitted() && !$tab.isValid()}
+                                        ">
                                     Сохранить
                                 </button>
                             </div>
@@ -1039,108 +1056,107 @@
                             <!-- /ko -->
 
                             <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
-                                <div class="hrm-table__scrollable-wrapper position-page__ranks-tab-pane-table-scrollable-wrapper">
-                                    <div class="hrm-table__scrollable-wrapper-content">
-                                        <table class="position-page__ranks-tab-pane-table" data-bind="hrmTable">
-                                            <tbody>
-                                                <tr>
-                                                    <th class="position-page__ranks-tab-pane-table-number-head-cell">
-                                                        № разряда
-                                                    </th>
+                                <div class="position-page__ranks-tab-pane-table-scrollable-wrapper"
+                                     data-bind="component: {name: 'hrm-scrollable-wrapper'}">
+                                    <table class="position-page__ranks-tab-pane-table" data-bind="hrmTable">
+                                        <tbody>
+                                            <tr>
+                                                <th class="position-page__ranks-tab-pane-table-number-head-cell">
+                                                    № разряда
+                                                </th>
 
-                                                    <!-- ko foreach: {
-                                                        data: ranks,
-                                                        afterAdd: hrmFadeAfterAddFactory(200),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                    } -->
-                                                        <td class="position-page__ranks-tab-pane-table-number-cell"
-                                                            data-bind="text: number">
-                                                        </td>
-                                                    <!-- /ko -->
-                                                </tr>
+                                                <!-- ko foreach: {
+                                                    data: ranks,
+                                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                } -->
+                                                    <td class="position-page__ranks-tab-pane-table-number-cell"
+                                                        data-bind="text: number">
+                                                    </td>
+                                                <!-- /ko -->
+                                            </tr>
 
-                                                <tr>
-                                                    <th>Фикс. дневной оклад сотрудника, <i class="far fa-ruble-sign"></i></th>
+                                            <tr>
+                                                <th>Фикс. дневной оклад сотрудника, <i class="far fa-ruble-sign"></i></th>
 
-                                                    <!-- ko foreach: {
-                                                        data: ranks,
-                                                        afterAdd: hrmFadeAfterAddFactory(200),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                    } -->
-                                                        <td class="position-page__ranks-tab-pane-table-salary-bulk-cell"
-                                                            data-bind="text: $root.formatDecimal(salaryBulk())">
-                                                        </td>
-                                                    <!-- /ko -->
-                                                </tr>
+                                                <!-- ko foreach: {
+                                                    data: ranks,
+                                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                } -->
+                                                    <td class="position-page__ranks-tab-pane-table-salary-bulk-cell"
+                                                        data-bind="text: $root.formatDecimal(salaryBulk())">
+                                                    </td>
+                                                <!-- /ko -->
+                                            </tr>
 
-                                                <tr>
-                                                    <th>Коэффициент норматива выработки</th>
+                                            <tr>
+                                                <th>Коэффициент норматива выработки</th>
 
-                                                    <!-- ko foreach: {
-                                                        data: ranks,
-                                                        afterAdd: hrmFadeAfterAddFactory(200),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                    } -->
-                                                        <td class="position-page__ranks-tab-pane-table-production-standard-cell"
-                                                            data-bind="text: $root.formatDecimal(productionStandardFactor())">
-                                                        </td>
-                                                    <!-- /ko -->
-                                                </tr>
+                                                <!-- ko foreach: {
+                                                    data: ranks,
+                                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                } -->
+                                                    <td class="position-page__ranks-tab-pane-table-production-standard-cell"
+                                                        data-bind="text: $root.formatDecimal(productionStandardFactor())">
+                                                    </td>
+                                                <!-- /ko -->
+                                            </tr>
 
-                                                <tr>
-                                                    <th>Коэффициент для расчета премии</th>
+                                            <tr>
+                                                <th>Коэффициент для расчета премии</th>
 
-                                                    <!-- ko foreach: {
-                                                        data: ranks,
-                                                        afterAdd: hrmFadeAfterAddFactory(200),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                    } -->
-                                                        <td class="position-page__ranks-tab-pane-table-bonus-factory-cell"
-                                                            data-bind="text: $root.formatDecimal(bonusFactor())">
-                                                        </td>
-                                                    <!-- /ko -->
-                                                </tr>
+                                                <!-- ko foreach: {
+                                                    data: ranks,
+                                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                } -->
+                                                    <td class="position-page__ranks-tab-pane-table-bonus-factory-cell"
+                                                        data-bind="text: $root.formatDecimal(bonusFactor())">
+                                                    </td>
+                                                <!-- /ko -->
+                                            </tr>
 
-                                                <tr>
-                                                    <th>Коэффициент для расчета штрафа</th>
+                                            <tr>
+                                                <th>Коэффициент для расчета штрафа</th>
 
-                                                    <!-- ko foreach: {
-                                                        data: ranks,
-                                                        afterAdd: hrmFadeAfterAddFactory(200),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                    } -->
-                                                        <td class="position-page__ranks-tab-pane-table-fine-factory-cell"
-                                                            data-bind="text: $root.formatDecimal(fineFactor())">
-                                                        </td>
-                                                    <!-- /ko -->
-                                                </tr>
+                                                <!-- ko foreach: {
+                                                    data: ranks,
+                                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                } -->
+                                                    <td class="position-page__ranks-tab-pane-table-fine-factory-cell"
+                                                        data-bind="text: $root.formatDecimal(fineFactor())">
+                                                    </td>
+                                                <!-- /ko -->
+                                            </tr>
 
-                                                <tr>
-                                                    <th class="position-page__ranks-tab-pane-table-actions-head-cell"></th>
+                                            <tr>
+                                                <th class="position-page__ranks-tab-pane-table-actions-head-cell"></th>
 
-                                                    <!-- ko foreach: {
-                                                        data: ranks,
-                                                        afterAdd: hrmFadeAfterAddFactory(200),
-                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                                                    } -->
-                                                        <td class="position-page__ranks-tab-pane-table-actions-cell">
-                                                            <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
-                                                                               hrm-icon-button--theme_secondary"
-                                                                    title="Редактировать"
-                                                                    data-bind="click: function () {$tab.edit($data);}">
-                                                            </button>
+                                                <!-- ko foreach: {
+                                                    data: ranks,
+                                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                } -->
+                                                    <td class="position-page__ranks-tab-pane-table-actions-cell">
+                                                        <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
+                                                                           hrm-icon-button--theme_secondary"
+                                                                title="Редактировать"
+                                                                data-bind="click: function () {$tab.edit($data);}">
+                                                        </button>
 
-                                                            <button class="hrm-button hrm-icon-button hrm-trash-icon-button
-                                                                               hrm-icon-button--theme_negative position-page__ranks-tab-pane-table-delete-button"
-                                                                    title="Удалить"
-                                                                    data-bind="click: function () {$tab.delete($data);}">
-                                                            </button>
-                                                        </td>
-                                                    <!-- /ko -->
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                        <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                           hrm-icon-button--theme_negative position-page__ranks-tab-pane-table-delete-button"
+                                                                title="Удалить"
+                                                                data-bind="click: function () {$tab.delete($data);}">
+                                                        </button>
+                                                    </td>
+                                                <!-- /ko -->
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             <!-- /ko -->
 
