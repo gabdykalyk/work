@@ -305,6 +305,7 @@
 
         const RanksTabViewModel = function (formModel, modalOpens, save) {
             this.isSubmitted = ko.observable(false);
+            this.isResetting = ko.observable(false);
 
             this.formModel = formModel;
 
@@ -336,9 +337,13 @@
             });
 
             this.cancel = function () {
+                this.isResetting(true);
+
                 this.formModel.value().ranks(this.lastFormModelValue.ranks.map(r => {
-                    return this.formModel.createRankFormModel(r)
+                    return this.formModel.createRankFormModel(r);
                 }));
+
+                this.isResetting(false);
             };
 
             this.submit = function () {
@@ -376,6 +381,7 @@
                             modalOpens.remove(open);
                             this.delete(rank);
                         },
+                        rankNumbers: this.formModel.value().ranks().filter(r => r !== rank).map(r => r.number()),
                         salaryBulk: this.formModel.value().bulk()
                     },
                     options: {
@@ -409,6 +415,7 @@
                     dialogTemplateName: 'position-page-rank-modal-content-template',
                     data: {
                         mode: 'create',
+                        rankNumbers: this.formModel.value().ranks().map(r => r.number()),
                         salaryBulk: this.formModel.value().bulk()
                     },
                     options: {
@@ -562,13 +569,13 @@
                 }));
 
                 // Раскомментировать, чтобы заполнить первую вкладку тестовыми данными:
-                /*this.formModel.value().name('Администратор филиала');
+                this.formModel.value().name('Администратор филиала');
                 this.formModel.value().workloadType('10');
                 this.formModel.value().productionStandard.value('2000');
                 this.workloadTabViewModel.submit();
                 this.formModel.value().bulk(1);
                 this.salaryTabViewModel.submit();
-                this.ranksTabViewModel.create();*/
+                //this.ranksTabViewModel.create();
             })();
         };
 

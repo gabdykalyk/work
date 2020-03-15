@@ -42,6 +42,12 @@
                         number: ko.observable(this.mode === 'edit' ? this.data.number : '').extend({
                             required: {
                                 message: 'Обязательное поле'
+                            },
+                            validation: {
+                                validator: value => {
+                                    return !params.data.rankNumbers.includes(value);
+                                },
+                                message: 'Номер уже используется'
                             }
                         }),
                         salaryBulk: ko.observable(this.mode === 'edit' ? this.data.salaryBulk : params.data.salaryBulk).extend({
