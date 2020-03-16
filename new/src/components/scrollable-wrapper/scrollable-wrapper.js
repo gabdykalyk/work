@@ -16,6 +16,43 @@
 
             this.element = componentInfo.element;
 
+            this.options = {
+                top: {
+                    disabled: false
+                },
+                right: {
+                    disabled: false
+                },
+                bottom: {
+                    disabled: false
+                },
+                left: {
+                    disabled: false
+                }
+            };
+
+            if ('options' in params) {
+                this.options = {
+                    ...this.options,
+                    top: {
+                        ...this.options.top,
+                        ...params.options.top
+                    },
+                    right: {
+                        ...this.options.right,
+                        ...params.options.right
+                    },
+                    bottom: {
+                        ...this.options.bottom,
+                        ...params.options.bottom
+                    },
+                    left: {
+                        ...this.options.left,
+                        ...params.options.left
+                    }
+                }
+            }
+
             this._init();
         }
 
@@ -66,7 +103,7 @@
                 <!-- ko template: {nodes: $componentTemplateNodes, data: _childData} --><!-- /ko -->
                 
                 <!-- ko template: {
-                    foreach: hrmTemplateIf(!_scrolledVerticalStart(), $data),
+                    foreach: hrmTemplateIf(!_scrolledVerticalStart() && !options.top.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
                     beforeRemove: hrmFadeBeforeRemoveFactory(0)
                 } -->
@@ -74,7 +111,7 @@
                 <!-- /ko -->
                 
                 <!-- ko template: {
-                    foreach: hrmTemplateIf(!_scrolledHorizontalEnd(), $data),
+                    foreach: hrmTemplateIf(!_scrolledHorizontalEnd() && !options.right.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                 } -->
@@ -82,7 +119,7 @@
                 <!-- /ko -->
                 
                 <!-- ko template: {
-                    foreach: hrmTemplateIf(!_scrolledVerticalEnd(), $data),
+                    foreach: hrmTemplateIf(!_scrolledVerticalEnd() && !options.bottom.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                 } -->
@@ -90,7 +127,7 @@
                 <!-- /ko -->
                 
                 <!-- ko template: {
-                    foreach: hrmTemplateIf(!_scrolledHorizontalStart(), $data),
+                    foreach: hrmTemplateIf(!_scrolledHorizontalStart() && !options.left.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                 } -->

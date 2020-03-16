@@ -3,24 +3,24 @@
         const $page = $(document.documentElement);
 
         const FormModel = function () {
-            this.createAdditionalWorkloadFormModel = function () {
-                const type = ko.observable('');
+            this.createAdditionalWorkloadFormModel = function (type, factor, name) {
+                const typeObservable = ko.observable(type);
 
                 return {
-                    type,
-                    factor: ko.observable('').extend({
+                    type: typeObservable,
+                    factor: ko.observable(factor).extend({
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => {
-                                return type() !== '';
+                                return typeObservable() !== '';
                             }
                         }
                     }),
-                    name: ko.observable('').extend({
+                    name: ko.observable(name).extend({
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => {
-                                return type() === '2';
+                                return typeObservable() === '2';
                             }
                         }
                     })
@@ -111,15 +111,6 @@
                     }
                 },
                 units: ko.observable('1'),
-                standard: ko.observable('').extend({
-                    required: {
-                        message: 'Обязательное поле',
-                        onlyIf: () => {
-                            return this.value() === null ||
-                                ['0', '1', '2', '3', '4', '5', '6', '7', '8'].includes(this.value().workloadType());
-                        }
-                    }
-                }),
                 dishCategories: ko.observableArray([]),
                 dishCategoriesExclusionFlag: ko.observable(false),
                 orderTypes: ko.observableArray([]),
@@ -162,8 +153,35 @@
 
         const WorkloadTabViewModel = function (formModel, save) {
             this.isSubmitted = ko.observable(false);
+            this.isResetting = ko.observable(false);
 
             this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+                return {
+                    name: this.formModel.value().name(),
+                    workloadType: this.formModel.value().workloadType(),
+                    productionStandard: {
+                        type: this.formModel.value().productionStandard.type(),
+                        value: this.formModel.value().productionStandard.value(),
+                        range: {
+                            min: this.formModel.value().productionStandard.range.min(),
+                            max: this.formModel.value().productionStandard.range.max(),
+                        }
+                    },
+                    units: this.formModel.value().units(),
+                    dishCategories: this.formModel.value().dishCategories(),
+                    dishCategoriesExclusionFlag: this.formModel.value().dishCategoriesExclusionFlag(),
+                    orderTypes: this.formModel.value().orderTypes(),
+                    additionalWorkload: this.formModel.value().additionalWorkload().map(item => ({
+                        type: item.type(),
+                        factor: item.factor(),
+                        name: item.name()
+                    }))
+                }
+            });
+
+            this.lastFormModelValue = this.formModelValue();
 
             const validationObject = ko.validatedObservable({
                 name: this.formModel.value().name,
@@ -177,7 +195,6 @@
                         max: this.formModel.value().productionStandard.range.max
                     }
                 },
-                standard: this.formModel.value().standard,
                 dishCategories: this.formModel.value().dishCategories,
                 orderTypes: this.formModel.value().orderTypes,
                 additionalWorkload: this.formModel.value().additionalWorkload,
@@ -187,10 +204,31 @@
                 return validationObject.isValid();
             });
 
+            this.cancel = function () {
+                this.isResetting(true);
+
+                this.formModel.value().name(this.lastFormModelValue.name);
+                this.formModel.value().workloadType(this.lastFormModelValue.workloadType);
+                this.formModel.value().units(this.lastFormModelValue.units);
+                this.formModel.value().productionStandard.type(this.lastFormModelValue.productionStandard.type);
+                this.formModel.value().productionStandard.value(this.lastFormModelValue.productionStandard.value);
+                this.formModel.value().productionStandard.range.min(this.lastFormModelValue.productionStandard.range.min);
+                this.formModel.value().productionStandard.range.max(this.lastFormModelValue.productionStandard.range.max);
+                this.formModel.value().dishCategories(this.lastFormModelValue.dishCategories);
+                this.formModel.value().orderTypes(this.lastFormModelValue.orderTypes);
+                this.formModel.value().additionalWorkload(this.lastFormModelValue.additionalWorkload.map(item => {
+                    return this.formModel.createAdditionalWorkloadFormModel(item.type, item.factor, item.name);
+                }));
+
+                this.isResetting(false);
+            };
+
             this.submit = function () {
                 this.isSubmitted(true);
 
                 if (this.isValid()) {
+                    this.lastFormModelValue = this.formModelValue();
+
                     save();
                 }
             };
@@ -569,12 +607,12 @@
                 }));
 
                 // Раскомментировать, чтобы заполнить первую вкладку тестовыми данными:
-                this.formModel.value().name('Администратор филиала');
+                /*this.formModel.value().name('Администратор филиала');
                 this.formModel.value().workloadType('10');
                 this.formModel.value().productionStandard.value('2000');
                 this.workloadTabViewModel.submit();
                 this.formModel.value().bulk(1);
-                this.salaryTabViewModel.submit();
+                this.salaryTabViewModel.submit();*/
                 //this.ranksTabViewModel.create();
             })();
         };

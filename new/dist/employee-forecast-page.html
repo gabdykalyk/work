@@ -210,9 +210,10 @@
                         <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
                             <div class="hrm-table__fixed-section-container employee-forecast-page__positions-table">
                                 <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left
+                                              employee-forecast-page__positions-table-table
                                               employee-forecast-page__positions-table-fixed-section"
                                        data-bind="hrmTable">
-                                    <thead>
+                                    <tbody>
                                     <tr>
                                         <th>
                                             <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
@@ -272,19 +273,44 @@
                                             </div>
                                         </th>
                                     </tr>
-                                    </thead>
+                                    </tbody>
                                 </table>
 
-                                <div data-bind="component: {name: 'hrm-scrollable-wrapper'}">
+                                <div data-bind="component: {
+                                    name: 'hrm-scrollable-wrapper',
+                                    params: {
+                                        options: {left: {disabled: true}}
+                                    }
+                                }">
                                     <table class="employee-forecast-page__positions-table-table"
                                            data-bind="hrmTable">
                                         <tbody>
                                         <tr>
+                                            <th>
+                                                <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                    Должность
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Должность'">
+                                                    </button>
+                                                </div>
+                                            </th>
+
                                             <!-- ko foreach: formModel().positions -->
                                                 <td colspan="2" data-bind="text: name"></td>
                                             <!-- /ko -->
                                         </tr>
                                         <tr>
+                                            <th class="employee-forecast-page__positions-table-workload-type-head-cell">
+                                                <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                    Тип нагрузки
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'">
+                                                    </button>
+                                                </div>
+                                            </th>
+
                                             <!-- ko foreach: formModel().positions -->
                                                 <td class="employee-forecast-page__positions-table-workload-type-cell" colspan="2">
                                                     <div class="hrm-table__cell-content">
@@ -300,6 +326,16 @@
                                         </tr>
 
                                         <tr>
+                                            <th>
+                                                <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                    Нагрузка
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'">
+                                                    </button>
+                                                </div>
+                                            </th>
+
                                             <!-- ko foreach: formModel().positions -->
                                                 <!-- ko let: {editableCell: ko.observable(null)} -->
                                                     <td data-bind="hrmTableEditableCell: editableCell">
@@ -332,6 +368,16 @@
                                         </tr>
 
                                         <tr>
+                                            <th>
+                                                <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                    Сотрудники
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'">
+                                                    </button>
+                                                </div>
+                                            </th>
+
                                             <!-- ko foreach: formModel().positions -->
                                                 <td class="employee-forecast-page__positions-table-estimated-hours-cell"
                                                     data-bind="text: estimatedHours" colspan="2">
@@ -340,6 +386,16 @@
                                         </tr>
 
                                         <tr>
+                                            <th>
+                                                <div class="hrm-table__head-cell-content employee-forecast-page__positions-table-table-head-cell-content">
+                                                    Нормо-часы
+                                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                   hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                            data-bind="hrmTooltip, hrmTooltipText: 'Нормо-часы'">
+                                                    </button>
+                                                </div>
+                                            </th>
+
                                             <!-- ko foreach: formModel().positions -->
                                                 <td class="employee-forecast-page__positions-table-estimated-hours-cell"
                                                     data-bind="text: estimatedHours" colspan="2">
@@ -762,7 +818,12 @@
                                                 </tbody>
                                             </table>
 
-                                            <div data-bind="component: {name: 'hrm-scrollable-wrapper'}">
+                                            <div data-bind="component: {
+                                                name: 'hrm-scrollable-wrapper',
+                                                params: {
+                                                    options: {left: {disabled: true}}
+                                                }
+                                            }">
                                                 <!-- ko template: {name: 'employee-forecast-page-employees-table'} --><!-- /ko -->
                                             </div>
                                         </div>
@@ -939,9 +1000,10 @@
                                                             <div class="hrm-table__fixed-section-container
                                                                         employee-forecast-page__employees-table-position-section-table-fixed-section-container">
                                                                 <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left
+                                                                              employee-forecast-page__employees-table-position-section-table
                                                                               employee-forecast-page__employees-table-position-section-table-fixed-section"
                                                                        data-bind="hrmTable">
-                                                                    <thead>
+                                                                    <tbody>
                                                                     <tr>
                                                                         <th class="employee-forecast-page__employees-table-name-head-cell">
                                                                             Сотрудник
@@ -1051,14 +1113,23 @@
                                                                             Удалить
                                                                         </th>
                                                                     </tr>
-                                                                    </thead>
+                                                                    </tbody>
                                                                 </table>
 
-                                                                <div data-bind="component: {name: 'hrm-scrollable-wrapper'}">
+                                                                <div data-bind="component: {
+                                                                    name: 'hrm-scrollable-wrapper',
+                                                                    params: {
+                                                                        options: {left: {disabled: true}}
+                                                                    }
+                                                                }">
                                                                     <table class="employee-forecast-page__employees-table-position-section-table"
                                                                            data-bind="hrmTable">
                                                                         <tbody>
                                                                             <tr>
+                                                                                <th class="employee-forecast-page__employees-table-name-head-cell">
+                                                                                    Сотрудник
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
@@ -1073,6 +1144,24 @@
 
                                                                             <!-- ko foreach: {data: _.range($root.getPositionMaxWorkingIntervalCount(position)()), as: 'workingIntervalIndex'} -->
                                                                                 <tr>
+                                                                                    <!-- ko if: workingIntervalIndex === 0 -->
+                                                                                        <th class="employee-forecast-page__employees-table-working-intervals-head-cell"
+                                                                                            data-bind="
+                                                                                                attr: {rowspan: $root.getPositionMaxWorkingIntervalCount(position)},
+                                                                                                css: {
+                                                                                                    'employee-forecast-page__employees-table-working-intervals-head-cell--single-line': $root.getPositionMaxWorkingIntervalCount(position)() === 1
+                                                                                                }
+                                                                                            ">
+                                                                                            <div class="hrm-table__head-cell-content">
+                                                                                                Начало/конец работы
+                                                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                                                   hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Начало/конец работы'">
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        </th>
+                                                                                    <!-- /ko -->
+
                                                                                     <!-- ko foreach: {
                                                                                         data: position.employees,
                                                                                         as: 'employee',
@@ -1134,6 +1223,16 @@
                                                                             <!-- /ko -->
 
                                                                             <tr>
+                                                                                <th>
+                                                                                    <div class="hrm-table__head-cell-content">
+                                                                                        Рабочее время
+                                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                                                data-bind="hrmTooltip, hrmTooltipText: 'Рабочее время'">
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
@@ -1147,6 +1246,16 @@
                                                                             </tr>
 
                                                                             <tr>
+                                                                                <th>
+                                                                                    <div class="hrm-table__head-cell-content">
+                                                                                        <span>Оклад, <i class="far fa-ruble-sign"></i>/час</span>
+                                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                                                data-bind="hrmTooltip, hrmTooltipText: 'Оклад, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;/час'">
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
@@ -1174,6 +1283,16 @@
                                                                             </tr>
 
                                                                             <tr>
+                                                                                <th>
+                                                                                    <div class="hrm-table__head-cell-content">
+                                                                                        Норматив выручки
+                                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                                                data-bind="hrmTooltip, hrmTooltipText: 'Норматив выручки'">
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
@@ -1187,6 +1306,16 @@
                                                                             </tr>
 
                                                                             <tr>
+                                                                                <th class="employee-forecast-page__employees-table-salary-bulk-head-cell">
+                                                                                    <div class="hrm-table__head-cell-content">
+                                                                                        <span>Основная часть зп, <i class="far fa-ruble-sign"></i></span>
+                                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                                                data-bind="hrmTooltip, hrmTooltipText: 'Основная часть зп, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
@@ -1200,6 +1329,16 @@
                                                                             </tr>
 
                                                                             <tr>
+                                                                                <th>
+                                                                                    <div class="hrm-table__head-cell-content">
+                                                                                        <span>Прем., <i class="far fa-ruble-sign"></i></span>
+                                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                                                data-bind="hrmTooltip, hrmTooltipText: 'Прем., &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
@@ -1222,6 +1361,16 @@
                                                                             </tr>
 
                                                                             <tr>
+                                                                                <th>
+                                                                                    <div class="hrm-table__head-cell-content">
+                                                                                        <span>Депрем, <i class="far fa-ruble-sign"></i></span>
+                                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                                                data-bind="hrmTooltip, hrmTooltipText: 'Депрем, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
@@ -1244,6 +1393,16 @@
                                                                             </tr>
 
                                                                             <tr>
+                                                                                <th>
+                                                                                    <div class="hrm-table__head-cell-content">
+                                                                                        <span>К выплате, <i class="far fa-ruble-sign"></i></span>
+                                                                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                                                           hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                                                                                data-bind="hrmTooltip, hrmTooltipText: 'К выплате, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
@@ -1257,6 +1416,10 @@
                                                                             </tr>
 
                                                                             <tr>
+                                                                                <th>
+                                                                                    Удалить
+                                                                                </th>
+
                                                                                 <!-- ko foreach: {
                                                                                     data: employees,
                                                                                     as: 'employee',
