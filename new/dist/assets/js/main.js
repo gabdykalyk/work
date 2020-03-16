@@ -319,6 +319,126 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 };
 "use strict";
 
+(() => {
+  class HrmDatepickerViewModel {
+    constructor(element, value) {
+      this._subscriptions = [];
+      this._valueSubscription = null;
+      this._value = null;
+      this._daterangepicker = null;
+      this._applyHandler = null;
+      this.element = element;
+
+      this._init(value);
+    }
+
+    _init(value) {
+      const $element = $(this.element);
+      $element.attr('autocomplete', 'off');
+      $element.daterangepicker({
+        singleDatePicker: true,
+        showDropdown: false,
+        autoUpdateInput: false,
+        locale: {
+          format: 'DD.MM.YYYY, dddd',
+          monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+          daysOfWeek: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+          firstDay: 1
+        }
+      });
+
+      this._applyHandler = () => {
+        let newValue = this._daterangepicker.startDate.format(this._daterangepicker.locale.format);
+
+        if (newValue !== $element.val()) {
+          $element.val(newValue).trigger('change');
+        }
+      };
+
+      $element.on('apply.daterangepicker', this._applyHandler);
+      this._daterangepicker = $element.data('daterangepicker');
+
+      this._daterangepicker.container.addClass('hrm-datepicker');
+
+      this._setValue(value);
+    }
+
+    _setValue(value) {
+      if (this._valueSubscription !== null) {
+        this._valueSubscription.dispose();
+
+        this._valueSubscription = null;
+      }
+
+      if (value !== undefined) {
+        if (ko.isObservable(value)) {
+          this._valueSubscription = value.subscribe(v => {
+            this._daterangepicker.elementChanged();
+          });
+        } else {
+          this._daterangepicker.elementChanged();
+        }
+      }
+
+      this._value = value;
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      if (this._valueSubscription !== null) {
+        this._valueSubscription.dispose();
+      }
+
+      $element.off('apply.daterangepicker', this._applyHandler);
+    }
+
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
+  ko.bindingHandlers.hrmDatepicker = {
+    init: function (element, valueAccessor, allBindings) {
+      const value = allBindings.get('value');
+      const viewModel = new HrmDatepickerViewModel(element, value);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['value'] !== allBindings.get('value')) {
+          instance._setValue(allBindings.get('value'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
+"use strict";
+
 // hrmDropdownMenu
 (() => {
   class HrmDropdownMenuViewModel {
@@ -1385,126 +1505,6 @@ ko.components.register('hrm-form-field-error', {
 "use strict";
 
 (() => {
-  class HrmDatepickerViewModel {
-    constructor(element, value) {
-      this._subscriptions = [];
-      this._valueSubscription = null;
-      this._value = null;
-      this._daterangepicker = null;
-      this._applyHandler = null;
-      this.element = element;
-
-      this._init(value);
-    }
-
-    _init(value) {
-      const $element = $(this.element);
-      $element.attr('autocomplete', 'off');
-      $element.daterangepicker({
-        singleDatePicker: true,
-        showDropdown: false,
-        autoUpdateInput: false,
-        locale: {
-          format: 'DD.MM.YYYY, dddd',
-          monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-          daysOfWeek: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
-          firstDay: 1
-        }
-      });
-
-      this._applyHandler = () => {
-        let newValue = this._daterangepicker.startDate.format(this._daterangepicker.locale.format);
-
-        if (newValue !== $element.val()) {
-          $element.val(newValue).trigger('change');
-        }
-      };
-
-      $element.on('apply.daterangepicker', this._applyHandler);
-      this._daterangepicker = $element.data('daterangepicker');
-
-      this._daterangepicker.container.addClass('hrm-datepicker');
-
-      this._setValue(value);
-    }
-
-    _setValue(value) {
-      if (this._valueSubscription !== null) {
-        this._valueSubscription.dispose();
-
-        this._valueSubscription = null;
-      }
-
-      if (value !== undefined) {
-        if (ko.isObservable(value)) {
-          this._valueSubscription = value.subscribe(v => {
-            this._daterangepicker.elementChanged();
-          });
-        } else {
-          this._daterangepicker.elementChanged();
-        }
-      }
-
-      this._value = value;
-    }
-
-    _destroy() {
-      this._subscriptions.forEach(s => s.dispose());
-
-      if (this._valueSubscription !== null) {
-        this._valueSubscription.dispose();
-      }
-
-      $element.off('apply.daterangepicker', this._applyHandler);
-    }
-
-  }
-
-  const instances = new Map();
-  const previousBindingsList = new Map();
-  ko.bindingHandlers.hrmDatepicker = {
-    init: function (element, valueAccessor, allBindings) {
-      const value = allBindings.get('value');
-      const viewModel = new HrmDatepickerViewModel(element, value);
-      instances.set(element, viewModel);
-
-      if (valueAccessor() !== undefined) {
-        if (ko.isObservableArray(valueAccessor())) {
-          valueAccessor().push(viewModel);
-        } else {
-          valueAccessor()(viewModel);
-        }
-      }
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        if (valueAccessor() !== undefined) {
-          if (ko.isObservableArray(valueAccessor())) {
-            valueAccessor().remove(this);
-          } else {
-            valueAccessor()(null);
-          }
-        }
-
-        viewModel._destroy();
-      });
-    },
-    update: function (element, valueAccessor, allBindings) {
-      const instance = instances.get(element);
-      const previousBindings = previousBindingsList.get(element);
-
-      if (previousBindings !== undefined) {
-        if (previousBindings['value'] !== allBindings.get('value')) {
-          instance._setValue(allBindings.get('value'));
-        }
-      }
-
-      previousBindingsList.set(element, allBindings());
-    }
-  };
-})();
-"use strict";
-
-(() => {
   ko.components.register('hrm-main-sidebar', {
     viewModel: {
       createViewModel: function (params, componentInfo) {
@@ -2159,6 +2159,116 @@ ko.components.register('hrm-modal-container', {
 });
 "use strict";
 
+// hrmScrollableWrapper
+(() => {
+  class HrmScrollableWrapperViewModel {
+    constructor(params, componentInfo) {
+      this._subscriptions = [];
+      this._$element = $(componentInfo.element);
+      this._$contentElement = null;
+      this._contentScrollHandler = null;
+      this._windowResizeHandler = null;
+      this._childData = ko.contextFor(componentInfo.element).$data;
+      this._contentElement = ko.observable(null);
+      this._scrolledHorizontalStart = ko.observable(true);
+      this._scrolledHorizontalEnd = ko.observable(true);
+      this._scrolledVerticalStart = ko.observable(true);
+      this._scrolledVerticalEnd = ko.observable(true);
+      this.element = componentInfo.element;
+
+      this._init();
+    }
+
+    _init() {
+      this._$element.addClass('hrm-scrollable-wrapper');
+
+      this._contentScrollHandler = function () {
+        this.check();
+      };
+
+      this._windowResizeHandler = function () {
+        this.check();
+      };
+
+      this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
+        this._$contentElement = $(this._contentElement());
+
+        this._$contentElement.on('scroll', this._contentScrollHandler.bind(this));
+
+        this.check();
+      }));
+
+      $(window).on('resize', this._windowResizeHandler.bind(this));
+    }
+
+    check() {
+      this._scrolledHorizontalStart(this._$contentElement.scrollLeft() === 0);
+
+      this._scrolledHorizontalEnd(this._$contentElement.outerWidth() + this._$contentElement.scrollLeft() + 5 >= this._$contentElement.prop('scrollWidth'));
+
+      this._scrolledVerticalStart(this._$contentElement.scrollTop() === 0);
+
+      this._scrolledVerticalEnd(this._$contentElement.outerHeight() + this._$contentElement.scrollTop() + 5 >= this._$contentElement.prop('scrollHeight'));
+    }
+
+    dispose() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._$contentElement.off('scroll', this._contentScrollHandler);
+
+      $(window).off('resize', this._windowResizeHandler);
+    }
+
+  }
+
+  ko.components.register('hrm-scrollable-wrapper', {
+    viewModel: {
+      createViewModel: function (params, componentInfo) {
+        return new HrmScrollableWrapperViewModel(params, componentInfo);
+      }
+    },
+    template: `
+            <div class="hrm-scrollable-wrapper__content"
+                 data-bind="hrmElement: _contentElement">
+                <!-- ko template: {nodes: $componentTemplateNodes, data: _childData} --><!-- /ko -->
+                
+                <!-- ko template: {
+                    foreach: hrmTemplateIf(!_scrolledVerticalStart(), $data),
+                    afterAdd: hrmFadeAfterAddFactory(200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(0)
+                } -->
+                    <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__top-curtain"></div>
+                <!-- /ko -->
+                
+                <!-- ko template: {
+                    foreach: hrmTemplateIf(!_scrolledHorizontalEnd(), $data),
+                    afterAdd: hrmFadeAfterAddFactory(200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__right-curtain"></div>
+                <!-- /ko -->
+                
+                <!-- ko template: {
+                    foreach: hrmTemplateIf(!_scrolledVerticalEnd(), $data),
+                    afterAdd: hrmFadeAfterAddFactory(200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__bottom-curtain"></div>
+                <!-- /ko -->
+                
+                <!-- ko template: {
+                    foreach: hrmTemplateIf(!_scrolledHorizontalStart(), $data),
+                    afterAdd: hrmFadeAfterAddFactory(200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__left-curtain"></div>
+                <!-- /ko -->
+            </div>
+        `
+  });
+})();
+"use strict";
+
 // hrmScrollable
 (() => {
   class HrmScrollableViewModel {
@@ -2270,116 +2380,6 @@ ko.components.register('hrm-modal-container', {
       previousBindingsList.set(element, allBindings());
     }
   };
-})();
-"use strict";
-
-// hrmScrollableWrapper
-(() => {
-  class HrmScrollableWrapperViewModel {
-    constructor(params, componentInfo) {
-      this._subscriptions = [];
-      this._$element = $(componentInfo.element);
-      this._$contentElement = null;
-      this._contentScrollHandler = null;
-      this._windowResizeHandler = null;
-      this._childData = ko.contextFor(componentInfo.element).$data;
-      this._contentElement = ko.observable(null);
-      this._scrolledHorizontalStart = ko.observable(true);
-      this._scrolledHorizontalEnd = ko.observable(true);
-      this._scrolledVerticalStart = ko.observable(true);
-      this._scrolledVerticalEnd = ko.observable(true);
-      this.element = componentInfo.element;
-
-      this._init();
-    }
-
-    _init() {
-      this._$element.addClass('hrm-scrollable-wrapper');
-
-      this._contentScrollHandler = function () {
-        this.check();
-      };
-
-      this._windowResizeHandler = function () {
-        this.check();
-      };
-
-      this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
-        this._$contentElement = $(this._contentElement());
-
-        this._$contentElement.on('scroll', this._contentScrollHandler.bind(this));
-
-        this.check();
-      }));
-
-      $(window).on('resize', this._windowResizeHandler.bind(this));
-    }
-
-    check() {
-      this._scrolledHorizontalStart(this._$contentElement.scrollLeft() === 0);
-
-      this._scrolledHorizontalEnd(this._$contentElement.outerWidth() + this._$contentElement.scrollLeft() + 5 >= this._$contentElement.prop('scrollWidth'));
-
-      this._scrolledVerticalStart(this._$contentElement.scrollTop() === 0);
-
-      this._scrolledVerticalEnd(this._$contentElement.outerHeight() + this._$contentElement.scrollTop() + 5 >= this._$contentElement.prop('scrollHeight'));
-    }
-
-    dispose() {
-      this._subscriptions.forEach(s => s.dispose());
-
-      this._$contentElement.off('scroll', this._contentScrollHandler);
-
-      $(window).off('resize', this._windowResizeHandler);
-    }
-
-  }
-
-  ko.components.register('hrm-scrollable-wrapper', {
-    viewModel: {
-      createViewModel: function (params, componentInfo) {
-        return new HrmScrollableWrapperViewModel(params, componentInfo);
-      }
-    },
-    template: `
-            <div class="hrm-scrollable-wrapper__content"
-                 data-bind="hrmElement: _contentElement">
-                <!-- ko template: {nodes: $componentTemplateNodes, data: _childData} --><!-- /ko -->
-                
-                <!-- ko template: {
-                    foreach: hrmTemplateIf(!_scrolledVerticalStart(), $data),
-                    afterAdd: hrmFadeAfterAddFactory(200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(0)
-                } -->
-                    <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__top-curtain"></div>
-                <!-- /ko -->
-                
-                <!-- ko template: {
-                    foreach: hrmTemplateIf(!_scrolledHorizontalEnd(), $data),
-                    afterAdd: hrmFadeAfterAddFactory(200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__right-curtain"></div>
-                <!-- /ko -->
-                
-                <!-- ko template: {
-                    foreach: hrmTemplateIf(!_scrolledVerticalEnd(), $data),
-                    afterAdd: hrmFadeAfterAddFactory(200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__bottom-curtain"></div>
-                <!-- /ko -->
-                
-                <!-- ko template: {
-                    foreach: hrmTemplateIf(!_scrolledHorizontalStart(), $data),
-                    afterAdd: hrmFadeAfterAddFactory(200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__left-curtain"></div>
-                <!-- /ko -->
-            </div>
-        `
-  });
 })();
 "use strict";
 
