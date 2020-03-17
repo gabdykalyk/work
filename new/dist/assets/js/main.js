@@ -214,6 +214,23 @@ ko.components.register('hrm-basic-footer', {
 });
 "use strict";
 
+ko.components.register('hrm-basic-sidebar', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-basic-sidebar']);
+      return new function () {}();
+    }
+  },
+  template: `
+        <button class="hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button hrm-basic-sidebar__logout-button"
+                title="Войти/зарегистрироваться">
+        </button>
+        <a class="hrm-basic-sidebar__support-link" href="#" title="Помощь"></a>
+    `
+});
+"use strict";
+
 ko.components.register('hrm-checkbox', {
   viewModel: {
     createViewModel: function (params, componentInfo) {
@@ -300,126 +317,6 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
     $element.attr('for', checkboxGroup().id);
   }
 };
-"use strict";
-
-ko.components.register('hrm-basic-sidebar', {
-  viewModel: {
-    createViewModel: function (params, componentInfo) {
-      const $element = $(componentInfo.element);
-      $element.addClass(['hrm-basic-sidebar']);
-      return new function () {}();
-    }
-  },
-  template: `
-        <button class="hrm-button hrm-circle-icon-button hrm-circle-logout-icon-button hrm-basic-sidebar__logout-button"
-                title="Войти/зарегистрироваться">
-        </button>
-        <a class="hrm-basic-sidebar__support-link" href="#" title="Помощь"></a>
-    `
-});
-"use strict";
-
-// hrmDropdownMenu
-(() => {
-  class HrmDropdownMenuViewModel {
-    constructor(element, context, template, placement) {
-      this._subscriptions = [];
-      this._template = template;
-      this._placement = placement;
-      this._context = context;
-      this.element = element;
-      this._tippyInstance = null;
-      this._tooltipClickHandler = null;
-
-      this._init();
-    }
-
-    _init() {
-      let hidingFlag = false;
-
-      this._tooltipClickHandler = event => {
-        const $target = $(event.target);
-
-        if ($target.is('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)') || $target.parents('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)').length > 0) {
-          this._tippyInstance.hide();
-        }
-      };
-
-      this._tippyInstance = tippy(this.element, {
-        content: this._createContent(document.getElementById(this._template).innerHTML),
-        arrow: false,
-        distance: 7,
-        interactive: true,
-        placement: this._placement !== undefined ? this._placement : 'bottom',
-        appendTo: document.body,
-        boundary: 'viewport',
-        hideOnClick: true,
-        trigger: 'click',
-        onCreate: instance => {
-          $(instance.popperChildren.tooltip).addClass('hrm-dropdown-menu');
-          $(instance.popperChildren.tooltip).on('click', this._tooltipClickHandler);
-        },
-        onShow: () => {
-          return !hidingFlag;
-        },
-        onMount: instance => {
-          $(instance.popperChildren.content).find('.hrm-dropdown-menu__content').overlayScrollbars({});
-          ko.applyBindingsToDescendants(this._context, instance.popperChildren.content);
-          setTimeout(() => {
-            instance.popperInstance.update();
-          });
-        },
-        onHide: () => {
-          hidingFlag = true;
-        },
-        onHidden: instance => {
-          // Хак, чтобы tippy пересоздал содержимое и можно было применить заново биндинги Knockout
-          instance.setContent(this._createContent(document.getElementById(this._template).innerHTML));
-          hidingFlag = false;
-        }
-      });
-    }
-
-    _destroy() {
-      this._subscriptions.forEach(s => s.dispose());
-
-      this._tippyInstance.destroy();
-    }
-
-    _createContent(template) {
-      return $('<div>').addClass('hrm-dropdown-menu__content').append(template).get()[0];
-    }
-
-  }
-
-  ko.bindingHandlers.hrmDropdownMenu = {
-    init: function (element, valueAccessor, allBindings, _, bindingContext) {
-      const template = allBindings.get('hrmDropdownMenuTemplate');
-      const placement = allBindings.get('hrmDropdownMenuPlacement');
-      const viewModel = new HrmDropdownMenuViewModel(element, bindingContext, template, placement);
-
-      if (valueAccessor() !== undefined) {
-        if (ko.isObservableArray(valueAccessor())) {
-          valueAccessor().push(viewModel);
-        } else {
-          valueAccessor()(viewModel);
-        }
-      }
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        if (valueAccessor() !== undefined) {
-          if (ko.isObservableArray(valueAccessor())) {
-            valueAccessor().remove(this);
-          } else {
-            valueAccessor()(null);
-          }
-        }
-
-        viewModel._destroy();
-      });
-    }
-  };
-})();
 "use strict";
 
 (() => {
@@ -537,6 +434,109 @@ ko.components.register('hrm-basic-sidebar', {
       }
 
       previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
+"use strict";
+
+// hrmDropdownMenu
+(() => {
+  class HrmDropdownMenuViewModel {
+    constructor(element, context, template, placement) {
+      this._subscriptions = [];
+      this._template = template;
+      this._placement = placement;
+      this._context = context;
+      this.element = element;
+      this._tippyInstance = null;
+      this._tooltipClickHandler = null;
+
+      this._init();
+    }
+
+    _init() {
+      let hidingFlag = false;
+
+      this._tooltipClickHandler = event => {
+        const $target = $(event.target);
+
+        if ($target.is('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)') || $target.parents('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)').length > 0) {
+          this._tippyInstance.hide();
+        }
+      };
+
+      this._tippyInstance = tippy(this.element, {
+        content: this._createContent(document.getElementById(this._template).innerHTML),
+        arrow: false,
+        distance: 7,
+        interactive: true,
+        placement: this._placement !== undefined ? this._placement : 'bottom',
+        appendTo: document.body,
+        boundary: 'viewport',
+        hideOnClick: true,
+        trigger: 'click',
+        onCreate: instance => {
+          $(instance.popperChildren.tooltip).addClass('hrm-dropdown-menu');
+          $(instance.popperChildren.tooltip).on('click', this._tooltipClickHandler);
+        },
+        onShow: () => {
+          return !hidingFlag;
+        },
+        onMount: instance => {
+          $(instance.popperChildren.content).find('.hrm-dropdown-menu__content').overlayScrollbars({});
+          ko.applyBindingsToDescendants(this._context, instance.popperChildren.content);
+          setTimeout(() => {
+            instance.popperInstance.update();
+          });
+        },
+        onHide: () => {
+          hidingFlag = true;
+        },
+        onHidden: instance => {
+          // Хак, чтобы tippy пересоздал содержимое и можно было применить заново биндинги Knockout
+          instance.setContent(this._createContent(document.getElementById(this._template).innerHTML));
+          hidingFlag = false;
+        }
+      });
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._tippyInstance.destroy();
+    }
+
+    _createContent(template) {
+      return $('<div>').addClass('hrm-dropdown-menu__content').append(template).get()[0];
+    }
+
+  }
+
+  ko.bindingHandlers.hrmDropdownMenu = {
+    init: function (element, valueAccessor, allBindings, _, bindingContext) {
+      const template = allBindings.get('hrmDropdownMenuTemplate');
+      const placement = allBindings.get('hrmDropdownMenuPlacement');
+      const viewModel = new HrmDropdownMenuViewModel(element, bindingContext, template, placement);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
     }
   };
 })();
@@ -1504,6 +1504,102 @@ ko.components.register('hrm-form-field-error', {
 });
 "use strict";
 
+ko.bindingHandlers.hrmModalContainerModalWrapper = {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = $.extend({
+      closeOnBackdropClick: true,
+      escapePress: 'close'
+    }, allBindings()['hrmModalContainerModalWrapperOptions']);
+    const close = allBindings()['hrmModalContainerModalWrapperClose'];
+    const $element = $(element);
+    const $modal = $element.find('.hrm-modal');
+    $modal.appendTo('body');
+    $modal.modal({
+      backdrop: false,
+      keyboard: false,
+      focus: true
+    });
+
+    if ('modalClass' in options) {
+      $modal.addClass(options.modalClass);
+    }
+
+    $modal.keyup(event => {
+      if (event.keyCode === 27) {
+        if (options.escapePress === 'close') {
+          close.call(viewModel);
+        } else if (options.escapePress instanceof Function) {
+          options.escapePress();
+        }
+      }
+    });
+
+    if (options.closeOnBackdropClick) {
+      $modal.on('click', event => {
+        if (event.target === $modal.get()[0]) {
+          close.call(viewModel);
+        }
+      });
+    }
+
+    const innerBindingContext = ko.bindingEvent.startPossiblyAsyncContentBinding($modal.get()[0], bindingContext);
+    ko.applyBindings(innerBindingContext, $modal.get()[0]);
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      $modal.modal('hide').remove();
+    });
+  }
+};
+ko.components.register('hrm-modal-container', {
+  viewModel: {
+    createViewModel: function (params) {
+      const viewModel = new function () {
+        this.opens = params.opens;
+
+        this.close = function (open, value) {
+          this.opens.remove(open);
+
+          if ('close' in open) {
+            open.close(value);
+          }
+        };
+      }();
+      viewModel.initializing = ko.observable(true);
+
+      viewModel.onInit = function () {
+        viewModel.initializing(false);
+      };
+
+      return viewModel;
+    }
+  },
+  template: `
+        <!-- ko template: {afterRender: onInit} -->
+            <!-- ko foreach: opens -->
+                <!-- ko let: {modalElement: ko.observable()} -->
+                    <div data-bind="
+                         hrmModalContainerModalWrapper,
+                         hrmModalContainerModalWrapperOptions: $data.options,
+                         hrmModalContainerModalWrapperClose: function (value) {$component.close($data, value);}
+                    ">
+                        <div class="modal hrm-modal" role="dialog" tabindex="1" data-bind="element: modalElement">
+                            <!-- ko template: {
+                                name: dialogTemplateName,
+                                data: {
+                                    data: $data.data,
+                                    modalElement: modalElement(),
+                                    close: function (value) {$component.close($data, value);}
+                                }
+                            } -->
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                <!-- /ko -->
+            <!-- /ko -->
+        <!-- /ko -->
+    `
+});
+"use strict";
+
 (() => {
   ko.components.register('hrm-main-sidebar', {
     viewModel: {
@@ -2061,102 +2157,6 @@ ko.components.register('hrm-form-field-error', {
         `
   });
 })();
-"use strict";
-
-ko.bindingHandlers.hrmModalContainerModalWrapper = {
-  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-    const options = $.extend({
-      closeOnBackdropClick: true,
-      escapePress: 'close'
-    }, allBindings()['hrmModalContainerModalWrapperOptions']);
-    const close = allBindings()['hrmModalContainerModalWrapperClose'];
-    const $element = $(element);
-    const $modal = $element.find('.hrm-modal');
-    $modal.appendTo('body');
-    $modal.modal({
-      backdrop: false,
-      keyboard: false,
-      focus: true
-    });
-
-    if ('modalClass' in options) {
-      $modal.addClass(options.modalClass);
-    }
-
-    $modal.keyup(event => {
-      if (event.keyCode === 27) {
-        if (options.escapePress === 'close') {
-          close.call(viewModel);
-        } else if (options.escapePress instanceof Function) {
-          options.escapePress();
-        }
-      }
-    });
-
-    if (options.closeOnBackdropClick) {
-      $modal.on('click', event => {
-        if (event.target === $modal.get()[0]) {
-          close.call(viewModel);
-        }
-      });
-    }
-
-    const innerBindingContext = ko.bindingEvent.startPossiblyAsyncContentBinding($modal.get()[0], bindingContext);
-    ko.applyBindings(innerBindingContext, $modal.get()[0]);
-    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-      $modal.modal('hide').remove();
-    });
-  }
-};
-ko.components.register('hrm-modal-container', {
-  viewModel: {
-    createViewModel: function (params) {
-      const viewModel = new function () {
-        this.opens = params.opens;
-
-        this.close = function (open, value) {
-          this.opens.remove(open);
-
-          if ('close' in open) {
-            open.close(value);
-          }
-        };
-      }();
-      viewModel.initializing = ko.observable(true);
-
-      viewModel.onInit = function () {
-        viewModel.initializing(false);
-      };
-
-      return viewModel;
-    }
-  },
-  template: `
-        <!-- ko template: {afterRender: onInit} -->
-            <!-- ko foreach: opens -->
-                <!-- ko let: {modalElement: ko.observable()} -->
-                    <div data-bind="
-                         hrmModalContainerModalWrapper,
-                         hrmModalContainerModalWrapperOptions: $data.options,
-                         hrmModalContainerModalWrapperClose: function (value) {$component.close($data, value);}
-                    ">
-                        <div class="modal hrm-modal" role="dialog" tabindex="1" data-bind="element: modalElement">
-                            <!-- ko template: {
-                                name: dialogTemplateName,
-                                data: {
-                                    data: $data.data,
-                                    modalElement: modalElement(),
-                                    close: function (value) {$component.close($data, value);}
-                                }
-                            } -->
-                            <!-- /ko -->
-                        </div>
-                    </div>
-                <!-- /ko -->
-            <!-- /ko -->
-        <!-- /ko -->
-    `
-});
 "use strict";
 
 // hrmScrollable
