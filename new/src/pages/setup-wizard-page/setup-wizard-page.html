@@ -303,7 +303,7 @@
                                 <span class="setup-wizard-page__turnover-selector-title">Оборот предприятия</span>
 
                                 <span class="setup-wizard-page__turnover-selector-description"
-                                      data-bind="hrmFade, hrmFadeValue: !isTurnoverCalculated()">
+                                      data-bind="hrmFade, hrmFadeValue: !isTurnoverCalculated() && !$root.isTurnoverStepCalculating()">
                                     Заполните поля хотя бы для одной категории
                                 </span>
 
@@ -357,27 +357,35 @@
                                                             </td>
                                                         <!-- /ko -->
                                                         <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
-                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
-                                                                    data-bind="
-                                                                        hrmTableEditableCell: editableCell,
-                                                                        hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
-                                                                    ">
-                                                                    <input data-bind="
-                                                                        textInput: $parent.week[weekday - 1].weekdayTotal,
-                                                                        event: {
-                                                                            input: function() {
-                                                                                $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                            <!-- ko if: $parent.week[weekday - 1]() !== null -->
+                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                    <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
+                                                                        data-bind="
+                                                                            hrmTableEditableCell: editableCell,
+                                                                            hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
+                                                                        ">
+                                                                        <input data-bind="
+                                                                            textInput: $parent.week[weekday - 1]().weekdayTotal,
+                                                                            event: {
+                                                                                input: function() {
+                                                                                    $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                                },
+                                                                                change: function() {
+                                                                                    $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
+                                                                                }
                                                                             },
-                                                                            change: function() {
-                                                                                $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
-                                                                            }
-                                                                        },
-                                                                        hrmMask, hrmMaskPattern: 'decimal',
-                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
-                                                                        hrmTableEditableCellInputControl,
-                                                                        hrmTableEditableCellInputControlOwner: editableCell
-                                                                    " placeholder="0">
+                                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
+                                                                            hrmTableEditableCellInputControl,
+                                                                            hrmTableEditableCellInputControlOwner: editableCell
+                                                                        " placeholder="0">
+                                                                    </td>
+                                                                <!-- /ko -->
+                                                            <!-- /ko -->
+
+                                                            <!-- ko if: $parent.week[weekday - 1]() === null -->
+                                                                <td class="setup-wizard-page__turnover-selector-table-weekday-cell
+                                                                           setup-wizard-page__turnover-selector-table-weekday-cell--disabled">
                                                                 </td>
                                                             <!-- /ko -->
                                                         <!-- /ko -->
@@ -499,28 +507,36 @@
                                                                         <tbody>
                                                                             <tr>
                                                                                 <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
-                                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                                        <td class="setup-wizard-page__turnover-selector-table-category-section-table-weekday-cell"
-                                                                                            data-bind="
-                                                                                                hrmTableEditableCell: editableCell,
-                                                                                                hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
-                                                                                            "
-                                                                                        >
-                                                                                            <input data-bind="
-                                                                                                textInput: $parent.week[weekday - 1].weekdayTotal,
-                                                                                                event: {
-                                                                                                    input: function() {
-                                                                                                        $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                                    <!-- ko if: $parent.week[weekday - 1]() !== null -->
+                                                                                        <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                                            <td class="setup-wizard-page__turnover-selector-table-category-section-table-weekday-cell"
+                                                                                                data-bind="
+                                                                                                    hrmTableEditableCell: editableCell,
+                                                                                                    hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
+                                                                                                "
+                                                                                            >
+                                                                                                <input data-bind="
+                                                                                                    textInput: $parent.week[weekday - 1]().weekdayTotal,
+                                                                                                    event: {
+                                                                                                        input: function() {
+                                                                                                            $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                                                        },
+                                                                                                        change: function() {
+                                                                                                            $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
+                                                                                                        }
                                                                                                     },
-                                                                                                    change: function() {
-                                                                                                        $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
-                                                                                                    }
-                                                                                                },
-                                                                                                hrmMask, hrmMaskPattern: 'decimal',
-                                                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
-                                                                                                hrmTableEditableCellInputControl,
-                                                                                                hrmTableEditableCellInputControlOwner: editableCell
-                                                                                            " placeholder="0">
+                                                                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
+                                                                                                    hrmTableEditableCellInputControl,
+                                                                                                    hrmTableEditableCellInputControlOwner: editableCell
+                                                                                                " placeholder="0">
+                                                                                            </td>
+                                                                                        <!-- /ko -->
+                                                                                    <!-- /ko -->
+
+                                                                                    <!-- ko if: $parent.week[weekday - 1]() === null -->
+                                                                                        <td class="setup-wizard-page__turnover-selector-table-weekday-cell
+                                                                                                   setup-wizard-page__turnover-selector-table-weekday-cell--disabled">
                                                                                         </td>
                                                                                     <!-- /ko -->
                                                                                 <!-- /ko -->
@@ -604,27 +620,35 @@
                                                                             <!-- /ko -->
                                                                         <!-- /ko -->
                                                                         <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
-                                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                                <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
-                                                                                    data-bind="
-                                                                                    hrmTableEditableCell: editableCell,
-                                                                                    hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor($parentContext.activeCategoryIndex, weekday)
-                                                                                ">
-                                                                                    <input data-bind="
-                                                                                        textInput: $parent.week[weekday - 1].weekdayTotal,
-                                                                                        event: {
-                                                                                            input: function() {
-                                                                                                $root.onTurnoverStepWeekdayTotalInput($parentContext.activeCategoryIndex);
+                                                                            <!-- ko if: $parent.week[weekday - 1]() !== null -->
+                                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                                    <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
+                                                                                        data-bind="
+                                                                                        hrmTableEditableCell: editableCell,
+                                                                                        hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor($parentContext.activeCategoryIndex, weekday)
+                                                                                    ">
+                                                                                        <input data-bind="
+                                                                                            textInput: $parent.week[weekday - 1]().weekdayTotal,
+                                                                                            event: {
+                                                                                                input: function() {
+                                                                                                    $root.onTurnoverStepWeekdayTotalInput($parentContext.activeCategoryIndex);
+                                                                                                },
+                                                                                                change: function() {
+                                                                                                    $root.onTurnoverStepWeekdayTotalChange($parentContext.activeCategoryIndex, weekdayIndex());
+                                                                                                }
                                                                                             },
-                                                                                            change: function() {
-                                                                                                $root.onTurnoverStepWeekdayTotalChange($parentContext.activeCategoryIndex, weekdayIndex());
-                                                                                            }
-                                                                                        },
-                                                                                        hrmMask, hrmMaskPattern: 'decimal',
-                                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
-                                                                                        hrmTableEditableCellInputControl,
-                                                                                        hrmTableEditableCellInputControlOwner: editableCell
-                                                                                    " placeholder="0">
+                                                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
+                                                                                            hrmTableEditableCellInputControl,
+                                                                                            hrmTableEditableCellInputControlOwner: editableCell
+                                                                                        " placeholder="0">
+                                                                                    </td>
+                                                                                <!-- /ko -->
+                                                                            <!-- /ko -->
+
+                                                                            <!-- ko if: $parent.week[weekday - 1]() === null -->
+                                                                                <td class="setup-wizard-page__turnover-selector-table-weekday-cell
+                                                                                           setup-wizard-page__turnover-selector-table-weekday-cell--disabled">
                                                                                 </td>
                                                                             <!-- /ko -->
                                                                         <!-- /ko -->
@@ -701,27 +725,35 @@
                                                                 </td>
                                                             <!-- /ko -->
                                                             <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
-                                                                <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                    <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
-                                                                        data-bind="
-                                                                            hrmTableEditableCell: editableCell,
-                                                                            hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
-                                                                        ">
-                                                                        <input data-bind="
-                                                                            textInput: $parent.week[weekday - 1].weekdayTotal,
-                                                                            event: {
-                                                                                input: function() {
-                                                                                    $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                <!-- ko if: $parent.week[weekday - 1]() !== null -->
+                                                                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                        <td class="setup-wizard-page__turnover-selector-table-weekday-cell"
+                                                                            data-bind="
+                                                                                hrmTableEditableCell: editableCell,
+                                                                                hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
+                                                                            ">
+                                                                            <input data-bind="
+                                                                                textInput: $parent.week[weekday - 1]().weekdayTotal,
+                                                                                event: {
+                                                                                    input: function() {
+                                                                                        $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                                    },
+                                                                                    change: function() {
+                                                                                        $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
+                                                                                    }
                                                                                 },
-                                                                                change: function() {
-                                                                                    $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
-                                                                                }
-                                                                            },
-                                                                            hrmMask, hrmMaskPattern: 'decimal',
-                                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
-                                                                            hrmTableEditableCellInputControl,
-                                                                            hrmTableEditableCellInputControlOwner: editableCell
-                                                                        " placeholder="0">
+                                                                                hrmMask, hrmMaskPattern: 'decimal',
+                                                                                hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
+                                                                                hrmTableEditableCellInputControl,
+                                                                                hrmTableEditableCellInputControlOwner: editableCell
+                                                                            " placeholder="0">
+                                                                        </td>
+                                                                    <!-- /ko -->
+                                                                <!-- /ko -->
+
+                                                                <!-- ko if: $parent.week[weekday - 1]() === null -->
+                                                                    <td class="setup-wizard-page__turnover-selector-table-weekday-cell
+                                                                               setup-wizard-page__turnover-selector-table-weekday-cell--disabled">
                                                                     </td>
                                                                 <!-- /ko -->
                                                             <!-- /ko -->
@@ -757,14 +789,14 @@
                                                                 <!-- /ko -->
                                                                 <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
                                                                     <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                        <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] !== null -->
+                                                                        <!-- ko if: $parents[1].week[weekday - 1]() !== null && $parents[1].week[weekday - 1]().hours()[hourIndex()] !== null -->
                                                                             <td class="setup-wizard-page__turnover-selector-table-hour-cell"
                                                                                 data-bind="
                                                                                     hrmTableEditableCell: editableCell,
-                                                                                    hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor($parents[1].week[weekday - 1].hours()[hourIndex()])
+                                                                                    hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor($parents[1].week[weekday - 1]().hours()[hourIndex()])
                                                                                 ">
                                                                                 <input data-bind="
-                                                                                    textInput: $parents[1].week[weekday - 1].hours()[hourIndex()],
+                                                                                    textInput: $parents[1].week[weekday - 1]().hours()[hourIndex()],
                                                                                     event: {
                                                                                         input: function() {
                                                                                             $root.onTurnoverStepHourInput($parentContext.dishCategoryIndex(), weekdayIndex(), hourIndex());
@@ -778,7 +810,7 @@
                                                                             </td>
                                                                         <!-- /ko -->
 
-                                                                        <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] === null -->
+                                                                        <!-- ko if: $parents[1].week[weekday - 1]() === null || $parents[1].week[weekday - 1]().hours()[hourIndex()] === null -->
                                                                             <td class="setup-wizard-page__turnover-selector-table-hour-cell
                                                                                        setup-wizard-page__turnover-selector-table-hour-cell--disabled">
                                                                             </td>
@@ -952,28 +984,36 @@
                                                                             <tbody>
                                                                                 <tr>
                                                                                     <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
-                                                                                        <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                                            <td class="setup-wizard-page__turnover-selector-table-category-section-table-weekday-cell"
-                                                                                                data-bind="
-                                                                                                    hrmTableEditableCell: editableCell,
-                                                                                                    hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
-                                                                                                "
-                                                                                            >
-                                                                                                <input data-bind="
-                                                                                                    textInput: $parent.week[weekday - 1].weekdayTotal,
-                                                                                                    event: {
-                                                                                                        input: function() {
-                                                                                                            $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                                        <!-- ko if: $parent.week[weekday - 1]() !== null -->
+                                                                                            <!-- ko let: {editableCell: ko.observable(null)} -->
+                                                                                                <td class="setup-wizard-page__turnover-selector-table-category-section-table-weekday-cell"
+                                                                                                    data-bind="
+                                                                                                        hrmTableEditableCell: editableCell,
+                                                                                                        hrmTableEditableCellError: $root.turnoverStepWeekdayTotalErrorExtractor(dishCategoryIndex(), weekday)
+                                                                                                    "
+                                                                                                >
+                                                                                                    <input data-bind="
+                                                                                                        textInput: $parent.week[weekday - 1]().weekdayTotal,
+                                                                                                        event: {
+                                                                                                            input: function() {
+                                                                                                                $root.onTurnoverStepWeekdayTotalInput($parentContext.dishCategoryIndex());
+                                                                                                            },
+                                                                                                            change: function() {
+                                                                                                                $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
+                                                                                                            }
                                                                                                         },
-                                                                                                        change: function() {
-                                                                                                            $root.onTurnoverStepWeekdayTotalChange($parentContext.dishCategoryIndex(), weekdayIndex());
-                                                                                                        }
-                                                                                                    },
-                                                                                                    hrmMask, hrmMaskPattern: 'decimal',
-                                                                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
-                                                                                                    hrmTableEditableCellInputControl,
-                                                                                                    hrmTableEditableCellInputControlOwner: editableCell
-                                                                                                " placeholder="0">
+                                                                                                        hrmMask, hrmMaskPattern: 'decimal',
+                                                                                                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false},
+                                                                                                        hrmTableEditableCellInputControl,
+                                                                                                        hrmTableEditableCellInputControlOwner: editableCell
+                                                                                                    " placeholder="0">
+                                                                                                </td>
+                                                                                            <!-- /ko -->
+                                                                                        <!-- /ko -->
+
+                                                                                        <!-- ko if: $parent.week[weekday - 1]() === null -->
+                                                                                            <td class="setup-wizard-page__turnover-selector-table-weekday-cell
+                                                                                                       setup-wizard-page__turnover-selector-table-weekday-cell--disabled">
                                                                                             </td>
                                                                                         <!-- /ko -->
                                                                                     <!-- /ko -->
@@ -983,14 +1023,14 @@
                                                                                     <tr class="setup-wizard-page__turnover-selector-table-hour-row">
                                                                                         <!-- ko foreach: {data: [1, 2, 3, 4, 5, 6, 7], as: 'weekday'} -->
                                                                                             <!-- ko let: {editableCell: ko.observable(null)} -->
-                                                                                                <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] !== null -->
+                                                                                                <!-- ko if: $parents[1].week[weekday - 1]() !== null && $parents[1].week[weekday - 1]().hours()[hourIndex()] !== null -->
                                                                                                     <td class="setup-wizard-page__turnover-selector-table-hour-cell"
                                                                                                         data-bind="
                                                                                                             hrmTableEditableCell: editableCell,
-                                                                                                            hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor($parents[1].week[weekday - 1].hours()[hourIndex()])
+                                                                                                            hrmTableEditableCellError: $root.turnoverStepTableErrorExtractor($parents[1].week[weekday - 1]().hours()[hourIndex()])
                                                                                                         ">
                                                                                                             <input data-bind="
-                                                                                                                textInput: $parents[1].week[weekday - 1].hours()[hourIndex()],
+                                                                                                                textInput: $parents[1].week[weekday - 1]().hours()[hourIndex()],
                                                                                                                 event: {
                                                                                                                     input: function() {
                                                                                                                         $root.onTurnoverStepHourInput($parentContext.dishCategoryIndex(), weekdayIndex(), hourIndex());
@@ -1004,7 +1044,7 @@
                                                                                                     </td>
                                                                                                 <!-- /ko -->
 
-                                                                                                <!-- ko if: $parents[1].week[weekday - 1].hours()[hourIndex()] === null -->
+                                                                                                <!-- ko if: $parents[1].week[weekday - 1]() === null || $parents[1].week[weekday - 1]().hours()[hourIndex()] === null -->
                                                                                                     <td class="setup-wizard-page__turnover-selector-table-hour-cell
                                                                                                            setup-wizard-page__turnover-selector-table-hour-cell--disabled">
                                                                                                     </td>
@@ -1038,12 +1078,20 @@
                                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                                 } -->
                                     <div>
-                                        Производится рассчёт...
+                                        <div class="setup-wizard-page__turnover-selector-calculating">
+                                            <i class="fa fa-spinner fa-pulse
+                                                      setup-wizard-page__turnover-selector-calculating-indicator">
+                                            </i>
+
+                                            <span class="setup-wizard-page__turnover-selector-calculating-text">
+                                                Производится расчет
+                                            </span>
+                                        </div>
                                     </div>
                                 <!-- /ko -->
 
                                 <!-- ko template: {
-                                    foreach: hrmTemplateIf(!($root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth && isTurnoverCalculated()), $data),
+                                    foreach: hrmTemplateIf(!($root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth && isTurnoverCalculated()) && !$root.isTurnoverStepCalculating(), $data),
                                     afterAdd: hrmFadeAfterAddFactory(200, 200),
                                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                                 } -->
@@ -1071,13 +1119,16 @@
 
                             <div class="setup-wizard-page__tab-pane-actions">
                                 <button class="hrm-button hrm-basic-button setup-wizard-page__tab-pane-actions-button"
-                                        data-bind="click: function () { $root.turnoverStepBack(); }">
+                                        data-bind="
+                                            click: function () { $root.turnoverStepBack(); },
+                                            attr: {disabled: $root.isTurnoverStepCalculating()}
+                                        ">
                                     Назад
                                 </button>
                                 <button class="hrm-button hrm-basic-button hrm-accent-button setup-wizard-page__tab-pane-actions-button"
                                         data-bind="
                                             click: function () { $root.turnoverStepSubmit(); },
-                                            attr: {disabled: $root.isTurnoverStepSubmitted() && !$root.isTurnoverStepValid()},
+                                            attr: {disabled: ($root.isTurnoverStepSubmitted() && !$root.isTurnoverStepValid()) || $root.isTurnoverStepCalculating()},
                                             css: {
                                                 'setup-wizard-page__turnover-tab-pane-calculate-button': !isTurnoverCalculated()
                                             },
