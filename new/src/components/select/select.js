@@ -72,12 +72,23 @@ ko.bindingHandlers.hrmSelect = {
             }
         });
 
+        function hasValue() {
+            const value = $element.val();
+            return value !== '' && value !== undefined && (!(value instanceof Array) || value.length !== 0);
+        }
+
+        select2Instance.$container.toggleClass('hrm-select--has-value', hasValue());
+
         const openHandler = () => {
             $dropdownResultsContainer.overlayScrollbars().scroll(0);
         };
 
         const openingHandler = () => {
             select2Instance.$dropdown.hide().fadeIn(150);
+        };
+
+        const changeHandler = () => {
+            select2Instance.$container.toggleClass('hrm-select--has-value', hasValue());
         };
 
         let isClosingAnimated = false;
@@ -98,11 +109,13 @@ ko.bindingHandlers.hrmSelect = {
         $element.on('select2:open', openHandler);
         $element.on('select2:opening', openingHandler);
         $element.on('select2:closing', closingHandler);
+        $element.on('change.select2', changeHandler);
 
         ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
             $element.off('select2:open', openHandler);
             $element.off('select2:opening', openingHandler);
             $element.off('select2:closing', closingHandler);
+            $element.off('change.select2', changeHandler);
         });
     },
     update: function (element, valueAccessor, allBindings) {
