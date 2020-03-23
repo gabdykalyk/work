@@ -17,7 +17,7 @@ ko.bindingHandlers.hrmSelect = {
             minimumResultsForSearch: searchEnabled ? 0 : Infinity,
             language: 'ru',
             width: '100%',
-            dropdownAutoWidth: false,
+            dropdownAutoWidth: true,
             dropdownCssClass: 'hrm-select__dropdown',
             placeholder,
             allowClear,
