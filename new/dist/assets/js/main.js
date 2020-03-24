@@ -196,6 +196,24 @@ ko.bindingHandlers.hrmLog = {
 };
 "use strict";
 
+ko.components.register('hrm-basic-footer', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-basic-footer']);
+      return new function () {}();
+    }
+  },
+  template: `
+        <div class="hrm-basic-footer__branding">
+            <div class="hrm-basic-footer__logo"></div>
+            <span class="hrm-basic-footer__copyright">© Lookin, 2020</span>
+        </div>
+        <a class="hrm-basic-footer__support-link" href="#">Техническая поддержка</a>
+    `
+});
+"use strict";
+
 ko.components.register('hrm-basic-sidebar', {
   viewModel: {
     createViewModel: function (params, componentInfo) {
@@ -522,24 +540,6 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
     }
   };
 })();
-"use strict";
-
-ko.components.register('hrm-basic-footer', {
-  viewModel: {
-    createViewModel: function (params, componentInfo) {
-      const $element = $(componentInfo.element);
-      $element.addClass(['hrm-basic-footer']);
-      return new function () {}();
-    }
-  },
-  template: `
-        <div class="hrm-basic-footer__branding">
-            <div class="hrm-basic-footer__logo"></div>
-            <span class="hrm-basic-footer__copyright">© Lookin, 2020</span>
-        </div>
-        <a class="hrm-basic-footer__support-link" href="#">Техническая поддержка</a>
-    `
-});
 "use strict";
 
 // hrmFormFieldComplexControl
@@ -1041,7 +1041,6 @@ ko.components.register('hrm-basic-footer', {
     constructor(element, value, selectedOptions, errorStateMatcher) {
       this._subscriptions = [];
       this._$element = $(element);
-      this._focusChangeHandler = null;
       this._valueChangeHandler = null;
       this._selectionFocusHandler = null;
       this._selectionBlurHandler = null;
@@ -1133,10 +1132,6 @@ ko.components.register('hrm-basic-footer', {
         return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
       });
 
-      this._$element.on('focus blur', this._focusChangeHandler);
-
-      this._$element.on('input change', this._valueChangeHandler);
-
       this._select2Instance.$selection.on('focus', this._selectionFocusHandler);
 
       this._select2Instance.$selection.on('blur', this._selectionBlurHandler);
@@ -1147,7 +1142,7 @@ ko.components.register('hrm-basic-footer', {
         this._select2Instance.selection.$search.on('blur', this._searchBlurHandler);
       }
 
-      this._$element.on('change.select2', this._changeHandler);
+      this._$element.on('change.select2', this._valueChangeHandler);
 
       this._$element.on('select2:opening', this._openingHandler);
 

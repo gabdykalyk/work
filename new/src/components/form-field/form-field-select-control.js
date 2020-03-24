@@ -6,7 +6,6 @@
         constructor(element, value, selectedOptions, errorStateMatcher) {
             this._subscriptions = [];
             this._$element = $(element);
-            this._focusChangeHandler = null;
             this._valueChangeHandler = null;
             this._selectionFocusHandler = null;
             this._selectionBlurHandler = null;
@@ -90,15 +89,13 @@
                 return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
             });
 
-            this._$element.on('focus blur', this._focusChangeHandler);
-            this._$element.on('input change', this._valueChangeHandler);
             this._select2Instance.$selection.on('focus', this._selectionFocusHandler);
             this._select2Instance.$selection.on('blur', this._selectionBlurHandler);
             if (this._isMultiple) {
                 this._select2Instance.selection.$search.on('focus', this._searchFocusHandler);
                 this._select2Instance.selection.$search.on('blur', this._searchBlurHandler);
             }
-            this._$element.on('change.select2', this._changeHandler);
+            this._$element.on('change.select2', this._valueChangeHandler);
             this._$element.on('select2:opening', this._openingHandler);
             this._$element.on('select2:close', this._closeHandler);
             this._$element.on('hrm-select:search-update', this._searchUpdateHandler);
