@@ -38,6 +38,16 @@
                 }
             });
 
+            this._subscriptions.push(ko.pureComputed(() => {
+                if (this._control() !== null) {
+                    return this._control()();
+                } else {
+                    return null;
+                }
+            }).subscribe(() => {
+                this._$element.trigger('change.hrm-form-field-input-control');
+            }));
+
             this.focused = ko.observable(this._hasFocus());
             this.disabled = ko.observable(this._isDisabled());
             const hasValue = ko.observable(this._hasValue());
@@ -71,7 +81,7 @@
             });
 
             this._$element.on('focus blur', this._focusChangeHandler);
-            this._$element.on('input change', this._valueChangeHandler);
+            this._$element.on('input change change.hrm-form-field-input-control', this._valueChangeHandler);
         }
 
         dispose() {
