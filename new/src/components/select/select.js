@@ -116,6 +116,8 @@ ko.bindingHandlers.hrmSelect = {
             $element.off('select2:opening', openingHandler);
             $element.off('select2:closing', closingHandler);
             $element.off('change.select2', changeHandler);
+
+            select2Instance.close();
         });
     },
     update: function (element, valueAccessor, allBindings) {
