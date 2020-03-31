@@ -1,0 +1,119 @@
+<script type="text/javascript">
+    $(function () {
+        ko.components.register('positions-page-speciality-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'position-page__speciality-modal-dialog',
+                        'position-page__speciality-modal-dialog--initializing'
+                    ]);
+
+                    return new (function () {
+                        this.initializing = ko.observable(true);
+
+                        this.mode = params.data.mode;
+                        this.data = params.data.data;
+
+                        this.isSubmitted = ko.observable(this.mode === 'edit');
+
+                        this.formModel = ko.validatedObservable({
+                            name: ko.observable(this.mode === 'edit' ? this.data.name : '').extend({
+                                required: {
+                                    message: 'Обязательное поле'
+                                }
+                            })
+                        });
+
+                        this.formControlErrorStateMatcher = function (formControl) {
+                            return ko.pureComputed(() => {
+                                return this.isSubmitted() && !formControl.isValid();
+                            });
+                        };
+
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        this.submit = function () {
+                            this.isSubmitted(true);
+
+                            if (this.formModel.isValid()) {
+                                if ('submit' in params) {
+                                    params.submit({
+                                        name: this.formModel().name()
+                                    })
+                                }
+                            }
+                        };
+
+                        this.afterRender = function () {
+                            $element.removeClass('position-page__speciality-modal-dialog--initializing');
+                            this.initializing(false);
+                        }.bind(this);
+                    });
+                }
+            },
+            template: `
+                <!-- ko template: { afterRender: afterRender } -->
+                    <button class="hrm-button hrm-basic-modal-dialog__close-button"
+                            data-bind="click: function() { cancel(); }" aria-label="Close">
+                    </button>
+
+                    <div class="hrm-basic-modal-dialog__header">
+                        <h2 class="hrm-basic-modal-dialog__title"
+                            data-bind="text: mode === 'edit' ? 'Редактировать специальность' : 'Новая специальность'">
+                        </h2>
+                    </div>
+
+                    <div class="hrm-basic-modal-dialog__body" data-bind="using: formModel">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div data-bind="
+                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                            ">
+                                <label data-bind="hrmFormFieldLabel: label">Название специальности</label>
+
+                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                    <input data-bind="
+                                        textInput: name,
+                                        hrmFormFieldInputControl: control,
+                                        hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                    ">
+                                </div>
+
+                                <div data-bind="
+                                    component: {name: 'hrm-form-field-error'},
+                                    hrmSlide,
+                                    hrmSlideValue: control() !== null ? control().errorState : false,
+                                    hrmSlideDuration: 150
+                                ">
+                                    <!-- ko text: $parent.name.error() --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="hrm-basic-modal-dialog__action-list">
+                        <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+                                       position-page__speciality-modal-dialog-cancel-button"
+                                data-bind="click: function() {cancel();}">
+                            Отменить
+                        </button>
+
+                        <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+                                       position-page__speciality-modal-dialog-submit-button"
+                                data-bind="click: function() {submit();}, attr: {disabled: isSubmitted() && !formModel.isValid()}">
+                            Сохранить
+                        </button>
+                    </div>
+                <!-- /ko -->
+            `
+        });
+    });
+</script>

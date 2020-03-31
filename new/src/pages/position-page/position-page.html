@@ -1187,7 +1187,7 @@
                                                position-page__tab-pane-action-list-item position-page__cancel-button"
                                         data-bind="
                                             click: function() {$tab.cancel();},
-                                            attr: {disabled: ranks().length === 0}
+                                            attr: {disabled: !$tab.isValid()}
                                         ">
                                     Отменить
                                 </button>
@@ -1196,7 +1196,101 @@
                                                position-page__tab-pane-action-list-item position-page__save-button"
                                         data-bind="
                                             click: function() {$tab.submit();},
-                                            attr: {disabled: ranks().length === 0}
+                                            attr: {disabled: !$tab.isValid()}
+                                        ">
+                                    Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko template: {
+                    foreach: hrmTemplateIf($root.activeTab() === 3, $data),
+                    afterAdd: hrmFadeAfterAddFactory(200, 200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <!-- ko let: {'$tab': $root.specialitiesTabViewModel} -->
+                        <div class="position-page__tab-pane position-page__specialities-tab-pane"
+                             data-bind="using: $tab.formModel.value">
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                           hrm-button-with-plus-icon position-page__specialities-tab-pane-add-button position-page__specialities-tab-pane-first-add-button"
+                                    data-bind="click: function() {$tab.create();}">
+                                Добавить специальность
+                            </button>
+
+                            <!-- ko template: {
+                                foreach: hrmTemplateIf(specialities().length > 0, $data),
+                                afterAdd: hrmFadeAfterAddFactory(200),
+                                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                            } -->
+                                <!-- ko if: !$tab.isResetting() -->
+                                    <div class="row">
+                                        <div class="col-12 col-md-8 col-xl-4">
+                                            <table class="position-page__specialities-tab-pane-table" data-bind="hrmTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Название</th>
+                                                        <th class="position-page__specialities-tab-pane-table-actions-head-cell"></th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <!-- ko foreach: {
+                                                        data: specialities,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <tr>
+                                                            <td data-bind="text: name"></td>
+                                                            <td class="position-page__specialities-tab-pane-table-actions-cell">
+                                                                <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
+                                                                               hrm-icon-button--theme_secondary"
+                                                                        title="Редактировать"
+                                                                        data-bind="click: function () {$tab.edit($data);}">
+                                                                </button><!--
+                                                                --><button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                               hrm-icon-button--theme_negative position-page__specialities-tab-pane-table-delete-button"
+                                                                        title="Удалить"
+                                                                        data-bind="click: function () {$tab.delete($data);}">
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    <!-- /ko -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                <!-- /ko -->
+                            <!-- /ko -->
+
+                            <!-- ko template: {
+                                foreach: hrmTemplateIf(specialities().length > 0, $data),
+                                afterAdd: hrmFadeAfterAddFactory(200),
+                                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                            } -->
+                                <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                               hrm-button-with-plus-icon position-page__specialities-tab-pane-add-button position-page__specialities-tab-pane-second-add-button"
+                                        data-bind="click: function() {$tab.create();}">
+                                    Добавить специальность
+                                </button>
+                            <!-- /ko -->
+
+                            <div class="position-page__tab-pane-action-list">
+                                <button class="hrm-button hrm-basic-button
+                                               position-page__tab-pane-action-list-item position-page__cancel-button"
+                                        data-bind="
+                                            click: function() {$tab.cancel();},
+                                            attr: {disabled: !$tab.isValid()}
+                                        ">
+                                    Отменить
+                                </button>
+
+                                <button class="hrm-button hrm-basic-button hrm-accent-button
+                                               position-page__tab-pane-action-list-item position-page__save-button"
+                                        data-bind="
+                                            click: function() {$tab.submit();},
+                                            attr: {disabled: !$tab.isValid()}
                                         ">
                                     Сохранить
                                 </button>
@@ -1230,11 +1324,29 @@
         </div>
     </script>
 
+    <script type="text/html" id="position-page-delete-speciality-modal-content-template">
+        <div data-bind="component: {
+            name: 'positions-page-delete-speciality-modal-dialog',
+            params: {data, modalElement, cancel: function () {close();}, submit: function () {close(true);}}
+        }" role="document">
+        </div>
+    </script>
+
+    <script type="text/html" id="position-page-speciality-modal-content-template">
+        <div data-bind="component: {
+            name: 'positions-page-speciality-modal-dialog',
+            params: {data, modalElement, cancel: function () {close();}, submit: function ($data) {close($data);}}
+        }" role="document">
+        </div>
+    </script>
+
     <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
 
     @@include('../../base/_page-scripts.html')
     @@include('./components/delete-rank-modal-dialog/_delete-rank-modal-dialog.js.html')
     @@include('./components/rank-modal-dialog/_rank-modal-dialog.js.html')
+    @@include('./components/delete-speciality-modal-dialog/_delete-speciality-modal-dialog.js.html')
+    @@include('./components/speciality-modal-dialog/_speciality-modal-dialog.js.html')
     @@include('./_position-page.js.html')
 </body>
 </html>

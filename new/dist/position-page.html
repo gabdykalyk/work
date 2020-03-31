@@ -1201,7 +1201,7 @@
                                                position-page__tab-pane-action-list-item position-page__cancel-button"
                                         data-bind="
                                             click: function() {$tab.cancel();},
-                                            attr: {disabled: ranks().length === 0}
+                                            attr: {disabled: !$tab.isValid()}
                                         ">
                                     Отменить
                                 </button>
@@ -1210,7 +1210,101 @@
                                                position-page__tab-pane-action-list-item position-page__save-button"
                                         data-bind="
                                             click: function() {$tab.submit();},
-                                            attr: {disabled: ranks().length === 0}
+                                            attr: {disabled: !$tab.isValid()}
+                                        ">
+                                    Сохранить
+                                </button>
+                            </div>
+                        </div>
+                    <!-- /ko -->
+                <!-- /ko -->
+
+                <!-- ko template: {
+                    foreach: hrmTemplateIf($root.activeTab() === 3, $data),
+                    afterAdd: hrmFadeAfterAddFactory(200, 200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <!-- ko let: {'$tab': $root.specialitiesTabViewModel} -->
+                        <div class="position-page__tab-pane position-page__specialities-tab-pane"
+                             data-bind="using: $tab.formModel.value">
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                           hrm-button-with-plus-icon position-page__specialities-tab-pane-add-button position-page__specialities-tab-pane-first-add-button"
+                                    data-bind="click: function() {$tab.create();}">
+                                Добавить специальность
+                            </button>
+
+                            <!-- ko template: {
+                                foreach: hrmTemplateIf(specialities().length > 0, $data),
+                                afterAdd: hrmFadeAfterAddFactory(200),
+                                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                            } -->
+                                <!-- ko if: !$tab.isResetting() -->
+                                    <div class="row">
+                                        <div class="col-12 col-md-8 col-xl-4">
+                                            <table class="position-page__specialities-tab-pane-table" data-bind="hrmTable">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Название</th>
+                                                        <th class="position-page__specialities-tab-pane-table-actions-head-cell"></th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+                                                    <!-- ko foreach: {
+                                                        data: specialities,
+                                                        afterAdd: hrmFadeAfterAddFactory(200),
+                                                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                                    } -->
+                                                        <tr>
+                                                            <td data-bind="text: name"></td>
+                                                            <td class="position-page__specialities-tab-pane-table-actions-cell">
+                                                                <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
+                                                                               hrm-icon-button--theme_secondary"
+                                                                        title="Редактировать"
+                                                                        data-bind="click: function () {$tab.edit($data);}">
+                                                                </button><!--
+                                                                --><button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                                                               hrm-icon-button--theme_negative position-page__specialities-tab-pane-table-delete-button"
+                                                                        title="Удалить"
+                                                                        data-bind="click: function () {$tab.delete($data);}">
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    <!-- /ko -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                <!-- /ko -->
+                            <!-- /ko -->
+
+                            <!-- ko template: {
+                                foreach: hrmTemplateIf(specialities().length > 0, $data),
+                                afterAdd: hrmFadeAfterAddFactory(200),
+                                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                            } -->
+                                <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                                               hrm-button-with-plus-icon position-page__specialities-tab-pane-add-button position-page__specialities-tab-pane-second-add-button"
+                                        data-bind="click: function() {$tab.create();}">
+                                    Добавить специальность
+                                </button>
+                            <!-- /ko -->
+
+                            <div class="position-page__tab-pane-action-list">
+                                <button class="hrm-button hrm-basic-button
+                                               position-page__tab-pane-action-list-item position-page__cancel-button"
+                                        data-bind="
+                                            click: function() {$tab.cancel();},
+                                            attr: {disabled: !$tab.isValid()}
+                                        ">
+                                    Отменить
+                                </button>
+
+                                <button class="hrm-button hrm-basic-button hrm-accent-button
+                                               position-page__tab-pane-action-list-item position-page__save-button"
+                                        data-bind="
+                                            click: function() {$tab.submit();},
+                                            attr: {disabled: !$tab.isValid()}
                                         ">
                                     Сохранить
                                 </button>
@@ -1241,6 +1335,22 @@
             <!-- /ko -->
 
             <div data-bind="component: { name: 'position-page__rank-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function ($data) { close($data); } } }" role="document"></div>
+        </div>
+    </script>
+
+    <script type="text/html" id="position-page-delete-speciality-modal-content-template">
+        <div data-bind="component: {
+            name: 'positions-page-delete-speciality-modal-dialog',
+            params: {data, modalElement, cancel: function () {close();}, submit: function () {close(true);}}
+        }" role="document">
+        </div>
+    </script>
+
+    <script type="text/html" id="position-page-speciality-modal-content-template">
+        <div data-bind="component: {
+            name: 'positions-page-speciality-modal-dialog',
+            params: {data, modalElement, cancel: function () {close();}, submit: function ($data) {close($data);}}
+        }" role="document">
         </div>
     </script>
 
@@ -1282,7 +1392,7 @@
                         'position-page__delete-rank-modal-dialog--initializing'
                     ]);
 
-                    const viewModel = new (function () {
+                    return new (function () {
                         this.initializing = ko.observable(true);
 
                         this.cancel = function () {
@@ -1302,8 +1412,6 @@
                             this.initializing(false);
                         }.bind(this);
                     });
-
-                    return viewModel;
                 }
             },
             template: `
@@ -2111,6 +2219,196 @@
 
     <script type="text/javascript">
     $(function () {
+        ko.components.register('positions-page-delete-speciality-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'position-page__delete-speciality-modal-dialog',
+                        'position-page__delete-speciality-modal-dialog--initializing'
+                    ]);
+
+                    return new (function () {
+                        this.initializing = ko.observable(true);
+
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        this.submit = function () {
+                            if ('submit' in params) {
+                                params.submit();
+                            }
+                        };
+
+                        this.afterRender = function () {
+                            $element.removeClass('position-page__delete-speciality-modal-dialog--initializing');
+                            this.initializing(false);
+                        }.bind(this);
+                    });
+                }
+            },
+            template: `
+                <!-- ko template: { afterRender: afterRender } -->
+                    <button class="hrm-button hrm-basic-modal-dialog__close-button"
+                            data-bind="click: function() { cancel(); }" aria-label="Close">
+                    </button>
+
+                    <div class="hrm-basic-modal-dialog__header">
+                        <h2 class="hrm-basic-modal-dialog__title">Удалить специальность</h2>
+                    </div>
+
+                    <div class="hrm-basic-modal-dialog__body">
+                        Специальность будет удалена без возможности восстановления.
+                    </div>
+
+                    <div class="hrm-basic-modal-dialog__action-list">
+                        <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+                                       position-page__delete-speciality-modal-dialog-cancel-button"
+                                data-bind="click: function() {cancel();}">
+                            Отменить
+                        </button>
+
+                        <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+                                       position-page__delete-speciality-modal-dialog-submit-button"
+                                data-bind="click: function() {submit();}">
+                            Удалить
+                        </button>
+                    </div>
+                <!-- /ko -->
+            `
+        });
+    });
+</script>
+
+    <script type="text/javascript">
+    $(function () {
+        ko.components.register('positions-page-speciality-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'position-page__speciality-modal-dialog',
+                        'position-page__speciality-modal-dialog--initializing'
+                    ]);
+
+                    return new (function () {
+                        this.initializing = ko.observable(true);
+
+                        this.mode = params.data.mode;
+                        this.data = params.data.data;
+
+                        this.isSubmitted = ko.observable(this.mode === 'edit');
+
+                        this.formModel = ko.validatedObservable({
+                            name: ko.observable(this.mode === 'edit' ? this.data.name : '').extend({
+                                required: {
+                                    message: 'Обязательное поле'
+                                }
+                            })
+                        });
+
+                        this.formControlErrorStateMatcher = function (formControl) {
+                            return ko.pureComputed(() => {
+                                return this.isSubmitted() && !formControl.isValid();
+                            });
+                        };
+
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        this.submit = function () {
+                            this.isSubmitted(true);
+
+                            if (this.formModel.isValid()) {
+                                if ('submit' in params) {
+                                    params.submit({
+                                        name: this.formModel().name()
+                                    })
+                                }
+                            }
+                        };
+
+                        this.afterRender = function () {
+                            $element.removeClass('position-page__speciality-modal-dialog--initializing');
+                            this.initializing(false);
+                        }.bind(this);
+                    });
+                }
+            },
+            template: `
+                <!-- ko template: { afterRender: afterRender } -->
+                    <button class="hrm-button hrm-basic-modal-dialog__close-button"
+                            data-bind="click: function() { cancel(); }" aria-label="Close">
+                    </button>
+
+                    <div class="hrm-basic-modal-dialog__header">
+                        <h2 class="hrm-basic-modal-dialog__title"
+                            data-bind="text: mode === 'edit' ? 'Редактировать специальность' : 'Новая специальность'">
+                        </h2>
+                    </div>
+
+                    <div class="hrm-basic-modal-dialog__body" data-bind="using: formModel">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div data-bind="
+                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                            ">
+                                <label data-bind="hrmFormFieldLabel: label">Название специальности</label>
+
+                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                    <input data-bind="
+                                        textInput: name,
+                                        hrmFormFieldInputControl: control,
+                                        hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+                                    ">
+                                </div>
+
+                                <div data-bind="
+                                    component: {name: 'hrm-form-field-error'},
+                                    hrmSlide,
+                                    hrmSlideValue: control() !== null ? control().errorState : false,
+                                    hrmSlideDuration: 150
+                                ">
+                                    <!-- ko text: $parent.name.error() --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="hrm-basic-modal-dialog__action-list">
+                        <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+                                       position-page__speciality-modal-dialog-cancel-button"
+                                data-bind="click: function() {cancel();}">
+                            Отменить
+                        </button>
+
+                        <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+                                       position-page__speciality-modal-dialog-submit-button"
+                                data-bind="click: function() {submit();}, attr: {disabled: isSubmitted() && !formModel.isValid()}">
+                            Сохранить
+                        </button>
+                    </div>
+                <!-- /ko -->
+            `
+        });
+    });
+</script>
+
+    <script type="text/javascript">
+    $(function () {
         const $page = $(document.documentElement);
 
         const FormModel = function () {
@@ -2156,6 +2454,12 @@
                     bonusAndFineCalculatedAbsoluteSum: ko.observable(data.bonusAndFineCalculatedAbsoluteSum),
                     bonusAndFineAssignedRelativeSum: ko.observable(data.bonusAndFineAssignedRelativeSum),
                     bonusAndFineCalculatedRelativeSum: ko.observable(data.bonusAndFineCalculatedRelativeSum)
+                }
+            };
+
+            this.createSpecialityFormModel = function (data) {
+                return {
+                    name: ko.observable(data.name)
                 }
             };
 
@@ -2244,7 +2548,12 @@
                     max: ko.observable('')
                 },
                 premiumAccount: ko.observable(false),
-                ranks: ko.observableArray([])
+                ranks: ko.observableArray([]).extend({
+                    required: true
+                }),
+                specialities: ko.observableArray([]).extend({
+                    required: true
+                })
             });
 
             this.formatDecimal = function (value) {
@@ -2596,6 +2905,103 @@
             };
         };
 
+        const SpecialitiesTabViewModel = function (formModel, modalOpens, save) {
+            this.isSubmitted = ko.observable(false);
+            this.isResetting = ko.observable(false);
+
+            this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+                return {
+                    specialities: this.formModel.value().specialities().map(speciality => ({
+                        name: speciality.name()
+                    }))
+                }
+            });
+
+            this.lastFormModelValue = this.formModelValue();
+
+            this.isValid = ko.pureComputed(() => {
+                return this.formModel.value().specialities.isValid();
+            });
+
+            this.cancel = function () {
+                this.isResetting(true);
+
+                this.formModel.value().ranks(this.lastFormModelValue.specialities.map(s => {
+                    return this.formModel.createSpecialityFormModel(s);
+                }));
+
+                this.isResetting(false);
+            };
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    this.lastFormModelValue = this.formModelValue();
+
+                    save();
+                }
+            };
+
+            this.edit = function (speciality) {
+                const open = {
+                    dialogTemplateName: 'position-page-speciality-modal-content-template',
+                    data: {
+                        mode: 'edit',
+                        data: {
+                            name: speciality.name()
+                        }
+                    },
+                    options: {
+                        modalClass: 'position-page__speciality-modal'
+                    },
+                    close: result => {
+                        if (result !== undefined) {
+                            speciality.name(result.name);
+                        }
+                    }
+                };
+
+                modalOpens.push(open);
+            };
+
+            this.create = function () {
+                modalOpens.push({
+                    dialogTemplateName: 'position-page-speciality-modal-content-template',
+                    data: {
+                        mode: 'create'
+                    },
+                    options: {
+                        modalClass: 'position-page__speciality-modal'
+                    },
+                    close: result => {
+                        if (result !== undefined) {
+                            this.formModel.value().specialities.splice(0, 0, this.formModel.createSpecialityFormModel(result));
+                        }
+                    }
+                });
+            };
+
+            this.delete = function (speciality) {
+                modalOpens.push({
+                    dialogTemplateName: 'position-page-delete-speciality-modal-content-template',
+                    close: result => {
+                        if (result !== undefined) {
+                            this.formModel.value().specialities.remove(speciality);
+                        }
+                    }
+                });
+            };
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+        };
+
         const ViewModel = function () {
             this.dishCategories = [
                 {id: '1', name: 'Пицца'},
@@ -2647,6 +3053,10 @@
                 this.activeTab(3);
             });
 
+            this.specialitiesTabViewModel = new SpecialitiesTabViewModel(this.formModel, this.modalOpens, () => {
+                this.activeTab(4);
+            });
+
             this.descendantsComplete = function () {
                 $page.removeClass('hrm-page--initializing');
             };
@@ -2663,17 +3073,18 @@
                 const isWorkloadTabPassed = this.workloadTabViewModel.isValid() && this.workloadTabViewModel.isSubmitted();
                 const isSalaryTabPassed = this.salaryTabViewModel.isValid() && this.salaryTabViewModel.isSubmitted();
                 const isRanksTabPassed = this.ranksTabViewModel.isValid() && this.ranksTabViewModel.isSubmitted();
+                const isSpecialitiesTabPassed = this.specialitiesTabViewModel.isValid() && this.specialitiesTabViewModel.isSubmitted();
+
                 this.navigationTabs[1].disabled(!isWorkloadTabPassed);
-
                 this.navigationTabs[2].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-
                 this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
-                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
-                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
-                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
-                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
-                this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
-                this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+
+                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
+                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
+                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
+                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
+                this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
+                this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
             };
 
             this.formatDecimal = function (value) {
@@ -2716,15 +3127,22 @@
                 this.subscriptions.push(this.ranksTabViewModel.isValid.subscribe(() => {
                     this.updateTabActivities();
                 }));
+                this.subscriptions.push(this.specialitiesTabViewModel.isSubmitted.subscribe(() => {
+                    this.updateTabActivities();
+                }));
+                this.subscriptions.push(this.specialitiesTabViewModel.isValid.subscribe(() => {
+                    this.updateTabActivities();
+                }));
 
-                // Раскомментировать, чтобы заполнить первую вкладку тестовыми данными:
-                /*this.formModel.value().name('Администратор филиала');
-                this.formModel.value().workloadType('10');
-                this.formModel.value().productionStandard.value('2000');
-                this.workloadTabViewModel.submit();
-                this.formModel.value().bulk(1);
-                this.salaryTabViewModel.submit();*/
-                //this.ranksTabViewModel.create();
+                setTimeout(() => {
+                    // Раскомментировать, чтобы заполнить первую вкладку тестовыми данными:
+                    this.formModel.value().name('Администратор филиала');
+                    this.formModel.value().workloadType('10');
+                    this.formModel.value().productionStandard.value('2000');
+                    this.workloadTabViewModel.submit();
+                    this.formModel.value().bulk(1);
+                    this.salaryTabViewModel.submit();
+                });
             })();
         };
 
