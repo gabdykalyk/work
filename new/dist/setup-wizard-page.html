@@ -1981,11 +1981,19 @@
                 return formModel;
             };
 
-            this.createPositionFormModel = function (name = '') {
-                return {
+            this.createPositionFormModel = function (name, list) {
+                const formModel = {
                     name: ko.observable(name).extend({
                         required: {
                             message: 'Выберите должность'
+                        },
+                        validation: {
+                            validator: v => {
+                                const selfIndex = list().indexOf(formModel);
+                                return list().filter((item, index) => index < selfIndex)
+                                    .every(item => item.name() !== v);
+                            },
+                            message: 'Данная должность уже выбрана'
                         }
                     }),
                     workloadType: ko.observable('').extend({
@@ -2009,7 +2017,9 @@
                         }
                     }),
                     dishCategoriesExclusive: ko.observable(false)
-                }
+                };
+
+                return formModel;
             };
 
             this.formModel = (() => {
@@ -2017,6 +2027,12 @@
 
                 dishCategories.push(
                     this.createDishCategoryFormModel('', dishCategories)
+                );
+
+                const positions = ko.observableArray([]);
+
+                positions.push(
+                    this.createPositionFormModel('', positions)
                 );
 
                 return ko.validatedObservable({
@@ -2046,9 +2062,7 @@
                         ko.observableArray([]),
                         ko.observableArray([])
                     ],
-                    positions: ko.observableArray([
-                        this.createPositionFormModel()
-                    ])
+                    positions
                 });
             })();
 
@@ -2724,11 +2738,11 @@
             this.isPositionsStepSubmitted = ko.observable(false);
 
             this.isPositionsStepValid = ko.pureComputed(() => {
-                return this.formModel().positions().every(p => p.name() !== '' && p.name() !== undefined);
+                return this.formModel().positions().every(p => p.name.isValid());
             });
 
             this.positionsStepAdd = function () {
-                this.formModel().positions.push(this.createPositionFormModel());
+                this.formModel().positions.push(this.createPositionFormModel('', this.formModel().positions));
             };
 
             this.positionsStepRemove = function (index) {
