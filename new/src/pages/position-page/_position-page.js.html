@@ -519,7 +519,7 @@
             this.cancel = function () {
                 this.isResetting(true);
 
-                this.formModel.value().ranks(this.lastFormModelValue.specialities.map(s => {
+                this.formModel.value().specialities(this.lastFormModelValue.specialities.map(s => {
                     return this.formModel.createSpecialityFormModel(s);
                 }));
 
@@ -543,7 +543,8 @@
                         mode: 'edit',
                         data: {
                             name: speciality.name()
-                        }
+                        },
+                        specialityNames: this.formModel.value().map(s => s.name())
                     },
                     options: {
                         modalClass: 'position-page__speciality-modal'
@@ -562,7 +563,8 @@
                 modalOpens.push({
                     dialogTemplateName: 'position-page-speciality-modal-content-template',
                     data: {
-                        mode: 'create'
+                        mode: 'create',
+                        specialityNames: this.formModel.value().specialities().map(s => s.name())
                     },
                     options: {
                         modalClass: 'position-page__speciality-modal'
@@ -668,7 +670,7 @@
 
                 this.navigationTabs[1].disabled(!isWorkloadTabPassed);
                 this.navigationTabs[2].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
 
                 this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
                 this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);

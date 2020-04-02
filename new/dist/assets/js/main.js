@@ -439,668 +439,6 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 })();
 "use strict";
 
-// hrmDropdownMenu
-(() => {
-  class HrmDropdownMenuViewModel {
-    constructor(element, context, template, placement) {
-      this._subscriptions = [];
-      this._template = template;
-      this._placement = placement;
-      this._context = context;
-      this.element = element;
-      this._tippyInstance = null;
-      this._tooltipClickHandler = null;
-
-      this._init();
-    }
-
-    _init() {
-      let hidingFlag = false;
-
-      this._tooltipClickHandler = event => {
-        const $target = $(event.target);
-
-        if ($target.is('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)') || $target.parents('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)').length > 0) {
-          this._tippyInstance.hide();
-        }
-      };
-
-      this._tippyInstance = tippy(this.element, {
-        content: this._createContent(document.getElementById(this._template).innerHTML),
-        arrow: false,
-        distance: 7,
-        interactive: true,
-        placement: this._placement !== undefined ? this._placement : 'bottom',
-        appendTo: document.body,
-        boundary: 'viewport',
-        hideOnClick: true,
-        trigger: 'click',
-        onCreate: instance => {
-          $(instance.popperChildren.tooltip).addClass('hrm-dropdown-menu');
-          $(instance.popperChildren.tooltip).on('click', this._tooltipClickHandler);
-        },
-        onShow: () => {
-          return !hidingFlag;
-        },
-        onMount: instance => {
-          $(instance.popperChildren.content).find('.hrm-dropdown-menu__content').overlayScrollbars({});
-          ko.applyBindingsToDescendants(this._context, instance.popperChildren.content);
-          setTimeout(() => {
-            instance.popperInstance.update();
-          });
-        },
-        onHide: () => {
-          hidingFlag = true;
-        },
-        onHidden: instance => {
-          // Хак, чтобы tippy пересоздал содержимое и можно было применить заново биндинги Knockout
-          instance.setContent(this._createContent(document.getElementById(this._template).innerHTML));
-          hidingFlag = false;
-        }
-      });
-    }
-
-    _destroy() {
-      this._subscriptions.forEach(s => s.dispose());
-
-      this._tippyInstance.destroy();
-    }
-
-    _createContent(template) {
-      return $('<div>').addClass('hrm-dropdown-menu__content').append(template).get()[0];
-    }
-
-  }
-
-  ko.bindingHandlers.hrmDropdownMenu = {
-    init: function (element, valueAccessor, allBindings, _, bindingContext) {
-      const template = allBindings.get('hrmDropdownMenuTemplate');
-      const placement = allBindings.get('hrmDropdownMenuPlacement');
-      const viewModel = new HrmDropdownMenuViewModel(element, bindingContext, template, placement);
-
-      if (valueAccessor() !== undefined) {
-        if (ko.isObservableArray(valueAccessor())) {
-          valueAccessor().push(viewModel);
-        } else {
-          valueAccessor()(viewModel);
-        }
-      }
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        if (valueAccessor() !== undefined) {
-          if (ko.isObservableArray(valueAccessor())) {
-            valueAccessor().remove(this);
-          } else {
-            valueAccessor()(null);
-          }
-        }
-
-        viewModel._destroy();
-      });
-    }
-  };
-})();
-"use strict";
-
-(() => {
-  ko.components.register('hrm-main-sidebar', {
-    viewModel: {
-      createViewModel: function (params, componentInfo) {
-        const $element = $(componentInfo.element);
-        $element.addClass(['hrm-main-sidebar']);
-        return new class {
-          constructor() {
-            this._isCollapsed = hrmExtractComponentParam(params, 'collapsed', false);
-            this._isUserSelected = false;
-            this._isNotificationsSelected = false;
-            this._selectedMenuItemIndex = null;
-            this._selectedDrawerContentName = null;
-            this._$element = $element;
-            this._$collapseToggleElement = this._$element.find('.hrm-main-sidebar__collapse-toggle');
-            this._$user = this._$element.find('.hrm-main-sidebar__user');
-            this._$notifications = this._$element.find('.hrm-main-sidebar__notifications');
-            this._$menuItems = this._$element.find('.hrm-main-sidebar__menu-item');
-            this._$drawer = this._$element.find('.hrm-main-sidebar__drawer');
-            this._$backdrop = this._$element.find('.hrm-main-sidebar__backdrop');
-            this._drawerContents = new Map(this._$element.find('.hrm-main-sidebar__drawer-content').toArray().map(element => {
-              const $element = $(element);
-              return [$element.data('hrm-main-sidebar-drawer-content-name'), $element];
-            }));
-            this.viewportSize = ko.observable({
-              width: $(window).width(),
-              height: $(window).height()
-            });
-
-            this._init();
-          }
-
-          _init() {
-            this._$element.addClass('hrm-notransition');
-
-            this._$element.find('.hrm-main-sidebar__user').on('click', async () => {
-              if (this._isUserSelected) {
-                this.clearSelection();
-              } else {
-                this.selectUser();
-              }
-            });
-
-            this._$element.find('.hrm-main-sidebar__notifications').on('click', async () => {
-              if (this._isNotificationsSelected) {
-                this.clearSelection();
-              } else {
-                this.selectNotifications();
-              }
-            });
-
-            this._$backdrop.on('click', async () => {
-              this.clearSelection();
-            });
-
-            this._$menuItems.each((index, menuItem) => {
-              $(menuItem).on('click', () => {
-                if (this._selectedMenuItemIndex === index) {
-                  this.clearSelection();
-                } else {
-                  this.selectMenuItem(index);
-                }
-              });
-            });
-
-            $(window).on('resize', () => {
-              this.viewportSize({
-                width: $(window).width(),
-                height: $(window).height()
-              });
-            });
-
-            this._$element.toggleClass('hrm-main-sidebar--collapsed', this._isCollapsed());
-
-            this._isCollapsed.subscribe(collapsed => {
-              this._$element.toggleClass('hrm-main-sidebar--collapsed', collapsed);
-            });
-
-            setTimeout(() => {
-              this._$element.removeClass('hrm-notransition');
-            }, 0);
-            this.viewportSize.subscribe(() => {
-              this._$element.addClass('hrm-notransition');
-
-              setTimeout(() => {
-                this._$element.removeClass('hrm-notransition');
-              }, 0);
-            });
-          }
-
-          async selectUser() {
-            if (!this._isUserSelected) {
-              await this.clearSelection();
-
-              this._$user.addClass('hrm-main-sidebar__user--active');
-
-              this._isUserSelected = true;
-              await this._openDrawer('user');
-            }
-          }
-
-          async selectNotifications() {
-            if (!this._isNotificationsSelected) {
-              await this.clearSelection();
-
-              this._$notifications.addClass('hrm-main-sidebar__notifications--active');
-
-              this._isNotificationsSelected = true;
-              await this._openDrawer('notifications');
-            }
-          }
-
-          async selectMenuItem(index) {
-            if (this._selectedMenuItemIndex !== index) {
-              await this.clearSelection();
-
-              this._$menuItems.eq(index).addClass('hrm-main-sidebar__menu-item--active');
-
-              this._selectedMenuItemIndex = index;
-              this._isUserSelected = false;
-              await this._openDrawer(this._$menuItems.eq(index).data('hrm-main-sidebar-drawer-content-name'));
-            }
-          }
-
-          async clearSelection() {
-            if (this._selectedMenuItemIndex !== null) {
-              this._$menuItems.eq(this._selectedMenuItemIndex).removeClass('hrm-main-sidebar__menu-item--active');
-
-              this._selectedMenuItemIndex = null;
-            } else if (this._isUserSelected) {
-              this._$user.removeClass('hrm-main-sidebar__user--active');
-
-              this._isUserSelected = false;
-            } else if (this._isNotificationsSelected) {
-              this._$notifications.removeClass('hrm-main-sidebar__notifications--active');
-
-              this._isNotificationsSelected = false;
-            }
-
-            await this._closeDrawer();
-          }
-
-          async _openDrawer(contentName) {
-            if (this._selectedDrawerContentName !== contentName) {
-              await this._closeDrawer();
-
-              const $drawerContent = this._drawerContents.get(contentName);
-
-              $drawerContent.addClass('hrm-main-sidebar__drawer-content--active');
-
-              this._$drawer.addClass('hrm-main-sidebar__drawer--open');
-
-              this._$backdrop.addClass('hrm-main-sidebar__backdrop--visible');
-
-              if ($drawerContent.data('hrm-main-sidebar-drawer-class') !== undefined) {
-                this._$drawer.addClass($drawerContent.data('hrm-main-sidebar-drawer-class'));
-              }
-
-              this._selectedDrawerContentName = contentName;
-            }
-          }
-
-          async _closeDrawer() {
-            if (this._selectedDrawerContentName !== null) {
-              this._$drawer.removeClass('hrm-main-sidebar__drawer--open');
-
-              this._$backdrop.removeClass('hrm-main-sidebar__backdrop--visible');
-
-              await new Promise(resolve => setTimeout(resolve, 200));
-
-              const $drawerContent = this._drawerContents.get(this._selectedDrawerContentName);
-
-              this._$drawer.removeClass($drawerContent.data('hrm-main-sidebar-drawer-class'));
-
-              $drawerContent.removeClass('hrm-main-sidebar__drawer-content--active');
-              this._selectedDrawerContentName = null;
-            }
-          }
-
-        }();
-      }
-    },
-    template: `
-            <div class="hrm-main-sidebar__content-wrapper">
-                <div class="hrm-main-sidebar__content">
-                    <div class="hrm-main-sidebar__header">
-                        <div class="hrm-main-sidebar__user">
-                            <!--<img class="hrm-main-sidebar__avatar" src="assets/examples/avatar.jpg">-->
-                            <img class="hrm-main-sidebar__avatar" src="assets/img/avatar-placeholder.png">
-        
-                            <div class="hrm-main-sidebar__user-name">
-                                Пётр Петров
-                            </div>
-                        </div>
-        
-                        <div class="hrm-main-sidebar__notifications">
-                            <div class="hrm-main-sidebar__notifications-icon">
-                                <div class="hrm-main-sidebar__notifications-icon-counter">28</div>
-                            </div>
-                        </div>
-                    </div>
-        
-                    <ul class="nav hrm-main-sidebar__menu">
-                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-calculations-item"
-                            data-hrm-main-sidebar-drawer-content-name="calculations">
-                            <span class="hrm-main-sidebar__menu-item-name">Расчёты</span>
-                        </li>
-        
-                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-hr-item"
-                            data-hrm-main-sidebar-drawer-content-name="hr">
-                            <span class="hrm-main-sidebar__menu-item-name">Кадры</span>
-                        </li>
-        
-                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-documents-item"
-                            data-hrm-main-sidebar-drawer-content-name="documents">
-                            <span class="hrm-main-sidebar__menu-item-name">Отчёты</span>
-                        </li>
-        
-                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-reference-item"
-                            data-hrm-main-sidebar-drawer-content-name="reference">
-                            <span class="hrm-main-sidebar__menu-item-name">Справочники</span>
-                        </li>
-        
-                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-contents-item"
-                            data-hrm-main-sidebar-drawer-content-name="contents">
-                            <span class="hrm-main-sidebar__menu-item-name">Все разделы</span>
-                        </li>
-                    </ul>
-        
-                    <div class="hrm-spacer"></div>
-                    
-                    <div class="hrm-main-sidebar__actions">
-                        <a class="hrm-main-sidebar__settings-link" href="#" title="Настройки"></a>
-        
-                        <a class="hrm-main-sidebar__support-link" href="#" title="Помощь"></a>
-            
-                        <button class="hrm-button hrm-main-sidebar__collapse-toggle"
-                                data-bind="click: function() {_isCollapsed(!_isCollapsed());}">
-                        </button>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="hrm-main-sidebar__drawer">
-                <div class="hrm-main-sidebar__drawer-content-wrapper" 
-                     data-bind="hrmScrollable, hrmScrollableDisabled: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth">
-                    <div class="hrm-main-sidebar__drawer-content"
-                         data-hrm-main-sidebar-drawer-content-name="calculations"
-                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
-                         <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                    </div>
-        
-                    <div class="hrm-main-sidebar__drawer-content"
-                         data-hrm-main-sidebar-drawer-content-name="hr"
-                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
-                         <!-- ko template: {name: 'hrm-main-sidebar-hr-content'} --><!-- /ko -->
-                    </div >
-        
-                    <div class="hrm-main-sidebar__drawer-content"
-                         data-hrm-main-sidebar-drawer-content-name="documents"
-                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
-                         <!-- ko template: {name: 'hrm-main-sidebar-documents-content'} --><!-- /ko -->
-                    </div>
-        
-                    <div class="hrm-main-sidebar__drawer-content"
-                         data-hrm-main-sidebar-drawer-content-name="reference"
-                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
-                         <!-- ko template: {name: 'hrm-main-sidebar-reference-content'} --><!-- /ko -->
-                    </div>
-                    
-                    <div class="hrm-main-sidebar__drawer-content"
-                         data-hrm-main-sidebar-drawer-content-name="contents"
-                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__contents-drawer">
-                         <!-- ko template: {name: 'hrm-main-sidebar-contents-content'} --><!-- /ko -->
-                    </div>
-                    
-                    <div class="hrm-main-sidebar__drawer-content"
-                         data-hrm-main-sidebar-drawer-content-name="user">
-                         <!-- ko template: {name: 'hrm-main-sidebar-user-content'} --><!-- /ko -->
-                    </div>
-                    
-                    <div class="hrm-main-sidebar__drawer-content"
-                         data-hrm-main-sidebar-drawer-content-name="notifications">
-                         <!-- ko template: {name: 'hrm-main-sidebar-notifications-content'} --><!-- /ko -->
-                    </div>
-                </div>
-            </div>
-        
-            <div class="hrm-main-sidebar__backdrop"></div>
-            
-            <script id="hrm-main-sidebar-calculations-content" type="text/html">
-                <div class="hrm-main-sidebar__submenu">
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
-                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
-                </div>
-            </script>
-            
-            <script id="hrm-main-sidebar-hr-content" type="text/html">
-                <div class="hrm-main-sidebar__submenu">
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
-                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
-                </div>
-            </script>
-            
-            <script id="hrm-main-sidebar-documents-content" type="text/html">
-                <div class="hrm-main-sidebar__submenu">
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
-                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
-                </div>
-            </script>
-            
-            <script id="hrm-main-sidebar-reference-content" type="text/html">
-                <div class="hrm-main-sidebar__submenu">
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
-                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
-                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
-                </div>
-            </script>
-            
-            <script id="hrm-main-sidebar-user-content" type="text/html">
-                Пользователь
-            </script>
-            
-            <script id="hrm-main-sidebar-notifications-content" type="text/html">
-                Уведомления
-            </script>
-            
-            <script id="hrm-main-sidebar-contents-content" type="text/html">
-                <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-                    Все разделы
-                <!-- /ko -->
-                
-                <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
-                    <div class="hrm-main-sidebar__contents">
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Расчеты
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Кадры
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-hr-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Документы
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-documents-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Справочники
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-reference-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Графики
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Листовки
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Маркетинг
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Штрафы/Премии
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Нарушения
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Плохие отзывы
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Жалобы и предложения
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Зоны доставки
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Инструкции
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
-                            <div class="hrm-main-sidebar__contents-section"
-                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
-                                <div class="hrm-main-sidebar__contents-section-header"
-                                     data-bind="click: function() {isOpen(!isOpen());}">
-                                    Календарь событий
-                                </div>
-                                <div class="hrm-main-sidebar__contents-section-body"
-                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
-                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
-                                </div>
-                            </div>
-                        <!-- /ko -->
-                    </div>
-                <!-- /ko -->
-            </script>
-        `
-  });
-})();
-"use strict";
-
 // hrmFormFieldComplexControl
 (() => {
   let nextId = 0;
@@ -2080,6 +1418,109 @@ ko.components.register('hrm-form-field-error', {
 });
 "use strict";
 
+// hrmDropdownMenu
+(() => {
+  class HrmDropdownMenuViewModel {
+    constructor(element, context, template, placement) {
+      this._subscriptions = [];
+      this._template = template;
+      this._placement = placement;
+      this._context = context;
+      this.element = element;
+      this._tippyInstance = null;
+      this._tooltipClickHandler = null;
+
+      this._init();
+    }
+
+    _init() {
+      let hidingFlag = false;
+
+      this._tooltipClickHandler = event => {
+        const $target = $(event.target);
+
+        if ($target.is('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)') || $target.parents('.hrm-dropdown-menu__item:not(.hrm-dropdown-menu__item--disabled)').length > 0) {
+          this._tippyInstance.hide();
+        }
+      };
+
+      this._tippyInstance = tippy(this.element, {
+        content: this._createContent(document.getElementById(this._template).innerHTML),
+        arrow: false,
+        distance: 7,
+        interactive: true,
+        placement: this._placement !== undefined ? this._placement : 'bottom',
+        appendTo: document.body,
+        boundary: 'viewport',
+        hideOnClick: true,
+        trigger: 'click',
+        onCreate: instance => {
+          $(instance.popperChildren.tooltip).addClass('hrm-dropdown-menu');
+          $(instance.popperChildren.tooltip).on('click', this._tooltipClickHandler);
+        },
+        onShow: () => {
+          return !hidingFlag;
+        },
+        onMount: instance => {
+          $(instance.popperChildren.content).find('.hrm-dropdown-menu__content').overlayScrollbars({});
+          ko.applyBindingsToDescendants(this._context, instance.popperChildren.content);
+          setTimeout(() => {
+            instance.popperInstance.update();
+          });
+        },
+        onHide: () => {
+          hidingFlag = true;
+        },
+        onHidden: instance => {
+          // Хак, чтобы tippy пересоздал содержимое и можно было применить заново биндинги Knockout
+          instance.setContent(this._createContent(document.getElementById(this._template).innerHTML));
+          hidingFlag = false;
+        }
+      });
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._tippyInstance.destroy();
+    }
+
+    _createContent(template) {
+      return $('<div>').addClass('hrm-dropdown-menu__content').append(template).get()[0];
+    }
+
+  }
+
+  ko.bindingHandlers.hrmDropdownMenu = {
+    init: function (element, valueAccessor, allBindings, _, bindingContext) {
+      const template = allBindings.get('hrmDropdownMenuTemplate');
+      const placement = allBindings.get('hrmDropdownMenuPlacement');
+      const viewModel = new HrmDropdownMenuViewModel(element, bindingContext, template, placement);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
+    }
+  };
+})();
+"use strict";
+
 ko.bindingHandlers.hrmModalContainerModalWrapper = {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const options = $.extend({
@@ -2174,6 +1615,679 @@ ko.components.register('hrm-modal-container', {
         <!-- /ko -->
     `
 });
+"use strict";
+
+(() => {
+  ko.components.register('hrm-main-sidebar', {
+    viewModel: {
+      createViewModel: function (params, componentInfo) {
+        const $element = $(componentInfo.element);
+        $element.addClass(['hrm-main-sidebar']);
+        return new class {
+          constructor() {
+            this._isCollapsed = hrmExtractComponentParam(params, 'collapsed', false);
+            this._isUserSelected = false;
+            this._isNotificationsSelected = false;
+            this._selectedMenuItemIndex = null;
+            this._selectedDrawerContentName = null;
+            this._$element = $element;
+            this._$collapseToggleElement = this._$element.find('.hrm-main-sidebar__collapse-toggle');
+            this._$user = this._$element.find('.hrm-main-sidebar__user');
+            this._$notifications = this._$element.find('.hrm-main-sidebar__notifications');
+            this._$menuItems = this._$element.find('.hrm-main-sidebar__menu-item');
+            this._$drawer = this._$element.find('.hrm-main-sidebar__drawer');
+            this._$backdrop = this._$element.find('.hrm-main-sidebar__backdrop');
+            this._drawerContents = new Map(this._$element.find('.hrm-main-sidebar__drawer-content').toArray().map(element => {
+              const $element = $(element);
+              return [$element.data('hrm-main-sidebar-drawer-content-name'), $element];
+            }));
+            this.viewportSize = ko.observable({
+              width: $(window).width(),
+              height: $(window).height()
+            });
+
+            this._init();
+          }
+
+          _init() {
+            this._$element.addClass('hrm-notransition');
+
+            this._$element.find('.hrm-main-sidebar__user').on('click', async () => {
+              if (this._isUserSelected) {
+                this.clearSelection();
+              } else {
+                this.selectUser();
+              }
+            });
+
+            this._$element.find('.hrm-main-sidebar__notifications').on('click', async () => {
+              if (this._isNotificationsSelected) {
+                this.clearSelection();
+              } else {
+                this.selectNotifications();
+              }
+            });
+
+            this._$backdrop.on('click', async () => {
+              this.clearSelection();
+            });
+
+            this._$menuItems.each((index, menuItem) => {
+              $(menuItem).on('click', () => {
+                if (this._selectedMenuItemIndex === index) {
+                  this.clearSelection();
+                } else {
+                  this.selectMenuItem(index);
+                }
+              });
+            });
+
+            $(window).on('resize', () => {
+              this.viewportSize({
+                width: $(window).width(),
+                height: $(window).height()
+              });
+            });
+
+            this._$element.toggleClass('hrm-main-sidebar--collapsed', this._isCollapsed());
+
+            this._isCollapsed.subscribe(collapsed => {
+              this._$element.toggleClass('hrm-main-sidebar--collapsed', collapsed);
+            });
+
+            setTimeout(() => {
+              this._$element.removeClass('hrm-notransition');
+            }, 0);
+            this.viewportSize.subscribe(() => {
+              this._$element.addClass('hrm-notransition');
+
+              setTimeout(() => {
+                this._$element.removeClass('hrm-notransition');
+              }, 0);
+            });
+          }
+
+          async selectUser() {
+            if (!this._isUserSelected) {
+              await this.clearSelection();
+
+              this._$user.addClass('hrm-main-sidebar__user--active');
+
+              this._isUserSelected = true;
+              await this._openDrawer('user');
+            }
+          }
+
+          async selectNotifications() {
+            if (!this._isNotificationsSelected) {
+              await this.clearSelection();
+
+              this._$notifications.addClass('hrm-main-sidebar__notifications--active');
+
+              this._isNotificationsSelected = true;
+              await this._openDrawer('notifications');
+            }
+          }
+
+          async selectMenuItem(index) {
+            if (this._selectedMenuItemIndex !== index) {
+              await this.clearSelection();
+
+              this._$menuItems.eq(index).addClass('hrm-main-sidebar__menu-item--active');
+
+              this._selectedMenuItemIndex = index;
+              this._isUserSelected = false;
+              await this._openDrawer(this._$menuItems.eq(index).data('hrm-main-sidebar-drawer-content-name'));
+            }
+          }
+
+          async clearSelection() {
+            if (this._selectedMenuItemIndex !== null) {
+              this._$menuItems.eq(this._selectedMenuItemIndex).removeClass('hrm-main-sidebar__menu-item--active');
+
+              this._selectedMenuItemIndex = null;
+            } else if (this._isUserSelected) {
+              this._$user.removeClass('hrm-main-sidebar__user--active');
+
+              this._isUserSelected = false;
+            } else if (this._isNotificationsSelected) {
+              this._$notifications.removeClass('hrm-main-sidebar__notifications--active');
+
+              this._isNotificationsSelected = false;
+            }
+
+            await this._closeDrawer();
+          }
+
+          async _openDrawer(contentName) {
+            if (this._selectedDrawerContentName !== contentName) {
+              await this._closeDrawer();
+
+              const $drawerContent = this._drawerContents.get(contentName);
+
+              $drawerContent.addClass('hrm-main-sidebar__drawer-content--active');
+
+              this._$drawer.addClass('hrm-main-sidebar__drawer--open');
+
+              this._$backdrop.addClass('hrm-main-sidebar__backdrop--visible');
+
+              if ($drawerContent.data('hrm-main-sidebar-drawer-class') !== undefined) {
+                this._$drawer.addClass($drawerContent.data('hrm-main-sidebar-drawer-class'));
+              }
+
+              this._selectedDrawerContentName = contentName;
+            }
+          }
+
+          async _closeDrawer() {
+            if (this._selectedDrawerContentName !== null) {
+              this._$drawer.removeClass('hrm-main-sidebar__drawer--open');
+
+              this._$backdrop.removeClass('hrm-main-sidebar__backdrop--visible');
+
+              await new Promise(resolve => setTimeout(resolve, 200));
+
+              const $drawerContent = this._drawerContents.get(this._selectedDrawerContentName);
+
+              this._$drawer.removeClass($drawerContent.data('hrm-main-sidebar-drawer-class'));
+
+              $drawerContent.removeClass('hrm-main-sidebar__drawer-content--active');
+              this._selectedDrawerContentName = null;
+            }
+          }
+
+        }();
+      }
+    },
+    template: `
+            <div class="hrm-main-sidebar__content-wrapper">
+                <div class="hrm-main-sidebar__content">
+                    <div class="hrm-main-sidebar__header">
+                        <div class="hrm-main-sidebar__user">
+                            <!--<img class="hrm-main-sidebar__avatar" src="assets/examples/avatar.jpg">-->
+                            <img class="hrm-main-sidebar__avatar" src="assets/img/avatar-placeholder.png">
+        
+                            <div class="hrm-main-sidebar__user-name">
+                                Пётр Петров
+                            </div>
+                        </div>
+        
+                        <div class="hrm-main-sidebar__notifications">
+                            <div class="hrm-main-sidebar__notifications-icon">
+                                <div class="hrm-main-sidebar__notifications-icon-counter">28</div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <ul class="nav hrm-main-sidebar__menu">
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-calculations-item"
+                            data-hrm-main-sidebar-drawer-content-name="calculations">
+                            <span class="hrm-main-sidebar__menu-item-name">Расчёты</span>
+                        </li>
+        
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-hr-item"
+                            data-hrm-main-sidebar-drawer-content-name="hr">
+                            <span class="hrm-main-sidebar__menu-item-name">Кадры</span>
+                        </li>
+        
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-documents-item"
+                            data-hrm-main-sidebar-drawer-content-name="documents">
+                            <span class="hrm-main-sidebar__menu-item-name">Отчёты</span>
+                        </li>
+        
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-reference-item"
+                            data-hrm-main-sidebar-drawer-content-name="reference">
+                            <span class="hrm-main-sidebar__menu-item-name">Справочники</span>
+                        </li>
+        
+                        <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-contents-item"
+                            data-hrm-main-sidebar-drawer-content-name="contents">
+                            <span class="hrm-main-sidebar__menu-item-name">Все разделы</span>
+                        </li>
+                    </ul>
+        
+                    <div class="hrm-spacer"></div>
+                    
+                    <div class="hrm-main-sidebar__actions">
+                        <a class="hrm-main-sidebar__settings-link" href="#" title="Настройки"></a>
+        
+                        <a class="hrm-main-sidebar__support-link" href="#" title="Помощь"></a>
+            
+                        <button class="hrm-button hrm-main-sidebar__collapse-toggle"
+                                data-bind="click: function() {_isCollapsed(!_isCollapsed());}">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        
+            <div class="hrm-main-sidebar__drawer">
+                <div class="hrm-main-sidebar__drawer-content-wrapper" 
+                     data-bind="hrmScrollable, hrmScrollableDisabled: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth">
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="calculations"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                    </div>
+        
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="hr"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-hr-content'} --><!-- /ko -->
+                    </div >
+        
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="documents"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-documents-content'} --><!-- /ko -->
+                    </div>
+        
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="reference"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-reference-content'} --><!-- /ko -->
+                    </div>
+                    
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="contents"
+                         data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__contents-drawer">
+                         <!-- ko template: {name: 'hrm-main-sidebar-contents-content'} --><!-- /ko -->
+                    </div>
+                    
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="user">
+                         <!-- ko template: {name: 'hrm-main-sidebar-user-content'} --><!-- /ko -->
+                    </div>
+                    
+                    <div class="hrm-main-sidebar__drawer-content"
+                         data-hrm-main-sidebar-drawer-content-name="notifications">
+                         <!-- ko template: {name: 'hrm-main-sidebar-notifications-content'} --><!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        
+            <div class="hrm-main-sidebar__backdrop"></div>
+            
+            <script id="hrm-main-sidebar-calculations-content" type="text/html">
+                <div class="hrm-main-sidebar__submenu">
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
+                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
+                </div>
+            </script>
+            
+            <script id="hrm-main-sidebar-hr-content" type="text/html">
+                <div class="hrm-main-sidebar__submenu">
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
+                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
+                </div>
+            </script>
+            
+            <script id="hrm-main-sidebar-documents-content" type="text/html">
+                <div class="hrm-main-sidebar__submenu">
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
+                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
+                </div>
+            </script>
+            
+            <script id="hrm-main-sidebar-reference-content" type="text/html">
+                <div class="hrm-main-sidebar__submenu">
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Штатная численность</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Потребность в персонале</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Кандидаты</a>
+                    <a class="hrm-main-sidebar__submenu-item hrm-main-sidebar__submenu-item--active" href="#">Жалобы и предложения</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Приказы/инструкции</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Анкеты водителей</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Праздничные надбавки</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Надбавки за лучшие показатели</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Договоры</a>
+                    <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
+                </div>
+            </script>
+            
+            <script id="hrm-main-sidebar-user-content" type="text/html">
+                Пользователь
+            </script>
+            
+            <script id="hrm-main-sidebar-notifications-content" type="text/html">
+                Уведомления
+            </script>
+            
+            <script id="hrm-main-sidebar-contents-content" type="text/html">
+                <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                    Все разделы
+                <!-- /ko -->
+                
+                <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                    <div class="hrm-main-sidebar__contents">
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Расчеты
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Кадры
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-hr-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Документы
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-documents-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Справочники
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-reference-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Графики
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Листовки
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Маркетинг
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Штрафы/Премии
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Нарушения
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Плохие отзывы
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Жалобы и предложения
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Зоны доставки
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Инструкции
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                            <div class="hrm-main-sidebar__contents-section"
+                                 data-bind="css: {'hrm-main-sidebar__contents-section--open': isOpen}">
+                                <div class="hrm-main-sidebar__contents-section-header"
+                                     data-bind="click: function() {isOpen(!isOpen());}">
+                                    Календарь событий
+                                </div>
+                                <div class="hrm-main-sidebar__contents-section-body"
+                                     data-bind="hrmSlide, hrmSlideValue: isOpen">
+                                    <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                <!-- /ko -->
+            </script>
+        `
+  });
+})();
+"use strict";
+
+// hrmScrollable
+(() => {
+  class HrmScrollableViewModel {
+    constructor(element, disabled) {
+      this._subscriptions = [];
+      this._disabledSubscription = null;
+      this._disabled = null;
+      this._overlayScrollbarsInstance = null;
+      this._overlayScrollbarsOptions = {
+        className: 'hrm-scrollable'
+      };
+      this.element = element;
+
+      this._init(disabled);
+    }
+
+    _init(disabled) {
+      this._setDisabled(disabled);
+
+      this._update();
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      this._disabledSubscription.dispose();
+    }
+
+    _setDisabled(disabled) {
+      if (disabled === undefined) {
+        disabled = false;
+      }
+
+      if (this._disabledSubscription !== null) {
+        this._disabledSubscription.dispose();
+      }
+
+      if (ko.isObservable(disabled)) {
+        this._disabledSubscription = disabled.subscribe(disabled => {
+          this._disabled = disabled;
+
+          this._update();
+        });
+        this._disabled = disabled();
+      } else {
+        this._disabled = disabled;
+
+        this._update();
+      }
+    }
+
+    _update() {
+      const $element = $(this.element);
+
+      if (!this._disabled) {
+        if (this._overlayScrollbarsInstance === null) {
+          $element.overlayScrollbars(this._overlayScrollbarsOptions);
+          this._overlayScrollbarsInstance = $element.overlayScrollbars();
+        }
+      } else {
+        if (this._overlayScrollbarsInstance !== null) {
+          this._overlayScrollbarsInstance.destroy();
+
+          this._overlayScrollbarsInstance = null;
+        }
+      }
+    }
+
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
+  ko.bindingHandlers.hrmScrollable = {
+    init: function (element, valueAccessor, allBindings) {
+      const disabled = allBindings.get('hrmScrollableDisabled');
+      const viewModel = new HrmScrollableViewModel(element, disabled);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['hrmScrollableDisabled'] !== allBindings.get('hrmScrollableDisabled')) {
+          instance._setDisabled(allBindings.get('hrmScrollableDisabled'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
 "use strict";
 
 // hrmScrollableWrapper
@@ -2314,120 +2428,6 @@ ko.components.register('hrm-modal-container', {
             </div>
         `
   });
-})();
-"use strict";
-
-// hrmScrollable
-(() => {
-  class HrmScrollableViewModel {
-    constructor(element, disabled) {
-      this._subscriptions = [];
-      this._disabledSubscription = null;
-      this._disabled = null;
-      this._overlayScrollbarsInstance = null;
-      this._overlayScrollbarsOptions = {
-        className: 'hrm-scrollable'
-      };
-      this.element = element;
-
-      this._init(disabled);
-    }
-
-    _init(disabled) {
-      this._setDisabled(disabled);
-
-      this._update();
-    }
-
-    _destroy() {
-      this._subscriptions.forEach(s => s.dispose());
-
-      this._disabledSubscription.dispose();
-    }
-
-    _setDisabled(disabled) {
-      if (disabled === undefined) {
-        disabled = false;
-      }
-
-      if (this._disabledSubscription !== null) {
-        this._disabledSubscription.dispose();
-      }
-
-      if (ko.isObservable(disabled)) {
-        this._disabledSubscription = disabled.subscribe(disabled => {
-          this._disabled = disabled;
-
-          this._update();
-        });
-        this._disabled = disabled();
-      } else {
-        this._disabled = disabled;
-
-        this._update();
-      }
-    }
-
-    _update() {
-      const $element = $(this.element);
-
-      if (!this._disabled) {
-        if (this._overlayScrollbarsInstance === null) {
-          $element.overlayScrollbars(this._overlayScrollbarsOptions);
-          this._overlayScrollbarsInstance = $element.overlayScrollbars();
-        }
-      } else {
-        if (this._overlayScrollbarsInstance !== null) {
-          this._overlayScrollbarsInstance.destroy();
-
-          this._overlayScrollbarsInstance = null;
-        }
-      }
-    }
-
-  }
-
-  const instances = new Map();
-  const previousBindingsList = new Map();
-  ko.bindingHandlers.hrmScrollable = {
-    init: function (element, valueAccessor, allBindings) {
-      const disabled = allBindings.get('hrmScrollableDisabled');
-      const viewModel = new HrmScrollableViewModel(element, disabled);
-      instances.set(element, viewModel);
-
-      if (valueAccessor() !== undefined) {
-        if (ko.isObservableArray(valueAccessor())) {
-          valueAccessor().push(viewModel);
-        } else {
-          valueAccessor()(viewModel);
-        }
-      }
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        if (valueAccessor() !== undefined) {
-          if (ko.isObservableArray(valueAccessor())) {
-            valueAccessor().remove(this);
-          } else {
-            valueAccessor()(null);
-          }
-        }
-
-        viewModel._destroy();
-      });
-    },
-    update: function (element, valueAccessor, allBindings) {
-      const instance = instances.get(element);
-      const previousBindings = previousBindingsList.get(element);
-
-      if (previousBindings !== undefined) {
-        if (previousBindings['hrmScrollableDisabled'] !== allBindings.get('hrmScrollableDisabled')) {
-          instance._setDisabled(allBindings.get('hrmScrollableDisabled'));
-        }
-      }
-
-      previousBindingsList.set(element, allBindings());
-    }
-  };
 })();
 "use strict";
 
@@ -2711,154 +2711,6 @@ ko.bindingHandlers.hrmSelect = {
     }
   };
 })();
-"use strict";
-
-class HrmTabGroupItem {
-  constructor(text, disabled = false) {
-    this.text = text;
-    this.disabled = ko.observable(disabled);
-  }
-
-}
-
-ko.components.register('hrm-tab-group', {
-  viewModel: {
-    createViewModel: function (params, componentInfo) {
-      const $element = $(componentInfo.element);
-      $element.addClass(['hrm-tab-group']);
-
-      const HrmTabGroupViewModel = function () {
-        this.moreButtonElementWidth = 33.5;
-        this.itemMargin = 30;
-        this.subscriptions = [];
-        this.element = componentInfo.element;
-
-        this.windowResizeHandler = () => {
-          this.viewportSize({
-            width: $(window).width(),
-            height: $(window).height()
-          });
-          this.updateWidth();
-        };
-
-        this.viewportSize = ko.observable({
-          width: $(window).width(),
-          height: $(window).height()
-        });
-        this.items = params.items;
-        this.activeItem = hrmExtractComponentParam(params, 'activeItem', 0);
-        this.width = ko.observable($element.width());
-        this.itemWidths = ko.pureComputed(() => {
-          const $itemMirror = $('<span>').css({
-            'font-weight': 500,
-            'font-size': '13px',
-            'white-space': 'nowrap'
-          });
-          const $container = $('<div>').css({
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            width: '100%',
-            height: '100%',
-            visibility: 'hidden'
-          });
-          $container.appendTo(document.body);
-          $container.append($itemMirror);
-          const result = ko.unwrap(this.items).map(item => {
-            $itemMirror.text(item.text);
-            return $itemMirror.width();
-          });
-          $container.remove();
-          return result;
-        });
-        this.maxFitItem = ko.pureComputed(() => {
-          const itemWidths = this.itemWidths();
-          const width = this.width();
-          let w = 0;
-
-          for (let i = 0; i < itemWidths.length; i++) {
-            if (i > 0) {
-              w += itemWidths[i] + this.itemMargin;
-            } else {
-              w += itemWidths[i];
-            }
-
-            if (w >= width - this.moreButtonElementWidth - this.itemMargin) {
-              return i !== 0 ? i - 1 : null;
-            }
-          }
-
-          return itemWidths.length > 0 ? itemWidths.length - 1 : null;
-        });
-
-        this.updateWidth = function () {
-          this.width($element.width());
-        };
-
-        this.timer = ko.observable(0);
-        setInterval(() => {
-          this.timer(this.timer() + 1);
-        }, 1000);
-
-        (() => {
-          $(window).on('resize', this.windowResizeHandler);
-        })();
-      };
-
-      HrmTabGroupViewModel.prototype.dispose = function () {
-        this.subscriptions.forEach(s => s.dispose());
-        $(window).off('resize', this.windowResizeHandler);
-      };
-
-      return new HrmTabGroupViewModel();
-    }
-  },
-  template: `
-        <div class="hrm-tab-group__content-wrapper">
-            <div class="hrm-tab-group__content">
-                <!-- ko if: items.length > 0 -->
-                    <!-- ko foreach: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth ? items.slice(0, maxFitItem() + 1) : items -->
-                        <div class="hrm-tab-group__item"
-                             data-bind="
-                                click: function() {if (!disabled()) {$component.activeItem($index());}},
-                                css: {
-                                    'hrm-tab-group__item--active': $component.activeItem() === $index(),
-                                    'hrm-tab-group__item--disabled': disabled
-                                },
-                                text: text
-                             ">
-                        </div>
-                    <!-- /ko -->
-                    
-                    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
-                        <!-- ko if: maxFitItem() < items.length - 1 -->
-                            <button class="hrm-button hrm-tab-group__more-button"
-                                    data-bind="
-                                        hrmDropdownMenu,
-                                        hrmDropdownMenuTemplate: 'hrm-tab-group-more-button-dropdown-menu-template',
-                                        hrmDropdownMenuPlacement: 'bottom-end'
-                                    ">
-                                Еще...
-                            </button>
-                            
-                            <script id="hrm-tab-group-more-button-dropdown-menu-template" type="text/html">
-                                <!-- ko foreach: items.slice(maxFitItem() + 1) -->
-                                    <div class="hrm-dropdown-menu__item"
-                                         data-bind="
-                                            text: text,
-                                            click: function() {if (!disabled()) {$component.activeItem($index() + $component.maxFitItem() + 1);}},
-                                            css: {'hrm-dropdown-menu__item--disabled': disabled}
-                                         ">
-                                    </div>
-                                <!-- /ko -->
-                            </script>   
-                        <!-- /ko -->
-                    <!-- /ko -->
-                <!-- /ko -->
-            </div>
-        </div>
-    `
-});
 "use strict";
 
 ko.bindingHandlers.hrmTable = {
@@ -3332,6 +3184,154 @@ ko.bindingHandlers.hrmTable = {
     }
   };
 })();
+"use strict";
+
+class HrmTabGroupItem {
+  constructor(text, disabled = false) {
+    this.text = text;
+    this.disabled = ko.observable(disabled);
+  }
+
+}
+
+ko.components.register('hrm-tab-group', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-tab-group']);
+
+      const HrmTabGroupViewModel = function () {
+        this.moreButtonElementWidth = 33.5;
+        this.itemMargin = 30;
+        this.subscriptions = [];
+        this.element = componentInfo.element;
+
+        this.windowResizeHandler = () => {
+          this.viewportSize({
+            width: $(window).width(),
+            height: $(window).height()
+          });
+          this.updateWidth();
+        };
+
+        this.viewportSize = ko.observable({
+          width: $(window).width(),
+          height: $(window).height()
+        });
+        this.items = params.items;
+        this.activeItem = hrmExtractComponentParam(params, 'activeItem', 0);
+        this.width = ko.observable($element.width());
+        this.itemWidths = ko.pureComputed(() => {
+          const $itemMirror = $('<span>').css({
+            'font-weight': 500,
+            'font-size': '13px',
+            'white-space': 'nowrap'
+          });
+          const $container = $('<div>').css({
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
+            visibility: 'hidden'
+          });
+          $container.appendTo(document.body);
+          $container.append($itemMirror);
+          const result = ko.unwrap(this.items).map(item => {
+            $itemMirror.text(item.text);
+            return $itemMirror.width();
+          });
+          $container.remove();
+          return result;
+        });
+        this.maxFitItem = ko.pureComputed(() => {
+          const itemWidths = this.itemWidths();
+          const width = this.width();
+          let w = 0;
+
+          for (let i = 0; i < itemWidths.length; i++) {
+            if (i > 0) {
+              w += itemWidths[i] + this.itemMargin;
+            } else {
+              w += itemWidths[i];
+            }
+
+            if (w >= width - this.moreButtonElementWidth - this.itemMargin) {
+              return i !== 0 ? i - 1 : null;
+            }
+          }
+
+          return itemWidths.length > 0 ? itemWidths.length - 1 : null;
+        });
+
+        this.updateWidth = function () {
+          this.width($element.width());
+        };
+
+        this.timer = ko.observable(0);
+        setInterval(() => {
+          this.timer(this.timer() + 1);
+        }, 1000);
+
+        (() => {
+          $(window).on('resize', this.windowResizeHandler);
+        })();
+      };
+
+      HrmTabGroupViewModel.prototype.dispose = function () {
+        this.subscriptions.forEach(s => s.dispose());
+        $(window).off('resize', this.windowResizeHandler);
+      };
+
+      return new HrmTabGroupViewModel();
+    }
+  },
+  template: `
+        <div class="hrm-tab-group__content-wrapper">
+            <div class="hrm-tab-group__content">
+                <!-- ko if: items.length > 0 -->
+                    <!-- ko foreach: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth ? items.slice(0, maxFitItem() + 1) : items -->
+                        <div class="hrm-tab-group__item"
+                             data-bind="
+                                click: function() {if (!disabled()) {$component.activeItem($index());}},
+                                css: {
+                                    'hrm-tab-group__item--active': $component.activeItem() === $index(),
+                                    'hrm-tab-group__item--disabled': disabled
+                                },
+                                text: text
+                             ">
+                        </div>
+                    <!-- /ko -->
+                    
+                    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
+                        <!-- ko if: maxFitItem() < items.length - 1 -->
+                            <button class="hrm-button hrm-tab-group__more-button"
+                                    data-bind="
+                                        hrmDropdownMenu,
+                                        hrmDropdownMenuTemplate: 'hrm-tab-group-more-button-dropdown-menu-template',
+                                        hrmDropdownMenuPlacement: 'bottom-end'
+                                    ">
+                                Еще...
+                            </button>
+                            
+                            <script id="hrm-tab-group-more-button-dropdown-menu-template" type="text/html">
+                                <!-- ko foreach: items.slice(maxFitItem() + 1) -->
+                                    <div class="hrm-dropdown-menu__item"
+                                         data-bind="
+                                            text: text,
+                                            click: function() {if (!disabled()) {$component.activeItem($index() + $component.maxFitItem() + 1);}},
+                                            css: {'hrm-dropdown-menu__item--disabled': disabled}
+                                         ">
+                                    </div>
+                                <!-- /ko -->
+                            </script>   
+                        <!-- /ko -->
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+    `
+});
 "use strict";
 
 // hrmTooltip

@@ -1200,8 +1200,7 @@
                                 <button class="hrm-button hrm-basic-button
                                                position-page__tab-pane-action-list-item position-page__cancel-button"
                                         data-bind="
-                                            click: function() {$tab.cancel();},
-                                            attr: {disabled: !$tab.isValid()}
+                                            click: function() {$tab.cancel();}
                                         ">
                                     Отменить
                                 </button>
@@ -1294,8 +1293,7 @@
                                 <button class="hrm-button hrm-basic-button
                                                position-page__tab-pane-action-list-item position-page__cancel-button"
                                         data-bind="
-                                            click: function() {$tab.cancel();},
-                                            attr: {disabled: !$tab.isValid()}
+                                            click: function() {$tab.cancel();}
                                         ">
                                     Отменить
                                 </button>
@@ -2314,6 +2312,12 @@
                             name: ko.observable(this.mode === 'edit' ? this.data.name : '').extend({
                                 required: {
                                     message: 'Обязательное поле'
+                                },
+                                validation: {
+                                    validator: value => {
+                                        return !params.data.specialityNames.includes(value);
+                                    },
+                                    message: 'Название уже используется'
                                 }
                             })
                         });
@@ -2928,7 +2932,7 @@
             this.cancel = function () {
                 this.isResetting(true);
 
-                this.formModel.value().ranks(this.lastFormModelValue.specialities.map(s => {
+                this.formModel.value().specialities(this.lastFormModelValue.specialities.map(s => {
                     return this.formModel.createSpecialityFormModel(s);
                 }));
 
@@ -2952,7 +2956,8 @@
                         mode: 'edit',
                         data: {
                             name: speciality.name()
-                        }
+                        },
+                        specialityNames: this.formModel.value().map(s => s.name())
                     },
                     options: {
                         modalClass: 'position-page__speciality-modal'
@@ -2971,7 +2976,8 @@
                 modalOpens.push({
                     dialogTemplateName: 'position-page-speciality-modal-content-template',
                     data: {
-                        mode: 'create'
+                        mode: 'create',
+                        specialityNames: this.formModel.value().specialities().map(s => s.name())
                     },
                     options: {
                         modalClass: 'position-page__speciality-modal'
@@ -3077,7 +3083,7 @@
 
                 this.navigationTabs[1].disabled(!isWorkloadTabPassed);
                 this.navigationTabs[2].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed);
+                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
 
                 this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
                 this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
