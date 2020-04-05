@@ -1,0 +1,192 @@
+<!-- ko let: {'$tab': $root.recruitingTabViewModel} -->
+    <div class="position-page__tab-pane position-page__recruiting-tab-pane"
+         data-bind="using: $tab.formModel.value">
+        <div class="position-page__section">
+            <div class="position-page__section-row">
+                <div class="position-page__section-row-content">
+                    <div class="position-page__section-row-item">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div class="position-page__recruiting-tab-pane-position-code-form-field"
+                                 data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                <label data-bind="hrmFormFieldLabel: label">
+                                    Код должности
+
+                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                            data-bind="hrmTooltip, hrmTooltipText: 'Код должности'">
+                                    </button>
+                                </label>
+
+                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                    <input data-bind="
+                                        textInput: recruiting.positionCode,
+                                        hrmMask, hrmMaskPattern: {regex: '[\\w]*'},
+                                        hrmFormFieldInputControl: control,
+                                        hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                    " placeholder="0">
+                                </div>
+
+                                <div data-bind="
+                                    component: {name: 'hrm-form-field-error'},
+                                    hrmSlide,
+                                    hrmSlideValue: control() !== null ? control().errorState : false,
+                                    hrmSlideDuration: 150
+                                ">
+                                    <!-- ko text: $parent.recruiting.positionCode.error() --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="position-page__section-row-item">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div class="position-page__recruiting-tab-pane-template-form-field"
+                                 data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                <label data-bind="hrmFormFieldLabel: label">
+                                    Шаблон для анкеты
+
+                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                            data-bind="hrmTooltip, hrmTooltipText: 'Шаблон для анкеты'">
+                                    </button>
+                                </label>
+
+                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                    <select data-bind="
+                                        value: recruiting.template  ,
+                                        hrmSelect, hrmSelectAllowClear: true, hrmSelectPlaceholder: '', hrmSelectSearchEnabled: true,
+                                        hrmFormFieldSelectControl: control
+                                    ">
+                                        <option></option>
+                                        <option value="0">1</option>
+                                        <option value="0">2</option>
+                                        <option value="0">3</option>
+                                        <option value="0">4</option>
+                                        <option value="0">5</option>
+                                    </select>
+                                </div>
+
+                                <div class="hrm-form-field__hint">необязательно</div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="position-page__section-row">
+                <div class="position-page__section-row-content">
+                    <div class="position-page__section-row-item">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div class="position-page__recruiting-tab-pane-hatimaki-vacancy-id-form-field"
+                                 data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                <label data-bind="hrmFormFieldLabel: label">
+                                    ID вакансии на сайте Хатимаки
+
+                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                            data-bind="hrmTooltip, hrmTooltipText: 'ID вакансии на сайте Хатимаки'">
+                                    </button>
+                                </label>
+
+                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                    <input data-bind="
+                                        textInput: recruiting.hatimakiVacancyId,
+                                        hrmMask, hrmMaskPattern: '999999999',
+                                        hrmFormFieldInputControl: control,
+                                        hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                    " placeholder="Девятизначное число">
+                                </div>
+
+                                <div class="hrm-form-field__hint" data-bind="
+                                    hrmSlide,
+                                    hrmSlideValue: control() !== null ? !control().errorState() : true,
+                                    hrmSlideDuration: 150
+                                ">
+                                    необязательно
+                                </div>
+
+                                <div data-bind="
+                                    component: {name: 'hrm-form-field-error'},
+                                    hrmSlide,
+                                    hrmSlideValue: control() !== null ? control().errorState : false,
+                                    hrmSlideDuration: 150
+                                ">
+                                    <!-- ko text: $parent.recruiting.hatimakiVacancyId.error() --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="position-page__section-row">
+                <div class="position-page__section-row-content">
+                    <div class="position-page__section-row-item">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div class="position-page__deposit-tab-pane-avito-vacancy-xml-form-field" data-bind="
+                                hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                            ">
+                                <label data-bind="hrmFormFieldLabel: label">
+                                    XML для вакансии на сайте Avito
+
+                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                            data-bind="hrmTooltip, hrmTooltipText: 'XML для вакансии на сайте Avito'">
+                                    </button>
+                                </label>
+
+                                <div data-bind="hrmFormFieldComplexControl: control">
+                                    <div data-bind="component: {
+                                        name: 'position-page-xml-control',
+                                        params: {value: recruiting.avitoVacancyXml}
+                                    }">
+                                    </div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="position-page__section-row">
+                <div class="position-page__section-row-content">
+                    <div class="position-page__section-row-item">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div class="hrm-form-field-switch-group position-page__deposit-tab-pane-avito-activity-switch-group"
+                                 data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                <div data-bind="component: {name: 'hrm-switch', params: {checked: recruiting.avitoActivity, exportAs: control}}"></div>
+                                <label data-bind="hrmSwitchGroupLabel: label">
+                                    Активность для сайта Avito
+
+                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                   hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
+                                            data-bind="hrmTooltip, hrmTooltipText: 'Активность для сайта Avito'">
+                                    </button>
+                                </label>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="position-page__tab-pane-action-list">
+            <button class="hrm-button hrm-basic-button
+                           position-page__tab-pane-action-list-item position-page__cancel-button"
+                    data-bind="
+                        click: function() {$tab.cancel();}
+                    ">
+                Отменить
+            </button>
+
+            <button class="hrm-button hrm-basic-button hrm-accent-button
+                           position-page__tab-pane-action-list-item position-page__save-button"
+                    data-bind="
+                        click: function() {$tab.submit();},
+                        attr: {disabled: $tab.isSubmitted() && !$tab.isValid()}
+                    ">
+                Сохранить
+            </button>
+        </div>
+    </div>
+<!-- /ko -->

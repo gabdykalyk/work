@@ -1,0 +1,56 @@
+<script type="text/javascript">
+    $(function () {
+        ko.components.register('position-page-xml-control', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass(['position-page__xml-control', 'position-page__xml-control--initializing']);
+
+                    return new (function () {
+                        this._subscriptions = [];
+
+                        this.textareaElement = ko.observable(null);
+
+                        this.value = params.value;
+                        this.selfUpdate = false;
+
+                        this.afterRender = function () {
+                            const editor = CodeMirror.fromTextArea(this.textareaElement(), {
+                                mode: "xml",
+                                lineNumbers: true
+                            });
+
+                            editor.getDoc().setValue(this.value());
+
+                            this._subscriptions.push(this.value.subscribe(v => {
+                                if (!this.selfUpdate) {
+                                    editor.getDoc().setValue(v);
+                                }
+                            }));
+
+                            editor.on('change', () => {
+                                this.selfUpdate = true;
+                                this.value(editor.getValue());
+                                this.selfUpdate = false;
+                            });
+
+                            setTimeout(() => {
+                                $element.removeClass('position-page__xml-control--initializing');
+                                editor.refresh();
+                            }, 1000);
+                        }.bind(this);
+
+                        this.dispose = function () {
+                            this._subscriptions.forEach(s => s.dispose());
+                        }
+                    });
+                }
+            },
+            template: `
+                <!-- ko template: { afterRender: afterRender } -->
+                    <textarea data-bind="hrmElement: textareaElement" id="1"></textarea>
+                <!-- /ko -->
+            `
+        });
+    });
+</script>

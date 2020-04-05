@@ -54,6 +54,106 @@
                 }
             };
 
+            this.createShiftFormModel = function (data) {
+                const formModel = ko.validatedObservable(null, {deep: true, live: true});
+
+                formModel({
+                    interval: {
+                        start: ko.observable(data.interval.start).extend({
+                            required: {
+                                message: 'Обязательное поле'
+                            },
+                            hrmDate: {
+                                params: 'HH:mm',
+                                message: 'Неверный формат времени'
+                            },
+                            validation: {
+                                validator: value => {
+                                    if (formModel() === null) {
+                                        return false;
+                                    }
+
+                                    const start = moment(value, 'HH:mm');
+                                    const end = moment(formModel().interval.end(), 'HH:mm');
+
+                                    return end.isAfter(start);
+                                }
+                            }
+                        }),
+                        end: ko.observable(data.interval.end).extend({
+                            required: {
+                                message: 'Обязательное поле'
+                            },
+                            hrmDate: {
+                                params: 'HH:mm',
+                                message: 'Неверный формат времени'
+                            },
+                            validation: {
+                                validator: value => {
+                                    if (formModel() === null) {
+                                        return false;
+                                    }
+
+                                    const start = moment(formModel().interval.start(), 'HH:mm');
+                                    const end = moment(value, 'HH:mm');
+
+                                    return end.isAfter(start);
+                                }
+                            }
+                        })
+                    },
+                    salaryFactor: ko.observable(data.salaryFactor),
+                    productionStandard: {
+                        type: ko.observable(data.productionStandard.type),
+                        value: ko.observable(data.productionStandard.value),
+                        range: {
+                            min: ko.observable(data.productionStandard.range.min).extend({
+                                required: {
+                                    onlyIf: () => {
+                                        return formModel() === null || formModel().productionStandard.range.max() !== '';
+                                    }
+                                },
+                                validation: {
+                                    validator: value => {
+                                        return formModel() !== null && (
+                                            formModel().productionStandard.type() !== '1' ||
+                                            this.unmaskDecimal(formModel().productionStandard.range.max()) > this.unmaskDecimal(value)
+                                        );
+                                    }
+                                }
+                            }),
+                            max: ko.observable(data.productionStandard.range.max).extend({
+                                required: {
+                                    onlyIf: () => {
+                                        return formModel() === null || formModel().productionStandard.range.min() !== '';
+                                    }
+                                },
+                                validation: {
+                                    validator: value => {
+                                        return formModel() !== null && (
+                                            formModel().productionStandard.type() !== '1' ||
+                                            this.unmaskDecimal(formModel().productionStandard.range.min()) < this.unmaskDecimal(value)
+                                        );
+                                    }
+                                }
+                            })
+                        }
+                    },
+                    bonus: {
+                        rate: ko.observable(data.bonus.rate),
+                        sum: ko.observable(data.bonus.sum),
+                        max: ko.observable(data.bonus.max)
+                    },
+                    fine: {
+                        rate: ko.observable(data.fine.rate),
+                        sum: ko.observable(data.fine.sum),
+                        max: ko.observable(data.fine.max)
+                    }
+                });
+
+                return formModel;
+            };
+
             this.value = ko.validatedObservable(null, {deep: true, live: true});
 
             this.value({
@@ -144,7 +244,50 @@
                 }),
                 specialities: ko.observableArray([]).extend({
                     required: true
-                })
+                }),
+                shifts: ko.observableArray([]).extend({
+                    required: true
+                }),
+                deposit: {
+                    sum: ko.observable('').extend({
+                        required: {
+                            message: 'Обязательное поле'
+                        }
+                    }),
+                    manual: ko.observable(false),
+                    shiftSum: {
+                        type: ko.observable('0'),
+                        value: ko.observable('').extend({
+                            required: {
+                                message: 'Обязательное поле',
+                                onlyIf: () => {
+                                    return this.value() === null || !this.value().deposit.manual();
+                                }
+                            }
+                        })
+                    },
+                    minSalary: ko.observable(''),
+                    shiftCount: ko.observable(''),
+                    rank: ko.observable(''),
+                    isAssignedToBranch: ko.observable(true)
+                },
+                equipment: ko.observableArray([]),
+                recruiting: {
+                    positionCode: ko.observable('').extend({
+                        required: {
+                            message: 'Обязательное поле'
+                        }
+                    }),
+                    template: ko.observable(''),
+                    hatimakiVacancyId: ko.observable('').extend({
+                        minLength: {
+                            params: 9,
+                            message: 'ID должен состоять из 9 символов'
+                        }
+                    }),
+                    avitoVacancyXml: ko.observable(''),
+                    avitoActivity: ko.observable(false)
+                }
             });
 
             this.formatDecimal = function (value) {
@@ -595,6 +738,277 @@
             };
         };
 
+        const ShiftsTabViewModel = function (formModel, modalOpens, save) {
+            this.isSubmitted = ko.observable(false);
+            this.isResetting = ko.observable(false);
+
+            this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+                return {
+                    shifts: this.formModel.value().shifts().map(shift => ({
+                        interval: {
+                            start: shift().interval.start(),
+                            end: shift().interval.end()
+                        },
+                        salaryFactor: shift().salaryFactor(),
+                        productionStandard: {
+                            type: shift().productionStandard.type(),
+                            value: shift().productionStandard.value(),
+                            range: {
+                                min: shift().productionStandard.range.min(),
+                                max: shift().productionStandard.range.max()
+                            }
+                        },
+                        bonus: {
+                            rate: shift().bonus.rate(),
+                            sum: shift().bonus.sum(),
+                            max: shift().bonus.max()
+                        },
+                        fine: {
+                            rate: shift().fine.rate(),
+                            sum: shift().fine.sum(),
+                            max: shift().fine.max()
+                        }
+                    }))
+                }
+            });
+
+            this.lastFormModelValue = this.formModelValue();
+
+            this.isValid = ko.pureComputed(() => {
+                return this.formModel.value().shifts.isValid() && this.formModel.value().shifts().every(s => s.isValid());
+            });
+
+            this.cancel = function () {
+                this.isResetting(true);
+
+                this.formModel.value().shifts(this.lastFormModelValue.shifts.map(s => {
+                    return this.formModel.createShiftFormModel(s);
+                }));
+
+                this.isResetting(false);
+            };
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    this.lastFormModelValue = this.formModelValue();
+
+                    save();
+                }
+            };
+
+            this.create = function () {
+                this.formModel.value().shifts.push(this.formModel.createShiftFormModel({
+                    interval: {
+                        start: '',
+                        end: ''
+                    },
+                    salaryFactor: '',
+                    productionStandard: {
+                        type: '0',
+                        value: '',
+                        range: {
+                            min: '',
+                            max: ''
+                        }
+                    },
+                    bonus: {
+                        rate: '',
+                        sum: '',
+                        max: ''
+                    },
+                    fine: {
+                        rate: '',
+                        sum: '',
+                        max: ''
+                    }
+                }));
+            };
+
+            this.delete = function (shift) {
+                this.formModel.value().shifts.remove(shift);
+            };
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+        };
+
+        const DepositTabViewModel = function (formModel, save) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+               return {
+                   sum: this.formModel.value().deposit.sum(),
+                   manual: this.formModel.value().deposit.manual(),
+                   shiftSum: {
+                       type: this.formModel.value().deposit.shiftSum.type(),
+                       value: this.formModel.value().deposit.shiftSum.value()
+                   },
+                   minSalary: this.formModel.value().deposit.minSalary(),
+                   shiftCount: this.formModel.value().deposit.shiftCount(),
+                   rank: this.formModel.value().deposit.rank(),
+                   isAssignedToBranch: this.formModel.value().deposit.isAssignedToBranch()
+               };
+            });
+
+            this.lastFormModelValue = this.formModelValue();
+
+            this.isValid = ko.pureComputed(() => {
+                return this.formModel.value().deposit.sum.isValid() && this.formModel.value().deposit.shiftSum.value.isValid();
+            });
+
+            this.cancel = function () {
+                this.formModel.value().deposit.sum(this.lastFormModelValue.sum);
+                this.formModel.value().deposit.manual(this.lastFormModelValue.manual);
+                this.formModel.value().deposit.shiftSum.type(this.lastFormModelValue.shiftSum.type);
+                this.formModel.value().deposit.shiftSum.value(this.lastFormModelValue.shiftSum.value);
+                this.formModel.value().deposit.minSalary(this.lastFormModelValue.minSalary);
+                this.formModel.value().deposit.shiftCount(this.lastFormModelValue.shiftCount);
+                this.formModel.value().deposit.rank(this.lastFormModelValue.rank);
+                this.formModel.value().deposit.isAssignedToBranch(this.lastFormModelValue.isAssignedToBranch);
+            };
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    this.lastFormModelValue = this.formModelValue();
+
+                    save();
+                }
+            };
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+        };
+
+        const EquipmentTabViewModel = function (formModel, save) {
+            this.equipment = [
+                {id: 0, name: 'Китель поварской'},
+                {id: 1, name: 'Брюки поварские'},
+                {id: 2, name: 'Бандана поварская'},
+                {id: 3, name: 'Фартук поварской'},
+                {id: 4, name: 'Футболка поварская'},
+                {id: 5, name: 'Кардиган администратора'},
+                {id: 6, name: 'Футболка администратора'},
+                {id: 7, name: 'Кепка администратора'},
+                {id: 8, name: 'Жилетка курьера'},
+                {id: 9, name: 'Футболка курьера'},
+                {id: 10, name: 'Кепка курьера'},
+                {id: 11, name: 'Халат тех.сотрудника'},
+                {id: 12, name: 'Брюки тех.сотрудника'},
+                {id: 13, name: 'Кепка тех.сотрудника'},
+                {id: 14, name: 'Китель поварской Б/У'},
+                {id: 15, name: 'Бандана поварская Б/У'},
+                {id: 16, name: 'Блузка администратора'}
+            ];
+
+            this.searchTerm = ko.observable('');
+
+            this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+                return {
+                    equipment: [...this.formModel.value().equipment()]
+                };
+            });
+
+            this.lastFormModelValue = this.formModelValue();
+
+            this.cancel = function () {
+                this.formModel.value().equipment([...this.lastFormModelValue.equipment]);
+            };
+
+            this.submit = function () {
+                this.lastFormModelValue = this.formModelValue();
+
+                save();
+            };
+
+            this.filteredEquipment = ko.pureComputed(() => {
+                return this.equipment.filter(c => c.name.toLowerCase().includes(this.searchTerm().toLowerCase()));
+            });
+
+            this.getEquipmentChecked = function (id) {
+                return ko.pureComputed({
+                    read: () => {
+                        return this.formModel.value().equipment().includes(id);
+                    },
+                    write: value => {
+                        if (value) {
+                            this.formModel.value().equipment.push(id);
+                        } else {
+                            this.formModel.value().equipment.remove(id);
+                        }
+                    },
+                    owner: this
+                });
+            };
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+        };
+
+        const RecruitingTabViewModel = function (formModel, save) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+                return {
+                    positionCode: this.formModel.value().recruiting.positionCode(),
+                    template: this.formModel.value().recruiting.template(),
+                    hatimakiVacancyId: this.formModel.value().recruiting.hatimakiVacancyId(),
+                    avitoVacancyXml: this.formModel.value().recruiting.avitoVacancyXml(),
+                    avitoActivity: this.formModel.value().recruiting.avitoActivity()
+                };
+            });
+
+            this.lastFormModelValue = this.formModelValue();
+
+            this.isValid = ko.pureComputed(() => {
+                return this.formModel.value().recruiting.positionCode.isValid();
+            });
+
+            this.cancel = function () {
+                this.formModel.value().recruiting.positionCode(this.lastFormModelValue.positionCode);
+                this.formModel.value().recruiting.template(this.lastFormModelValue.template);
+                this.formModel.value().recruiting.hatimakiVacancyId(this.lastFormModelValue.hatimakiVacancyId);
+                this.formModel.value().recruiting.avitoVacancyXml(this.lastFormModelValue.avitoVacancyXml);
+                this.formModel.value().recruiting.avitoActivity(this.lastFormModelValue.avitoActivity);
+            };
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    this.lastFormModelValue = this.formModelValue();
+
+                    save();
+                }
+            };
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+        };
+
         const ViewModel = function () {
             this.dishCategories = [
                 {id: '1', name: 'Пицца'},
@@ -625,8 +1039,8 @@
                 new HrmTabGroupItem('Смены', true),
                 new HrmTabGroupItem('Депозит', true),
                 new HrmTabGroupItem('Мат. ценности', true),
-                new HrmTabGroupItem('Договоры', true),
-                new HrmTabGroupItem('Доплаты', true),
+                /*new HrmTabGroupItem('Договоры', true),
+                new HrmTabGroupItem('Доплаты', true),*/
                 new HrmTabGroupItem('Подбор персонала', true),
             ];
 
@@ -650,6 +1064,20 @@
                 this.activeTab(4);
             });
 
+            this.shiftsTabViewModel = new ShiftsTabViewModel(this.formModel, this.modalOpens, () => {
+                this.activeTab(5);
+            });
+
+            this.depositTabViewModel = new DepositTabViewModel(this.formModel, () => {
+                this.activeTab(6);
+            });
+
+            this.equipmentTabViewModel = new EquipmentTabViewModel(this.formModel, () => {
+                this.activeTab(7);
+            });
+
+            this.recruitingTabViewModel = new RecruitingTabViewModel(this.formModel, () => {});
+
             this.descendantsComplete = function () {
                 $page.removeClass('hrm-page--initializing');
             };
@@ -665,19 +1093,18 @@
             this.updateTabActivities = function () {
                 const isWorkloadTabPassed = this.workloadTabViewModel.isValid() && this.workloadTabViewModel.isSubmitted();
                 const isSalaryTabPassed = this.salaryTabViewModel.isValid() && this.salaryTabViewModel.isSubmitted();
-                const isRanksTabPassed = this.ranksTabViewModel.isValid() && this.ranksTabViewModel.isSubmitted();
-                const isSpecialitiesTabPassed = this.specialitiesTabViewModel.isValid() && this.specialitiesTabViewModel.isSubmitted();
 
                 this.navigationTabs[1].disabled(!isWorkloadTabPassed);
                 this.navigationTabs[2].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
                 this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
 
-                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
-                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
-                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
-                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
-                this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
-                this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
+                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
+                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
+                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
+                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
+
+                /*this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
+                this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);*/
             };
 
             this.formatDecimal = function (value) {
@@ -714,18 +1141,6 @@
                 this.subscriptions.push(this.salaryTabViewModel.isValid.subscribe(() => {
                     this.updateTabActivities();
                 }));
-                this.subscriptions.push(this.ranksTabViewModel.isSubmitted.subscribe(() => {
-                    this.updateTabActivities();
-                }));
-                this.subscriptions.push(this.ranksTabViewModel.isValid.subscribe(() => {
-                    this.updateTabActivities();
-                }));
-                this.subscriptions.push(this.specialitiesTabViewModel.isSubmitted.subscribe(() => {
-                    this.updateTabActivities();
-                }));
-                this.subscriptions.push(this.specialitiesTabViewModel.isValid.subscribe(() => {
-                    this.updateTabActivities();
-                }));
 
                 setTimeout(() => {
                     // Раскомментировать, чтобы заполнить первую вкладку тестовыми данными:
@@ -734,7 +1149,9 @@
                     this.formModel.value().productionStandard.value('2000');
                     this.workloadTabViewModel.submit();
                     this.formModel.value().bulk(1);
-                    this.salaryTabViewModel.submit();*/
+                    this.salaryTabViewModel.submit();
+                    this.activeTab(7);
+                    this.shiftsTabViewModel.create();*/
                 });
             })();
         };

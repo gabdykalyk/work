@@ -1,0 +1,257 @@
+<!-- ko let: {'$tab': $root.depositTabViewModel} -->
+    <div class="position-page__tab-pane position-page__deposit-tab-pane"
+         data-bind="using: $tab.formModel.value">
+        <div class="position-page__section">
+            <div class="position-page__section-row">
+                <div class="position-page__section-row-content">
+                    <div class="position-page__section-row-item">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div class="position-page__deposit-tab-pane-sum-form-field"
+                                 data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                <label data-bind="hrmFormFieldLabel: label">
+                                    <span>Сумма депозита, <i class="far fa-ruble-sign"></i></span>
+
+                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                   hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                            data-bind="hrmTooltip, hrmTooltipText: 'Сумма депозита, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                    </button>
+                                </label>
+
+                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                    <input data-bind="
+                                        textInput: deposit.sum,
+                                        hrmMask, hrmMaskPattern: 'decimal',
+                                        hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                        hrmFormFieldInputControl: control,
+                                        hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                    " placeholder="0">
+                                </div>
+
+                                <div data-bind="
+                                    component: {name: 'hrm-form-field-error'},
+                                    hrmSlide,
+                                    hrmSlideValue: control() !== null ? control().errorState : false,
+                                    hrmSlideDuration: 150
+                                ">
+                                    <!-- ko text: $parent.deposit.sum.error() --><!-- /ko -->
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="position-page__section-row-item">
+                        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                            <div class="hrm-form-field-switch-group position-page__deposit-tab-pane-manual-switch-group"
+                                 data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                <div data-bind="component: {name: 'hrm-switch', params: {checked: deposit.manual, exportAs: control}}"></div>
+                                <label data-bind="hrmSwitchGroupLabel: label">
+                                    Снимать в ручном режиме
+
+                                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                   hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
+                                            data-bind="hrmTooltip, hrmTooltipText: 'Снимать в ручном режиме'">
+                                    </button>
+                                </label>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                </div>
+            </div>
+
+            <div data-bind="hrmFade, hrmFadeValue: !deposit.manual()">
+                <div class="position-page__section-row">
+                    <div class="position-page__section-row-content">
+                        <div class="position-page__section-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div class="position-page__deposit-tab-pane-shift-sum-form-field" data-bind="
+                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                                ">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Взимать за смену
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Взимать за смену'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldComplexControl: control">
+                                        <div class="hrm-radio-group position-page__deposit-tab-pane-shift-sum-form-field-type-control">
+                                            <!-- ko let: {prefix: 'position-page-deposit-tab-pane-shift-sum-'} -->
+                                                <div class="hrm-radio-group__radio">
+                                                    <input class="hrm-radio-group__radio-input" data-bind="checked: deposit.shiftSum.type, attr: {id: prefix + 'value-radio'}"
+                                                           type="radio" value="0" checked/>
+                                                    <label class="hrm-radio-group__radio-label" data-bind="attr: {for: prefix + 'value-radio'}">
+                                                        <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                                                            Рубли
+                                                        <!-- /ko -->
+
+                                                        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                                            <i class="fas fa-ruble-sign"></i>
+                                                        <!-- /ko -->
+                                                    </label>
+                                                </div>
+
+                                                <div class="hrm-radio-group__radio">
+                                                    <input class="hrm-radio-group__radio-input" data-bind="checked: deposit.shiftSum.type, attr: {id: prefix + 'percentage-radio'}"
+                                                           type="radio" value="1"/>
+                                                    <label class="hrm-radio-group__radio-label" data-bind="attr: {for: prefix + 'percentage-radio'}">
+                                                        <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                                                            Проценты
+                                                        <!-- /ko -->
+
+                                                        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                                                            %
+                                                        <!-- /ko -->
+                                                    </label>
+                                                </div>
+                                            <!-- /ko -->
+                                        </div>
+
+                                        <!-- ko let: {control: ko.observable(null)} -->
+                                            <div class="position-page__deposit-tab-pane-shift-sum-form-field-value-control"
+                                                 data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                                <input data-bind="
+                                                    textInput: deposit.shiftSum.value,
+                                                    hrmFormFieldInputControl: control,
+                                                    hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                                " placeholder="0">
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="position-page__section-row">
+                    <div class="position-page__section-row-content">
+                        <div class="position-page__section-row-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div class="position-page__deposit-tab-pane-min-salary-form-field"
+                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        <span>При минимальной ЗП, <i class="far fa-ruble-sign"></i></span>
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'При минимальной ЗП, &lt;i class=&quot;far fa-ruble-sign&quot;&gt;&lt;/i&gt;'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: deposit.minSalary,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="position-page__section-row-item position-page__deposit-tab-pane-shift-count-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div class="position-page__deposit-tab-pane-shift-count-form-field"
+                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Количество смен
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Количество смен'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: deposit.shiftCount,
+                                            hrmMask, hrmMaskPattern: 'decimal',
+                                            hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                            hrmFormFieldInputControl: control
+                                        " placeholder="0">
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="position-page__section-row-item position-page__deposit-tab-pane-rank-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div class="position-page__deposit-tab-pane-rank-form-field"
+                                     data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+                                    <label data-bind="hrmFormFieldLabel: label">
+                                        Разряд
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Разряд'">
+                                        </button>
+                                    </label>
+
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <select data-bind="
+                                            value: deposit.rank,
+                                            hrmSelect, hrmSelectAllowClear: true, hrmSelectPlaceholder: '', hrmSelectSearchEnabled: true,
+                                            hrmFormFieldSelectControl: control
+                                        ">
+                                            <option></option>
+                                            <option value="0">1</option>
+                                            <option value="0">2</option>
+                                            <option value="0">3</option>
+                                            <option value="0">4</option>
+                                            <option value="0">5</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="hrm-form-field__hint">необязательно</div>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+
+                        <div class="position-page__section-row-item position-page__deposit-tab-pane-is-assigned-to-branch-item">
+                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                                <div class="hrm-form-field-switch-group position-page__deposit-tab-pane-is-assigned-to-branch-switch-group"
+                                     data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+                                    <div data-bind="component: {name: 'hrm-switch', params: {checked: deposit.isAssignedToBranch, exportAs: control}}"></div>
+                                    <label data-bind="hrmSwitchGroupLabel: label">
+                                        Закреплен за филиалом
+
+                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                       hrm-switch-group__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                data-bind="hrmTooltip, hrmTooltipText: 'Закреплен за филиалом'">
+                                        </button>
+                                    </label>
+                                </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="position-page__tab-pane-action-list">
+            <button class="hrm-button hrm-basic-button
+                           position-page__tab-pane-action-list-item position-page__cancel-button"
+                    data-bind="
+                        click: function() {$tab.cancel();}
+                    ">
+                Отменить
+            </button>
+
+            <button class="hrm-button hrm-basic-button hrm-accent-button
+                           position-page__tab-pane-action-list-item position-page__save-button"
+                    data-bind="
+                        click: function() {$tab.submit();},
+                        attr: {disabled: $tab.isSubmitted() && !$tab.isValid()}
+                    ">
+                Сохранить
+            </button>
+        </div>
+    </div>
+<!-- /ko -->
