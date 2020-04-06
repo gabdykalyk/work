@@ -1,51 +1,53 @@
 <!-- ko let: {'$tab': $root.equipmentTabViewModel} -->
-    <div class="position-page__tab-pane position-page__equipment-tab-pane"
-         data-bind="using: $tab.formModel.value">
-        <!-- ko let: {control: ko.observable(null)} -->
-            <div class="hrm-search-form-field position-page__equipment-tab-pane-search-form-field"
-                 data-bind="hrmFormField, hrmFormFieldControlRef: control">
-                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                    <i class="hrm-form-field__basis-prefix hrm-form-field-icon hrm-form-field-search-icon"></i>
+    <!-- ko template: { afterRender: $tab.afterRender } -->
+        <div class="position-page__tab-pane position-page__equipment-tab-pane"
+             data-bind="using: $tab.formModel.value">
+            <!-- ko let: {control: ko.observable(null)} -->
+                <div class="hrm-search-form-field position-page__equipment-tab-pane-search-form-field"
+                     data-bind="hrmFormField, hrmFormFieldControlRef: control">
+                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                        <i class="hrm-form-field__basis-prefix hrm-form-field-icon hrm-form-field-search-icon"></i>
 
-                    <input data-bind="
-                        textInput: $tab.searchTerm,
-                        hrmFormFieldInputControl: control
-                    " placeholder="Поиск">
-                </div>
-            </div>
-        <!-- /ko -->
-
-        <div class="position-page__equipment-tab-pane-list">
-            <!-- ko foreach: $tab.filteredEquipment -->
-                <div class="position-page__equipment-tab-pane-list-item">
-                    <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-                        <div class="position-page__equipment-tab-pane-list-item-checkbox-group"
-                             data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-                            <div data-bind="component: {name: 'hrm-checkbox', params: {checked: $tab.getEquipmentChecked($parent.id), owner: checkboxGroup}}"></div>
-                            <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: $parent.name">
-                            </label>
-                        </div>
-                    <!-- /ko -->
+                        <input data-bind="
+                            textInput: $tab.searchTerm,
+                            hrmFormFieldInputControl: control
+                        " placeholder="Поиск">
+                    </div>
                 </div>
             <!-- /ko -->
-        </div>
 
-        <div class="position-page__tab-pane-action-list">
-            <button class="hrm-button hrm-basic-button
-                           position-page__tab-pane-action-list-item position-page__cancel-button"
-                    data-bind="
-                        click: function() {$tab.cancel();}
-                    ">
-                Отменить
-            </button>
+            <div class="position-page__equipment-tab-pane-list">
+                <!-- ko foreach: $tab.filteredEquipment -->
+                    <div class="position-page__equipment-tab-pane-list-item">
+                        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+                            <div class="position-page__equipment-tab-pane-list-item-checkbox-group"
+                                 data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+                                <div data-bind="component: {name: 'hrm-checkbox', params: {checked: $tab.getEquipmentChecked($parent.id), owner: checkboxGroup}}"></div>
+                                <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: $parent.name">
+                                </label>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                <!-- /ko -->
+            </div>
 
-            <button class="hrm-button hrm-basic-button hrm-accent-button
-                           position-page__tab-pane-action-list-item position-page__save-button"
-                    data-bind="
-                        click: function() {$tab.submit();}
-                    ">
-                Сохранить
-            </button>
+            <div class="position-page__tab-pane-action-list">
+                <button class="hrm-button hrm-basic-button
+                               position-page__tab-pane-action-list-item position-page__cancel-button"
+                        data-bind="
+                            click: function() {$tab.cancel();}
+                        ">
+                    Отменить
+                </button>
+
+                <button class="hrm-button hrm-basic-button hrm-accent-button
+                               position-page__tab-pane-action-list-item position-page__save-button"
+                        data-bind="
+                            click: function() {$tab.submit();}
+                        ">
+                    Сохранить
+                </button>
+            </div>
         </div>
-    </div>
+    <!-- /ko -->
 <!-- /ko -->

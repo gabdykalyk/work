@@ -19,7 +19,7 @@
                         afterAdd: hrmFadeAfterAddFactory(200),
                         beforeRemove: hrmFadeBeforeRemoveFactory(200)
                     } -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                        <!-- ko let: {isOpen: ko.observable(true)} -->
                             <div class="position-page__shifts-tab-pane-list-item">
                                 <div class="position-page__shifts-tab-pane-list-item-header">
                                     <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
@@ -439,7 +439,8 @@
             <button class="hrm-button hrm-basic-button
                            position-page__tab-pane-action-list-item position-page__cancel-button"
                     data-bind="
-                        click: function() {$tab.cancel();}
+                        click: function() {$tab.cancel();},
+                        attr: {disabled: $root.formModel.value().shifts().length === 0 && $tab.lastFormModelValue.shifts.length === 0}
                     ">
                 Отменить
             </button>
@@ -448,7 +449,7 @@
                            position-page__tab-pane-action-list-item position-page__save-button"
                     data-bind="
                         click: function() {$tab.submit();},
-                        attr: {disabled: $tab.isSubmitted() && !$tab.isValid()}
+                        attr: {disabled: ($tab.isSubmitted() && !$tab.isValid()) || $root.formModel.value().shifts().length === 0}
                     ">
                 Сохранить
             </button>

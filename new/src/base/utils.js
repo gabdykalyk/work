@@ -88,10 +88,20 @@ ko.bindingHandlers.hrmElement = {
 
 ko.bindingHandlers.hrmMask = {
     init: function (element, valueAccessor, allBindings) {
+        // DEPRECATED! Use options.alias instead.
         const pattern = allBindings.get('hrmMaskPattern');
-        const options = allBindings.get('hrmMaskOptions');
 
-        $(element).inputmask(pattern, {
+        let options = allBindings.get('hrmMaskOptions');
+
+        if (pattern !== undefined) {
+            if (options !== undefined) {
+                options = {alias: pattern, ...options};
+            } else {
+                options = {alias: pattern};
+            }
+        }
+
+        $(element).inputmask({
             jitMasking: true,
             showMaskOnFocus: false,
             showMaskOnHover: false,

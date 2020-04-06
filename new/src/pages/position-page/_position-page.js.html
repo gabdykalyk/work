@@ -117,6 +117,7 @@
                                     validator: value => {
                                         return formModel() !== null && (
                                             formModel().productionStandard.type() !== '1' ||
+                                            formModel().productionStandard.range.max() === '' ||
                                             this.unmaskDecimal(formModel().productionStandard.range.max()) > this.unmaskDecimal(value)
                                         );
                                     }
@@ -132,6 +133,7 @@
                                     validator: value => {
                                         return formModel() !== null && (
                                             formModel().productionStandard.type() !== '1' ||
+                                            formModel().productionStandard.range.min() === '' ||
                                             this.unmaskDecimal(formModel().productionStandard.range.min()) < this.unmaskDecimal(value)
                                         );
                                     }
@@ -269,7 +271,7 @@
                     minSalary: ko.observable(''),
                     shiftCount: ko.observable(''),
                     rank: ko.observable(''),
-                    isAssignedToBranch: ko.observable(true)
+                    isAssignedToBranch: ko.observable(false)
                 },
                 equipment: ko.observableArray([]),
                 recruiting: {
@@ -926,6 +928,10 @@
 
             this.lastFormModelValue = this.formModelValue();
 
+            this.afterRender = function () {
+                this.searchTerm('');
+            }.bind(this);
+
             this.cancel = function () {
                 this.formModel.value().equipment([...this.lastFormModelValue.equipment]);
             };
@@ -1150,8 +1156,7 @@
                     this.workloadTabViewModel.submit();
                     this.formModel.value().bulk(1);
                     this.salaryTabViewModel.submit();
-                    this.activeTab(7);
-                    this.shiftsTabViewModel.create();*/
+                    this.activeTab(7);*/
                 });
             })();
         };

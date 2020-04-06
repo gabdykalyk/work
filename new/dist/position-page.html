@@ -1203,7 +1203,8 @@
             <button class="hrm-button hrm-basic-button
                            position-page__tab-pane-action-list-item position-page__cancel-button"
                     data-bind="
-                        click: function() {$tab.cancel();}
+                        click: function() {$tab.cancel();},
+                        attr: {disabled: $root.formModel.value().ranks().length === 0 && $tab.lastFormModelValue.ranks.length === 0}
                     ">
                 Отменить
             </button>
@@ -1297,7 +1298,8 @@
             <button class="hrm-button hrm-basic-button
                            position-page__tab-pane-action-list-item position-page__cancel-button"
                     data-bind="
-                        click: function() {$tab.cancel();}
+                        click: function() {$tab.cancel();},
+                        attr: {disabled: $root.formModel.value().specialities().length === 0 && $tab.lastFormModelValue.specialities.length === 0}
                     ">
                 Отменить
             </button>
@@ -1342,7 +1344,7 @@
                         afterAdd: hrmFadeAfterAddFactory(200),
                         beforeRemove: hrmFadeBeforeRemoveFactory(200)
                     } -->
-                        <!-- ko let: {isOpen: ko.observable(false)} -->
+                        <!-- ko let: {isOpen: ko.observable(true)} -->
                             <div class="position-page__shifts-tab-pane-list-item">
                                 <div class="position-page__shifts-tab-pane-list-item-header">
                                     <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
@@ -1762,7 +1764,8 @@
             <button class="hrm-button hrm-basic-button
                            position-page__tab-pane-action-list-item position-page__cancel-button"
                     data-bind="
-                        click: function() {$tab.cancel();}
+                        click: function() {$tab.cancel();},
+                        attr: {disabled: $root.formModel.value().shifts().length === 0 && $tab.lastFormModelValue.shifts.length === 0}
                     ">
                 Отменить
             </button>
@@ -1771,7 +1774,7 @@
                            position-page__tab-pane-action-list-item position-page__save-button"
                     data-bind="
                         click: function() {$tab.submit();},
-                        attr: {disabled: $tab.isSubmitted() && !$tab.isValid()}
+                        attr: {disabled: ($tab.isSubmitted() && !$tab.isValid()) || $root.formModel.value().shifts().length === 0}
                     ">
                 Сохранить
             </button>
@@ -1901,6 +1904,8 @@
                                                  data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                                 <input data-bind="
                                                     textInput: deposit.shiftSum.value,
+                                                    hrmMask, hrmMaskPattern: 'decimal',
+                                                    hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                                                     hrmFormFieldInputControl: control,
                                                     hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                                 " placeholder="0">
@@ -1990,10 +1995,10 @@
                                         ">
                                             <option></option>
                                             <option value="0">1</option>
-                                            <option value="0">2</option>
-                                            <option value="0">3</option>
-                                            <option value="0">4</option>
-                                            <option value="0">5</option>
+                                            <option value="1">2</option>
+                                            <option value="2">3</option>
+                                            <option value="3">4</option>
+                                            <option value="4">5</option>
                                         </select>
                                     </div>
 
@@ -2052,55 +2057,57 @@
                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                 } -->
                     <!-- ko let: {'$tab': $root.equipmentTabViewModel} -->
-    <div class="position-page__tab-pane position-page__equipment-tab-pane"
-         data-bind="using: $tab.formModel.value">
-        <!-- ko let: {control: ko.observable(null)} -->
-            <div class="hrm-search-form-field position-page__equipment-tab-pane-search-form-field"
-                 data-bind="hrmFormField, hrmFormFieldControlRef: control">
-                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                    <i class="hrm-form-field__basis-prefix hrm-form-field-icon hrm-form-field-search-icon"></i>
+    <!-- ko template: { afterRender: $tab.afterRender } -->
+        <div class="position-page__tab-pane position-page__equipment-tab-pane"
+             data-bind="using: $tab.formModel.value">
+            <!-- ko let: {control: ko.observable(null)} -->
+                <div class="hrm-search-form-field position-page__equipment-tab-pane-search-form-field"
+                     data-bind="hrmFormField, hrmFormFieldControlRef: control">
+                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                        <i class="hrm-form-field__basis-prefix hrm-form-field-icon hrm-form-field-search-icon"></i>
 
-                    <input data-bind="
-                        textInput: $tab.searchTerm,
-                        hrmFormFieldInputControl: control
-                    " placeholder="Поиск">
-                </div>
-            </div>
-        <!-- /ko -->
-
-        <div class="position-page__equipment-tab-pane-list">
-            <!-- ko foreach: $tab.filteredEquipment -->
-                <div class="position-page__equipment-tab-pane-list-item">
-                    <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-                        <div class="position-page__equipment-tab-pane-list-item-checkbox-group"
-                             data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-                            <div data-bind="component: {name: 'hrm-checkbox', params: {checked: $tab.getEquipmentChecked($parent.id), owner: checkboxGroup}}"></div>
-                            <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: $parent.name">
-                            </label>
-                        </div>
-                    <!-- /ko -->
+                        <input data-bind="
+                            textInput: $tab.searchTerm,
+                            hrmFormFieldInputControl: control
+                        " placeholder="Поиск">
+                    </div>
                 </div>
             <!-- /ko -->
-        </div>
 
-        <div class="position-page__tab-pane-action-list">
-            <button class="hrm-button hrm-basic-button
-                           position-page__tab-pane-action-list-item position-page__cancel-button"
-                    data-bind="
-                        click: function() {$tab.cancel();}
-                    ">
-                Отменить
-            </button>
+            <div class="position-page__equipment-tab-pane-list">
+                <!-- ko foreach: $tab.filteredEquipment -->
+                    <div class="position-page__equipment-tab-pane-list-item">
+                        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+                            <div class="position-page__equipment-tab-pane-list-item-checkbox-group"
+                                 data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+                                <div data-bind="component: {name: 'hrm-checkbox', params: {checked: $tab.getEquipmentChecked($parent.id), owner: checkboxGroup}}"></div>
+                                <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: $parent.name">
+                                </label>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+                <!-- /ko -->
+            </div>
 
-            <button class="hrm-button hrm-basic-button hrm-accent-button
-                           position-page__tab-pane-action-list-item position-page__save-button"
-                    data-bind="
-                        click: function() {$tab.submit();}
-                    ">
-                Сохранить
-            </button>
+            <div class="position-page__tab-pane-action-list">
+                <button class="hrm-button hrm-basic-button
+                               position-page__tab-pane-action-list-item position-page__cancel-button"
+                        data-bind="
+                            click: function() {$tab.cancel();}
+                        ">
+                    Отменить
+                </button>
+
+                <button class="hrm-button hrm-basic-button hrm-accent-button
+                               position-page__tab-pane-action-list-item position-page__save-button"
+                        data-bind="
+                            click: function() {$tab.submit();}
+                        ">
+                    Сохранить
+                </button>
+            </div>
         </div>
-    </div>
+    <!-- /ko -->
 <!-- /ko -->
 
                 <!-- /ko -->
@@ -2132,7 +2139,7 @@
                                 <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                     <input data-bind="
                                         textInput: recruiting.positionCode,
-                                        hrmMask, hrmMaskPattern: {regex: '[\\w]*'},
+                                        hrmMask, hrmMaskOptions : {regex: '[\\w]*'},
                                         hrmFormFieldInputControl: control,
                                         hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                                     " placeholder="0">
@@ -2171,10 +2178,10 @@
                                     ">
                                         <option></option>
                                         <option value="0">1</option>
-                                        <option value="0">2</option>
-                                        <option value="0">3</option>
-                                        <option value="0">4</option>
-                                        <option value="0">5</option>
+                                        <option value="1">2</option>
+                                        <option value="2">3</option>
+                                        <option value="3">4</option>
+                                        <option value="4">5</option>
                                     </select>
                                 </div>
 
@@ -3583,6 +3590,7 @@
                                     validator: value => {
                                         return formModel() !== null && (
                                             formModel().productionStandard.type() !== '1' ||
+                                            formModel().productionStandard.range.max() === '' ||
                                             this.unmaskDecimal(formModel().productionStandard.range.max()) > this.unmaskDecimal(value)
                                         );
                                     }
@@ -3598,6 +3606,7 @@
                                     validator: value => {
                                         return formModel() !== null && (
                                             formModel().productionStandard.type() !== '1' ||
+                                            formModel().productionStandard.range.min() === '' ||
                                             this.unmaskDecimal(formModel().productionStandard.range.min()) < this.unmaskDecimal(value)
                                         );
                                     }
@@ -3735,7 +3744,7 @@
                     minSalary: ko.observable(''),
                     shiftCount: ko.observable(''),
                     rank: ko.observable(''),
-                    isAssignedToBranch: ko.observable(true)
+                    isAssignedToBranch: ko.observable(false)
                 },
                 equipment: ko.observableArray([]),
                 recruiting: {
@@ -4392,6 +4401,10 @@
 
             this.lastFormModelValue = this.formModelValue();
 
+            this.afterRender = function () {
+                this.searchTerm('');
+            }.bind(this);
+
             this.cancel = function () {
                 this.formModel.value().equipment([...this.lastFormModelValue.equipment]);
             };
@@ -4616,8 +4629,7 @@
                     this.workloadTabViewModel.submit();
                     this.formModel.value().bulk(1);
                     this.salaryTabViewModel.submit();
-                    this.activeTab(7);
-                    this.shiftsTabViewModel.create();*/
+                    this.activeTab(7);*/
                 });
             })();
         };
