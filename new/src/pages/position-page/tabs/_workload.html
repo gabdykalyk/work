@@ -2,46 +2,52 @@
     <div class="position-page__tab-pane position-page__workload-tab-pane"
          data-bind="using: $tab.formModel.value">
         <!-- ko if: !$tab.isResetting() -->
-            <div class="position-page__section">
-                <div class="position-page__section-row position-page__workload-tab-pane-section-row">
-                    <div class="position-page__section-row-content">
-                        <div class="position-page__section-row-item
-                                    position-page__workload-tab-pane-section-row-name-item">
-                            <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                                <div data-bind="
-                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-                                ">
-                                    <label data-bind="hrmFormFieldLabel: label">
-                                        Название должности
-
-                                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
-                                                       hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
-                                                data-bind="hrmTooltip, hrmTooltipText: 'Название должности'">
-                                        </button>
-                                    </label>
-
-                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                                        <input data-bind="
-                                            textInput: name,
-                                            hrmFormFieldInputControl: control,
-                                            hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
-                                        " placeholder="Введите название">
-                                    </div>
-
+            <!-- ko template: {
+                foreach: hrmTemplateIf($root.formModel.mode() === 'create', $data),
+                afterAdd: hrmFadeAfterAddFactory(200),
+                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+                <div class="position-page__section">
+                    <div class="position-page__section-row position-page__workload-tab-pane-section-row">
+                        <div class="position-page__section-row-content">
+                            <div class="position-page__section-row-item
+                                        position-page__workload-tab-pane-section-row-name-item">
+                                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
                                     <div data-bind="
-                                        component: {name: 'hrm-form-field-error'},
-                                        hrmSlide,
-                                        hrmSlideValue: control() !== null ? control().errorState : false,
-                                        hrmSlideDuration: 150
+                                        hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                                     ">
-                                        <!-- ko text: $parent.name.error() --><!-- /ko -->
+                                        <label data-bind="hrmFormFieldLabel: label">
+                                            Название должности
+
+                                            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
+                                                           hrm-form-field__label-info-button hrm-circle-icon-button--theme_neutral"
+                                                    data-bind="hrmTooltip, hrmTooltipText: 'Название должности'">
+                                            </button>
+                                        </label>
+
+                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                            <input data-bind="
+                                                textInput: name,
+                                                hrmFormFieldInputControl: control,
+                                                hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                                            " placeholder="Введите название">
+                                        </div>
+
+                                        <div data-bind="
+                                            component: {name: 'hrm-form-field-error'},
+                                            hrmSlide,
+                                            hrmSlideValue: control() !== null ? control().errorState : false,
+                                            hrmSlideDuration: 150
+                                        ">
+                                            <!-- ko text: $parent.name.error() --><!-- /ko -->
+                                        </div>
                                     </div>
-                                </div>
-                            <!-- /ko -->
+                                <!-- /ko -->
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            <!-- /ko -->
 
             <div class="position-page__section">
                 <span class="position-page__section-title">Основная нагрузка</span>
@@ -54,7 +60,7 @@
                                 <div data-bind="
                                    hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
                                 ">
-                                    <label data-bind="hrmFormFieldLabel: label">
+                                    <label class="position-page__with-difference-flag" data-bind="hrmFormFieldLabel: label">
                                         Тип нагрузки
 
                                         <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button
@@ -145,7 +151,7 @@
                                     <div class="hrm-form-field-switch-group"
                                          data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
                                         <div data-bind="component: {name: 'hrm-switch', params: {checked: dishCategoriesExclusionFlag, exportAs: control}}"></div>
-                                        <label data-bind="hrmSwitchGroupLabel: label">
+                                        <label class="position-page__with-difference-flag" data-bind="hrmSwitchGroupLabel: label">
                                             Все категории, кроме указанных
                                         </label>
                                     </div>
@@ -208,7 +214,8 @@
                                             </button>
                                         </label>
 
-                                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <div class="position-page__with-difference-flag"
+                                             data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
                                             <select data-bind="
                                                 value: value,
                                                 hrmSelect,

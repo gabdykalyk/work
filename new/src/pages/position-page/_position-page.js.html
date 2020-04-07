@@ -156,6 +156,10 @@
                 return formModel;
             };
 
+            this.mode = ko.observable('create');
+
+            this.branch = ko.observable('');
+
             this.value = ko.validatedObservable(null, {deep: true, live: true});
 
             this.value({
@@ -384,6 +388,7 @@
 
                 if (this.isValid()) {
                     this.lastFormModelValue = this.formModelValue();
+                    this.formModel.mode('edit');
 
                     save();
                 }
@@ -1054,6 +1059,17 @@
 
             this.formModel = new FormModel();
 
+            this.isNameEditing = ko.observable(false);
+            this.name = ko.observable('').extend({
+                required: {
+                    message: 'Обязательное поле'
+                },
+                minLength: {
+                    params: 2,
+                    message: 'Должно быть введено хотя бы 2 символа'
+                }
+            });
+
             this.workloadTabViewModel = new WorkloadTabViewModel(this.formModel, () => {
                 this.activeTab(1);
             });
@@ -1111,6 +1127,16 @@
 
                 /*this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
                 this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);*/
+            };
+
+            this.editName = function () {
+                this.isNameEditing(true);
+                this.name(this.formModel.value().name());
+            };
+
+            this.saveName = function () {
+                this.formModel.value().name(this.name());
+                this.isNameEditing(false);
             };
 
             this.formatDecimal = function (value) {

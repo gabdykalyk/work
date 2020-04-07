@@ -9,6 +9,15 @@
             this._focusChangeHandler = null;
             this._valueChangeHandler = null;
             this._mutationObserver = null;
+
+            if (errorStateMatcher === undefined) {
+                errorStateMatcher = formControl => {
+                    return ko.pureComputed(() => {
+                        return 'isValid' in formControl && !formControl.isValid();
+                    });
+                }
+            }
+
             this._errorStateMatcher = ko.observable(errorStateMatcher);
             this._value = ko.observable(value);
             this._textInput = ko.observable(textInput);

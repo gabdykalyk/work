@@ -19,17 +19,72 @@
                 padding-left: 30px;
             }
         }
+
+        .position-page__edit-name-button {
+            margin-left: calc(8px - 4px);
+            flex-shrink: 0;
+        }
+
+        .position-page__name-editing-form-field {
+            width: 367px;
+        }
+
+        .position-page__branch-form-field {
+            width: 115px;
+        }
+
+        .position-page__back-button {
+            margin-left: 28px;
+            flex-shrink: 0;
+        }
     }
 
-    &__header {
+    &__header-first-row {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+    }
+
+    &__title-wrapper {
+        display: flex;
+        align-items: center;
+
+        overflow: hidden;
+        white-space: nowrap;
     }
 
     &__title {
         font-weight: 500;
         font-size: 22px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__name-editing-form-field {
+        .position-page__name-editing-form-field-cancel-button {
+            margin-top: 0;
+            margin-bottom: 0;
+            margin-left:calc(8px - 5.5px);
+        }
+
+        .position-page__name-editing-form-field-submit-button {
+            margin-top: 0;
+            margin-bottom: 0;
+            margin-left:calc(16px - 3px);
+        }
+    }
+
+    &__branch-form-field {
+        .hrm-form-field__basis {
+            padding-bottom: 4px;
+        }
+
+        .select2-selection__rendered {
+            padding-right: 8px !important;
+        }
+
+        .hrm-select__rendered-text {
+            font-size: 13px;
+        }
     }
 
     &__tab-pane {
@@ -740,12 +795,65 @@
     &__save-button {
         width: 125px;
     }
+
+    &__with-difference-flag {
+        position: relative;
+
+        &:after {
+            @background-svg: '
+                <svg width="2" height="13" viewBox="0 0 2 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="1" y1="1" x2="1" y2="7" stroke="#12C971" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="1" y1="11" x2="1" y2="12" stroke="#12C971" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            ';
+
+            content: '';
+
+            width: 2px;
+            height: 13px;
+            position: absolute;
+            right: -9px;
+
+            @escaped-background-svg: escape(@background-svg);
+            background-image: url('data:image/svg+xml,@{escaped-background-svg}');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+
+        &.hrm-form-field__basis {
+            &:after {
+                top: 4px;
+            }
+        }
+    }
 }
 
 @media (max-width: @tablet-max-width) {
     .position-page {
         &__content {
             padding-top: 30px;
+
+            .position-page__name-editing-form-field {
+                width: 300px;
+            }
+
+            .position-page__header-second-row {
+                margin-top: 5px;
+            }
+
+            .position-page__back-button {
+                margin-left: 16px;
+            }
+        }
+
+        &__back-button {
+            width: 30px;
+            height: 30px;
+
+            &:before {
+                width: 14px;
+                height: 10px;
+            }
         }
 
         &__workload-tab-pane {
@@ -929,16 +1037,6 @@
 
         &__title {
             font-size: 18px;
-        }
-
-        &__back-button {
-            width: 30px;
-            height: 30px;
-
-            &:before {
-                width: 14px;
-                height: 10px;
-            }
         }
 
         &__tab-pane {

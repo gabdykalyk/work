@@ -13,22 +13,130 @@
         <div class="hrm-scaffold__body">
             <div class="hrm-scaffold__content position-page__content">
                 <div class="position-page__header">
-                    <span class="position-page__title">
-                        Новая должность
-                    </span>
+                    <script type="text/html" id="position-page-branch-form-field-template">
+                        <!-- ko let: {control: ko.observable(null)} -->
+                            <div class="position-page__branch-form-field"
+                                 data-bind="hrmFormField, hrmFormFieldControlRef: control">
+                                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                    <select data-bind="
+                                        value: formModel.branch,
+                                        hrmSelect, hrmSelectPlaceholder: 'Все филиалы',
+                                        hrmSelectAllowClear: true, hrmSelectSearchEnabled: true,
+                                        hrmFormFieldSelectControl: control
+                                    ">
+                                        <option></option>
+                                        <option value="0">Филиал #1</option>
+                                        <option value="1">Филиал #2</option>
+                                        <option value="2">Филиал #3</option>
+                                        <option value="3">Филиал #4</option>
+                                        <option value="4">Филиал #5</option>
+                                    </select>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </script>
 
-                    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary
-                                       hrm-button-with-arrow-left-icon position-page__back-button">
-                            К списку должностей
-                        </button>
-                    <!-- /ko -->
+                    <div class="position-page__header-first-row">
+                        <!-- ko template: {
+                            foreach: hrmTemplateIf(!isNameEditing(), $data),
+                            afterAdd: hrmFadeAfterAddFactory(200, 200),
+                            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                        } -->
+                            <div class="position-page__title-wrapper">
+                                <span class="position-page__title"
+                                      data-bind="text: formModel.mode() === 'create' ? 'Новая должности' : formModel.value().name()">
+                                </span>
 
-                    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
-                        <button class="hrm-button hrm-circle-icon-button hrm-circle-icon-button--theme_secondary
-                                       hrm-circle-arrow-left-icon-button position-page__back-button">
-                        </button>
-                    <!-- /ko -->
+                                <!-- ko template: {
+                                    foreach: hrmTemplateIf(formModel.mode() === 'edit', $data),
+                                    afterAdd: hrmFadeAfterAddFactory(200),
+                                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                                } -->
+                                    <button class="hrm-button hrm-icon-button hrm-pencil-icon-button
+                                                   hrm-icon-button--theme_secondary position-page__edit-name-button"
+                                            title="Редактировать"
+                                            data-bind="click: function () {editName();}">
+                                    </button>
+                                <!-- /ko -->
+                            </div>
+                        <!-- /ko -->
+
+                        <!-- ko template: {
+                            foreach: hrmTemplateIf(isNameEditing(), $data),
+                            afterAdd: hrmFadeAfterAddFactory(200, 200),
+                            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                        } -->
+                            <!-- ko let: {control: ko.observable(null)} -->
+                                <div class="position-page__name-editing-form-field"
+                                     data-bind="hrmFormField, hrmFormFieldControlRef: control">
+                                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                                        <input data-bind="
+                                            textInput: name,
+                                            hrmFormFieldInputControl: control
+                                        " placeholder="Название">
+
+                                        <button class="hrm-button hrm-icon-button hrm-times-icon-button
+                                                       hrm-icon-button--theme_negative hrm-form-field__basis-suffix position-page__name-editing-form-field-cancel-button"
+                                                title="Отменить"
+                                                data-bind="click: function () {isNameEditing(false);}">
+                                        </button>
+
+                                        <button class="hrm-button hrm-icon-button hrm-check-icon-button
+                                                       hrm-icon-button--theme_positive hrm-form-field__basis-suffix position-page__name-editing-form-field-submit-button"
+                                                title="Сохранить"
+                                                data-bind="click: function () {saveName();}">
+                                        </button>
+                                    </div>
+
+                                    <div data-bind="
+                                        component: {name: 'hrm-form-field-error'},
+                                        hrmSlide,
+                                        hrmSlideValue: control() !== null ? control().errorState : false,
+                                        hrmSlideDuration: 150
+                                    ">
+                                        <!-- ko text: $parent.name.error() --><!-- /ko -->
+                                    </div>
+                                </div>
+                            <!-- /ko -->
+                        <!-- /ko -->
+
+                        <div class="hrm-spacer"></div>
+
+                        <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                            <!-- ko template: {
+                                foreach: hrmTemplateIf(formModel.mode() === 'edit', $data),
+                                afterAdd: hrmFadeAfterAddFactory(200, 200),
+                                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                            } -->
+                                <!-- ko template: {name: 'position-page-branch-form-field-template'} --><!-- /ko -->
+                            <!-- /ko -->
+                        <!-- /ko -->
+
+                        <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
+                            <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary
+                                           hrm-button-with-arrow-left-icon position-page__back-button">
+                                К списку должностей
+                            </button>
+                        <!-- /ko -->
+
+                        <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth -->
+                            <button class="hrm-button hrm-circle-icon-button hrm-circle-icon-button--theme_secondary
+                                           hrm-circle-arrow-left-icon-button position-page__back-button">
+                            </button>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="position-page__header-second-row">
+                        <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+                            <!-- ko template: {
+                                foreach: hrmTemplateIf(formModel.mode() === 'edit', $data),
+                                afterAdd: hrmFadeAfterAddFactory(200, 200),
+                                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                            } -->
+                                <!-- ko template: {name: 'position-page-branch-form-field-template'} --><!-- /ko -->
+                            <!-- /ko -->
+                        <!-- /ko -->
+                    </div>
                 </div>
 
                 <div class="position-page__navigation"
