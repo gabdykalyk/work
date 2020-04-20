@@ -15,6 +15,15 @@
             this._closeHandler = null;
             this._searchUpdateHandler = null;
             this._mutationObserver = null;
+
+            if (errorStateMatcher === undefined) {
+                errorStateMatcher = formControl => {
+                    return ko.pureComputed(() => {
+                        return 'isValid' in formControl && !formControl.isValid();
+                    });
+                }
+            }
+
             this._errorStateMatcher = ko.observable(errorStateMatcher);
             this._value = ko.observable(value);
             this._selectedOptions = ko.observable(selectedOptions);
