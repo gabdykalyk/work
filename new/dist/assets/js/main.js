@@ -246,94 +246,6 @@ ko.components.register('hrm-basic-sidebar', {
 });
 "use strict";
 
-ko.components.register('hrm-checkbox', {
-  viewModel: {
-    createViewModel: function (params, componentInfo) {
-      const $element = $(componentInfo.element);
-      $element.addClass(['hrm-checkbox']);
-
-      const ViewModel = function () {
-        this._subscriptions = [];
-
-        if (params !== undefined && 'checked' in params) {
-          this.checked = ko.isObservable(params.checked) ? params.checked : ko.observable(params.checked);
-        } else {
-          this.checked = ko.observable(false);
-        }
-
-        this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
-
-        (() => {
-          $element.toggleClass('hrm-checkbox--checked', this.checked());
-
-          this._subscriptions.push(this.checked.subscribe(checked => {
-            $element.toggleClass('hrm-checkbox--checked', checked);
-          }));
-        })();
-      };
-
-      ViewModel.prototype.dispose = function () {
-        this._subscriptions.forEach(s => s.dispose());
-      };
-
-      return new ViewModel();
-    }
-  },
-  template: `
-        <label class="hrm-checkbox__layout">
-            <input data-bind="checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}"
-                   type="checkbox" hidden>
-        </label>
-    `
-});
-let hrmCheckboxGroupNextId = 0;
-ko.components.register('hrm-checkbox-group', {
-  viewModel: {
-    createViewModel: function (params, componentInfo) {
-      const $element = $(componentInfo.element);
-      $element.addClass(['hrm-checkbox-group']);
-
-      const ViewModel = function () {
-        this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
-
-        (() => {
-          if (params !== undefined && 'exportAs' in params) {
-            if (ko.isObservableArray(params.exportAs)) {
-              params.exportAs.push(this);
-            } else {
-              params.exportAs(this);
-            }
-          }
-        })();
-      };
-
-      ViewModel.prototype.dispose = function () {
-        if (params !== undefined && 'exportAs' in params) {
-          if (ko.isObservableArray(params.exportAs)) {
-            params.exportAs.remove(this);
-          } else {
-            params.exportAs(null);
-          }
-        }
-      };
-
-      return new ViewModel();
-    }
-  },
-  template: `
-        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->
-    `
-});
-ko.bindingHandlers.hrmCheckboxGroupLabel = {
-  init: function (element, valueAccessor, allBindings) {
-    const checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
-    const $element = $(element);
-    $element.addClass('hrm-checkbox-group__label');
-    $element.attr('for', checkboxGroup().id);
-  }
-};
-"use strict";
-
 (() => {
   class HrmDatepickerViewModel {
     constructor(element, value) {
@@ -452,6 +364,94 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
     }
   };
 })();
+"use strict";
+
+ko.components.register('hrm-checkbox', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-checkbox']);
+
+      const ViewModel = function () {
+        this._subscriptions = [];
+
+        if (params !== undefined && 'checked' in params) {
+          this.checked = ko.isObservable(params.checked) ? params.checked : ko.observable(params.checked);
+        } else {
+          this.checked = ko.observable(false);
+        }
+
+        this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
+
+        (() => {
+          $element.toggleClass('hrm-checkbox--checked', this.checked());
+
+          this._subscriptions.push(this.checked.subscribe(checked => {
+            $element.toggleClass('hrm-checkbox--checked', checked);
+          }));
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        this._subscriptions.forEach(s => s.dispose());
+      };
+
+      return new ViewModel();
+    }
+  },
+  template: `
+        <label class="hrm-checkbox__layout">
+            <input data-bind="checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}"
+                   type="checkbox" hidden>
+        </label>
+    `
+});
+let hrmCheckboxGroupNextId = 0;
+ko.components.register('hrm-checkbox-group', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-checkbox-group']);
+
+      const ViewModel = function () {
+        this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
+
+        (() => {
+          if (params !== undefined && 'exportAs' in params) {
+            if (ko.isObservableArray(params.exportAs)) {
+              params.exportAs.push(this);
+            } else {
+              params.exportAs(this);
+            }
+          }
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        if (params !== undefined && 'exportAs' in params) {
+          if (ko.isObservableArray(params.exportAs)) {
+            params.exportAs.remove(this);
+          } else {
+            params.exportAs(null);
+          }
+        }
+      };
+
+      return new ViewModel();
+    }
+  },
+  template: `
+        <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->
+    `
+});
+ko.bindingHandlers.hrmCheckboxGroupLabel = {
+  init: function (element, valueAccessor, allBindings) {
+    const checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
+    const $element = $(element);
+    $element.addClass('hrm-checkbox-group__label');
+    $element.attr('for', checkboxGroup().id);
+  }
+};
 "use strict";
 
 // hrmDropdownMenu
@@ -750,7 +750,7 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 
         const control = this._control();
 
-        return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
+        return control !== null ? errorStateMatcher(control)() : false;
       });
 
       this._$element.on('focus blur', this._focusChangeHandler);
@@ -959,7 +959,7 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 
         const control = this._control();
 
-        return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
+        return control !== null ? errorStateMatcher(control)() : false;
       });
 
       this._$element.on('focus blur', this._focusChangeHandler);
@@ -1175,7 +1175,7 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 
         const control = this._control();
 
-        return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
+        return control !== null ? errorStateMatcher(control)() : false;
       });
 
       this._select2Instance.$selection.on('focus', this._selectionFocusHandler);
@@ -2885,6 +2885,148 @@ ko.components.register('hrm-tab-group', {
 });
 "use strict";
 
+// hrmTooltip
+(() => {
+  class ViewModel {
+    constructor(element, text, mode = 'basic') {
+      this._subscriptions = [];
+      this._textSubscription = null;
+      this._clickHandler = null;
+      this._text = null;
+      this._mode = mode;
+      this.element = element;
+      this._tippyInstance = null;
+
+      this._init(text);
+    }
+
+    _init(text) {
+      if (this._mode === 'large') {
+        this._clickHandler = () => {
+          this._tippyInstance.show();
+        };
+
+        $(this.element).on('click', this._clickHandler);
+
+        this._tooltipClickHandler = event => {
+          const $target = $(event.target);
+
+          if ($target.hasClass('hrm-tooltip__close-button')) {
+            this._tippyInstance.hide();
+          }
+        };
+      }
+
+      this._tippyInstance = tippy(this.element, {
+        arrow: false,
+        distance: 7,
+        placement: 'bottom',
+        interactive: true,
+        appendTo: document.body,
+        boundary: 'viewport',
+        hideOnClick: true,
+        trigger: this._mode === 'basic' ? 'mouseenter click' : 'manual',
+        onCreate: instance => {
+          $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
+          $(instance.popperChildren.tooltip).addClass(this._mode === 'basic' ? 'hrm-tooltip--mode_basic' : 'hrm-tooltip--mode_large');
+
+          if (this._mode === 'large') {
+            $(instance.popperChildren.tooltip).on('click', this._tooltipClickHandler);
+          }
+        }
+      });
+
+      this._setText(text);
+    }
+
+    _setText(text) {
+      if (this._textSubscription !== null) {
+        this._textSubscription.dispose();
+      }
+
+      if (ko.isObservable(text)) {
+        this._textSubscription = text.subscribe(text => {
+          this._text = text;
+
+          this._update();
+        });
+        this._text = text();
+      } else {
+        this._text = text;
+      }
+
+      this._update();
+    }
+
+    _update() {
+      this._tippyInstance.setContent(this._createContent(this._text, this._mode));
+    }
+
+    _createContent(text, mode) {
+      let result = `<div class="hrm-tooltip__text">${text}</div>`;
+
+      if (mode === 'large') {
+        result += '<button class="hrm-button hrm-tooltip__close-button">Ок</button>';
+      }
+
+      return result;
+    }
+
+    _destroy() {
+      this._subscriptions.forEach(s => s.dispose());
+
+      if (this._mode === 'large') {
+        $(this.element).off('click', this._clickHandler);
+      }
+    }
+
+  }
+
+  const instances = new Map();
+  const previousBindingsList = new Map();
+  ko.bindingHandlers.hrmTooltip = {
+    init: function (element, valueAccessor, allBindings) {
+      const text = allBindings.get('hrmTooltipText');
+      const mode = allBindings.get('hrmTooltipMode');
+      const viewModel = new ViewModel(element, text, mode);
+      instances.set(element, viewModel);
+
+      if (valueAccessor() !== undefined) {
+        if (ko.isObservableArray(valueAccessor())) {
+          valueAccessor().push(viewModel);
+        } else {
+          valueAccessor()(viewModel);
+        }
+      }
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        if (valueAccessor() !== undefined) {
+          if (ko.isObservableArray(valueAccessor())) {
+            valueAccessor().remove(this);
+          } else {
+            valueAccessor()(null);
+          }
+        }
+
+        viewModel._destroy();
+      });
+    },
+    update: function (element, valueAccessor, allBindings) {
+      const instance = instances.get(element);
+      const previousBindings = previousBindingsList.get(element);
+
+      if (previousBindings !== undefined) {
+        if (previousBindings['hrmTooltipText'] !== allBindings.get('hrmTooltipText')) {
+          instance._setText(allBindings.get('hrmTooltipText'));
+        }
+      }
+
+      previousBindingsList.set(element, allBindings());
+    }
+  };
+})();
+"use strict";
+
 ko.bindingHandlers.hrmTable = {
   init: function (element) {
     const $element = $(element);
@@ -3353,148 +3495,6 @@ ko.bindingHandlers.hrmTable = {
 
         viewModel._destroy();
       });
-    }
-  };
-})();
-"use strict";
-
-// hrmTooltip
-(() => {
-  class ViewModel {
-    constructor(element, text, mode = 'basic') {
-      this._subscriptions = [];
-      this._textSubscription = null;
-      this._clickHandler = null;
-      this._text = null;
-      this._mode = mode;
-      this.element = element;
-      this._tippyInstance = null;
-
-      this._init(text);
-    }
-
-    _init(text) {
-      if (this._mode === 'large') {
-        this._clickHandler = () => {
-          this._tippyInstance.show();
-        };
-
-        $(this.element).on('click', this._clickHandler);
-
-        this._tooltipClickHandler = event => {
-          const $target = $(event.target);
-
-          if ($target.hasClass('hrm-tooltip__close-button')) {
-            this._tippyInstance.hide();
-          }
-        };
-      }
-
-      this._tippyInstance = tippy(this.element, {
-        arrow: false,
-        distance: 7,
-        placement: 'bottom',
-        interactive: true,
-        appendTo: document.body,
-        boundary: 'viewport',
-        hideOnClick: true,
-        trigger: this._mode === 'basic' ? 'mouseenter click' : 'manual',
-        onCreate: instance => {
-          $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
-          $(instance.popperChildren.tooltip).addClass(this._mode === 'basic' ? 'hrm-tooltip--mode_basic' : 'hrm-tooltip--mode_large');
-
-          if (this._mode === 'large') {
-            $(instance.popperChildren.tooltip).on('click', this._tooltipClickHandler);
-          }
-        }
-      });
-
-      this._setText(text);
-    }
-
-    _setText(text) {
-      if (this._textSubscription !== null) {
-        this._textSubscription.dispose();
-      }
-
-      if (ko.isObservable(text)) {
-        this._textSubscription = text.subscribe(text => {
-          this._text = text;
-
-          this._update();
-        });
-        this._text = text();
-      } else {
-        this._text = text;
-      }
-
-      this._update();
-    }
-
-    _update() {
-      this._tippyInstance.setContent(this._createContent(this._text, this._mode));
-    }
-
-    _createContent(text, mode) {
-      let result = `<div class="hrm-tooltip__text">${text}</div>`;
-
-      if (mode === 'large') {
-        result += '<button class="hrm-button hrm-tooltip__close-button">Ок</button>';
-      }
-
-      return result;
-    }
-
-    _destroy() {
-      this._subscriptions.forEach(s => s.dispose());
-
-      if (this._mode === 'large') {
-        $(this.element).off('click', this._clickHandler);
-      }
-    }
-
-  }
-
-  const instances = new Map();
-  const previousBindingsList = new Map();
-  ko.bindingHandlers.hrmTooltip = {
-    init: function (element, valueAccessor, allBindings) {
-      const text = allBindings.get('hrmTooltipText');
-      const mode = allBindings.get('hrmTooltipMode');
-      const viewModel = new ViewModel(element, text, mode);
-      instances.set(element, viewModel);
-
-      if (valueAccessor() !== undefined) {
-        if (ko.isObservableArray(valueAccessor())) {
-          valueAccessor().push(viewModel);
-        } else {
-          valueAccessor()(viewModel);
-        }
-      }
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-        if (valueAccessor() !== undefined) {
-          if (ko.isObservableArray(valueAccessor())) {
-            valueAccessor().remove(this);
-          } else {
-            valueAccessor()(null);
-          }
-        }
-
-        viewModel._destroy();
-      });
-    },
-    update: function (element, valueAccessor, allBindings) {
-      const instance = instances.get(element);
-      const previousBindings = previousBindingsList.get(element);
-
-      if (previousBindings !== undefined) {
-        if (previousBindings['hrmTooltipText'] !== allBindings.get('hrmTooltipText')) {
-          instance._setText(allBindings.get('hrmTooltipText'));
-        }
-      }
-
-      previousBindingsList.set(element, allBindings());
     }
   };
 })();

@@ -86,7 +86,7 @@
                 const errorStateMatcher = this._errorStateMatcher();
                 const control = this._control();
 
-                return errorStateMatcher !== undefined ? errorStateMatcher(control)() : false;
+                return control !== null ? errorStateMatcher(control)() : false;
             });
 
             this._select2Instance.$selection.on('focus', this._selectionFocusHandler);
