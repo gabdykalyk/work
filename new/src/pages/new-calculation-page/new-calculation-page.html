@@ -20,341 +20,40 @@
           </span>
           <div class="calculation-page__actions">
             <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
-            <a href="#" class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-arrow-left-icon">
+            <a href="#"
+               class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-arrow-left-icon">
               К списку расчетов
             </a>
             <!-- /ko -->
             <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
-            <a href="#" class="hrm-button hrm-circle-icon-button hrm-circle-arrow-left-icon-button  hrm-circle-icon-button--theme_secondary"></a>
+            <a href="#"
+               class="hrm-button hrm-circle-icon-button hrm-circle-arrow-left-icon-button  hrm-circle-icon-button--theme_secondary"></a>
             <!-- /ko -->
           </div>
         </div>
 
-        <div class="calculation-page__form calculation-form">
-          @@include('./components/_form-header.html')
+        <div class="calculation-form">
+          @@include('./components/_form-input.html')
+
 
           <!-- ko template: {
             foreach: hrmTemplateIf(isBuilt(), $data),
             afterAdd: hrmFadeAfterAddFactory(200, 200),
             beforeRemove: hrmFadeBeforeRemoveFactory(200)
           } -->
-          <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-          <table class="calculation-page__positions-table"
-                 data-bind="hrmTable">
-            <thead>
-              <tr>
-                <th class="calculation-page__positions-table-name-head-cell">
-                  <div class="hrm-table__head-cell-content">
-                    Должность
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'Должность'"></button>
-                  </div>
-                </th>
-                <th class="calculation-page__positions-table-workload-type-head-cell">
-                  <div class="hrm-table__head-cell-content">
-                    Тип нагрузки
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'"></button>
-                  </div>
-                </th>
-                <th colspan="2">
-                  <div class="hrm-table__head-cell-content">
-                    Нагрузка
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'"></button>
-                  </div>
-                </th>
-                <th>
-                  <div class="hrm-table__head-cell-content">
-                    Доп. нагрузка
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'Дополнительная нагрузка'"></button>
-                  </div>
-                </th>
-                <th class="calculation-page__positions-table-employee-count-head-cell">
-                  <div class="hrm-table__head-cell-content">
-                    Сотрудники
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'"></button>
-                  </div>
-                </th>
-                <th class="calculation-page__positions-table-estimated-hours-head-cell">
-                  <div class="hrm-table__head-cell-content">
-                    ФОТ, % в категории
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'ФОТ, % в категории'"></button>
-                  </div>
-                </th>
-                <th class="calculation-page__positions-table-estimated-hours-head-cell">
-                  <div class="hrm-table__head-cell-content">
-                    ФОТ, % от выручки
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'ФОТ, % от выручки'"></button>
-                  </div>
-                </th>
-                <th class="calculation-page__positions-table-estimated-hours-head-cell">
-                  <div class="hrm-table__head-cell-content">
-                    Норм. выработки, %
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'Норм. выработки, %'"></button>
-                  </div>
-                </th>
-                <th colspan="2"
-                    class="calculation-page__positions-table-estimated-hours-head-cell">
-                  <div class="hrm-table__head-cell-content">
-                    Опоздания
-                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                            data-bind="hrmTooltip, hrmTooltipText: 'Норм. выработки, %'"></button>
-                  </div>
-                </th>
-              </tr>
-            </thead>
+          <div class="calculation-form__content">
+            @@include('./components/_form-summary.html')
 
-            <tbody>
-              <!-- ko foreach: formModel().positions -->
-              <tr>
-                <td data-bind="text: name"></td>
-                <td>
-                  <!-- ko text: $root.getWorkloadTypeName(workloadType) -->
-                  <!-- /ko -->
-                  <!-- ko if: workloadType === 2 -->
-                  <span class="calculation-page__positions-table-categories-count"
-                        data-bind="text: categories.length, hrmTooltip, hrmTooltipText: $root.getCategoriesTooltipText(categories)">
-                  </span>
-                  <!-- /ko -->
-                </td>
-                <!-- ko let: {editableCell: ko.observable(null)} -->
-                <td class="calculation-page__positions-table-units-cell"
-                    data-bind="hrmTableEditableCell: editableCell">
-                  <select data-bind="
-                      value: units,
-                      hrmSelect,
-                      hrmTableEditableCellSelectControl,
-                      hrmTableEditableCellSelectControlOwner: editableCell
-                    ">
-                    <option value="1">Штуки</option>
-                    <option value="2">Рубли</option>
-                    <option value="3">Норма времени</option>
-                  </select>
-                </td>
-                <!-- /ko -->
-                <!-- ko let: {editableCell: ko.observable(null)} -->
-                <td class="calculation-page__positions-table-workload-cell"
-                    data-bind="hrmTableEditableCell: editableCell">
-                  <input data-bind="
-                      value: workload,
-                      hrmMask, hrmMaskPattern: 'decimal',
-                      hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                      hrmTableEditableCellInputControl,
-                      hrmTableEditableCellInputControlOwner: editableCell
-                    "
-                         placeholder="0" />
-                </td>
-                <!-- /ko -->
+            <div class="calculation-form__actions">
+              <button class="hrm-button hrm-basic-button calculation-form__action">
+                Отменить
+              </button>
 
-                <td></td>
-
-                <td class="calculation-page__positions-table-employee-count-cell"
-                    data-bind="text: employees().length"></td>
-                <td class="calculation-page__positions-table-estimated-hours-cell"></td>
-                <td class="calculation-page__positions-table-estimated-hours-cell"></td>
-                <td class="calculation-page__positions-table-estimated-hours-cell"></td>
-                <td class="calculation-page__positions-table-estimated-hours-cell"></td>
-              </tr>
-              <!-- /ko -->
-            </tbody>
-          </table>
-          <!-- /ko -->
-
-          <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
-          <div class="hrm-table__fixed-section-container calculation-page__positions-table">
-            <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left calculation-page__positions-table-table calculation-page__positions-table-fixed-section"
-                   data-bind="hrmTable">
-              <tbody>
-                <tr>
-                  <th>
-                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                      Должность
-                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                              data-bind="hrmTooltip, hrmTooltipText: 'Должность'"></button>
-                    </div>
-                  </th>
-                </tr>
-
-                <tr>
-                  <th class="calculation-page__positions-table-workload-type-head-cell">
-                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                      Тип нагрузки
-                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                              data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'"></button>
-                    </div>
-                  </th>
-                </tr>
-
-                <tr>
-                  <th>
-                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                      Нагрузка
-                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                              data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'"></button>
-                    </div>
-                  </th>
-                </tr>
-
-                <tr>
-                  <th>
-                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                      Сотрудники
-                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                              data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'"></button>
-                    </div>
-                  </th>
-                </tr>
-
-                <tr>
-                  <th>
-                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                      Нормо-часы
-                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                              data-bind="hrmTooltip, hrmTooltipText: 'Нормо-часы'"></button>
-                    </div>
-                  </th>
-                </tr>
-              </tbody>
-            </table>
-
-            <div data-bind="component: {
-                                    name: 'hrm-scrollable-wrapper',
-                                    params: {
-                                        options: {left: {disabled: true}}
-                                    }
-                                }">
-              <table class="calculation-page__positions-table-table"
-                     data-bind="hrmTable">
-                <tbody>
-                  <tr>
-                    <th>
-                      <div
-                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                        Должность
-                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                data-bind="hrmTooltip, hrmTooltipText: 'Должность'"></button>
-                      </div>
-                    </th>
-
-                    <!-- ko foreach: formModel().positions -->
-                    <td colspan="2"
-                        data-bind="text: name"></td>
-                    <!-- /ko -->
-                  </tr>
-                  <tr>
-                    <th class="calculation-page__positions-table-workload-type-head-cell">
-                      <div
-                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                        Тип нагрузки
-                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'"></button>
-                      </div>
-                    </th>
-
-                    <!-- ko foreach: formModel().positions -->
-                    <td class="calculation-page__positions-table-workload-type-cell"
-                        colspan="2">
-                      <div class="hrm-table__cell-content">
-                        <!-- ko text: $root.getWorkloadTypeName(workloadType) -->
-                        <!-- /ko -->
-                        <!-- ko if: workloadType === 2 -->
-                        <span class="calculation-page__positions-table-categories-count"
-                              data-bind="text: categories.length, hrmTooltip, hrmTooltipText: $root.getCategoriesTooltipText(categories)">
-                        </span>
-                        <!-- /ko -->
-                      </div>
-                    </td>
-                    <!-- /ko -->
-                  </tr>
-
-                  <tr>
-                    <th>
-                      <div
-                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                        Нагрузка
-                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'"></button>
-                      </div>
-                    </th>
-
-                    <!-- ko foreach: formModel().positions -->
-                    <!-- ko let: {editableCell: ko.observable(null)} -->
-                    <td data-bind="hrmTableEditableCell: editableCell">
-                      <select data-bind="
-                                                            value: units,
-                                                            hrmSelect,
-                                                            hrmTableEditableCellSelectControl,
-                                                            hrmTableEditableCellSelectControlOwner: editableCell
-                                                        ">
-                        <option value="1">Штуки</option>
-                        <option value="2">Рубли</option>
-                        <option value="3">Норма времени</option>
-                      </select>
-                    </td>
-                    <!-- /ko -->
-
-                    <!-- ko let: {editableCell: ko.observable(null)} -->
-                    <td class="calculation-page__positions-table-workload-cell"
-                        data-bind="hrmTableEditableCell: editableCell">
-                      <input data-bind="
-                                                            value: workload,
-                                                            hrmMask, hrmMaskPattern: 'decimal',
-                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
-                                                            hrmTableEditableCellInputControl,
-                                                            hrmTableEditableCellInputControlOwner: editableCell
-                                                        "
-                             placeholder="0" />
-                    </td>
-                    <!-- /ko -->
-                    <!-- /ko -->
-                  </tr>
-
-                  <tr>
-                    <th>
-                      <div
-                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                        Сотрудники
-                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'"></button>
-                      </div>
-                    </th>
-
-                    <!-- ko foreach: formModel().positions -->
-                    <td class="calculation-page__positions-table-estimated-hours-cell"
-                        data-bind="text: estimatedHours"
-                        colspan="2"></td>
-                    <!-- /ko -->
-                  </tr>
-
-                  <tr>
-                    <th>
-                      <div
-                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-                        Нормо-часы
-                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
-                                data-bind="hrmTooltip, hrmTooltipText: 'Нормо-часы'"></button>
-                      </div>
-                    </th>
-
-                    <!-- ko foreach: formModel().positions -->
-                    <td class="calculation-page__positions-table-estimated-hours-cell"
-                        data-bind="text: estimatedHours"
-                        colspan="2"></td>
-                    <!-- /ko -->
-                  </tr>
-                </tbody>
-              </table>
+              <button class="hrm-button hrm-basic-button hrm-accent-button calculation-form__action">
+                Сохранить
+              </button>
             </div>
           </div>
-          <!-- /ko -->
-
-
           <!-- /ko -->
         </div>
       </div>

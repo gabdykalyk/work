@@ -17,8 +17,7 @@
 
       this.isBuilt = ko.observable(false);
 
-
-      function createIntervalsModel (data) {
+      function createIntervalsModel(data, needCheck) {
 
         function createIntervalModel(intervalModel, boundaryName = 'start', defaultValue) {
           return ko.observable(defaultValue).extend({
@@ -34,6 +33,8 @@
                 if (intervalModel() === null) {
                   return false;
                 }
+
+                if (!needCheck()) return true;
 
                 const startValue = moment(boundaryName === 'start' ? value : intervalModel().start(), 'HH:mm');
                 const endValue = moment(boundaryName === 'end' ? value : intervalModel().end(), 'HH:mm');
@@ -53,18 +54,18 @@
         return model;
       }
 
-      this.configModel = {
+      this.inputModel = {
         filial: ko.observable('').extend({
           required: {
             message: 'Обязательное поле'
           }
         }),
-        date: ko.observable(moment().format('DD.MM.YYYY')).extend({
+        date: ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
           required: {
             message: 'Обязательное поле'
           },
           hrmDate: {
-            params: 'DD.MM.YYYY',
+            params: 'DD.MM.YYYY, dddd',
             message: 'Неверный формат даты'
           }
         }),
@@ -72,16 +73,22 @@
           required: {
             message: 'Обязательное поле'
           }
-        }),
-        interval: createIntervalsModel({
-          start: '11:00',
-          end: '23:00'
         })
       };
 
-      this.isParamsValid = ko.pureComputed(() => {
-        return this.configModel.date.isValid() && this.configModel.interval.isValid();
+      this.inputModel.interval = createIntervalsModel({
+        start: '11:00',
+        end: '23:00'
+      }, () => {
+        return this.inputModel.shift() == 0
+      })
+
+      window.test = this.inputModel.interval;
+
+      this.isInputValid = ko.pureComputed(() => {
+        return this.inputModel.date.isValid() && this.inputModel.interval.isValid();
       }, this);
+
 
       this.formControlErrorStateMatcher = function (formControl) {
         return ko.pureComputed(() => {
@@ -90,81 +97,42 @@
       };
 
 
-
-
-
-      this.isEmployeesCalculated = ko.observable(false);
-
-      /**/
-      this.createPositionFormModel = function (data) {
-        return {
-          ...data,
-          units: ko.observable(data.units.toString()),
-          workload: ko.observable(data.workload),
-          employees: ko.observableArray(data.employees.map(e => this.createPositionEmployeeFormModel(e))),
-          rate: ko.observable('')
-        };
-      };
-
-      /**/
-      this.createPositionEmployeeFormModel = function (data) {
-        const workingIntervals = ko.observableArray(data.workingIntervals.map(v => this.createPositionEmployeeWorkingIntervalFormModel(v)));
-
-        return {
-          ...data,
-          workingIntervals,
-          rate: ko.observable(data.rate),
-          returnRate: data.returnRate,
-          salaryBulk: ko.observable(data.salaryBulk),
-          bonus: ko.observable(data.bonus),
-          fine: ko.observable(data.fine),
-          workingIntervalsValidationObject: ko.observable().extend({
-            validation: {
-              validator: () => {
-                return workingIntervals().every(i => i.value.isValid());
-              }
-            }
-          })
-        };
-      };
-
-      /**/
-      this.createPositionEmployeeWorkingIntervalFormModel = function (value) {
-        return {
-          value: ko.observable(value).extend({
-            required: {
-              message: 'Обязательное поле'
-            },
-            validation: {
-              validator: value => {
-                if (!/^\d\d:\d\d – \d\d:\d\d$/.test(value)) {
-                  return false;
-                } else {
-                  const boundaries = value.split(' – ');
-
-                  if (boundaries[0] === boundaries[1]) {
-                    return false;
-                  }
-
-                  return boundaries.every(b => moment(b, 'HH:mm', true).isValid());
-                }
-              },
-              message: 'Неверный формат интервала'
-            }
-          })
-        };
-      };
-
-      /**/
-      this.formModel = ko.validatedObservable({
-        positions: ko.observable(positions.map(p => this.createPositionFormModel(p))),
-      });
-
-
-      this.buildCalculation =  () => {
+      this.buildCalculation = () => {
         this.isBuilt(true);
       };
 
+      this.createPositionModel = function (data) {
+        return {
+          ...data
+        };
+      };
+
+      this.jobsModel = ko.observable({
+        positions: positions.map(position => {
+          return this.createPositionModel(position)
+        })
+      });
+      this.jobsModel.total = ko.pureComputed(() => {
+        return this.jobsModel().positions.reduce((acc, p) => {
+          return {
+            workload: (acc.workload || 0) + p.workload,
+            workloadType: '',
+            units: '',
+            additionalWorkload: '',
+            fotCategory: 100,
+            fotRevenue: 100,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: (acc.employees || 0) + p.employees.length
+          }
+        }, {})
+      })
+
+      this.isEmployeesCalculated = ko.observable(false);
 
       this.calculateEmployees = function () {
         this.isEmployeesCalculated(true);
@@ -174,20 +142,20 @@
         this.isEmployeesCalculated(false);
 
         this.formModel().positions().forEach((position, index) => {
-          position.employees(positions[index].employees.map(e => this.createPositionEmployeeFormModel(e)));
+          position.employees(positions[index].employees.map(e => this.createEmployeeModel(e)));
         });
 
         this.isEmployeesCalculated(true);
       };
 
       this.addWorkingInterval = function (employee) {
-        employee.workingIntervals.push(this.createPositionEmployeeWorkingIntervalFormModel(''));
+        employee.workingIntervals.push(this.createEmployeeWorkingIntervalModel(''));
       };
 
       this.addEmployee = function (position) {
         const index = Math.floor(Math.random() * 1000);
 
-        position.employees.push(this.createPositionEmployeeFormModel({
+        position.employees.push(this.createEmployeeModel({
           name: position.name + ' #' + index,
           workingIntervals: [''],
           rate: position.rate() !== '' ? position.rate() : 600,
@@ -315,95 +283,44 @@
 
     const viewModel = new ViewModel([
       {
-        name: 'Повар-пицмейкер',
-        workloadType: 1,
-        categories: null,
-        units: 1,
-        workload: 90,
+        name: 'Администратор филиала',
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkload: 'Время без дела 0%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        performanceStandart: -100,
+        lateness: {
+          green: 0,
+          yellow: 0,
+          red: 0
+        },
         employees: [
           {
-            name: 'Повар-пицмейкер #1',
-            workingIntervals: ['11:00 – 23:00', '00:00 – 05:00'],
-            rate: 600,
-            returnRate: 30,
-            salaryBulk: 7200,
-            bonus: 100,
-            fine: 20
+            name: 'Сергеева Мария Владиславовна',
           }
-        ],
-        estimatedHours: 36
+        ]
+      }, {
+        name: 'Водители',
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkload: '',
+        fotCategory: 0,
+        fotRevenue: 0,
+        performanceStandart: -100,
+        lateness: {
+          green: 0,
+          yellow: 0,
+          red: 0
+        },
+        employees: [
+          {},
+          {},
+          {}
+        ]
       },
-      {
-        name: 'Повар-сушист',
-        workloadType: 2,
-        categories: [
-          { name: 'Роллы открытые' },
-          { name: 'Роллы закрытые' },
-          { name: 'Гунканы' },
-          { name: 'Суши' },
-          { name: 'Сашими' }
-        ],
-        units: 2,
-        workload: 10000,
-        employees: [
-          {
-            name: 'Повар-сушист #1',
-            workingIntervals: ['11:00 – 23:00'],
-            rate: 600,
-            returnRate: 10000,
-            salaryBulk: 7200,
-            bonus: 100,
-            fine: 20
-          },
-          {
-            name: 'Повар-сушист #2',
-            workingIntervals: ['11:00 – 23:00'],
-            rate: 600,
-            returnRate: 10000,
-            salaryBulk: 7200,
-            bonus: 100,
-            fine: 20
-          },
-          {
-            name: 'Повар-сушист #3',
-            workingIntervals: ['11:00 – 23:00'],
-            rate: 600,
-            returnRate: 10000,
-            salaryBulk: 7200,
-            bonus: 100,
-            fine: 20
-          }
-        ],
-        estimatedHours: 36
-      },
-      {
-        name: 'Мороженщик',
-        workloadType: 1,
-        categories: null,
-        units: 3,
-        workload: 2.2,
-        employees: [
-          {
-            name: 'Мороженщик #1',
-            workingIntervals: ['11:00 – 23:00'],
-            rate: 600,
-            returnRate: 10000,
-            salaryBulk: 7200,
-            bonus: 100,
-            fine: 20
-          },
-          {
-            name: 'Мороженщик #2',
-            workingIntervals: ['11:00 – 23:00'],
-            rate: 600,
-            returnRate: 10000,
-            salaryBulk: 7200,
-            bonus: 100,
-            fine: 20
-          }
-        ],
-        estimatedHours: 36
-      }
     ]);
 
     ViewModel.prototype.dispose = function () {
