@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html class="hrm-page calculation-page hrm-page--initializing"
+      data-bind="childrenComplete: childrenComplete"
+      lang="ru">
+
+<head>
+  <title>Sakura</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="HandheldFriendly" content="true" />
+<meta content="IE=edge" http-equiv="X-UA-Compatible" />
+<link href="https://fonts.googleapis.com/css?family=Fira+Sans:100,200,300,400,500,600,700,800,900&display=swap&subset=cyrillic" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/css/OverlayScrollbars.min.css" integrity="sha256-zUBmWpj0DsZzFautKgMOtiOkT6ECQ+a6RitMns7+HRM=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<link rel="stylesheet" href="assets/fonts/fontawesome/css/all.css" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.css" integrity="sha256-vZ3SaLOjnKO/gGvcUWegySoDU6ff33CS5i9ot8J9Czk=" crossorigin="anonymous" />
+
+<link rel="stylesheet" href="assets/css/main.css" />
+
+</head>
+
+<body>
+  <div class="hrm-scaffold">
+    <div class="hrm-scaffold__sidebar"
+         data-bind="component: {name: 'hrm-basic-sidebar'}"></div>
+    <div class="hrm-scaffold__body">
+      <div class="hrm-scaffold__content calculation-page__content">
+
+        <div class="calculation-page__header">
+          <span class="calculation-page__title">
+            Новый расчет
+          </span>
+        </div>
+
+        <div class="calculation-page__form calculation-form">
+          <div class="calculation-form__header"
+     data-bind="let: { errorStateMatcher: $root.formControlErrorStateMatcher.bind($root), config: $root.configModel }">
+
+
+    <!-- Filial select -->
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="calculation-form__field calculation-form__filial"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+      <label data-bind="hrmFormFieldLabel: label">
+        Филиал
+      </label>
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <select data-bind="value: config.filial,
+                        hrmSelect,
+                        hrmFormFieldSelectControl: control,
+                        hrmFormFieldSelectControlErrorStateMatcher: errorStateMatcher">
+          <option value="0">Филиал #1</option>
+          <option value="1">Филиал #2123123</option>
+          <option value="2">Филиал #3</option>
+          <option value="3">Филиал #4</option>
+          <option value="4">Филиал #5</option>
+        </select>
+      </div>
+
+      <div data-bind="component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150">
+        <!-- ko text: config.filial.error() -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /Filial select -->
+
+    <!-- Date select -->
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="calculation-form__field calculation-form__date"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+      <label data-bind="hrmFormFieldLabel: label">Расчёт на дату</label>
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <input data-bind="textInput: config.date,
+                      hrmDatepicker,
+                      hrmFormFieldDatepickerControl: control,
+                      hrmFormFieldDatepickerControlErrorStateMatcher: errorStateMatcher" />
+
+        <i class="hrm-form-field__suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
+      </div>
+
+      <div data-bind="component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                    hrmSlideDuration: 150">
+        <!-- ko text: config.date.error() -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /Date select -->
+
+    <!-- Shift block -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="calculation-form__field"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label class=""
+               data-bind="hrmFormFieldLabel: label">
+          Смена
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: config.shift,
+             hrmSelect,
+             hrmFormFieldSelectControl: control,
+             hrmFormFieldSelectControlErrorStateMatcher: errorStateMatcher">
+            <option value="0">Дневная</option>
+            <option value="1">Ночная</option>
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+              hrmSlide,
+              hrmSlideValue: control() !== null ? control().errorState : false,
+              hrmSlideDuration: 150">
+          <!-- ko text: config.shift.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Shift select -->
+
+      <!-- Interval select -->
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="calculation-form__field calculation-form__interval"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+        <div class="calculation-form__interval-controls"
+             data-bind="hrmFormFieldComplexControl: control">
+
+          <!-- ko let: {control: ko.observable(null)} -->
+          <div class="calculation-form__interval-control"
+               data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="value: config.interval().start,
+                          hrmTimeAutocompleter,
+                          hrmMask,
+                          hrmMaskPattern: 'datetime',
+                          hrmMaskOptions: {
+                              inputFormat: 'HH:MM',
+                              placeholder: ' '
+                          },
+                          hrmFormFieldInputControl: control,
+                          hrmFormFieldInputControlErrorStateMatcher: errorStateMatcher"
+                   placeholder="00:00">
+          </div>
+          <!-- /ko -->
+
+          <span class="calculation-form__interval-separator">-</span>
+
+          <!-- ko let: {control: ko.observable(null)} -->
+          <div class="calculation-form__interval-control"
+               data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="value: config.interval().end,
+                          hrmTimeAutocompleter,
+                          hrmMask,
+                          hrmMaskPattern: 'datetime',
+                          hrmMaskOptions: {
+                              inputFormat: 'HH:MM',
+                              placeholder: ' '
+                          },
+                          hrmFormFieldInputControl: control,
+                          hrmFormFieldInputControlErrorStateMatcher: errorStateMatcher"
+                   placeholder="00:00">
+          </div>
+          <!-- /ko -->
+        </div><!-- .calculation-form__interval-controls -->
+      </div>
+      <!-- /ko -->
+      <!-- /Interval select -->
+    <!-- /Shift block -->
+
+
+  <div class="calculation-form__field calculation-form__actions">
+    <button class="hrm-button hrm-basic-button hrm-accent-button calculation-form__action"
+            data-bind="click: buildCalculation, enable: isParamsValid">
+      Рассчитать
+    </button>
+
+    <button class="hrm-button hrm-basic-button calculation-form__action">
+      На сейчас
+    </button>
+  </div>
+
+
+</div><!-- .calculaton-form__header -->
+
+
+          <!-- ko template: {
+            foreach: hrmTemplateIf(isBuilt(), $data),
+            afterAdd: hrmFadeAfterAddFactory(200, 200),
+            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+          } -->
+          <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+          <table class="calculation-page__positions-table"
+                 data-bind="hrmTable">
+            <thead>
+              <tr>
+                <th class="calculation-page__positions-table-name-head-cell">
+                  <div class="hrm-table__head-cell-content">
+                    Должность
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'Должность'"></button>
+                  </div>
+                </th>
+                <th class="calculation-page__positions-table-workload-type-head-cell">
+                  <div class="hrm-table__head-cell-content">
+                    Тип нагрузки
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'"></button>
+                  </div>
+                </th>
+                <th colspan="2">
+                  <div class="hrm-table__head-cell-content">
+                    Нагрузка
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'"></button>
+                  </div>
+                </th>
+                <th>
+                  <div class="hrm-table__head-cell-content">
+                    Доп. нагрузка
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'Дополнительная нагрузка'"></button>
+                  </div>
+                </th>
+                <th class="calculation-page__positions-table-employee-count-head-cell">
+                  <div class="hrm-table__head-cell-content">
+                    Сотрудники
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'"></button>
+                  </div>
+                </th>
+                <th class="calculation-page__positions-table-estimated-hours-head-cell">
+                  <div class="hrm-table__head-cell-content">
+                    ФОТ, % в категории
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'ФОТ, % в категории'"></button>
+                  </div>
+                </th>
+                <th class="calculation-page__positions-table-estimated-hours-head-cell">
+                  <div class="hrm-table__head-cell-content">
+                    ФОТ, % от выручки
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'ФОТ, % от выручки'"></button>
+                  </div>
+                </th>
+                <th class="calculation-page__positions-table-estimated-hours-head-cell">
+                  <div class="hrm-table__head-cell-content">
+                    Норм. выработки, %
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'Норм. выработки, %'"></button>
+                  </div>
+                </th>
+                <th colspan="2"
+                    class="calculation-page__positions-table-estimated-hours-head-cell">
+                  <div class="hrm-table__head-cell-content">
+                    Опоздания
+                    <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                            data-bind="hrmTooltip, hrmTooltipText: 'Норм. выработки, %'"></button>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <!-- ko foreach: formModel().positions -->
+              <tr>
+                <td data-bind="text: name"></td>
+                <td>
+                  <!-- ko text: $root.getWorkloadTypeName(workloadType) -->
+                  <!-- /ko -->
+                  <!-- ko if: workloadType === 2 -->
+                  <span class="calculation-page__positions-table-categories-count"
+                        data-bind="text: categories.length, hrmTooltip, hrmTooltipText: $root.getCategoriesTooltipText(categories)">
+                  </span>
+                  <!-- /ko -->
+                </td>
+                <!-- ko let: {editableCell: ko.observable(null)} -->
+                <td class="calculation-page__positions-table-units-cell"
+                    data-bind="hrmTableEditableCell: editableCell">
+                  <select data-bind="
+                      value: units,
+                      hrmSelect,
+                      hrmTableEditableCellSelectControl,
+                      hrmTableEditableCellSelectControlOwner: editableCell
+                    ">
+                    <option value="1">Штуки</option>
+                    <option value="2">Рубли</option>
+                    <option value="3">Норма времени</option>
+                  </select>
+                </td>
+                <!-- /ko -->
+                <!-- ko let: {editableCell: ko.observable(null)} -->
+                <td class="calculation-page__positions-table-workload-cell"
+                    data-bind="hrmTableEditableCell: editableCell">
+                  <input data-bind="
+                      value: workload,
+                      hrmMask, hrmMaskPattern: 'decimal',
+                      hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                      hrmTableEditableCellInputControl,
+                      hrmTableEditableCellInputControlOwner: editableCell
+                    "
+                         placeholder="0" />
+                </td>
+                <!-- /ko -->
+
+                <td></td>
+
+                <td class="calculation-page__positions-table-employee-count-cell"
+                    data-bind="text: employees().length"></td>
+                <td class="calculation-page__positions-table-estimated-hours-cell"></td>
+                <td class="calculation-page__positions-table-estimated-hours-cell"></td>
+                <td class="calculation-page__positions-table-estimated-hours-cell"></td>
+                <td class="calculation-page__positions-table-estimated-hours-cell"></td>
+              </tr>
+              <!-- /ko -->
+            </tbody>
+          </table>
+          <!-- /ko -->
+
+          <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+          <div class="hrm-table__fixed-section-container calculation-page__positions-table">
+            <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left calculation-page__positions-table-table calculation-page__positions-table-fixed-section"
+                   data-bind="hrmTable">
+              <tbody>
+                <tr>
+                  <th>
+                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                      Должность
+                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                              data-bind="hrmTooltip, hrmTooltipText: 'Должность'"></button>
+                    </div>
+                  </th>
+                </tr>
+
+                <tr>
+                  <th class="calculation-page__positions-table-workload-type-head-cell">
+                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                      Тип нагрузки
+                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                              data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'"></button>
+                    </div>
+                  </th>
+                </tr>
+
+                <tr>
+                  <th>
+                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                      Нагрузка
+                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                              data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'"></button>
+                    </div>
+                  </th>
+                </tr>
+
+                <tr>
+                  <th>
+                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                      Сотрудники
+                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                              data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'"></button>
+                    </div>
+                  </th>
+                </tr>
+
+                <tr>
+                  <th>
+                    <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                      Нормо-часы
+                      <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                              data-bind="hrmTooltip, hrmTooltipText: 'Нормо-часы'"></button>
+                    </div>
+                  </th>
+                </tr>
+              </tbody>
+            </table>
+
+            <div data-bind="component: {
+                                    name: 'hrm-scrollable-wrapper',
+                                    params: {
+                                        options: {left: {disabled: true}}
+                                    }
+                                }">
+              <table class="calculation-page__positions-table-table"
+                     data-bind="hrmTable">
+                <tbody>
+                  <tr>
+                    <th>
+                      <div
+                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                        Должность
+                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                data-bind="hrmTooltip, hrmTooltipText: 'Должность'"></button>
+                      </div>
+                    </th>
+
+                    <!-- ko foreach: formModel().positions -->
+                    <td colspan="2"
+                        data-bind="text: name"></td>
+                    <!-- /ko -->
+                  </tr>
+                  <tr>
+                    <th class="calculation-page__positions-table-workload-type-head-cell">
+                      <div
+                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                        Тип нагрузки
+                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'"></button>
+                      </div>
+                    </th>
+
+                    <!-- ko foreach: formModel().positions -->
+                    <td class="calculation-page__positions-table-workload-type-cell"
+                        colspan="2">
+                      <div class="hrm-table__cell-content">
+                        <!-- ko text: $root.getWorkloadTypeName(workloadType) -->
+                        <!-- /ko -->
+                        <!-- ko if: workloadType === 2 -->
+                        <span class="calculation-page__positions-table-categories-count"
+                              data-bind="text: categories.length, hrmTooltip, hrmTooltipText: $root.getCategoriesTooltipText(categories)">
+                        </span>
+                        <!-- /ko -->
+                      </div>
+                    </td>
+                    <!-- /ko -->
+                  </tr>
+
+                  <tr>
+                    <th>
+                      <div
+                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                        Нагрузка
+                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'"></button>
+                      </div>
+                    </th>
+
+                    <!-- ko foreach: formModel().positions -->
+                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                    <td data-bind="hrmTableEditableCell: editableCell">
+                      <select data-bind="
+                                                            value: units,
+                                                            hrmSelect,
+                                                            hrmTableEditableCellSelectControl,
+                                                            hrmTableEditableCellSelectControlOwner: editableCell
+                                                        ">
+                        <option value="1">Штуки</option>
+                        <option value="2">Рубли</option>
+                        <option value="3">Норма времени</option>
+                      </select>
+                    </td>
+                    <!-- /ko -->
+
+                    <!-- ko let: {editableCell: ko.observable(null)} -->
+                    <td class="calculation-page__positions-table-workload-cell"
+                        data-bind="hrmTableEditableCell: editableCell">
+                      <input data-bind="
+                                                            value: workload,
+                                                            hrmMask, hrmMaskPattern: 'decimal',
+                                                            hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                                                            hrmTableEditableCellInputControl,
+                                                            hrmTableEditableCellInputControlOwner: editableCell
+                                                        "
+                             placeholder="0" />
+                    </td>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                  </tr>
+
+                  <tr>
+                    <th>
+                      <div
+                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                        Сотрудники
+                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'"></button>
+                      </div>
+                    </th>
+
+                    <!-- ko foreach: formModel().positions -->
+                    <td class="calculation-page__positions-table-estimated-hours-cell"
+                        data-bind="text: estimatedHours"
+                        colspan="2"></td>
+                    <!-- /ko -->
+                  </tr>
+
+                  <tr>
+                    <th>
+                      <div
+                           class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
+                        Нормо-часы
+                        <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-table__head-cell-info-button hrm-circle-icon-button--theme_neutral"
+                                data-bind="hrmTooltip, hrmTooltipText: 'Нормо-часы'"></button>
+                      </div>
+                    </th>
+
+                    <!-- ko foreach: formModel().positions -->
+                    <td class="calculation-page__positions-table-estimated-hours-cell"
+                        data-bind="text: estimatedHours"
+                        colspan="2"></td>
+                    <!-- /ko -->
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- /ko -->
+
+
+          <!-- /ko -->
+        </div>
+      </div>
+
+
+
+      <div class="hrm-scaffold__footer calculation-page__footer">
+        <span class="calculation-page__footer-text"
+              data-bind="html: footerTextHtml"></span>
+
+        <button class="hrm-button hrm-basic-button hrm-primary-button calculation-page__footer-login-button">
+          <span class="hrm-primary-button__content">Войти/зарегистрироваться</span>
+          <span class="hrm-primary-button__background hrm-primary-button__hover-background"></span>
+          <span class="hrm-primary-button__background hrm-primary-button__active-background"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-debug.js" integrity="sha256-M5ZomNNnrnEB2WjSbnty5GWGqq6UuAAVNnWECisgEis=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.12/js/select2.full.min.js" integrity="sha256-vucLmrjdfi9YwjGY/3CQ7HnccFSS/XRS1M/3k/FDXJw=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.10/js/i18n/ru.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simplebar/5.1.0/simplebar.min.js" integrity="sha256-hFddD6XMIwFba4ITQjpv5WWE557w6O0w9RRfmGjIz4k=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/js/OverlayScrollbars.min.js" integrity="sha256-5Tj3ZUgjHEGwF7TxpOgbPpjhq+WxXvpfb+qr9OxRHtY=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/1.10.2/js/jquery.overlayScrollbars.min.js" integrity="sha256-RE+oy7ofA6XerySMpTlDcg0gFUwHN3n0qQ5fUIZVq/M=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/gh/RobinHerbots/jquery.inputmask@4.0.9/dist/jquery.inputmask.bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js" integrity="sha256-AdQN98MVZs44Eq2yTwtoKufhnU+uZ7v2kXnD5vqzZVo=" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/popper.js@1"></script>
+<script src="https://unpkg.com/tippy.js@5"></script>
+<script src="https://unpkg.com/sticky-events@3.1.1/dist/sticky-events.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/codemirror.min.js" integrity="sha256-id5Qk/MwQJxgNlDFDpVymUuReXfTUZiaQKb8arrddQM=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.52.2/mode/xml/xml.min.js" integrity="sha256-Lfk8z6WUsBN6YiCaMpH6bxBHyRqkPK4O2QbQHFNUS40=" crossorigin="anonymous"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<script src="assets/js/main.js"></script>
+
+  <script type="text/javascript">
+  $(function () {
+    const $page = $(document.documentElement);
+
+    const ViewModel = function (positions) {
+      this.subscriptions = [];
+
+      this.windowResizeHandler = () => {
+        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+      };
+      this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+
+      this.childrenComplete = function () {
+        $page.removeClass('hrm-page--initializing');
+      };
+
+
+      this.isBuilt = ko.observable(false);
+
+
+      function createIntervalsModel (data) {
+
+        function createIntervalModel(intervalModel, boundaryName = 'start', defaultValue) {
+          return ko.observable(defaultValue).extend({
+            required: {
+              message: 'Обязательное поле'
+            },
+            hrmDate: {
+              params: 'HH:mm',
+              message: 'Неверный формат времени'
+            },
+            validation: {
+              validator: (value) => {
+                if (intervalModel() === null) {
+                  return false;
+                }
+
+                const startValue = moment(boundaryName === 'start' ? value : intervalModel().start(), 'HH:mm');
+                const endValue = moment(boundaryName === 'end' ? value : intervalModel().end(), 'HH:mm');
+
+                return endValue.isAfter(startValue);
+              }
+            }
+          })
+        }
+
+        const model = ko.validatedObservable(null, { deep: true, live: true });
+        model({
+          start: createIntervalModel(model, 'start', data.start),
+          end: createIntervalModel(model, 'end', data.end)
+        });
+
+        return model;
+      }
+
+      this.configModel = {
+        filial: ko.observable('').extend({
+          required: {
+            message: 'Обязательное поле'
+          }
+        }),
+        date: ko.observable(moment().format('DD.MM.YYYY')).extend({
+          required: {
+            message: 'Обязательное поле'
+          },
+          hrmDate: {
+            params: 'DD.MM.YYYY',
+            message: 'Неверный формат даты'
+          }
+        }),
+        shift: ko.observable('').extend({
+          required: {
+            message: 'Обязательное поле'
+          }
+        }),
+        interval: createIntervalsModel({
+          start: '11:00',
+          end: '23:00'
+        })
+      };
+
+      this.isParamsValid = ko.pureComputed(() => {
+        return this.configModel.date.isValid() && this.configModel.interval.isValid();
+      }, this);
+
+      this.formControlErrorStateMatcher = function (formControl) {
+        return ko.pureComputed(() => {
+          return !formControl.isValid();
+        });
+      };
+
+
+
+
+
+      this.isEmployeesCalculated = ko.observable(false);
+
+      /**/
+      this.createPositionFormModel = function (data) {
+        return {
+          ...data,
+          units: ko.observable(data.units.toString()),
+          workload: ko.observable(data.workload),
+          employees: ko.observableArray(data.employees.map(e => this.createPositionEmployeeFormModel(e))),
+          rate: ko.observable('')
+        };
+      };
+
+      /**/
+      this.createPositionEmployeeFormModel = function (data) {
+        const workingIntervals = ko.observableArray(data.workingIntervals.map(v => this.createPositionEmployeeWorkingIntervalFormModel(v)));
+
+        return {
+          ...data,
+          workingIntervals,
+          rate: ko.observable(data.rate),
+          returnRate: data.returnRate,
+          salaryBulk: ko.observable(data.salaryBulk),
+          bonus: ko.observable(data.bonus),
+          fine: ko.observable(data.fine),
+          workingIntervalsValidationObject: ko.observable().extend({
+            validation: {
+              validator: () => {
+                return workingIntervals().every(i => i.value.isValid());
+              }
+            }
+          })
+        };
+      };
+
+      /**/
+      this.createPositionEmployeeWorkingIntervalFormModel = function (value) {
+        return {
+          value: ko.observable(value).extend({
+            required: {
+              message: 'Обязательное поле'
+            },
+            validation: {
+              validator: value => {
+                if (!/^\d\d:\d\d – \d\d:\d\d$/.test(value)) {
+                  return false;
+                } else {
+                  const boundaries = value.split(' – ');
+
+                  if (boundaries[0] === boundaries[1]) {
+                    return false;
+                  }
+
+                  return boundaries.every(b => moment(b, 'HH:mm', true).isValid());
+                }
+              },
+              message: 'Неверный формат интервала'
+            }
+          })
+        };
+      };
+
+      /**/
+      this.formModel = ko.validatedObservable({
+        positions: ko.observable(positions.map(p => this.createPositionFormModel(p))),
+      });
+
+
+      this.buildCalculation =  () => {
+        this.isBuilt(true);
+      };
+
+
+      this.calculateEmployees = function () {
+        this.isEmployeesCalculated(true);
+      };
+
+      this.recalculateEmployees = function () {
+        this.isEmployeesCalculated(false);
+
+        this.formModel().positions().forEach((position, index) => {
+          position.employees(positions[index].employees.map(e => this.createPositionEmployeeFormModel(e)));
+        });
+
+        this.isEmployeesCalculated(true);
+      };
+
+      this.addWorkingInterval = function (employee) {
+        employee.workingIntervals.push(this.createPositionEmployeeWorkingIntervalFormModel(''));
+      };
+
+      this.addEmployee = function (position) {
+        const index = Math.floor(Math.random() * 1000);
+
+        position.employees.push(this.createPositionEmployeeFormModel({
+          name: position.name + ' #' + index,
+          workingIntervals: [''],
+          rate: position.rate() !== '' ? position.rate() : 600,
+          returnRate: 30,
+          salaryBulk: 7200,
+          bonus: 100,
+          fine: 20
+        }));
+      };
+
+      this.onRateInput = function (position) {
+        position.employees().forEach(employee => {
+          employee.rate(position.rate());
+        });
+      };
+
+      this.onEmployeeRateInput = function (position) {
+        position.rate('');
+      };
+
+
+      this.getWorkloadTypeName = function (workloadType) {
+        switch (workloadType) {
+          case 1: return 'Объём товара по всему предприятию';
+          case 2: return 'Объём товара по категориям';
+        }
+      };
+
+      this.getEmployeeWorkingHours = function (employee) {
+        return ko.pureComputed(() => {
+          if (employee.workingIntervalsValidationObject.isValid()) {
+            return employee.workingIntervals().reduce((minutes, interval) => {
+              const boundaries = interval.value().split(' – ').map(b => moment(b, 'HH:mm'));
+
+              if (boundaries[0].isAfter(boundaries[1])) {
+                boundaries[1].add(1, 'd');
+              }
+
+              return minutes + boundaries[1].diff(boundaries[0], 'minutes');
+            }, 0);
+          } else {
+            return 0;
+          }
+        });
+      };
+
+      this.getEmployeeSalaryBulk = function (employee) {
+        return ko.pureComputed(() => {
+          const minutes = this.getEmployeeWorkingHours(employee)();
+
+          return this.unmaskDecimal(employee.rate()) * (minutes / 60);
+        });
+      };
+
+      this.getEmployeeSalary = function (employee) {
+        return ko.pureComputed(() => {
+          const bulk = this.getEmployeeSalaryBulk(employee)();
+          const bonus = this.unmaskDecimal(employee.bonus());
+          const fine = this.unmaskDecimal(employee.fine());
+
+          return this.unmaskDecimal(bulk + bonus - fine);
+        });
+      };
+
+      this.getPositionMaxWorkingIntervalCount = function (position) {
+        return ko.pureComputed(() => {
+          return Math.max(...position.employees().map(e => e.workingIntervals().length));
+        });
+      };
+
+      this.getCategoriesTooltipText = function (categories) {
+        return categories.map(c => c.name).join(', ');
+      };
+
+      this.getUnitsSuffixHtml = function (units) {
+        switch (units) {
+          case '1': return 'шт.';
+          case '2': return '<i class="far fa-ruble-sign"></i>';
+          case '3': return 'ч.';
+        }
+      };
+
+      this.formatDecimal = function (value) {
+        return Inputmask.format(value, { alias: 'decimal', digits: '2', groupSeparator: ' ', autoGroup: true, allowMinus: false }).replace('.00', '');
+      };
+
+      this.unmaskDecimal = function (value) {
+        const result = Inputmask.unmask(value, { alias: 'decimal', digits: '2', groupSeparator: ' ', autoGroup: true, allowMinus: false, unmaskAsNumber: true });
+
+        if (result === '') {
+          return 0;
+        }
+
+        return result;
+      };
+
+      this.editableCellControlErrorExtractor = function (control) {
+        return ko.pureComputed(() => {
+          return !control.isValid() ? { message: control.error() } : null;
+        });
+      };
+
+      this.formatDuration = function (minutes) {
+        let h = Math.floor(minutes / 60).toString();
+        h = h.length === 1 ? '0' + h : h;
+        let m = (minutes % 60).toString();
+        m = m.length === 1 ? '0' + m : m;
+
+        return h + ':' + m;
+      };
+
+      this.footerTextHtml = ko.pureComputed(() => {
+        if (this.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth) {
+          return 'Авторизация позволит <b>настраивать<br> должности</b> и <b>сохранять параметры</b> таблиц для следующих расчетов';
+        } else {
+          return 'Авторизация позволит <b>настраивать должности</b><br> и <b>сохранять параметры</b> таблиц для следующих расчетов';
+        }
+      });
+
+
+      (() => {
+        $(window).on('resize', this.windowResizeHandler);
+      })();
+    };
+
+    const viewModel = new ViewModel([
+      {
+        name: 'Повар-пицмейкер',
+        workloadType: 1,
+        categories: null,
+        units: 1,
+        workload: 90,
+        employees: [
+          {
+            name: 'Повар-пицмейкер #1',
+            workingIntervals: ['11:00 – 23:00', '00:00 – 05:00'],
+            rate: 600,
+            returnRate: 30,
+            salaryBulk: 7200,
+            bonus: 100,
+            fine: 20
+          }
+        ],
+        estimatedHours: 36
+      },
+      {
+        name: 'Повар-сушист',
+        workloadType: 2,
+        categories: [
+          { name: 'Роллы открытые' },
+          { name: 'Роллы закрытые' },
+          { name: 'Гунканы' },
+          { name: 'Суши' },
+          { name: 'Сашими' }
+        ],
+        units: 2,
+        workload: 10000,
+        employees: [
+          {
+            name: 'Повар-сушист #1',
+            workingIntervals: ['11:00 – 23:00'],
+            rate: 600,
+            returnRate: 10000,
+            salaryBulk: 7200,
+            bonus: 100,
+            fine: 20
+          },
+          {
+            name: 'Повар-сушист #2',
+            workingIntervals: ['11:00 – 23:00'],
+            rate: 600,
+            returnRate: 10000,
+            salaryBulk: 7200,
+            bonus: 100,
+            fine: 20
+          },
+          {
+            name: 'Повар-сушист #3',
+            workingIntervals: ['11:00 – 23:00'],
+            rate: 600,
+            returnRate: 10000,
+            salaryBulk: 7200,
+            bonus: 100,
+            fine: 20
+          }
+        ],
+        estimatedHours: 36
+      },
+      {
+        name: 'Мороженщик',
+        workloadType: 1,
+        categories: null,
+        units: 3,
+        workload: 2.2,
+        employees: [
+          {
+            name: 'Мороженщик #1',
+            workingIntervals: ['11:00 – 23:00'],
+            rate: 600,
+            returnRate: 10000,
+            salaryBulk: 7200,
+            bonus: 100,
+            fine: 20
+          },
+          {
+            name: 'Мороженщик #2',
+            workingIntervals: ['11:00 – 23:00'],
+            rate: 600,
+            returnRate: 10000,
+            salaryBulk: 7200,
+            bonus: 100,
+            fine: 20
+          }
+        ],
+        estimatedHours: 36
+      }
+    ]);
+
+    ViewModel.prototype.dispose = function () {
+      $(window).off('resize', this.windowResizeHandler);
+      this.subscriptions.forEach(s => s.dispose());
+    };
+
+    ko.applyBindings(
+      viewModel,
+      $page.get()[0]
+    );
+  });
+</script>
+
+</body>
+
+</html>

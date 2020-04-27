@@ -1,0 +1,155 @@
+<div class="calculation-form__header"
+     data-bind="let: { errorStateMatcher: $root.formControlErrorStateMatcher.bind($root), config: $root.configModel }">
+
+
+    <!-- Filial select -->
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="calculation-form__field calculation-form__filial"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+      <label data-bind="hrmFormFieldLabel: label">
+        Филиал
+      </label>
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <select data-bind="value: config.filial,
+                        hrmSelect,
+                        hrmFormFieldSelectControl: control,
+                        hrmFormFieldSelectControlErrorStateMatcher: errorStateMatcher">
+          <option value="0">Филиал #1</option>
+          <option value="1">Филиал #2123123</option>
+          <option value="2">Филиал #3</option>
+          <option value="3">Филиал #4</option>
+          <option value="4">Филиал #5</option>
+        </select>
+      </div>
+
+      <div data-bind="component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150">
+        <!-- ko text: config.filial.error() -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /Filial select -->
+
+    <!-- Date select -->
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="calculation-form__field calculation-form__date"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+      <label data-bind="hrmFormFieldLabel: label">Расчёт на дату</label>
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <input data-bind="textInput: config.date,
+                      hrmDatepicker,
+                      hrmFormFieldDatepickerControl: control,
+                      hrmFormFieldDatepickerControlErrorStateMatcher: errorStateMatcher" />
+
+        <i class="hrm-form-field__suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
+      </div>
+
+      <div data-bind="component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
+                    hrmSlideDuration: 150">
+        <!-- ko text: config.date.error() -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /Date select -->
+
+    <!-- Shift block -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="calculation-form__field"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label class=""
+               data-bind="hrmFormFieldLabel: label">
+          Смена
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: config.shift,
+             hrmSelect,
+             hrmFormFieldSelectControl: control,
+             hrmFormFieldSelectControlErrorStateMatcher: errorStateMatcher">
+            <option value="0">Дневная</option>
+            <option value="1">Ночная</option>
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+              hrmSlide,
+              hrmSlideValue: control() !== null ? control().errorState : false,
+              hrmSlideDuration: 150">
+          <!-- ko text: config.shift.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Shift select -->
+
+      <!-- Interval select -->
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="calculation-form__field calculation-form__interval"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+        <div class="calculation-form__interval-controls"
+             data-bind="hrmFormFieldComplexControl: control">
+
+          <!-- ko let: {control: ko.observable(null)} -->
+          <div class="calculation-form__interval-control"
+               data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="value: config.interval().start,
+                          hrmTimeAutocompleter,
+                          hrmMask,
+                          hrmMaskPattern: 'datetime',
+                          hrmMaskOptions: {
+                              inputFormat: 'HH:MM',
+                              placeholder: ' '
+                          },
+                          hrmFormFieldInputControl: control,
+                          hrmFormFieldInputControlErrorStateMatcher: errorStateMatcher"
+                   placeholder="00:00">
+          </div>
+          <!-- /ko -->
+
+          <span class="calculation-form__interval-separator">-</span>
+
+          <!-- ko let: {control: ko.observable(null)} -->
+          <div class="calculation-form__interval-control"
+               data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="value: config.interval().end,
+                          hrmTimeAutocompleter,
+                          hrmMask,
+                          hrmMaskPattern: 'datetime',
+                          hrmMaskOptions: {
+                              inputFormat: 'HH:MM',
+                              placeholder: ' '
+                          },
+                          hrmFormFieldInputControl: control,
+                          hrmFormFieldInputControlErrorStateMatcher: errorStateMatcher"
+                   placeholder="00:00">
+          </div>
+          <!-- /ko -->
+        </div><!-- .calculation-form__interval-controls -->
+      </div>
+      <!-- /ko -->
+      <!-- /Interval select -->
+    <!-- /Shift block -->
+
+
+  <div class="calculation-form__field calculation-form__actions">
+    <button class="hrm-button hrm-basic-button hrm-accent-button calculation-form__action"
+            data-bind="click: buildCalculation, enable: isParamsValid">
+      Рассчитать
+    </button>
+
+    <button class="hrm-button hrm-basic-button calculation-form__action">
+      На сейчас
+    </button>
+  </div>
+
+
+</div><!-- .calculaton-form__header -->
