@@ -134,6 +134,7 @@
       this.jobsModel.total = ko.pureComputed(() => {
         return this.jobsModel().positions.reduce((acc, p) => {
           return {
+            name: '',
             workload: (acc.workload || 0) + p.workload,
             workloadType: '',
             units: '',
@@ -146,10 +147,12 @@
               yellow: 0,
               red: 0
             },
-            employees: (acc.employees || 0) + p.employees.length
+            employees: [...(acc.employees || []), ...p.employees]
           }
         }, {})
       })
+
+      console.log(this.jobsModel.total())
 
       this.isEmployeesCalculated = ko.observable(false);
 
@@ -301,7 +304,7 @@
     };
 
     const viewModel = new ViewModel([
-      {
+      /*{
         name: 'Администратор филиала',
         workloadType: 'Выручка',
         workload: 0,
@@ -320,7 +323,8 @@
             name: 'Сергеева Мария Владиславовна',
           }
         ]
-      }, {
+      },*/
+       {
         name: 'Водители',
         workloadType: 'Выручка',
         workload: 0,

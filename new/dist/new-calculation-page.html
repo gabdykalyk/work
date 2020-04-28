@@ -161,8 +161,6 @@
                           hrmFormFieldInputControl: control,
                           hrmFormFieldInputControlErrorStateMatcher: errorStateMatcher"
                    placeholder="00:00">
-
-
           </div>
 
           <!-- /ko -->
@@ -232,71 +230,27 @@
   <table class="calculation-summary__table"
          data-bind="hrmTable">
     <thead>
+
       <tr>
-        <th class="calculation-summary__cell calculation-summary__job">
-          <div class="hrm-table__head-cell-content">
-            <span>Должность</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Должность'"></button>
-          </div>
-        </th>
-        <th class="calculation-summary__cell calculation-summary__workload-type">
-          <div class="hrm-table__head-cell-content">
-            <span>Тип нагрузки</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Тип нагрузки'"></button>
-          </div>
-        </th>
-        <th class="calculation-summary__cell calculation-summary__workload"
-            colspan="2">
-          <div class="hrm-table__head-cell-content">
-            <span>Нагрузка</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Нагрузка'"></button>
-          </div>
-        </th>
-        <th class="calculation-summary__cell calculation-summary__additional-workload">
-          <div class="hrm-table__head-cell-content">
-            <span>Доп. нагрузка</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Дополнительная нагрузка'"></button>
-          </div>
-        </th>
-        <th class="calculation-summary__cell calculation-summary__count">
-          <div class="hrm-table__head-cell-content">
-            <span>Сотрудники</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Сотрудники'"></button>
-          </div>
-        </th>
-        <th class="calculation-summary__cell calculation-summary__fot-category">
-          <div class="hrm-table__head-cell-content">
-            <span>ФОТ, % в категории</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'ФОТ, % в категории'"></button>
-          </div>
-        </th>
-        <th class="calculation-summary__cell calculation-summary__fot-revenue">
-          <div class="hrm-table__head-cell-content">
-            <span>ФОТ, % от выручки</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'ФОТ, % от выручки'"></button>
-          </div>
-        </th>
-        <th class="calculation-summary__cell calculation-summary__performance-standart">
-          <div class="hrm-table__head-cell-content">
-            <span>Норм. выработки, %</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Норма выработки, %'"></button>
-          </div>
-        </th>
-        <th class="calculation-summary__cell calculation-summary__lateness">
-          <div class="hrm-table__head-cell-content">
-            <span>Опоздания</span>
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Норм. выработки, %'"></button>
-          </div>
-        </th>
+        <!-- ko foreach: [
+            ['job', 'Должность', 'Должность'],
+            ['workload-type', 'Тип нагрузки', 'Тип нагрузки'],
+            ['workload', 'Нагрузка', 'Нагрузка', 2],
+            ['additional-workload', 'Доп. нагрузка', 'Дополнительная нагрузка'],
+            ['count', 'Сотр.', 'Сотрудники'],
+            ['fot-category', 'ФОТ, % в категории', 'ФОТ, % в категории'],
+            ['fot-revenue', 'ФОТ, % от выручки', 'ФОТ, % от выручки'],
+            ['performance-standart', 'Норм. выработки, %', 'Норма выработки, %'],
+            ['lateness', 'Опоздания', 'Опоздания'],
+        ] -->
+          <th class="calculation-summary__cell" data-bind="class: 'calculation-summary__' + $data[0], attr: {colspan: $data[3] || 1}">
+            <div class="hrm-table__head-cell-content">
+              <span data-bind="text: $data[1]"></span>
+              <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
+                    data-bind="hrmTooltip, hrmTooltipText: $data[2]"></button>
+            </div>
+          </th>
+        <!-- /ko -->
       </tr>
     </thead>
 
@@ -304,82 +258,88 @@
       <!-- ko foreach: $root.jobsModel().positions -->
       <!-- ko  let: { isTotal: false } -->
       <tr data-bind="css: { 'calculation-summary__total': isTotal }">
+  <!-- Должность -->
   <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+    <div class=""
          data-bind="text: name"></div>
   </td>
+
+  <!-- Тип нагрузки -->
   <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+    <div class=""
          data-bind="text: workloadType"></div>
   </td>
 
-  <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+  <!-- Нагрузка -->
+  <td class="calculation-summary__cell" align="right">
+    <div class=""
          data-bind="text: workload"></div>
   </td>
 
+  <!-- Юниты нагрузки -->
   <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+    <div class=""
          data-bind="text: units"></div>
   </td>
 
+  <!-- Доп. нагрузка -->
   <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+    <div class=""
          data-bind="text: additionalWorkload"></div>
   </td>
 
-  <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+  <!-- Сотрудники -->
+  <td class="calculation-summary__cell" align="right">
+    <div class=""
          data-bind="text: employees.length"></div>
   </td>
 
+  <!-- ФОТ, % в категории -->
   <td class="calculation-summary__cell"
-      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}">
-    <div class="hrm-table__cell-content"
+      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}"  align="right">
+    <div class=""
          data-bind="text: fotCategory"></div>
   </td>
 
-
+  <!-- ФОТ, % от выручки -->
   <td class="calculation-summary__cell"
-      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}">
-    <div class="hrm-table__cell-content"
+      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}" align="right">
+    <div class=""
          data-bind="text: fotRevenue"></div>
   </td>
 
+  <!-- Норм. выработки -->
   <td class="calculation-summary__cell"
-      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}">
-    <div class="hrm-table__cell-content"
+      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}" align="right">
+    <div class=""
          data-bind="text: performanceStandart"></div>
   </td>
 
-
+  <!-- Опоздания -->
   <td class="calculation-summary__cell calculation-summary__lateness-row-cell">
     <div class="calculation-summary__lateness-row">
-      <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--green"
+      <div class="calculation-summary__lateness-cell"
            data-bind="style: {
         backgroundColor: lateness.green > 0 ? '#D0F4E3' : 'transparent'
       }">
         <!-- ko text: lateness.green > 0 ? lateness.green : '' -->
         <!-- /ko -->
       </div>
-      <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--yellow"
+      <div class="calculation-summary__lateness-cell"
            data-bind="style: {
         backgroundColor: lateness.yellow > 0 ? '#FDFFB3' : 'transparent'
       }">
         <!-- ko text: lateness.yellow > 0 ? lateness.yellow : '' -->
         <!-- /ko -->
       </div>
-      <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--red"
+      <div class="calculation-summary__lateness-cell"
            data-bind="style: {
         backgroundColor: lateness.red > 0 ? '#FFD3E8' : 'transparent'
       }">
         <!-- ko text: lateness.red > 0 ? lateness.red : '' -->
         <!-- /ko -->
       </div>
-      <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--red"
-           data-bind="style: {
-        backgroundColor: lateness.red > 0 ? '#FFD3E8' : 'transparent'
-      }">
+      <div class="calculation-summary__lateness-cell">
         <!-- ko text: lateness.green + lateness.yellow + lateness.red -->
         <!-- /ko -->
       </div>
@@ -394,82 +354,88 @@
       <!-- ko using: $root.jobsModel.total() -->
       <!-- ko  let: { isTotal: true } -->
       <tr data-bind="css: { 'calculation-summary__total': isTotal }">
+  <!-- Должность -->
   <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+    <div class=""
          data-bind="text: name"></div>
   </td>
+
+  <!-- Тип нагрузки -->
   <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+    <div class=""
          data-bind="text: workloadType"></div>
   </td>
 
-  <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+  <!-- Нагрузка -->
+  <td class="calculation-summary__cell" align="right">
+    <div class=""
          data-bind="text: workload"></div>
   </td>
 
+  <!-- Юниты нагрузки -->
   <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+    <div class=""
          data-bind="text: units"></div>
   </td>
 
+  <!-- Доп. нагрузка -->
   <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+    <div class=""
          data-bind="text: additionalWorkload"></div>
   </td>
 
-  <td class="calculation-summary__cell">
-    <div class="hrm-table__cell-content"
+  <!-- Сотрудники -->
+  <td class="calculation-summary__cell" align="right">
+    <div class=""
          data-bind="text: employees.length"></div>
   </td>
 
+  <!-- ФОТ, % в категории -->
   <td class="calculation-summary__cell"
-      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}">
-    <div class="hrm-table__cell-content"
+      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}"  align="right">
+    <div class=""
          data-bind="text: fotCategory"></div>
   </td>
 
-
+  <!-- ФОТ, % от выручки -->
   <td class="calculation-summary__cell"
-      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}">
-    <div class="hrm-table__cell-content"
+      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}" align="right">
+    <div class=""
          data-bind="text: fotRevenue"></div>
   </td>
 
+  <!-- Норм. выработки -->
   <td class="calculation-summary__cell"
-      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}">
-    <div class="hrm-table__cell-content"
+      data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}" align="right">
+    <div class=""
          data-bind="text: performanceStandart"></div>
   </td>
 
-
+  <!-- Опоздания -->
   <td class="calculation-summary__cell calculation-summary__lateness-row-cell">
     <div class="calculation-summary__lateness-row">
-      <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--green"
+      <div class="calculation-summary__lateness-cell"
            data-bind="style: {
         backgroundColor: lateness.green > 0 ? '#D0F4E3' : 'transparent'
       }">
         <!-- ko text: lateness.green > 0 ? lateness.green : '' -->
         <!-- /ko -->
       </div>
-      <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--yellow"
+      <div class="calculation-summary__lateness-cell"
            data-bind="style: {
         backgroundColor: lateness.yellow > 0 ? '#FDFFB3' : 'transparent'
       }">
         <!-- ko text: lateness.yellow > 0 ? lateness.yellow : '' -->
         <!-- /ko -->
       </div>
-      <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--red"
+      <div class="calculation-summary__lateness-cell"
            data-bind="style: {
         backgroundColor: lateness.red > 0 ? '#FFD3E8' : 'transparent'
       }">
         <!-- ko text: lateness.red > 0 ? lateness.red : '' -->
         <!-- /ko -->
       </div>
-      <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--red"
-           data-bind="style: {
-        backgroundColor: lateness.red > 0 ? '#FFD3E8' : 'transparent'
-      }">
+      <div class="calculation-summary__lateness-cell">
         <!-- ko text: lateness.green + lateness.yellow + lateness.red -->
         <!-- /ko -->
       </div>
@@ -489,77 +455,23 @@
     <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left"
            data-bind="hrmTable">
       <tbody>
+        <!-- ko foreach: [
+            ['job', 'Должность', 'Должность'],
+            ['workload-type', 'Тип нагрузки', 'Тип нагрузки'],
+            ['workload', 'Нагрузка', 'Нагрузка', 2],
+            ['additional-workload', 'Доп. нагрузка', 'Дополнительная нагрузка'],
+            ['count', 'Сотрудники', 'Сотрудники'],
+            ['fot-category', 'ФОТ, % в категории', 'ФОТ, % в категории'],
+            ['fot-revenue', 'ФОТ, % от выручки', 'ФОТ, % от выручки'],
+            ['performance-standart', 'Норм. выр-ки, %', 'Норма выработки, %'],
+            ['lateness', 'Опоздания', 'Опоздания'],
+        ] -->
         <tr>
-          <th class="calculation-summary__cell calculation-summary__job">
-            <div class="hrm-table__head-cell-content">
-              Должность
-            </div>
+          <th class="calculation-summary__cell" data-bind="class: 'calculation-summary__' + $data[0]">
+            <div class="hrm-table__head-cell-content" data-bind="text: $data[1]"></div>
           </th>
         </tr>
-
-        <tr>
-          <th class="calculation-summary__cell calculation-summary__workload-type">
-            <div class="hrm-table__head-cell-content">
-              Тип нагрузки
-            </div>
-          </th>
-        </tr>
-
-        <tr>
-          <th class="calculation-summary__cell calculation-summary__workload">
-            <div class="hrm-table__head-cell-content">
-              Нагрузка
-            </div>
-          </th>
-        </tr>
-
-        <tr>
-          <th class="calculation-summary__cell calculation-summary__additional-workload">
-            <div class="hrm-table__head-cell-content">
-              Доп. нагрузка
-            </div>
-          </th>
-        </tr>
-
-        <tr>
-          <th class="calculation-summary__cell calculation-summary__count">
-            <div class="hrm-table__head-cell-content">
-              Сотрудники
-            </div>
-          </th>
-        </tr>
-
-        <tr>
-          <th class="calculation-summary__cell calculation-summary__fot-category">
-            <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-              ФОТ, % в категории
-            </div>
-          </th>
-        </tr>
-
-        <tr>
-          <th class="calculation-summary__cell calculation-summary__fot-revenue">
-            <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-              ФОТ, % от выручки
-            </div>
-          </th>
-        </tr>
-
-        <tr>
-          <th class="calculation-summary__cell calculation-summary__performance-standart">
-            <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-              Норм. выр-ки, %
-            </div>
-          </th>
-        </tr>
-
-        <tr>
-          <th class="calculation-summary__cell calculation-summary__lateness">
-            <div class="hrm-table__head-cell-content calculation-page__positions-table-table-head-cell-content">
-              Опоздания
-            </div>
-          </th>
-        </tr>
+        <!-- /ko -->
       </tbody>
     </table>
 
@@ -674,7 +586,7 @@
 
             <td class="calculation-summary__cell  calculation-summary__total">
               <div class="hrm-table__cell-content"
-                   data-bind="text: jobsModel.total().employees"></div>
+                   data-bind="text: jobsModel.total().employees.length"></div>
             </td>
           </tr>
 
@@ -1002,6 +914,7 @@
       this.jobsModel.total = ko.pureComputed(() => {
         return this.jobsModel().positions.reduce((acc, p) => {
           return {
+            name: '',
             workload: (acc.workload || 0) + p.workload,
             workloadType: '',
             units: '',
@@ -1014,10 +927,12 @@
               yellow: 0,
               red: 0
             },
-            employees: (acc.employees || 0) + p.employees.length
+            employees: [...(acc.employees || []), ...p.employees]
           }
         }, {})
       })
+
+      console.log(this.jobsModel.total())
 
       this.isEmployeesCalculated = ko.observable(false);
 
@@ -1169,7 +1084,7 @@
     };
 
     const viewModel = new ViewModel([
-      {
+      /*{
         name: 'Администратор филиала',
         workloadType: 'Выручка',
         workload: 0,
@@ -1188,7 +1103,8 @@
             name: 'Сергеева Мария Владиславовна',
           }
         ]
-      }, {
+      },*/
+       {
         name: 'Водители',
         workloadType: 'Выручка',
         workload: 0,
