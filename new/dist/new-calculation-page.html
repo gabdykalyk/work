@@ -161,7 +161,10 @@
                           hrmFormFieldInputControl: control,
                           hrmFormFieldInputControlErrorStateMatcher: errorStateMatcher"
                    placeholder="00:00">
+
+
           </div>
+
           <!-- /ko -->
 
           <span class="calculation-input__interval-separator">-</span>
@@ -182,7 +185,15 @@
                    placeholder="00:00">
           </div>
           <!-- /ko -->
+
         </div><!-- .calculation-input__interval-controls -->
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+            hrmSlide,
+            hrmSlideValue: !inputModel.interval().correct(),
+            hrmSlideDuration: 150">
+            Некорректно задан интервал
+        </div>
       </div>
       <!-- /ko -->
       <!-- /Interval select -->
@@ -871,12 +882,11 @@
         $page.removeClass('hrm-page--initializing');
       };
 
-
       this.isBuilt = ko.observable(false);
 
       function createIntervalsModel(data, needCheck) {
 
-        function createIntervalModel(intervalModel, boundaryName = 'start', defaultValue) {
+        function createIntervalModel(defaultValue) {
           return ko.observable(defaultValue).extend({
             required: {
               message: 'Обязательное поле'
@@ -884,28 +894,35 @@
             hrmDate: {
               params: 'HH:mm',
               message: 'Неверный формат времени'
-            },
-            validation: {
-              validator: (value) => {
-                if (intervalModel() === null) {
-                  return false;
-                }
-
-                if (!needCheck()) return true;
-
-                const startValue = moment(boundaryName === 'start' ? value : intervalModel().start(), 'HH:mm');
-                const endValue = moment(boundaryName === 'end' ? value : intervalModel().end(), 'HH:mm');
-
-                return endValue.isAfter(startValue);
-              }
             }
           })
         }
 
         const model = ko.validatedObservable(null, { deep: true, live: true });
+        const start = createIntervalModel(data.start);
+        const end = createIntervalModel(data.end);
+        const correct = ko.computed(() => {
+          const endMoment = moment(end(), 'HH:mm');
+          const startMoment = moment(start(), 'HH:mm');
+
+          if (!needCheck()) return true;
+
+          return endMoment.isAfter(startMoment);
+        })
+        start.extend({
+          validation: {
+            validator: () => correct()
+          }
+        });
+        end.extend({
+          validation: {
+            validator: () => correct()
+          }
+        });
         model({
-          start: createIntervalModel(model, 'start', data.start),
-          end: createIntervalModel(model, 'end', data.end)
+          start,
+          end,
+          correct
         });
 
         return model;
@@ -935,10 +952,23 @@
 
       this.inputModel.interval = createIntervalsModel({
         start: '11:00',
-        end: '23:00'
+        end: '23:00',
       }, () => {
-        return this.inputModel.shift() == 0
-      })
+        return !this.changeShift && this.inputModel.shift.peek() != 1
+      });
+
+      this.inputModel.shift.subscribe((value) => {
+        this.changeShift = 1;
+        if (value == 0) {
+          this.inputModel.interval().start('11:00');
+          this.inputModel.interval().end('23:00');
+        } else {
+          this.inputModel.interval().start('23:00');
+          this.inputModel.interval().end('11:00');
+        }
+        this.changeShift = 0;
+      });
+
 
       window.test = this.inputModel.interval;
 
