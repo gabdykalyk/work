@@ -2,112 +2,70 @@
   $(function () {
     const $page = $(document.documentElement);
 
-    const ViewModel = function (positions) {
-      this.subscriptions = [];
+    function createTimeModel(defaultValue) {
+      return ko.observable(defaultValue).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        hrmDate: {
+          params: 'HH:mm',
+          message: 'Неверный формат времени'
+        }
+      })
+    }
 
-      this.windowResizeHandler = () => {
-        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+    function createIntervalModel(data, needCheck) {
+      const model = ko.validatedObservable(null, { deep: true, live: true });
+      const start = createTimeModel(data.start);
+      const end = createTimeModel(data.end);
+
+      const correct = ko.pureComputed(() => {
+        const endMoment = moment(end(), 'HH:mm');
+        const startMoment = moment(start(), 'HH:mm');
+        if (!needCheck()) return true;
+        return endMoment.isAfter(startMoment);
+      });
+
+      start.extend({
+        validation: { validator: () => correct() }
+      });
+      end.extend({
+        validation: { validator: () => correct() }
+      });
+
+      model({
+        start,
+        end,
+        correct
+      });
+
+      return model;
+    }
+
+    function createPositionModel (positionData) {
+      return {
+        ...data
       };
-      this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+    };
 
-      this.childrenComplete = function () {
-        $page.removeClass('hrm-page--initializing');
-      };
+    const ViewModel = function (positions, settings) {
+      /** Initialization */
+      (() => {
+        this.subscriptions = [];
+        this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+        this.windowResizeHandler = () => {
+          this.viewportSize({ width: $(window).width(), height: $(window).height() });
+        };
+        this.childrenComplete = function () {
+          $page.removeClass('hrm-page--initializing');
+        };
+      })();
 
+      /** Calculation created */
       this.isBuilt = ko.observable(false);
-
-      function createIntervalsModel(data, needCheck) {
-
-        function createIntervalModel(defaultValue) {
-          return ko.observable(defaultValue).extend({
-            required: {
-              message: 'Обязательное поле'
-            },
-            hrmDate: {
-              params: 'HH:mm',
-              message: 'Неверный формат времени'
-            }
-          })
-        }
-
-        const model = ko.validatedObservable(null, { deep: true, live: true });
-        const start = createIntervalModel(data.start);
-        const end = createIntervalModel(data.end);
-        const correct = ko.computed(() => {
-          const endMoment = moment(end(), 'HH:mm');
-          const startMoment = moment(start(), 'HH:mm');
-
-          if (!needCheck()) return true;
-
-          return endMoment.isAfter(startMoment);
-        })
-        start.extend({
-          validation: {
-            validator: () => correct()
-          }
-        });
-        end.extend({
-          validation: {
-            validator: () => correct()
-          }
-        });
-        model({
-          start,
-          end,
-          correct
-        });
-
-        return model;
-      }
-
-      this.inputModel = {
-        filial: ko.observable('').extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        }),
-        date: ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
-          required: {
-            message: 'Обязательное поле'
-          },
-          hrmDate: {
-            params: 'DD.MM.YYYY, dddd',
-            message: 'Неверный формат даты'
-          }
-        }),
-        shift: ko.observable('').extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        })
+      this.buildCalculation = () => {
+        this.isBuilt(true);
       };
-
-      this.inputModel.interval = createIntervalsModel({
-        start: '11:00',
-        end: '23:00',
-      }, () => {
-        return !this.changeShift && this.inputModel.shift.peek() != 1
-      });
-
-      this.inputModel.shift.subscribe((value) => {
-        this.changeShift = 1;
-        if (value == 0) {
-          this.inputModel.interval().start('11:00');
-          this.inputModel.interval().end('23:00');
-        } else {
-          this.inputModel.interval().start('23:00');
-          this.inputModel.interval().end('11:00');
-        }
-        this.changeShift = 0;
-      });
-
-
-      window.test = this.inputModel.interval;
-
-      this.isInputValid = ko.pureComputed(() => {
-        return this.inputModel.date.isValid() && this.inputModel.interval.isValid();
-      }, this);
-
 
       this.formControlErrorStateMatcher = function (formControl) {
         return ko.pureComputed(() => {
@@ -115,44 +73,95 @@
         });
       };
 
+      /** Input data for calculation */
+      this.inputModel = (() => {
+        /* Shift select is changing */
+        const changeShift = ko.observable(false);
 
-      this.buildCalculation = () => {
-        this.isBuilt(true);
-      };
-
-      this.createPositionModel = function (data) {
-        return {
-          ...data
-        };
-      };
-
-      this.jobsModel = ko.observable({
-        positions: positions.map(position => {
-          return this.createPositionModel(position)
-        })
-      });
-      this.jobsModel.total = ko.pureComputed(() => {
-        return this.jobsModel().positions.reduce((acc, p) => {
-          return {
-            name: '',
-            workload: (acc.workload || 0) + p.workload,
-            workloadType: '',
-            units: '',
-            additionalWorkload: '',
-            fotCategory: 100,
-            fotRevenue: 100,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [...(acc.employees || []), ...p.employees]
+        const filial = ko.observable('').extend({
+          required: {
+            message: 'Обязательное поле'
           }
-        }, {})
-      })
+        });
+        const date = ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
+          required: {
+            message: 'Обязательное поле'
+          },
+          hrmDate: {
+            params: 'DD.MM.YYYY, dddd',
+            message: 'Неверный формат даты'
+          }
+        });
+        const shift = ko.observable(settings.shifts.day.value).extend({
+          required: {
+            message: 'Обязательное поле'
+          }
+        });
 
-      console.log(this.jobsModel.total())
+        const interval = createIntervalModel({
+          start: settings.shifts.day.start,
+          end: settings.shifts.day.end,
+        }, () => {
+          const shiftData = settings.shifts.find(shift => shift.value === value);
+          !changeShift && shiftData.needCheck
+        });
+
+        shift.subscribe((value) => {
+          changeShift = 1;
+
+          const shiftData = settings.shifts.find(shift => shift.value === value);
+          if (shift) {
+            interval().start(shiftData.start);
+            interval().end(shiftData.end);
+          }
+
+          changeShift = 0;
+        });
+
+        return {
+          filial,
+          date,
+          shift,
+          interval
+        }
+      })();
+
+      /** Data for summary table */
+      this.summaryModel = ((defaultPositions) => {
+        const positions = defaultPositions.map(position => {
+          return this.createPositionModel(position)
+        });
+
+        const total = ko.pureComputed(() => {
+          return positions.reduce((acc, p) => {
+            return {
+              name: '',
+              workload: (acc.workload || 0) + p.workload,
+              workloadType: '',
+              units: '',
+              additionalWorkload: '',
+              fotCategory: 100,
+              fotRevenue: 100,
+              performanceStandart: -100,
+              lateness: {
+                green: 0,
+                yellow: 0,
+                red: 0
+              },
+              employees: [...(acc.employees || []), ...p.employees]
+            }
+          }, {})
+        });
+
+        return {
+          positions, total
+        }
+      })(positions);
+
+
+
+
+
 
       this.isEmployeesCalculated = ko.observable(false);
 
@@ -300,8 +309,15 @@
       })();
     };
 
-    const viewModel = new ViewModel([
-      /*{
+
+    ViewModel.prototype.dispose = function () {
+      $(window).off('resize', this.windowResizeHandler);
+      this.subscriptions.forEach(s => s.dispose());
+    };
+
+    /***** Model activation *******/
+    const positions = [
+      {
         name: 'Администратор филиала',
         workloadType: 'Выручка',
         workload: 0,
@@ -320,7 +336,7 @@
             name: 'Сергеева Мария Владиславовна',
           }
         ]
-      },*/
+      },
       {
         name: 'Водители',
         workloadType: 'Выручка',
@@ -341,13 +357,25 @@
           {}
         ]
       },
-    ]);
+    ];
 
-    ViewModel.prototype.dispose = function () {
-      $(window).off('resize', this.windowResizeHandler);
-      this.subscriptions.forEach(s => s.dispose());
+    const settings = {
+      shifts: {
+        day: {
+          value: 'day',
+          start: '11:00',
+          end: '23:00',
+          needCheck: true // start < end
+        },
+        night: {
+          value: 'night',
+          start: '23:00',
+          end: '11:00'
+        }
+      }
     };
 
+    const viewModel = new ViewModel(positions, settings);
     ko.applyBindings(
       viewModel,
       $page.get()[0]

@@ -12,6 +12,7 @@
     <div class="hrm-scaffold__sidebar"
          data-bind="component: {name: 'hrm-main-sidebar', params: {collapsed: isSidebarCollapsed}}"></div>
     <div class="hrm-scaffold__body">
+      <!-- Page content  -->
       <div class="hrm-scaffold__content calculation-page__content">
 
         <div class="calculation-page__header">
@@ -28,8 +29,9 @@
         </div>
 
         <div class="calculation-form">
+          <!-- Input table -->
           @@include('./components/_form-input.html')
-
+          <!-- /Input table -->
 
           <!-- ko template: {
             foreach: hrmTemplateIf(isBuilt(), $data),
@@ -37,7 +39,79 @@
             beforeRemove: hrmFadeBeforeRemoveFactory(200)
           } -->
           <div class="calculation-form__content">
+            <!-- Summary table -->
             @@include('./components/_form-summary.html')
+            <!-- /Summary table -->
+
+            <!-- Tabs -->
+            <div class="calculation-page__tabs"
+                 data-bind="component: {name: 'hrm-tab-group', params: {items: navigationTabs, activeItem: activeTab}}">
+            </div>
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf($root.activeTab() === 0, $data),
+              afterAdd: hrmFadeAfterAddFactory(200, 200),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+            @@include('tabs/_workload.html')
+            <!-- /ko -->
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf($root.activeTab() === 1, $data),
+              afterAdd: hrmFadeAfterAddFactory(200, 200),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+            @@include('tabs/_salary.html')
+            <!-- /ko -->
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf($root.activeTab() === 2, $data),
+              afterAdd: hrmFadeAfterAddFactory(200, 200),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+            @@include('tabs/_ranks.html')
+            <!-- /ko -->
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf($root.activeTab() === 3, $data),
+              afterAdd: hrmFadeAfterAddFactory(200, 200),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+              } -->
+            @@include('tabs/_specialities.html')
+            <!-- /ko -->
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf($root.activeTab() === 4, $data),
+              afterAdd: hrmFadeAfterAddFactory(200, 200),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+            @@include('tabs/_shifts.html')
+            <!-- /ko -->
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf($root.activeTab() === 5, $data),
+              afterAdd: hrmFadeAfterAddFactory(200, 200),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+            @@include('tabs/_deposit.html')
+            <!-- /ko -->
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf($root.activeTab() === 6, $data),
+              afterAdd: hrmFadeAfterAddFactory(200, 200),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+            @@include('tabs/_equipment.html')
+            <!-- /ko -->
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf($root.activeTab() === 7, $data),
+              afterAdd: hrmFadeAfterAddFactory(200, 200),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+            @@include('tabs/_recruiting.html')
+            <!-- /ko -->
+            <!-- /Tabs -->
 
             <div class="calculation-form__actions">
               <button class="hrm-button hrm-basic-button calculation-form__action">
@@ -52,7 +126,7 @@
           <!-- /ko -->
         </div>
       </div>
-
+      <!-- /Page content  -->
     </div>
   </div>
   @@include('../../base/_page-scripts.html')
