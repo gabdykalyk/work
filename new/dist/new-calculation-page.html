@@ -120,8 +120,8 @@
              hrmSelect,
              hrmFormFieldSelectControl: control,
              hrmFormFieldSelectControlErrorStateMatcher: errorStateMatcher">
-            <option value="0">Дневная</option>
-            <option value="1">Ночная</option>
+            <option value="day">Дневная</option>
+            <option value="night">Ночная</option>
           </select>
         </div>
 
@@ -197,7 +197,7 @@
 
   <div class="calculation-input__field calculation-input__actions">
     <button class="hrm-button hrm-basic-button hrm-accent-button calculation-input__action"
-            data-bind="click: buildCalculation, enable: isInputValid">
+            data-bind="click: buildCalculation, enable: inputModel.isValid">
       Рассчитать
     </button>
 
@@ -254,7 +254,7 @@
       </thead>
 
       <tbody>
-        <!-- ko foreach: $root.jobsModel().positions -->
+        <!-- ko foreach: $root.summaryModel.positions -->
         <!-- ko  let: { isTotal: false } -->
         <tr data-bind="css: { 'calculation-summary__total': isTotal }">
   <!-- Должность -->
@@ -350,7 +350,7 @@
         <!-- /ko -->
 
 
-        <!-- ko using: $root.jobsModel.total() -->
+        <!-- ko using: $root.summaryModel.total() -->
         <!-- ko  let: { isTotal: true } -->
         <tr data-bind="css: { 'calculation-summary__total': isTotal }">
   <!-- Должность -->
@@ -490,7 +490,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: name"></div>
@@ -509,7 +509,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: workloadType"></div>
@@ -518,7 +518,7 @@
 
             <td class="calculation-summary__cell  calculation-summary__total">
               <div class="hrm-table__cell-content"
-                   data-bind="text: jobsModel.total().workloadType"></div>
+                   data-bind="text: summaryModel.total().workloadType"></div>
             </td>
           </tr>
 
@@ -529,7 +529,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell calculation-summary__workload-cell">
               <div class="calculation-summary__workload-row">
 
@@ -544,7 +544,7 @@
 
             <td class="calculation-summary__cell  calculation-summary__total">
               <div class="hrm-table__cell-content"
-                   data-bind="text: jobsModel.total().workload"></div>
+                   data-bind="text: summaryModel.total().workload"></div>
             </td>
           </tr>
 
@@ -555,7 +555,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: additionalWorkload"></div>
@@ -564,7 +564,7 @@
 
             <td class="calculation-summary__cell  calculation-summary__total">
               <div class="hrm-table__cell-content"
-                   data-bind="text: jobsModel.total().additionalWorkload"></div>
+                   data-bind="text: summaryModel.total().additionalWorkload"></div>
             </td>
           </tr>
 
@@ -575,7 +575,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: employees.length"></div>
@@ -584,7 +584,7 @@
 
             <td class="calculation-summary__cell  calculation-summary__total">
               <div class="hrm-table__cell-content"
-                   data-bind="text: jobsModel.total().employees.length"></div>
+                   data-bind="text: summaryModel.total().employees.length"></div>
             </td>
           </tr>
 
@@ -595,7 +595,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: fotCategory"></div>
@@ -604,7 +604,7 @@
 
             <td class="calculation-summary__cell  calculation-summary__total">
               <div class="hrm-table__cell-content"
-                   data-bind="text: jobsModel.total().fotCategory"></div>
+                   data-bind="text: summaryModel.total().fotCategory"></div>
             </td>
           </tr>
 
@@ -615,7 +615,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: fotRevenue"></div>
@@ -624,7 +624,7 @@
 
             <td class="calculation-summary__cell  calculation-summary__total">
               <div class="hrm-table__cell-content"
-                   data-bind="text: jobsModel.total().fotRevenue"></div>
+                   data-bind="text: summaryModel.total().fotRevenue"></div>
             </td>
           </tr>
 
@@ -635,7 +635,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: fotRevenue"></div>
@@ -644,7 +644,7 @@
 
             <td class="calculation-summary__cell  calculation-summary__total">
               <div class="hrm-table__cell-content"
-                   data-bind="text: jobsModel.total().performanceStandart"></div>
+                   data-bind="text: summaryModel.total().performanceStandart"></div>
             </td>
           </tr>
 
@@ -655,7 +655,7 @@
               </div>
             </th>
 
-            <!-- ko foreach: jobsModel().positions -->
+            <!-- ko foreach: summaryModel.positions -->
             <td class="calculation-summary__cell calculation-summary__lateness-row-cell">
               <div class="calculation-summary__lateness-row">
                 <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--green"
@@ -685,7 +685,7 @@
             <!-- /ko -->
 
             <td class="calculation-summary__cell  calculation-summary__lateness-row-cell  calculation-summary__total"
-                data-bind="using: $root.jobsModel.total()">
+                data-bind="using: $root.summaryModel.total()">
               <div class="hrm-table__cell-content">
                 <div class="calculation-summary__lateness-row">
                   <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--green"
@@ -722,9 +722,44 @@
 
             <!-- /Summary table -->
 
-            <!-- Summary table -->
-            
-            <!-- /Summary table -->
+            <!-- Tabs -->
+              <div class="calculation-page__tabs"
+                  data-bind="component: {name: 'hrm-tab-group', params: {items: settings.tabs, activeItem: settings.activeTab }}">
+              </div>
+
+              <!-- ko template: {
+                foreach: hrmTemplateIf(settings.activeTab() === 0, $data),
+                afterAdd: hrmFadeAfterAddFactory(200, 200),
+                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+              } -->
+                <div class="calculation-page__tab">
+                  production
+
+                </div>
+              <!-- /ko -->
+
+              <!-- ko template: {
+                foreach: hrmTemplateIf(settings.activeTab() === 1, $data),
+                afterAdd: hrmFadeAfterAddFactory(200, 200),
+                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+              } -->
+                <div class="calculation-page__tab">
+                  delivery
+
+                </div>
+              <!-- /ko -->
+
+              <!-- ko template: {
+                foreach: hrmTemplateIf(settings.activeTab() === 2, $data),
+                afterAdd: hrmFadeAfterAddFactory(200, 200),
+                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+              } -->
+                <div class="calculation-page__tab">
+                  lateness
+
+                </div>
+              <!-- /ko -->
+            <!-- /Tabs -->
 
             <div class="calculation-form__actions">
               <button class="hrm-button hrm-basic-button calculation-form__action">
@@ -769,112 +804,70 @@
   $(function () {
     const $page = $(document.documentElement);
 
-    const ViewModel = function (positions) {
-      this.subscriptions = [];
+    function createTimeModel(defaultValue) {
+      return ko.observable(defaultValue).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        hrmDate: {
+          params: 'HH:mm',
+          message: 'Неверный формат времени'
+        }
+      })
+    }
 
-      this.windowResizeHandler = () => {
-        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+    function createIntervalModel(data, needCheck) {
+      const model = ko.validatedObservable(null, { deep: true, live: true });
+      const start = createTimeModel(data.start);
+      const end = createTimeModel(data.end);
+
+      const correct = ko.pureComputed(() => {
+        const endMoment = moment(end(), 'HH:mm');
+        const startMoment = moment(start(), 'HH:mm');
+        if (!needCheck()) return true;
+        return endMoment.isAfter(startMoment);
+      });
+
+      start.extend({
+        validation: { validator: () => correct() }
+      });
+      end.extend({
+        validation: { validator: () => correct() }
+      });
+
+      model({
+        start,
+        end,
+        correct
+      });
+
+      return model;
+    }
+
+    function createPositionModel (positionData) {
+      return {
+        ...positionData
       };
-      this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+    };
 
-      this.childrenComplete = function () {
-        $page.removeClass('hrm-page--initializing');
-      };
+    const ViewModel = function (positions, settings) {
+      /** Initialization */
+      (() => {
+        this.subscriptions = [];
+        this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+        this.windowResizeHandler = () => {
+          this.viewportSize({ width: $(window).width(), height: $(window).height() });
+        };
+        this.childrenComplete = function () {
+          $page.removeClass('hrm-page--initializing');
+        };
+      })();
 
+      /** Calculation created */
       this.isBuilt = ko.observable(false);
-
-      function createIntervalsModel(data, needCheck) {
-
-        function createIntervalModel(defaultValue) {
-          return ko.observable(defaultValue).extend({
-            required: {
-              message: 'Обязательное поле'
-            },
-            hrmDate: {
-              params: 'HH:mm',
-              message: 'Неверный формат времени'
-            }
-          })
-        }
-
-        const model = ko.validatedObservable(null, { deep: true, live: true });
-        const start = createIntervalModel(data.start);
-        const end = createIntervalModel(data.end);
-        const correct = ko.computed(() => {
-          const endMoment = moment(end(), 'HH:mm');
-          const startMoment = moment(start(), 'HH:mm');
-
-          if (!needCheck()) return true;
-
-          return endMoment.isAfter(startMoment);
-        })
-        start.extend({
-          validation: {
-            validator: () => correct()
-          }
-        });
-        end.extend({
-          validation: {
-            validator: () => correct()
-          }
-        });
-        model({
-          start,
-          end,
-          correct
-        });
-
-        return model;
-      }
-
-      this.inputModel = {
-        filial: ko.observable('').extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        }),
-        date: ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
-          required: {
-            message: 'Обязательное поле'
-          },
-          hrmDate: {
-            params: 'DD.MM.YYYY, dddd',
-            message: 'Неверный формат даты'
-          }
-        }),
-        shift: ko.observable('').extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        })
+      this.buildCalculation = () => {
+        this.isBuilt(true);
       };
-
-      this.inputModel.interval = createIntervalsModel({
-        start: '11:00',
-        end: '23:00',
-      }, () => {
-        return !this.changeShift && this.inputModel.shift.peek() != 1
-      });
-
-      this.inputModel.shift.subscribe((value) => {
-        this.changeShift = 1;
-        if (value == 0) {
-          this.inputModel.interval().start('11:00');
-          this.inputModel.interval().end('23:00');
-        } else {
-          this.inputModel.interval().start('23:00');
-          this.inputModel.interval().end('11:00');
-        }
-        this.changeShift = 0;
-      });
-
-
-      window.test = this.inputModel.interval;
-
-      this.isInputValid = ko.pureComputed(() => {
-        return this.inputModel.date.isValid() && this.inputModel.interval.isValid();
-      }, this);
-
 
       this.formControlErrorStateMatcher = function (formControl) {
         return ko.pureComputed(() => {
@@ -882,44 +875,119 @@
         });
       };
 
+      /** Input data for calculation */
+      this.inputModel = (() => {
+        const getShift = (value) => {
+          return Object.keys(settings.shifts).find(shift => shift.value === value)
+        }
+        /* Shift select is changing */
+        const changeShift = ko.observable(false);
 
-      this.buildCalculation = () => {
-        this.isBuilt(true);
-      };
-
-      this.createPositionModel = function (data) {
-        return {
-          ...data
-        };
-      };
-
-      this.jobsModel = ko.observable({
-        positions: positions.map(position => {
-          return this.createPositionModel(position)
-        })
-      });
-      this.jobsModel.total = ko.pureComputed(() => {
-        return this.jobsModel().positions.reduce((acc, p) => {
-          return {
-            name: '',
-            workload: (acc.workload || 0) + p.workload,
-            workloadType: '',
-            units: '',
-            additionalWorkload: '',
-            fotCategory: 100,
-            fotRevenue: 100,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [...(acc.employees || []), ...p.employees]
+        const filial = ko.observable('').extend({
+          required: {
+            message: 'Обязательное поле'
           }
-        }, {})
-      })
+        });
+        const date = ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
+          required: {
+            message: 'Обязательное поле'
+          },
+          hrmDate: {
+            params: 'DD.MM.YYYY, dddd',
+            message: 'Неверный формат даты'
+          }
+        });
+        const shift = ko.observable(settings.shifts.day.value).extend({
+          required: {
+            message: 'Обязательное поле'
+          }
+        });
 
-      console.log(this.jobsModel.total())
+        const interval = createIntervalModel({
+          start: settings.shifts.day.start,
+          end: settings.shifts.day.end,
+        }, () => {
+          const shiftData = getShift(shift());
+          !changeShift && shiftData.needCheck
+        });
+
+        shift.subscribe((value) => {
+          changeShift = 1;
+
+          const shiftData = getShift(value);
+          if (shift) {
+            interval().start(shiftData.start);
+            interval().end(shiftData.end);
+          }
+
+          changeShift = 0;
+        });
+
+        const isValid = ko.pureComputed(() => {
+          return date.isValid() && interval.isValid();
+        }, this);
+
+
+        return {
+          filial,
+          date,
+          shift,
+          interval,
+          isValid
+        }
+      })();
+
+      /** Data for summary table */
+      this.summaryModel = ((defaultPositions) => {
+        const positions = defaultPositions.map(position => {
+          return createPositionModel(position)
+        });
+
+        const total = ko.pureComputed(() => {
+          return positions.reduce((acc, p) => {
+            return {
+              name: '',
+              workload: (acc.workload || 0) + p.workload,
+              workloadType: '',
+              units: '',
+              additionalWorkload: '',
+              fotCategory: 100,
+              fotRevenue: 100,
+              performanceStandart: -100,
+              lateness: {
+                green: 0,
+                yellow: 0,
+                red: 0
+              },
+              employees: [...(acc.employees || []), ...p.employees]
+            }
+          }, {})
+        });
+
+        return {
+          positions, total
+        }
+      })(positions);
+
+      this.settings = (() => {
+        const tabs = [
+          new HrmTabGroupItem('Производство'),
+          new HrmTabGroupItem('Доставка'),
+          new HrmTabGroupItem('Опоздания')
+        ];
+
+        const activeTab = ko.observable(0);
+
+        return {
+          tabs,
+          activeTab
+        }
+      })();
+
+
+
+
+
 
       this.isEmployeesCalculated = ko.observable(false);
 
@@ -1067,8 +1135,15 @@
       })();
     };
 
-    const viewModel = new ViewModel([
-      /*{
+
+    ViewModel.prototype.dispose = function () {
+      $(window).off('resize', this.windowResizeHandler);
+      this.subscriptions.forEach(s => s.dispose());
+    };
+
+    /***** Model activation *******/
+    const positions = [
+      {
         name: 'Администратор филиала',
         workloadType: 'Выручка',
         workload: 0,
@@ -1087,7 +1162,7 @@
             name: 'Сергеева Мария Владиславовна',
           }
         ]
-      },*/
+      },
       {
         name: 'Водители',
         workloadType: 'Выручка',
@@ -1108,13 +1183,25 @@
           {}
         ]
       },
-    ]);
+    ];
 
-    ViewModel.prototype.dispose = function () {
-      $(window).off('resize', this.windowResizeHandler);
-      this.subscriptions.forEach(s => s.dispose());
+    const settings = {
+      shifts: {
+        day: {
+          value: 'day',
+          start: '11:00',
+          end: '23:00',
+          needCheck: true // start < end
+        },
+        night: {
+          value: 'night',
+          start: '23:00',
+          end: '11:00'
+        }
+      }
     };
 
+    const viewModel = new ViewModel(positions, settings);
     ko.applyBindings(
       viewModel,
       $page.get()[0]

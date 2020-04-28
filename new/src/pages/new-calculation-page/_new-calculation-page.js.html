@@ -44,7 +44,7 @@
 
     function createPositionModel (positionData) {
       return {
-        ...data
+        ...positionData
       };
     };
 
@@ -75,6 +75,9 @@
 
       /** Input data for calculation */
       this.inputModel = (() => {
+        const getShift = (value) => {
+          return Object.keys(settings.shifts).find(shift => shift.value === value)
+        }
         /* Shift select is changing */
         const changeShift = ko.observable(false);
 
@@ -102,14 +105,14 @@
           start: settings.shifts.day.start,
           end: settings.shifts.day.end,
         }, () => {
-          const shiftData = settings.shifts.find(shift => shift.value === value);
+          const shiftData = getShift(shift());
           !changeShift && shiftData.needCheck
         });
 
         shift.subscribe((value) => {
           changeShift = 1;
 
-          const shiftData = settings.shifts.find(shift => shift.value === value);
+          const shiftData = getShift(value);
           if (shift) {
             interval().start(shiftData.start);
             interval().end(shiftData.end);
@@ -118,18 +121,24 @@
           changeShift = 0;
         });
 
+        const isValid = ko.pureComputed(() => {
+          return date.isValid() && interval.isValid();
+        }, this);
+
+
         return {
           filial,
           date,
           shift,
-          interval
+          interval,
+          isValid
         }
       })();
 
       /** Data for summary table */
       this.summaryModel = ((defaultPositions) => {
         const positions = defaultPositions.map(position => {
-          return this.createPositionModel(position)
+          return createPositionModel(position)
         });
 
         const total = ko.pureComputed(() => {
@@ -157,6 +166,21 @@
           positions, total
         }
       })(positions);
+
+      this.settings = (() => {
+        const tabs = [
+          new HrmTabGroupItem('Производство'),
+          new HrmTabGroupItem('Доставка'),
+          new HrmTabGroupItem('Опоздания')
+        ];
+
+        const activeTab = ko.observable(0);
+
+        return {
+          tabs,
+          activeTab
+        }
+      })();
 
 
 
