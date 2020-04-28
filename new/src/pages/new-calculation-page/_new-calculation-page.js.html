@@ -289,8 +289,14 @@
         return h + ':' + m;
       };
 
+      this.isSidebarCollapsed = ko.observable(localStorage.getItem(HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY) === 'true');
+
       (() => {
         $(window).on('resize', this.windowResizeHandler);
+
+        this.subscriptions.push(this.isSidebarCollapsed.subscribe(collapsed => {
+          localStorage.setItem(HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY, collapsed);
+        }));
       })();
     };
 
@@ -315,7 +321,7 @@
           }
         ]
       },*/
-       {
+      {
         name: 'Водители',
         workloadType: 'Выручка',
         workload: 0,
