@@ -43,10 +43,44 @@
     }
 
     function createPositionModel (positionData) {
-      return {
-        ...positionData
-      };
+      const visible = ko.observable(true);
+      const employees = ko.observableArray(positionData.employees);
+
+      return ko.observable({
+        ...positionData,
+        employees,
+        visible
+      });
     };
+
+
+    function PositionsModel(positions, settings, modals) {
+
+      function createPositionsModalDialog() {
+        return {
+          dialogTemplateName: settings.dialogTemplateName,
+          data: {
+            positions,
+          },
+          options: {
+            modalClass: 'calculations-page__positions-modal'
+          },
+          close: result => {
+            if (result !== undefined) {
+              console.log(result)
+            }
+          }
+        }
+      }
+
+      return {
+        positions,
+        openPositionsModal: () => {
+          modals.push(createPositionsModalDialog())
+        }
+      }
+
+    }
 
     const ViewModel = function (positions, settings) {
       /** Initialization */
@@ -144,6 +178,7 @@
 
         const total = ko.pureComputed(() => {
           return positions.reduce((acc, p) => {
+            p = p();
             return {
               name: '',
               workload: (acc.workload || 0) + p.workload,
@@ -158,7 +193,7 @@
                 yellow: 0,
                 red: 0
               },
-              employees: [...(acc.employees || []), ...p.employees]
+              employees: (acc.employees || 0) + p.employees().length
             }
           }, {})
         });
@@ -177,33 +212,17 @@
 
         const activeTab = ko.observable(0);
 
-        const production = {
-          visiblePositions: ko.observableArray(positions),
-          openPositionsModal: () => {
-            const modal = {
-              dialogTemplateName: 'calculation-settings-positions-modal-template',
-              data: {
-                  //mode: 'create',
-                  //specialityNames: this.formModel.value().specialities().map(s => s.name())
-              },
-              options: {
-                  //modalClass: 'position-page__speciality-modal'
-              },
-              close: result => {
-                  if (result !== undefined) {
-                    console.log(result)
-                      //this.formModel.value().specialities.splice(0, 0, this.formModel.createSpecialityFormModel(result));
-                  }
-              }
-          };
-            this.modalOpens.push(modal);
-          }
-        }
+        const productionPositions = this.summaryModel.positions
+        .filter(position => position().type === 'production');
+        console.log(productionPositions)
+        const productionModel = new PositionsModel(productionPositions, {
+          dialogTemplateName: 'calculation-settings-positions-modal-template',
+        }, this.modalOpens);
 
         return {
           tabs,
           activeTab,
-          production
+          production: productionModel
         }
       })();
 
@@ -368,6 +387,49 @@
     const positions = [
       {
         name: 'Администратор филиала',
+        type: 'production',
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkload: 'Время без дела 0%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        performanceStandart: -100,
+        lateness: {
+          green: 0,
+          yellow: 0,
+          red: 0
+        },
+        employees: [
+          {
+            name: 'Сергеева Мария Владиславовна',
+          }
+        ]
+      },
+      {
+        name: 'Повар-сушист',
+        type: 'production',
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkload: 'Время без дела 0%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        performanceStandart: -100,
+        lateness: {
+          green: 0,
+          yellow: 0,
+          red: 0
+        },
+        employees: [
+          {
+            name: 'Сергеева Мария Владиславовна',
+          }
+        ]
+      },
+      {
+        name: 'Официант',
+        type: 'production',
         workloadType: 'Выручка',
         workload: 0,
         units: '₽',
@@ -388,6 +450,7 @@
       },
       {
         name: 'Водители',
+        type: 'delivery',
         workloadType: 'Выручка',
         workload: 0,
         units: '₽',

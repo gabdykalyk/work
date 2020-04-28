@@ -13,13 +13,26 @@
                     ]);
 
                     return new (function () {
+                        this.term = ko.observable('админ');
 
-                        //this.mode = params.data.mode;
-                        //this.data = params.data.data;
+                        this.positions = params.data.positions.map((p) => {
+                            const positionData = p();
+                            return {
+                                name: positionData.name,
+                                checked: ko.observable(positionData.visible()),
+                                position: p,
+                                visible: ko.pureComputed(() => {
+                                    const term = this.term();
+                                    console.log('compute', term)
+                                    if (term.length <= 2) return true;
+
+                                    const formattedTerm = term.toLowerCase();
+                                    const formattedName = positionData.name.toLowerCase();
+                                    return formattedName.indexOf(formattedTerm) !== -1;
 
 
-                        this.formModel = ko.validatedObservable({
-
+                                })
+                            }
                         });
 
                         this.formControlErrorStateMatcher = function (formControl) {
@@ -35,11 +48,14 @@
                         };
 
                         this.submit = function () {
-                            if (this.formModel.isValid()) {
-                                if ('submit' in params) {
-                                    params.submit('hello')
-                                }
+                            if ('submit' in params) {
+                                this.positions.forEach(p => {
+                                    console.log(p.checked())
+                                    p.position().visible(p.checked());
+                                });
+                                params.submit(true);
                             }
+
                         };
                     });
                 }
@@ -65,6 +81,37 @@
     </div>
 
     <div class="hrm-basic-modal-dialog__body">
+        <!-- ko let: {control: ko.observable(null)} -->
+        <div class="hrm-search-form-field"
+             data-bind="hrmFormField, hrmFormFieldControlRef: control">
+            <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                <i class="hrm-form-field__basis-prefix hrm-form-field-icon hrm-form-field-search-icon"></i>
+
+                <input data-bind="
+                        textInput: term,
+                        hrmFormFieldInputControl: control
+                    "
+                       placeholder="Поиск">
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko foreach: { data: $component.positions, as: 'position' } -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
+        <div data-bind="if: visible">
+            <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+                <div
+                     data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
+                </div>
+                <label
+                       data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
+            </div>
+        </div>
+
+        <!-- /ko -->
+
+        <!-- /ko -->
     </div>
 
     <div class="hrm-basic-modal-dialog__action-list">

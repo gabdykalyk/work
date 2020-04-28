@@ -290,7 +290,7 @@
   <!-- Сотрудники -->
   <td class="calculation-summary__cell" align="right">
     <div class=""
-         data-bind="text: employees.length"></div>
+         data-bind="text: ko.isObservable(employees) ? employees().length : employees"></div>
   </td>
 
   <!-- ФОТ, % в категории -->
@@ -386,7 +386,7 @@
   <!-- Сотрудники -->
   <td class="calculation-summary__cell" align="right">
     <div class=""
-         data-bind="text: employees.length"></div>
+         data-bind="text: ko.isObservable(employees) ? employees().length : employees"></div>
   </td>
 
   <!-- ФОТ, % в категории -->
@@ -727,28 +727,28 @@
                   data-bind="component: {name: 'hrm-tab-group', params: {items: settings.tabs, activeItem: settings.activeTab }}">
               </div>
 
+              <script type="text/html"
+                    id="calculation-settings-positions-modal-template">
+
+                <div data-bind="component: {
+                    name: 'calculation-settings-positions-modal-dialog',
+                    params: {
+                      data, modalElement,
+                      cancel: function () { close(); },
+                      submit: function ($data) {close($data);}
+                    }}" role="document">
+                </div>
+
+              </script>
+
               <!-- ko template: {
                 foreach: hrmTemplateIf(settings.activeTab() === 0, $data),
                 afterAdd: hrmFadeAfterAddFactory(200, 200),
                 beforeRemove: hrmFadeBeforeRemoveFactory(200)
               } -->
                 <div class="calculation-page__tab">
-                  <script type="text/html"
-        id="calculation-settings-positions-modal-template">
-
-  <div data-bind="component: {
-      name: 'calculation-settings-positions-modal-dialog',
-      params: {
-        data, modalElement,
-        cancel: function () { close(); },
-        submit: function ($data) {close($data);}
-      }}" role="document">
-  </div>
-
-</script>
-
-<!-- ko let: {'$tab': $root.settings.production} -->
-<div class="calculation-tab calculation-production">
+                  <!-- ko let: {'$tab': $root.settings.production, tabName: 'production'} -->
+  <div class="calculation-tab calculation-production" data-bind="class: 'calculation-' + tabName">
   <div class="calculation-tab__settings">
     <div>
       <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
@@ -795,7 +795,13 @@
       </button>
     </div>
   </div>
+
+  <!-- ko foreach: $tab.positions -->
+      <div data-bind="text: $data.name"></div>
+      <div data-bind="text: $data.visible()"></div>
+  <!-- /ko -->
 </div>
+
 <!-- /ko -->
 
                 </div>
@@ -884,13 +890,26 @@
                     ]);
 
                     return new (function () {
+                        this.term = ko.observable('админ');
 
-                        //this.mode = params.data.mode;
-                        //this.data = params.data.data;
+                        this.positions = params.data.positions.map((p) => {
+                            const positionData = p();
+                            return {
+                                name: positionData.name,
+                                checked: ko.observable(positionData.visible()),
+                                position: p,
+                                visible: ko.pureComputed(() => {
+                                    const term = this.term();
+                                    console.log('compute', term)
+                                    if (term.length <= 2) return true;
+
+                                    const formattedTerm = term.toLowerCase();
+                                    const formattedName = positionData.name.toLowerCase();
+                                    return formattedName.indexOf(formattedTerm) !== -1;
 
 
-                        this.formModel = ko.validatedObservable({
-
+                                })
+                            }
                         });
 
                         this.formControlErrorStateMatcher = function (formControl) {
@@ -906,11 +925,14 @@
                         };
 
                         this.submit = function () {
-                            if (this.formModel.isValid()) {
-                                if ('submit' in params) {
-                                    params.submit('hello')
-                                }
+                            if ('submit' in params) {
+                                this.positions.forEach(p => {
+                                    console.log(p.checked())
+                                    p.position().visible(p.checked());
+                                });
+                                params.submit(true);
                             }
+
                         };
                     });
                 }
@@ -936,6 +958,37 @@
     </div>
 
     <div class="hrm-basic-modal-dialog__body">
+        <!-- ko let: {control: ko.observable(null)} -->
+        <div class="hrm-search-form-field"
+             data-bind="hrmFormField, hrmFormFieldControlRef: control">
+            <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                <i class="hrm-form-field__basis-prefix hrm-form-field-icon hrm-form-field-search-icon"></i>
+
+                <input data-bind="
+                        textInput: term,
+                        hrmFormFieldInputControl: control
+                    "
+                       placeholder="Поиск">
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- ko foreach: { data: $component.positions, as: 'position' } -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
+        <div data-bind="if: visible">
+            <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+                <div
+                     data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
+                </div>
+                <label
+                       data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
+            </div>
+        </div>
+
+        <!-- /ko -->
+
+        <!-- /ko -->
     </div>
 
     <div class="hrm-basic-modal-dialog__action-list">
@@ -999,10 +1052,44 @@
     }
 
     function createPositionModel (positionData) {
-      return {
-        ...positionData
-      };
+      const visible = ko.observable(true);
+      const employees = ko.observableArray(positionData.employees);
+
+      return ko.observable({
+        ...positionData,
+        employees,
+        visible
+      });
     };
+
+
+    function PositionsModel(positions, settings, modals) {
+
+      function createPositionsModalDialog() {
+        return {
+          dialogTemplateName: settings.dialogTemplateName,
+          data: {
+            positions,
+          },
+          options: {
+            modalClass: 'calculations-page__positions-modal'
+          },
+          close: result => {
+            if (result !== undefined) {
+              console.log(result)
+            }
+          }
+        }
+      }
+
+      return {
+        positions,
+        openPositionsModal: () => {
+          modals.push(createPositionsModalDialog())
+        }
+      }
+
+    }
 
     const ViewModel = function (positions, settings) {
       /** Initialization */
@@ -1100,6 +1187,7 @@
 
         const total = ko.pureComputed(() => {
           return positions.reduce((acc, p) => {
+            p = p();
             return {
               name: '',
               workload: (acc.workload || 0) + p.workload,
@@ -1114,7 +1202,7 @@
                 yellow: 0,
                 red: 0
               },
-              employees: [...(acc.employees || []), ...p.employees]
+              employees: (acc.employees || 0) + p.employees().length
             }
           }, {})
         });
@@ -1133,33 +1221,17 @@
 
         const activeTab = ko.observable(0);
 
-        const production = {
-          visiblePositions: ko.observableArray(positions),
-          openPositionsModal: () => {
-            const modal = {
-              dialogTemplateName: 'calculation-settings-positions-modal-template',
-              data: {
-                  //mode: 'create',
-                  //specialityNames: this.formModel.value().specialities().map(s => s.name())
-              },
-              options: {
-                  //modalClass: 'position-page__speciality-modal'
-              },
-              close: result => {
-                  if (result !== undefined) {
-                    console.log(result)
-                      //this.formModel.value().specialities.splice(0, 0, this.formModel.createSpecialityFormModel(result));
-                  }
-              }
-          };
-            this.modalOpens.push(modal);
-          }
-        }
+        const productionPositions = this.summaryModel.positions
+        .filter(position => position().type === 'production');
+        console.log(productionPositions)
+        const productionModel = new PositionsModel(productionPositions, {
+          dialogTemplateName: 'calculation-settings-positions-modal-template',
+        }, this.modalOpens);
 
         return {
           tabs,
           activeTab,
-          production
+          production: productionModel
         }
       })();
 
@@ -1324,6 +1396,49 @@
     const positions = [
       {
         name: 'Администратор филиала',
+        type: 'production',
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkload: 'Время без дела 0%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        performanceStandart: -100,
+        lateness: {
+          green: 0,
+          yellow: 0,
+          red: 0
+        },
+        employees: [
+          {
+            name: 'Сергеева Мария Владиславовна',
+          }
+        ]
+      },
+      {
+        name: 'Повар-сушист',
+        type: 'production',
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkload: 'Время без дела 0%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        performanceStandart: -100,
+        lateness: {
+          green: 0,
+          yellow: 0,
+          red: 0
+        },
+        employees: [
+          {
+            name: 'Сергеева Мария Владиславовна',
+          }
+        ]
+      },
+      {
+        name: 'Официант',
+        type: 'production',
         workloadType: 'Выручка',
         workload: 0,
         units: '₽',
@@ -1344,6 +1459,7 @@
       },
       {
         name: 'Водители',
+        type: 'delivery',
         workloadType: 'Выручка',
         workload: 0,
         units: '₽',
