@@ -59,6 +59,7 @@
         this.childrenComplete = function () {
           $page.removeClass('hrm-page--initializing');
         };
+        this.modalOpens = ko.observableArray([]);
       })();
 
       /** Calculation created */
@@ -176,9 +177,33 @@
 
         const activeTab = ko.observable(0);
 
+        const production = {
+          visiblePositions: ko.observableArray(positions),
+          openPositionsModal: () => {
+            const modal = {
+              dialogTemplateName: 'calculation-settings-positions-modal-template',
+              data: {
+                  //mode: 'create',
+                  //specialityNames: this.formModel.value().specialities().map(s => s.name())
+              },
+              options: {
+                  //modalClass: 'position-page__speciality-modal'
+              },
+              close: result => {
+                  if (result !== undefined) {
+                    console.log(result)
+                      //this.formModel.value().specialities.splice(0, 0, this.formModel.createSpecialityFormModel(result));
+                  }
+              }
+          };
+            this.modalOpens.push(modal);
+          }
+        }
+
         return {
           tabs,
-          activeTab
+          activeTab,
+          production
         }
       })();
 
