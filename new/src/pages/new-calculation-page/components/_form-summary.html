@@ -5,12 +5,12 @@
     name: 'hrm-scrollable-wrapper',
     params: { options: {left: {disabled: true}} }
    }">
-  <table class="calculation-summary__table"
-         data-bind="hrmTable">
-    <thead>
+    <table class="calculation-summary__table"
+           data-bind="hrmTable">
+      <thead>
 
-      <tr>
-        <!-- ko foreach: [
+        <tr>
+          <!-- ko foreach: [
             ['job', 'Должность', 'Должность'],
             ['workload-type', 'Тип нагрузки', 'Тип нагрузки'],
             ['workload', 'Нагрузка', 'Нагрузка', 2],
@@ -21,32 +21,33 @@
             ['performance-standart', 'Норм. выработки, %', 'Норма выработки, %'],
             ['lateness', 'Опоздания', 'Опоздания'],
         ] -->
-          <th class="calculation-summary__cell" data-bind="class: 'calculation-summary__' + $data[0], attr: {colspan: $data[3] || 1}">
+          <th class="calculation-summary__cell"
+              data-bind="class: 'calculation-summary__' + $data[0], attr: {colspan: $data[3] || 1}">
             <div class="hrm-table__head-cell-content">
               <span data-bind="text: $data[1]"></span>
               <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral calculation-summary__info hrm-table__head-cell-info-button"
-                    data-bind="hrmTooltip, hrmTooltipText: $data[2]"></button>
+                      data-bind="hrmTooltip, hrmTooltipText: $data[2]"></button>
             </div>
           </th>
+          <!-- /ko -->
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- ko foreach: $root.jobsModel().positions -->
+        <!-- ko  let: { isTotal: false } -->
+        @@include('./_job-summary.html')
         <!-- /ko -->
-      </tr>
-    </thead>
-
-    <tbody>
-      <!-- ko foreach: $root.jobsModel().positions -->
-      <!-- ko  let: { isTotal: false } -->
-      @@include('./_job-summary.html')
-      <!-- /ko -->
-      <!-- /ko -->
+        <!-- /ko -->
 
 
-      <!-- ko using: $root.jobsModel.total() -->
-      <!-- ko  let: { isTotal: true } -->
-      @@include('./_job-summary.html')
-      <!-- /ko -->
-      <!-- /ko -->
-    </tbody>
-  </table>
+        <!-- ko using: $root.jobsModel.total() -->
+        <!-- ko  let: { isTotal: true } -->
+        @@include('./_job-summary.html')
+        <!-- /ko -->
+        <!-- /ko -->
+      </tbody>
+    </table>
   </div>
   <!-- /ko -->
 
@@ -67,8 +68,10 @@
             ['lateness', 'Опоздания', 'Опоздания'],
         ] -->
         <tr>
-          <th class="calculation-summary__cell" data-bind="class: 'calculation-summary__' + $data[0]">
-            <div class="hrm-table__head-cell-content" data-bind="text: $data[1]"></div>
+          <th class="calculation-summary__cell"
+              data-bind="class: 'calculation-summary__' + $data[0]">
+            <div class="hrm-table__head-cell-content"
+                 data-bind="text: $data[1]"></div>
           </th>
         </tr>
         <!-- /ko -->
@@ -90,8 +93,7 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell"
-                colspan="2">
+            <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: name"></div>
             </td>
@@ -110,8 +112,7 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell"
-                colspan="2">
+            <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: workloadType"></div>
             </td>
@@ -131,14 +132,15 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell">
-              <div class="hrm-table__cell-content"
-                   data-bind="text: workload"></div>
-            </td>
+            <td class="calculation-summary__cell calculation-summary__workload-cell">
+              <div class="calculation-summary__workload-row">
 
-            <td class="calculation-summary__cell">
-              <div class="hrm-table__cell-content"
-                   data-bind="text: units"></div>
+                <div class="calculation-summary__workload-value"
+                      data-bind="text: workload"></div>
+                <div class="calculation-summary__workload-unit"
+                      data-bind="text: units"></div>
+
+              </div>
             </td>
             <!-- /ko -->
 
@@ -156,8 +158,7 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell"
-                colspan="2">
+            <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: additionalWorkload"></div>
             </td>
@@ -177,8 +178,7 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell"
-                colspan="2">
+            <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: employees.length"></div>
             </td>
@@ -198,8 +198,7 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell"
-                colspan="2">
+            <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: fotCategory"></div>
             </td>
@@ -219,8 +218,7 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell"
-                colspan="2">
+            <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: fotRevenue"></div>
             </td>
@@ -240,8 +238,7 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell"
-                colspan="2">
+            <td class="calculation-summary__cell">
               <div class="hrm-table__cell-content"
                    data-bind="text: fotRevenue"></div>
             </td>
@@ -261,8 +258,7 @@
             </th>
 
             <!-- ko foreach: jobsModel().positions -->
-            <td class="calculation-summary__cell calculation-summary__lateness-row-cell"
-                colspan="2">
+            <td class="calculation-summary__cell calculation-summary__lateness-row-cell">
               <div class="calculation-summary__lateness-row">
                 <div class="calculation-summary__lateness-cell calculation-summary__lateness-cell--green"
                      data-bind="style: {
