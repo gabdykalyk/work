@@ -29,72 +29,21 @@
 
       this.formControlErrorStateMatcher = function (formControl) {
         return ko.pureComputed(() => {
+
+          console.log(1, formControl, formControl())
           return !formControl.isValid();
         });
       };
 
-      /** Input data for calculation */
-      this.inputModel = (() => {
-        const getShift = (value) => {
-          const key = Object.keys(settings.shifts).find(shift => settings.shifts[shift].value === value);
-          return settings.shifts[key];
+      this.inputModel = {
+        filial: ko.observable(''),
+        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
+        shift: ko.observable(''),
+        interval: {
+          start: ko.observable(''),
+          end: ko.observable(''),
         }
-        /* Shift select is changing */
-        const changeShift = ko.observable(false);
-
-        const filial = ko.observable('').extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        });
-        const date = ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
-          required: {
-            message: 'Обязательное поле'
-          },
-          hrmDate: {
-            params: 'DD.MM.YYYY, dddd',
-            message: 'Неверный формат даты'
-          }
-        });
-        const shift = ko.observable(settings.shifts.day.value).extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        });
-
-        const interval = createIntervalModel({
-          start: settings.shifts.day.start,
-          end: settings.shifts.day.end,
-        }, () => {
-          const shiftData = getShift(shift());
-          !changeShift && shiftData.needCheck
-        });
-
-        shift.subscribe((value) => {
-          changeShift(1);
-
-          const shiftData = getShift(value);
-          if (shift) {
-            interval().start(shiftData.start);
-            interval().end(shiftData.end);
-          }
-
-          changeShift(0);
-        });
-
-        const isValid = ko.pureComputed(() => {
-          return date.isValid() && interval.isValid();
-        }, this);
-
-
-        return {
-          filial,
-          date,
-          shift,
-          interval,
-          isValid
-        }
-      })();
+      }
 
       /** Data for summary table */
       this.summaryModel = ((defaultPositions) => {
@@ -462,23 +411,7 @@
       },
     ];
 
-    const settings = {
-      shifts: {
-        day: {
-          value: 'day',
-          start: '11:00',
-          end: '23:00',
-          needCheck: true // start < end
-        },
-        night: {
-          value: 'night',
-          start: '23:00',
-          end: '11:00'
-        }
-      }
-    };
-
-    const viewModel = new ViewModel(positions, settings);
+    const viewModel = new ViewModel(positions);
     ko.applyBindings(
       viewModel,
       $page.get()[0]
@@ -487,45 +420,7 @@
 
     /*****/
 
-    function createTimeModel(defaultValue) {
-      return ko.observable(defaultValue).extend({
-        required: {
-          message: 'Обязательное поле'
-        },
-        hrmDate: {
-          params: 'HH:mm',
-          message: 'Неверный формат времени'
-        }
-      })
-    }
 
-    function createIntervalModel(data, needCheck) {
-      const model = ko.validatedObservable(null, { deep: true, live: true });
-      const start = createTimeModel(data.start);
-      const end = createTimeModel(data.end);
-
-      const correct = ko.pureComputed(() => {
-        const endMoment = moment(end(), 'HH:mm');
-        const startMoment = moment(start(), 'HH:mm');
-        if (!needCheck()) return true;
-        return endMoment.isAfter(startMoment);
-      });
-
-      start.extend({
-        validation: { validator: () => correct() }
-      });
-      end.extend({
-        validation: { validator: () => correct() }
-      });
-
-      model({
-        start,
-        end,
-        correct
-      });
-
-      return model;
-    }
 
     function createPositionModel(positionData) {
       const visible = ko.observable(false);

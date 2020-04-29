@@ -25,7 +25,7 @@
             this._daterangepickerInstance = null;
 
             this.element = element;
-            this.id = 'hrm-form-field-input-control-' + nextId++;
+            this.id = 'hrm-form-field-datepicker-control-' + nextId++;
             this.focused = null;
             this.disabled = null;
             this.shouldLabelFloat = null;

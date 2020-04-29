@@ -1,0 +1,166 @@
+@@include('./_input-form.html')
+
+<script type="text/javascript">
+  $(function () {
+    const filialsList = [
+      {
+        id: 1,
+        name: 'Филиал 1'
+      },
+      {
+        id: 2,
+        name: 'Филиал 2'
+      },
+      {
+        id: 3,
+        name: 'Филиал 12345'
+      },
+      {
+        id: 4,
+        name: 'Филиал 4'
+      },
+    ];
+
+    const shifts = [
+      {
+        id: 'day',
+        name: 'Дневная',
+        start: '11:00',
+        end: '23:00',
+      }, {
+        id: 'night',
+        name: 'Ночная',
+        start: '23:00',
+        end: '11:00'
+      }
+    ];
+
+    function getShift(value) {
+      return shifts.find(shift => shift.id === value);
+    }
+
+    function createIntervalModel(data, needCheck) {
+      const start = data.start;
+      const end = data.end;
+
+      const correct = ko.pureComputed(() => {
+        const endMoment = moment(end(), 'HH:mm');
+        const startMoment = moment(start(), 'HH:mm');
+        if (!needCheck()) return true;
+        return endMoment.isAfter(startMoment);
+      });
+
+      start.extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        hrmDate: {
+          params: 'HH:mm',
+          message: 'Неверный формат времени'
+        },
+        validation: { validator: () => correct() }
+      });
+
+      end.extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        hrmDate: {
+          params: 'HH:mm',
+          message: 'Неверный формат времени'
+        },
+        validation: { validator: () => correct() }
+      });
+
+      return {
+        start,
+        end,
+        isCorrect: correct
+      };
+    }
+
+
+    ko.components.register('calculation-page-input-form', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const model = params.model;
+
+          const filial = model.filial.extend({
+            required: {
+              message: 'Обязательное поле'
+            }
+          });
+
+          const date = model.date.extend({
+            required: {
+              message: 'Обязательное поле'
+            },
+            hrmDate: {
+              params: 'DD.MM.YYYY, dddd',
+              message: 'Неверный формат даты'
+            }
+          });
+
+          const shift = model.shift.extend({
+            required: {
+              message: 'Обязательное поле'
+            }
+          });
+          shift(shifts[0].value);
+          const needCheck = ['day'];
+          const changeShift = ko.observable(false);
+
+          const start = model.interval.start;
+          const end = model.interval.end;
+          start(shifts[0].start);
+          end(shifts[0].end);
+          const interval = createIntervalModel({
+            start: start,
+            end: end,
+          }, () => {
+            return !changeShift() && needCheck.indexOf(shift()) !== -1;
+          });
+
+          shift.subscribe((value) => {
+            changeShift(true);
+
+            const shiftData = getShift(value);
+            if (shiftData) {
+              interval.start(shiftData.start);
+              interval.end(shiftData.end);
+            }
+
+            changeShift(0);
+          });
+
+          const isValid = ko.pureComputed(() => {
+            return date.isValid() && interval.isCorrect();
+          }, this);
+
+          return {
+            filial,
+            filialsList,
+
+            date,
+
+            shift,
+            shiftsList: shifts,
+
+            interval,
+            isValid,
+
+            formControlErrorStateMatcher: function (formControl) {
+              return ko.pureComputed(() => {
+                return !formControl.isValid();
+              });
+            }
+          };
+        }
+      },
+
+      template: {
+        element: 'calculation-page-input-form-template'
+      }
+    })
+  })
+</script>

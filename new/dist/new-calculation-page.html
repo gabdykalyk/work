@@ -45,170 +45,7 @@
 
         <div class="calculation-form">
           <!-- Input table -->
-          <div class="calculation-input__header"
-     data-bind="let: { errorStateMatcher: $root.formControlErrorStateMatcher.bind($root), input: $root.inputModel }">
-
-    <!-- Filial select -->
-    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-    <div class="calculation-input__field calculation-input__filial"
-         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-      <label data-bind="hrmFormFieldLabel: label">
-        Филиал
-      </label>
-
-      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-        <select data-bind="value: input.filial,
-                        hrmSelect,
-                        hrmFormFieldSelectControl: control,
-                        hrmFormFieldSelectControlErrorStateMatcher: errorStateMatcher">
-          <option value="0">Филиал #1</option>
-          <option value="1">Филиал #2123123</option>
-          <option value="2">Филиал #3</option>
-          <option value="3">Филиал #4</option>
-          <option value="4">Филиал #5</option>
-        </select>
-      </div>
-
-      <div data-bind="component: {name: 'hrm-form-field-error'},
-                    hrmSlide,
-                    hrmSlideValue: control() !== null ? control().errorState : false,
-                    hrmSlideDuration: 150">
-        <!-- ko text: input.filial.error() -->
-        <!-- /ko -->
-      </div>
-    </div>
-    <!-- /ko -->
-    <!-- /Filial select -->
-
-    <!-- Date select -->
-    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-    <div class="calculation-input__field calculation-input__date"
-         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-      <label data-bind="hrmFormFieldLabel: label">Расчёт на дату</label>
-
-      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-        <input data-bind="textInput: input.date,
-                      hrmDatepicker,
-                      hrmFormFieldDatepickerControl: control,
-                      hrmFormFieldDatepickerControlErrorStateMatcher: errorStateMatcher" />
-
-        <i class="hrm-form-field__suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
-      </div>
-
-      <div data-bind="component: {name: 'hrm-form-field-error'},
-                    hrmSlide,
-                    hrmSlideValue: control() !== null ? control() !== null ? control().errorState : false : false,
-                    hrmSlideDuration: 150">
-        <!-- ko text: input.date.error() -->
-        <!-- /ko -->
-      </div>
-    </div>
-    <!-- /ko -->
-    <!-- /Date select -->
-
-    <!-- Shift block -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-      <div class="calculation-input__field"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-        <label class=""
-               data-bind="hrmFormFieldLabel: label">
-          Смена
-        </label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: input.shift,
-             hrmSelect,
-             hrmFormFieldSelectControl: control,
-             hrmFormFieldSelectControlErrorStateMatcher: errorStateMatcher">
-            <option value="day">Дневная</option>
-            <option value="night">Ночная</option>
-          </select>
-        </div>
-
-        <div data-bind="component: {name: 'hrm-form-field-error'},
-              hrmSlide,
-              hrmSlideValue: control() !== null ? control().errorState : false,
-              hrmSlideDuration: 150">
-          <!-- ko text: input.shift.error() -->
-          <!-- /ko -->
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /Shift select -->
-
-      <!-- Interval select -->
-      <!-- ko let: {control: ko.observable(null)} -->
-      <div class="calculation-input__field calculation-input__interval"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control">
-
-        <div class="calculation-input__interval-controls"
-             data-bind="hrmFormFieldComplexControl: control">
-
-          <!-- ko let: {control: ko.observable(null)} -->
-          <div class="calculation-input__interval-control"
-               data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <input data-bind="value: input.interval().start,
-                          hrmTimeAutocompleter,
-                          hrmMask,
-                          hrmMaskPattern: 'datetime',
-                          hrmMaskOptions: {
-                              inputFormat: 'HH:MM',
-                              placeholder: ' '
-                          },
-                          hrmFormFieldInputControl: control,
-                          hrmFormFieldInputControlErrorStateMatcher: errorStateMatcher"
-                   placeholder="00:00">
-          </div>
-
-          <!-- /ko -->
-
-          <span class="calculation-input__interval-separator">-</span>
-
-          <!-- ko let: {control: ko.observable(null)} -->
-          <div class="calculation-input__interval-control"
-               data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <input data-bind="value: input.interval().end,
-                          hrmTimeAutocompleter,
-                          hrmMask,
-                          hrmMaskPattern: 'datetime',
-                          hrmMaskOptions: {
-                              inputFormat: 'HH:MM',
-                              placeholder: ' '
-                          },
-                          hrmFormFieldInputControl: control,
-                          hrmFormFieldInputControlErrorStateMatcher: errorStateMatcher"
-                   placeholder="00:00">
-          </div>
-          <!-- /ko -->
-
-        </div><!-- .calculation-input__interval-controls -->
-
-        <div data-bind="component: {name: 'hrm-form-field-error'},
-            hrmSlide,
-            hrmSlideValue: !inputModel.interval().correct(),
-            hrmSlideDuration: 150">
-            Некорректно задан интервал
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /Interval select -->
-    <!-- /Shift block -->
-
-
-  <div class="calculation-input__field calculation-input__actions">
-    <button class="hrm-button hrm-button--size_large hrm-basic-button hrm-accent-button calculation-input__action"
-            data-bind="click: buildCalculation, enable: inputModel.isValid">
-      Рассчитать
-    </button>
-
-    <button class="hrm-button hrm-button--size_large hrm-basic-button calculation-input__action">
-      На сейчас
-    </button>
-  </div>
-
-
-</div><!-- .calculaton-form__header -->
-
+          <div data-bind="component: {name: 'calculation-page-input-form', params: { model: $root.inputModel, onSubmit: $root.buildCalculation.bind($root) }}"></div>
           <!-- /Input table -->
 
           <!-- ko template: {
@@ -856,6 +693,337 @@
 
 <script src="assets/js/main.js"></script>
 
+  <template id="calculation-page-input-form-template">
+  <div class="calculation-input__header">
+
+    <!-- Filial select -->
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="calculation-input__field calculation-input__filial"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+      <label data-bind="hrmFormFieldLabel: label">
+        Филиал
+      </label>
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <select data-bind="value: filial,
+                  options: filialsList,
+                  optionsText: 'name',
+                  optionsValue: 'id',
+                  hrmSelect,
+                  hrmFormFieldSelectControl: control,
+                  hrmFormFieldSelectControlErrorStateMatcher: formControlErrorStateMatcher">
+        </select>
+      </div>
+
+      <div data-bind="component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150">
+        <!-- ko text: $parent.filial.error() -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /Filial select -->
+
+    <!-- Date select -->
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="calculation-input__field calculation-input__date"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+      <label data-bind="hrmFormFieldLabel: label">Расчёт на дату</label>
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <input data-bind="textInput: date,
+                      hrmDatepicker,
+                      hrmFormFieldDatepickerControl: control,
+                      hrmFormFieldDatepickerControlErrorStateMatcher: formControlErrorStateMatcher" />
+
+        <i class="hrm-form-field__suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
+      </div>
+
+      <div data-bind="component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150">
+        <!-- ko text: $parent.date.error() -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /Date select -->
+
+    <!-- Shift block -->
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="calculation-input__field"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+      <label class=""
+             data-bind="hrmFormFieldLabel: label">
+        Смена
+      </label>
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <select data-bind="value: shift,
+              options: shiftsList,
+              optionsText: 'name',
+              optionsValue: 'id',
+              hrmSelect,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: formControlErrorStateMatcher">
+        </select>
+      </div>
+
+      <div data-bind="component: {name: 'hrm-form-field-error'},
+              hrmSlide,
+              hrmSlideValue: control() !== null ? control().errorState : false,
+              hrmSlideDuration: 150">
+        <!-- ko text: $parent.shift.error() -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /Shift select -->
+
+    <!-- Interval select -->
+    <!-- ko let: {control: ko.observable(null)} -->
+    <div class="calculation-input__field calculation-input__interval"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+      <div class="calculation-input__interval-controls"
+           data-bind="hrmFormFieldComplexControl: control">
+
+        <!-- ko let: {control: ko.observable(null)} -->
+        <div class="calculation-input__interval-control"
+             data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input data-bind="value: interval.start,
+                          hrmTimeAutocompleter,
+                          hrmMask,
+                          hrmMaskPattern: 'datetime',
+                          hrmMaskOptions: {
+                              inputFormat: 'HH:MM',
+                              placeholder: ' '
+                          },
+                          hrmFormFieldInputControl: control,
+                          hrmFormFieldInputControlErrorStateMatcher: formControlErrorStateMatcher"
+                 placeholder="00:00">
+        </div>
+
+        <!-- /ko -->
+
+        <span class="calculation-input__interval-separator">-</span>
+
+        <!-- ko let: {control: ko.observable(null)} -->
+        <div class="calculation-input__interval-control"
+             data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input data-bind="value: interval.end,
+                          hrmTimeAutocompleter,
+                          hrmMask,
+                          hrmMaskPattern: 'datetime',
+                          hrmMaskOptions: {
+                              inputFormat: 'HH:MM',
+                              placeholder: ' '
+                          },
+                          hrmFormFieldInputControl: control,
+                          hrmFormFieldInputControlErrorStateMatcher: formControlErrorStateMatcher"
+                 placeholder="00:00">
+        </div>
+        <!-- /ko -->
+
+      </div><!-- .calculation-input__interval-controls -->
+
+      <div data-bind="component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: !interval.isCorrect(),
+                    hrmSlideDuration: 150">
+        <!-- ko text: 'Некорректно задан интервал' -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /Interval select -->
+    <!-- /Shift block -->
+
+
+    <div class="calculation-input__field calculation-input__actions">
+      <button class="hrm-button hrm-button--size_large hrm-basic-button hrm-accent-button calculation-input__action"
+              data-bind="click: $root.buildCalculation, enable: isValid">
+        Рассчитать
+      </button>
+
+      <button class="hrm-button hrm-button--size_large hrm-basic-button calculation-input__action">
+        На сейчас
+      </button>
+    </div>
+
+
+  </div><!-- .calculaton-form__header -->
+</template>
+
+
+<script type="text/javascript">
+  $(function () {
+    const filialsList = [
+      {
+        id: 1,
+        name: 'Филиал 1'
+      },
+      {
+        id: 2,
+        name: 'Филиал 2'
+      },
+      {
+        id: 3,
+        name: 'Филиал 12345'
+      },
+      {
+        id: 4,
+        name: 'Филиал 4'
+      },
+    ];
+
+    const shifts = [
+      {
+        id: 'day',
+        name: 'Дневная',
+        start: '11:00',
+        end: '23:00',
+      }, {
+        id: 'night',
+        name: 'Ночная',
+        start: '23:00',
+        end: '11:00'
+      }
+    ];
+
+    function getShift(value) {
+      return shifts.find(shift => shift.id === value);
+    }
+
+    function createIntervalModel(data, needCheck) {
+      const start = data.start;
+      const end = data.end;
+
+      const correct = ko.pureComputed(() => {
+        const endMoment = moment(end(), 'HH:mm');
+        const startMoment = moment(start(), 'HH:mm');
+        if (!needCheck()) return true;
+        return endMoment.isAfter(startMoment);
+      });
+
+      start.extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        hrmDate: {
+          params: 'HH:mm',
+          message: 'Неверный формат времени'
+        },
+        validation: { validator: () => correct() }
+      });
+
+      end.extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        hrmDate: {
+          params: 'HH:mm',
+          message: 'Неверный формат времени'
+        },
+        validation: { validator: () => correct() }
+      });
+
+      return {
+        start,
+        end,
+        isCorrect: correct
+      };
+    }
+
+
+    ko.components.register('calculation-page-input-form', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const model = params.model;
+
+          const filial = model.filial.extend({
+            required: {
+              message: 'Обязательное поле'
+            }
+          });
+
+          const date = model.date.extend({
+            required: {
+              message: 'Обязательное поле'
+            },
+            hrmDate: {
+              params: 'DD.MM.YYYY, dddd',
+              message: 'Неверный формат даты'
+            }
+          });
+
+          const shift = model.shift.extend({
+            required: {
+              message: 'Обязательное поле'
+            }
+          });
+          shift(shifts[0].value);
+          const needCheck = ['day'];
+          const changeShift = ko.observable(false);
+
+          const start = model.interval.start;
+          const end = model.interval.end;
+          start(shifts[0].start);
+          end(shifts[0].end);
+          const interval = createIntervalModel({
+            start: start,
+            end: end,
+          }, () => {
+            return !changeShift() && needCheck.indexOf(shift()) !== -1;
+          });
+
+          shift.subscribe((value) => {
+            changeShift(true);
+
+            const shiftData = getShift(value);
+            if (shiftData) {
+              interval.start(shiftData.start);
+              interval.end(shiftData.end);
+            }
+
+            changeShift(0);
+          });
+
+          const isValid = ko.pureComputed(() => {
+            return date.isValid() && interval.isCorrect();
+          }, this);
+
+          return {
+            filial,
+            filialsList,
+
+            date,
+
+            shift,
+            shiftsList: shifts,
+
+            interval,
+            isValid,
+
+            formControlErrorStateMatcher: function (formControl) {
+              return ko.pureComputed(() => {
+                return !formControl.isValid();
+              });
+            }
+          };
+        }
+      },
+
+      template: {
+        element: 'calculation-page-input-form-template'
+      }
+    })
+  })
+</script>
+
   <script id="employees-dropdown-template"
         type="text/html">
         <div class="hrm-dropdown-menu__item">Добавить сотрудников</div>
@@ -1331,7 +1499,7 @@
   })
 </script>
 
-  
+
   <script type="text/javascript">
   $(function () {
     /* Справочник штрафов */
@@ -1998,72 +2166,21 @@
 
       this.formControlErrorStateMatcher = function (formControl) {
         return ko.pureComputed(() => {
+
+          console.log(1, formControl, formControl())
           return !formControl.isValid();
         });
       };
 
-      /** Input data for calculation */
-      this.inputModel = (() => {
-        const getShift = (value) => {
-          const key = Object.keys(settings.shifts).find(shift => settings.shifts[shift].value === value);
-          return settings.shifts[key];
+      this.inputModel = {
+        filial: ko.observable(''),
+        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
+        shift: ko.observable(''),
+        interval: {
+          start: ko.observable(''),
+          end: ko.observable(''),
         }
-        /* Shift select is changing */
-        const changeShift = ko.observable(false);
-
-        const filial = ko.observable('').extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        });
-        const date = ko.observable(moment().format('DD.MM.YYYY, dddd')).extend({
-          required: {
-            message: 'Обязательное поле'
-          },
-          hrmDate: {
-            params: 'DD.MM.YYYY, dddd',
-            message: 'Неверный формат даты'
-          }
-        });
-        const shift = ko.observable(settings.shifts.day.value).extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        });
-
-        const interval = createIntervalModel({
-          start: settings.shifts.day.start,
-          end: settings.shifts.day.end,
-        }, () => {
-          const shiftData = getShift(shift());
-          !changeShift && shiftData.needCheck
-        });
-
-        shift.subscribe((value) => {
-          changeShift(1);
-
-          const shiftData = getShift(value);
-          if (shift) {
-            interval().start(shiftData.start);
-            interval().end(shiftData.end);
-          }
-
-          changeShift(0);
-        });
-
-        const isValid = ko.pureComputed(() => {
-          return date.isValid() && interval.isValid();
-        }, this);
-
-
-        return {
-          filial,
-          date,
-          shift,
-          interval,
-          isValid
-        }
-      })();
+      }
 
       /** Data for summary table */
       this.summaryModel = ((defaultPositions) => {
@@ -2431,23 +2548,7 @@
       },
     ];
 
-    const settings = {
-      shifts: {
-        day: {
-          value: 'day',
-          start: '11:00',
-          end: '23:00',
-          needCheck: true // start < end
-        },
-        night: {
-          value: 'night',
-          start: '23:00',
-          end: '11:00'
-        }
-      }
-    };
-
-    const viewModel = new ViewModel(positions, settings);
+    const viewModel = new ViewModel(positions);
     ko.applyBindings(
       viewModel,
       $page.get()[0]
@@ -2456,45 +2557,7 @@
 
     /*****/
 
-    function createTimeModel(defaultValue) {
-      return ko.observable(defaultValue).extend({
-        required: {
-          message: 'Обязательное поле'
-        },
-        hrmDate: {
-          params: 'HH:mm',
-          message: 'Неверный формат времени'
-        }
-      })
-    }
 
-    function createIntervalModel(data, needCheck) {
-      const model = ko.validatedObservable(null, { deep: true, live: true });
-      const start = createTimeModel(data.start);
-      const end = createTimeModel(data.end);
-
-      const correct = ko.pureComputed(() => {
-        const endMoment = moment(end(), 'HH:mm');
-        const startMoment = moment(start(), 'HH:mm');
-        if (!needCheck()) return true;
-        return endMoment.isAfter(startMoment);
-      });
-
-      start.extend({
-        validation: { validator: () => correct() }
-      });
-      end.extend({
-        validation: { validator: () => correct() }
-      });
-
-      model({
-        start,
-        end,
-        correct
-      });
-
-      return model;
-    }
 
     function createPositionModel(positionData) {
       const visible = ko.observable(false);
