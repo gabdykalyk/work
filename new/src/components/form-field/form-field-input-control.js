@@ -105,7 +105,7 @@
         }
 
         onBasicReset() {
-            this._$element.val('');
+            this._$element.val('').trigger('change');
         }
 
         onBasisMousedown() {}

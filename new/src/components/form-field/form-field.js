@@ -152,8 +152,8 @@
       this._control = control;
       this._clickHandler = null;
       this._mousedownHandler = null;
-      this._inputHandler = null;
-      this._resetHandler = null;
+      this._changeHandler = null;
+
       this._withReset = withReset;
       this._reset = null;
 
@@ -167,21 +167,15 @@
 
       if (this._withReset) {
         this._reset = $(
-          '<i class="hrm-form-field__basis-prefix hrm-form-field-icon hrm-form-field-reset-icon"></i>',
+          '<i class="hrm-form-field-icon hrm-form-field-reset-icon"></i>',
         );
-        this._reset.hide();
         this._$element.append(this._reset);
-        this._resetHandler = () => {
-            this._control().onBasicReset();
-            this._reset.hide();;
-        }
-        this._reset.click(this._resetHandler);
-
-        this._inputHandler = (event) => {
-          if (event.target.value.length) this._reset.show();
-          else this._reset.hide();
-        };
-        this._$element.on('input', this._inputHandler);
+        this._reset.hide();
+        this._reset.click(() => {
+            if ('onBasicReset' in this._control()) {
+                this._control().onBasicReset();
+            }
+        });
       }
 
       this._subscriptions.push(
@@ -222,18 +216,26 @@
         this._control().onBasisMousedown(event);
       };
 
+      this._changeHandler = (event) => {
+        if (this._reset) {
+            if (event.target.value.length) this._reset.fadeIn(250);
+            else this._reset.fadeOut(250);
+        }
+      }
+
       this._$element.on('click', this._clickHandler);
       this._$element.on('mousedown', this._mousedownHandler);
+      this._$element.on('input change', this._changeHandler);
     }
 
     dispose() {
       this._subscriptions.forEach((s) => s.dispose());
       this._$element.off('click', this._clickHandler);
       this._$element.off('mousedown', this._mousedownHandler);
+      this._$element.off('input change', this._changeHandler);
 
       if (this._reset) {
-        this._$element.off('input', this._inputHandler);
-        this._$reset.off('click', this._resetHandler);
+        this._reset.off('click');
       }
     }
   }
@@ -241,7 +243,7 @@
   ko.bindingHandlers.hrmFormFieldBasis = {
     init: function (element, valueAccessor, allBindings) {
       const control = allBindings.get('hrmFormFieldBasisControl');
-      const withReset = allBindings.has('hrmFormFieldWithReset');
+      const withReset = allBindings.has('hrmFormFieldBasisReset');
 
       const viewModel = new HrmFormFieldBasisViewModel(
         element,

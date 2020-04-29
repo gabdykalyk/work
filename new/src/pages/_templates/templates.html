@@ -42,6 +42,65 @@
                     <!-- /ko -->
                 </div>
                 <div class="templates__section">
+                    <div class="templates__section-title">Поле ввода с возможностью сброса</div>
+
+                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                    <div class="templates__form-field"
+                         data-bind="
+                            hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                        ">
+                        <label data-bind="hrmFormFieldLabel: label">Значение</label>
+
+                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisReset">
+                            <input data-bind="
+                                    textInput: $root.value1,
+                                    hrmFormFieldInputControl: control,
+                                    hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher
+                                ">
+                        </div>
+
+                        <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: control() !== null ? control().errorState : false,
+                                hrmSlideDuration: 150
+                            ">
+                            <!-- ko text: $root.value1.error() -->
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="templates__section">
+                    <div class="templates__section-title">Поле ввода с автоматическим изменением высоты</div>
+
+                    <!-- ko let: {control: ko.observable(null)} -->
+                    <div class="templates__form-field"
+                         data-bind="
+                            hrmFormField, hrmFormFieldControlRef: control
+                        ">
+
+                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisReset">
+                            <textarea data-bind="
+                                    textInput: $root.value8,
+                                    hrmFormFieldInputControl: control,
+                                    hrmFormFieldInputControlErrorStateMatcher: $root.formControlErrorStateMatcher, hrmAutoResize
+                                " placeholder="Значение"></textarea>
+                        </div>
+
+                        <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: control() !== null ? control().errorState : false,
+                                hrmSlideDuration: 150
+                            ">
+                            <!-- ko text: $root.value8.error() -->
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="templates__section">
                     <div class="templates__section-title">Поле ввода + выпадающий список</div>
 
                     <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
@@ -207,7 +266,9 @@
                         </div>
                     </div>
                     <!-- /ko -->
-                    <br><br>
+                </div>
+                <div class="templates__section">
+                    <div class="templates__section-title">Поле поиска с возможность сброса</div>
                     <!-- ko let: { term: ko.observable('') } -->
                     <div class="templates__form-field"
                          data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}">

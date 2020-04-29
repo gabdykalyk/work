@@ -196,7 +196,7 @@ ko.bindingHandlers.hrmLog = {
     }
 };
 
-ko.bindingHandlers.hrmAutoresize = {
+ko.bindingHandlers.hrmAutoResize = {
     init: function (element) {
         $(element).addClass('hrm-auto-resize').autoResize();
     },
