@@ -19,7 +19,8 @@
                                 Должности
                         </button>
 
-                        <button class="hrm-button hrm-basic-button hrm-button--size_medium" data-bind="click: $root.stimulation.set">
+                        <button class="hrm-button hrm-basic-button hrm-button--size_medium"
+                                data-bind="click: $root.stimulation.set">
                                 Штраф/премия смене
                         </button>
                         <!-- /ko -->
@@ -31,7 +32,7 @@
                         <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-badge-icon hrm-button-with-icon--theme_secondary"
                                 data-bind="click: $tab.openPositionsModal"></button>
 
-                        <button  data-bind="click: $root.stimulation.set"
+                        <button data-bind="click: $root.stimulation.set"
                                 class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary"></button>
                         <!-- /ko -->
                 </div>
@@ -53,8 +54,177 @@
                 </div>
         </div>
 
-        <!-- ko foreach: $tab.positions -->
-        <!-- <div data-bind="text: $data.name"></div>
-        <div data-bind="text: $data.visible()"></div> -->
+        <div class="hrm-table__fixed-section-container positions-table">
+                <!-- Fixed section -->
+                <!-- ko ifnot: true && $root.viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
+                <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section"
+                       data-bind="hrmTable">
+                        <thead>
+                                <tr>
+                                        <th class="calculation-summary__cell">
+                                                <div class="hrm-table__head-cell-content">Сотрудник</div>
+                                        </th>
+                                </tr>
+                        </thead>
+                        <tbody>
+
+
+
+
+                                <!-- ko foreach: { data: $tab.positions, as: 'position' } -->
+                                <!-- ko if: position.visible -->
+                                <tr class="positions-table__position">
+                                        <td data-bind="attr: {colspan: $tab.activeColumns() + 2}">
+                                                <div class="hrm-table__cell-content">
+                                                        <span data-bind="text: position.name"></span>
+                                                </div>
+                                        </td>
+                                </tr>
+                                <!-- /ko -->
+                                <!-- /ko -->
+
+                                <!-- ko if: $tab.hasOtherSection() -->
+                                <tr class="positions-table__position">
+                                        <td data-bind="attr: {colspan: $tab.activeColumns() + 2}">
+                                                <div class="hrm-table__cell-content">
+                                                        <span>Прочие</span>
+                                                </div>
+                                        </td>
+                                </tr>
+                                <!-- /ko -->
+
+
+                                <!-- Total section -->
+                                <tr class="positions-table__total">
+                                        <td></td>
+                                </tr>
+                                <!-- /Total section -->
+                        </tbody>
+                </table>
+                <!-- /ko -->
+                <!-- /Fixed section -->
+
+
+                <div data-bind="component: {
+                        name: 'hrm-scrollable-wrapper',
+                        params: { options: {left: {disabled: true}} }
+                       }">
+                        <table class="positions-table__main-table"
+                               data-bind="hrmTable">
+
+                                <colgroup>
+                                        <col class="positions-table__col--name">
+                                        <!-- ko foreach: $tab.columns -->
+                                        <col data-bind="class: 'position-table__col--' + id">
+                                        <!-- /ko -->
+                                        <col class="positions-table__col--total">
+                                        <col class="positions-table__col--payment">
+                                </colgroup>
+
+                                <thead>
+                                        <tr>
+                                                <th class="positions-table__cell">
+                                                        <div class="hrm-table__head-cell-content">Сотрудник</div>
+                                                </th>
+
+                                                <!-- ko foreach: $tab.columns -->
+                                                <th class="positions-table__cell"
+                                                    data-bind="class: 'position-table__' + id">
+                                                        <div class="hrm-table__head-cell-content">
+                                                                <span data-bind="text: title"></span>
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: fullTitle"></button>
+                                                        </div>
+                                                </th>
+                                                <!-- /ko -->
+
+                                                <th class="positions-table__cell">
+                                                        <div class="hrm-table__head-cell-content">
+                                                                <span>Всего начислено, ₽</span>
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'Всего начислено'"></button>
+                                                        </div>
+                                                </th>
+
+                                                <th class="positions-table__cell__cell">
+                                                        <div class="hrm-table__head-cell-content">
+                                                                <span>К выплате, ₽</span>
+                                                                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button"
+                                                                        data-bind="hrmTooltip, hrmTooltipText: 'К выплате'"></button>
+                                                        </div>
+                                                </th>
+                                        </tr>
+
+
+
+                                </thead>
+
+                                <tbody>
+                                        <!-- ko foreach: { data: $tab.positions, as: 'position' } -->
+                                        <!-- ko if: position.visible -->
+                                        <tr class="positions-table__position">
+                                                <td data-bind="attr: {colspan: $tab.columnCount}">
+                                                        <div class="hrm-table__cell-content">
+                                                                <span data-bind="text: position.name"></span>
+                                                        </div>
+                                                </td>
+                                        </tr>
+                                        <!-- /ko -->
+                                        <!-- /ko -->
+
+                                        <!-- ko if: $tab.hasOtherSection() -->
+                                        <tr class="positions-table__position">
+                                                <td data-bind="attr: {colspan: $tab.columnCount}">
+                                                        <div class="hrm-table__cell-content">
+                                                                <span>Прочие</span>
+                                                        </div>
+                                                </td>
+                                        </tr>
+                                        <!-- /ko -->
+
+
+                                        <!-- Total section -->
+                                        <tr class="positions-table__total">
+                                                <td class="positions-table__cell positions-table__empty">
+
+                                                </td>
+
+                                                <!-- ko foreach: $tab.columns -->
+                                                <td class="positions-table__cell"
+                                                        data-bind="css: {'positions-table__empty': !hasTotal}">
+                                                        <div class="hrm-table__cell-content">
+                                                                <span data-bind="text: total"></span>
+                                                        </div>
+                                                </td>
+                                                <!-- /ko -->
+
+                                                <td class="calculation-summary__cell positions-table__col--total">
+                                                        <div class="hrm-table__cell-content">
+                                                                <span data-bind="text: $tab.total.total"></span>
+                                                        </div>
+                                                </td>
+
+                                                <td class="calculation-summary__cell positions-table__col--payment">
+                                                        <div class="hrm-table__cell-content">
+                                                                <span data-bind="text: $tab.total.toPayment"></span>
+                                                        </div>
+                                                </td>
+                                        </tr>
+                                        <!-- /Total section -->
+
+                                </tbody>
+
+
+                        </table>
+
+                </div>
+        </div>
+
+
+
+        <!-- ko ifnot: $root.viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
+
+
+
         <!-- /ko -->
 </div>
