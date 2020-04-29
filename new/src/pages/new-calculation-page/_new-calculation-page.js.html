@@ -31,7 +31,8 @@
       /** Input data for calculation */
       this.inputModel = (() => {
         const getShift = (value) => {
-          return Object.keys(settings.shifts).find(shift => shift.value === value)
+          const key = Object.keys(settings.shifts).find(shift => settings.shifts[shift].value === value);
+          return settings.shifts[key];
         }
         /* Shift select is changing */
         const changeShift = ko.observable(false);
@@ -65,7 +66,7 @@
         });
 
         shift.subscribe((value) => {
-          changeShift = 1;
+          changeShift(1);
 
           const shiftData = getShift(value);
           if (shift) {
@@ -73,7 +74,7 @@
             interval().end(shiftData.end);
           }
 
-          changeShift = 0;
+          changeShift(0);
         });
 
         const isValid = ko.pureComputed(() => {
@@ -508,7 +509,7 @@
 
       function createPositionsModalDialog() {
         return {
-          dialogTemplateName: 'calculation-settings-positions-modal-template',
+          dialogTemplateName: 'calculation-modal calculation-settings-positions-modal-template',
           data: {
             positions,
           },
@@ -522,8 +523,6 @@
           }
         }
       }
-
-
 
       return {
         positions,
@@ -539,7 +538,7 @@
       return {
         dialogTemplateName: 'calculation-settings-stimulation-modal-template',
         options: {
-          modalClass: 'calculation-page__stimulation-modal'
+          modalClass: 'calculation-modal calculation-page__stimulation-modal'
         },
         close: result => {
           if (result !== undefined) {
@@ -553,7 +552,7 @@
       return {
         dialogTemplateName: 'calculation-settings-employee-form-modal-template',
         options: {
-          modalClass: 'calculation-page__employee-modal'
+          modalClass: 'calculation-modal calculation-page__employee-modal'
         },
         close: result => {
           if (result !== undefined) {

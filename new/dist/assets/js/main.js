@@ -212,9 +212,6 @@ ko.bindingHandlers.hrmLog = {
 ko.bindingHandlers.hrmAutoResize = {
   init: function (element) {
     $(element).addClass('hrm-auto-resize').autoResize();
-    $(element).on('change', () => {
-      $(element).autoResize();
-    })
   }
 };
 "use strict";
@@ -1580,7 +1577,7 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
   ko.bindingHandlers.hrmFormFieldBasis = {
     init: function (element, valueAccessor, allBindings) {
       const control = allBindings.get('hrmFormFieldBasisControl');
-      const withReset = allBindings.has('hrmFormFieldBasisReset');
+      const withReset = allBindings.has('hrmFormFieldBasisAllowClear');
       const viewModel = new HrmFormFieldBasisViewModel(element, control, withReset);
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         viewModel.dispose();
@@ -1796,107 +1793,107 @@ ko.components.register('hrm-form-field-error', {
                         <div class="hrm-main-sidebar__user">
                             <!--<img class="hrm-main-sidebar__avatar" src="assets/examples/avatar.jpg">-->
                             <img class="hrm-main-sidebar__avatar" src="assets/img/avatar-placeholder.png">
-
+        
                             <div class="hrm-main-sidebar__user-name">
                                 Пётр Петров
                             </div>
                         </div>
-
+        
                         <div class="hrm-main-sidebar__notifications">
                             <div class="hrm-main-sidebar__notifications-icon">
                                 <div class="hrm-main-sidebar__notifications-icon-counter">28</div>
                             </div>
                         </div>
                     </div>
-
+        
                     <ul class="nav hrm-main-sidebar__menu">
                         <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-calculations-item"
                             data-hrm-main-sidebar-drawer-content-name="calculations">
                             <span class="hrm-main-sidebar__menu-item-name">Расчёты</span>
                         </li>
-
+        
                         <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-hr-item"
                             data-hrm-main-sidebar-drawer-content-name="hr">
                             <span class="hrm-main-sidebar__menu-item-name">Кадры</span>
                         </li>
-
+        
                         <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-documents-item"
                             data-hrm-main-sidebar-drawer-content-name="documents">
                             <span class="hrm-main-sidebar__menu-item-name">Отчёты</span>
                         </li>
-
+        
                         <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-reference-item"
                             data-hrm-main-sidebar-drawer-content-name="reference">
                             <span class="hrm-main-sidebar__menu-item-name">Справочники</span>
                         </li>
-
+        
                         <li class="hrm-main-sidebar__menu-item hrm-main-sidebar__menu-contents-item"
                             data-hrm-main-sidebar-drawer-content-name="contents">
                             <span class="hrm-main-sidebar__menu-item-name">Все разделы</span>
                         </li>
                     </ul>
-
+        
                     <div class="hrm-spacer"></div>
-
+                    
                     <div class="hrm-main-sidebar__actions">
                         <a class="hrm-main-sidebar__settings-link" href="#" title="Настройки"></a>
-
+        
                         <a class="hrm-main-sidebar__support-link" href="#" title="Помощь"></a>
-
+            
                         <button class="hrm-button hrm-main-sidebar__collapse-toggle"
                                 data-bind="click: function() {_isCollapsed(!_isCollapsed());}">
                         </button>
                     </div>
                 </div>
             </div>
-
+        
             <div class="hrm-main-sidebar__drawer">
-                <div class="hrm-main-sidebar__drawer-content-wrapper"
+                <div class="hrm-main-sidebar__drawer-content-wrapper" 
                      data-bind="hrmScrollable, hrmScrollableDisabled: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth">
                     <div class="hrm-main-sidebar__drawer-content"
                          data-hrm-main-sidebar-drawer-content-name="calculations"
                          data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
                          <!-- ko template: {name: 'hrm-main-sidebar-calculations-content'} --><!-- /ko -->
                     </div>
-
+        
                     <div class="hrm-main-sidebar__drawer-content"
                          data-hrm-main-sidebar-drawer-content-name="hr"
                          data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
                          <!-- ko template: {name: 'hrm-main-sidebar-hr-content'} --><!-- /ko -->
                     </div >
-
+        
                     <div class="hrm-main-sidebar__drawer-content"
                          data-hrm-main-sidebar-drawer-content-name="documents"
                          data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
                          <!-- ko template: {name: 'hrm-main-sidebar-documents-content'} --><!-- /ko -->
                     </div>
-
+        
                     <div class="hrm-main-sidebar__drawer-content"
                          data-hrm-main-sidebar-drawer-content-name="reference"
                          data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__menu-base-drawer">
                          <!-- ko template: {name: 'hrm-main-sidebar-reference-content'} --><!-- /ko -->
                     </div>
-
+                    
                     <div class="hrm-main-sidebar__drawer-content"
                          data-hrm-main-sidebar-drawer-content-name="contents"
                          data-hrm-main-sidebar-drawer-class="hrm-main-sidebar__contents-drawer">
                          <!-- ko template: {name: 'hrm-main-sidebar-contents-content'} --><!-- /ko -->
                     </div>
-
+                    
                     <div class="hrm-main-sidebar__drawer-content"
                          data-hrm-main-sidebar-drawer-content-name="user">
                          <!-- ko template: {name: 'hrm-main-sidebar-user-content'} --><!-- /ko -->
                     </div>
-
+                    
                     <div class="hrm-main-sidebar__drawer-content"
                          data-hrm-main-sidebar-drawer-content-name="notifications">
                          <!-- ko template: {name: 'hrm-main-sidebar-notifications-content'} --><!-- /ko -->
                     </div>
                 </div>
             </div>
-
+        
             <div class="hrm-main-sidebar__backdrop"></div>
-
+            
             <script id="hrm-main-sidebar-calculations-content" type="text/html">
                 <div class="hrm-main-sidebar__submenu">
                     <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
@@ -1912,7 +1909,7 @@ ko.components.register('hrm-form-field-error', {
                     <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
                 </div>
             </script>
-
+            
             <script id="hrm-main-sidebar-hr-content" type="text/html">
                 <div class="hrm-main-sidebar__submenu">
                     <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
@@ -1928,7 +1925,7 @@ ko.components.register('hrm-form-field-error', {
                     <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
                 </div>
             </script>
-
+            
             <script id="hrm-main-sidebar-documents-content" type="text/html">
                 <div class="hrm-main-sidebar__submenu">
                     <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
@@ -1944,7 +1941,7 @@ ko.components.register('hrm-form-field-error', {
                     <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
                 </div>
             </script>
-
+            
             <script id="hrm-main-sidebar-reference-content" type="text/html">
                 <div class="hrm-main-sidebar__submenu">
                     <a class="hrm-main-sidebar__submenu-item" href="#">Сотрудники</a>
@@ -1960,20 +1957,20 @@ ko.components.register('hrm-form-field-error', {
                     <a class="hrm-main-sidebar__submenu-item" href="#">Управление уведомлениями</a>
                 </div>
             </script>
-
+            
             <script id="hrm-main-sidebar-user-content" type="text/html">
                 Пользователь
             </script>
-
+            
             <script id="hrm-main-sidebar-notifications-content" type="text/html">
                 Уведомления
             </script>
-
+            
             <script id="hrm-main-sidebar-contents-content" type="text/html">
                 <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
                     Все разделы
                 <!-- /ko -->
-
+                
                 <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
                     <div class="hrm-main-sidebar__contents">
                         <!-- ko let: {isOpen: ko.observable(false)} -->
@@ -2479,7 +2476,7 @@ ko.components.register('hrm-modal-container', {
             <div class="hrm-scrollable-wrapper__content"
                  data-bind="hrmElement: _contentElement">
                 <!-- ko template: {nodes: $componentTemplateNodes, data: _childData} --><!-- /ko -->
-
+                
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledVerticalStart() && !options.top.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
@@ -2487,7 +2484,7 @@ ko.components.register('hrm-modal-container', {
                 } -->
                     <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__top-curtain"></div>
                 <!-- /ko -->
-
+                
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledHorizontalEnd() && !options.right.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
@@ -2495,7 +2492,7 @@ ko.components.register('hrm-modal-container', {
                 } -->
                     <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__right-curtain"></div>
                 <!-- /ko -->
-
+                
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledVerticalEnd() && !options.bottom.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
@@ -2503,7 +2500,7 @@ ko.components.register('hrm-modal-container', {
                 } -->
                     <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__bottom-curtain"></div>
                 <!-- /ko -->
-
+                
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledHorizontalStart() && !options.left.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
@@ -2974,7 +2971,7 @@ ko.components.register('hrm-tab-group', {
                              ">
                         </div>
                     <!-- /ko -->
-
+                    
                     <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
                         <!-- ko if: maxFitItem() < items.length - 1 -->
                             <button class="hrm-button hrm-tab-group__more-button"
@@ -2985,7 +2982,7 @@ ko.components.register('hrm-tab-group', {
                                     ">
                                 Еще...
                             </button>
-
+                            
                             <script id="hrm-tab-group-more-button-dropdown-menu-template" type="text/html">
                                 <!-- ko foreach: items.slice(maxFitItem() + 1) -->
                                     <div class="hrm-dropdown-menu__item"
@@ -2996,7 +2993,7 @@ ko.components.register('hrm-tab-group', {
                                          ">
                                     </div>
                                 <!-- /ko -->
-                            </script>
+                            </script>   
                         <!-- /ko -->
                     <!-- /ko -->
                 <!-- /ko -->

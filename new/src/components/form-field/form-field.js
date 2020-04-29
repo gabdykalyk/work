@@ -243,7 +243,7 @@
   ko.bindingHandlers.hrmFormFieldBasis = {
     init: function (element, valueAccessor, allBindings) {
       const control = allBindings.get('hrmFormFieldBasisControl');
-      const withReset = allBindings.has('hrmFormFieldBasisReset');
+      const withReset = allBindings.has('hrmFormFieldBasisAllowClear');
 
       const viewModel = new HrmFormFieldBasisViewModel(
         element,

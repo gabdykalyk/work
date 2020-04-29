@@ -1400,7 +1400,7 @@
            hrmFormField, hrmFormFieldControlRef: control
        ">
 
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisReset">
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
           <textarea data-bind="
                    textInput: comment,
                    hrmFormFieldInputControl: control,
@@ -1435,6 +1435,29 @@
 
   <script type="text/javascript">
   $(function () {
+    const positionsTable = [
+      {
+        id: 1,
+        name: 'Администратор филиала',
+        levels: [1, 2, 3]
+      }, {
+        id: 2,
+        name: 'Повар-пиццмейкер',
+        levels: [1, 2]
+      }, {
+        id: 3,
+        name: 'Повар-сушист',
+        levels: [1, 2]
+      }, {
+        id: 4,
+        name: 'Официант',
+        levels: []
+      }, {
+        id: 5,
+        name: 'Водитель',
+        levels: []
+      }
+    ];
 
     ko.components.register('calculation-settings-employee-form-modal-dialog', {
       viewModel: {
@@ -1452,9 +1475,50 @@
           const ViewModel = function () {
             this.isSubmitted = ko.observable(false);
 
-            this.formModel = {
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                console.log(formControl, formControl())
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
 
+            this.positions = positionsTable;
+            this.levels = ko.observable([]);
+
+            this.formModel = {
+              position: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              level: ko.observable(null),
+              name: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              })
             }
+
+            window.changeOptions = () => {
+              this.positions([10,11,212,23,123])
+            }
+
+            this.validationObject = ko.validatedObservable({
+              name: this.formModel.name,
+              position: this.formModel.position,
+            });
+
+            this.formModel.position.subscribe(positionId => {
+              this.formModel.level(null);
+              if (!positionId) {
+                this.levels([]);
+                return;
+              }
+
+              const position = positionsTable.find(p => p.id === positionId);
+              if (!position) this.levels([]);
+              else this.levels(position.levels);
+            })
 
             this.cancel = function () {
               if ('cancel' in params) {
@@ -1465,8 +1529,10 @@
             this.submit = function () {
               this.isSubmitted(true);
 
-              if ('submit' in params) {
-                params.submit(true);
+              if (this.validationObject.isValid()) {
+                if ('submit' in params) {
+                  params.submit(ko.toJS(this.formModel));
+                }
               }
             };
           }
@@ -1496,6 +1562,96 @@
 
   <div class="hrm-basic-modal-dialog__body employee-form"
        data-bind="using: formModel">
+
+    <div class="employee-form__row">
+      <!-- Name field -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="employee-form__name"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">ФИО сотрудника</label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <input data-bind="
+              textInput: name,
+              hrmFormFieldInputControl: control,
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+          ">
+        </div>
+
+        <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+          <!-- ko text: $parent.name.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Name field -->
+    </div>
+
+    <div class="employee-form__row">
+      <!-- Position select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="employee-form__position"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Должность
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: position,
+              options: $component.positions,
+              optionsText: 'name',
+              optionsValue: 'id',
+              valueAllowUnset: true,
+              hrmSelect,
+              hrmSelectPlaceholder: 'Не выбрано',
+              hrmSelectSearchEnabled: true,
+              hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+          </select>
+        </div>
+
+        <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+          <!-- ko text: $parent.position.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Position select -->
+
+
+      <!-- Levels select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="employee-form__level"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Разряд
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: level,
+              disable: $component.levels().length === 0,
+              options: $component.levels,
+              hrmSelect,
+              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control">
+          </select>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Levels select -->
+    </div>
+
 
   </div>
 
@@ -1548,7 +1704,8 @@
       /** Input data for calculation */
       this.inputModel = (() => {
         const getShift = (value) => {
-          return Object.keys(settings.shifts).find(shift => shift.value === value)
+          const key = Object.keys(settings.shifts).find(shift => settings.shifts[shift].value === value);
+          return settings.shifts[key];
         }
         /* Shift select is changing */
         const changeShift = ko.observable(false);
@@ -1582,7 +1739,7 @@
         });
 
         shift.subscribe((value) => {
-          changeShift = 1;
+          changeShift(1);
 
           const shiftData = getShift(value);
           if (shift) {
@@ -1590,7 +1747,7 @@
             interval().end(shiftData.end);
           }
 
-          changeShift = 0;
+          changeShift(0);
         });
 
         const isValid = ko.pureComputed(() => {
@@ -2025,7 +2182,7 @@
 
       function createPositionsModalDialog() {
         return {
-          dialogTemplateName: 'calculation-settings-positions-modal-template',
+          dialogTemplateName: 'calculation-modal calculation-settings-positions-modal-template',
           data: {
             positions,
           },
@@ -2039,8 +2196,6 @@
           }
         }
       }
-
-
 
       return {
         positions,
@@ -2056,7 +2211,7 @@
       return {
         dialogTemplateName: 'calculation-settings-stimulation-modal-template',
         options: {
-          modalClass: 'calculation-page__stimulation-modal'
+          modalClass: 'calculation-modal calculation-page__stimulation-modal'
         },
         close: result => {
           if (result !== undefined) {
@@ -2070,7 +2225,7 @@
       return {
         dialogTemplateName: 'calculation-settings-employee-form-modal-template',
         options: {
-          modalClass: 'calculation-page__employee-modal'
+          modalClass: 'calculation-modal calculation-page__employee-modal'
         },
         close: result => {
           if (result !== undefined) {
