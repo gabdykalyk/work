@@ -742,10 +742,10 @@
 </script>
 
 <script type="text/html"
-        id="calculation-settings-fine-bonus-modal-template">
+        id="calculation-settings-stimulation-modal-template">
 
   <div data-bind="component: {
-      name: 'calculation-settings-fine-bonus-modal-dialog',
+      name: 'calculation-settings-stimulation-modal-dialog',
       params: {
         data, modalElement,
         cancel: function () { close(); },
@@ -787,7 +787,7 @@
                                 Должности
                         </button>
 
-                        <button class="hrm-button hrm-basic-button hrm-button--size_medium" data-bind="click: $tab.openFineBonusModal">
+                        <button class="hrm-button hrm-basic-button hrm-button--size_medium" data-bind="click: $root.stimulation.set">
                                 Штраф/премия смене
                         </button>
                         <!-- /ko -->
@@ -799,7 +799,7 @@
                         <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-badge-icon hrm-button-with-icon--theme_secondary"
                                 data-bind="click: $tab.openPositionsModal"></button>
 
-                        <button  data-bind="click: $tab.openFineBonusModal"
+                        <button  data-bind="click: $root.stimulation.set"
                                 class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary"></button>
                         <!-- /ko -->
                 </div>
@@ -1024,7 +1024,18 @@
 
   <script type="text/javascript">
   $(function () {
-    ko.components.register('calculation-settings-fine-bonus-modal-dialog', {
+    /* Справочник штрафов */
+    const finesTable = {
+      '0': 200,
+      '1': 300,
+      '2': 400,
+      '3': 500,
+      '4': 600,
+      '5': 700,
+      '6': 800,
+    };
+
+    ko.components.register('calculation-settings-stimulation-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
           const $element = $(componentInfo.element);
@@ -1038,6 +1049,70 @@
           ]);
 
           const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                console.log(formControl, formControl())
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            /* fine/bonus */
+            this.stimulationTypes = {
+              "FINE": 'fine',
+              "BONUS": 'bonus'
+            }
+
+            this.formModel = {
+              category: ko.observable(''),
+              stimulationType: ko.observable(this.stimulationTypes.FINE),
+              base: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              author: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              sum: ko.observable(null).extend({
+                required: {
+                  message: 'Обязательное поле'
+                },
+                number: {
+                  message: 'Некорректный формат'
+                }
+              }),
+              comment: ko.observable('').extend({
+
+              }),
+            };
+
+            this.reset = function () {
+              this.formModel.base('');
+              this.formModel.sum(0);
+              this.formModel.author('');
+              this.formModel.comment('');
+            }
+
+            this.formModel.stimulationType.subscribe(() => {
+              this.reset();
+            })
+
+            this.formModel.base.subscribe((value) => {
+              if (this.formModel.stimulationType() !== this.stimulationTypes.FINE) return;
+              if (!value) this.formModel.sum(0);
+              this.formModel.sum(finesTable[value]);
+            })
+
+            this.validationObject = ko.validatedObservable({
+              base: this.formModel.base,
+              author: this.formModel.author,
+              sum: this.formModel.sum,
+            })
+
             this.cancel = function () {
               if ('cancel' in params) {
                 params.cancel();
@@ -1045,8 +1120,10 @@
             };
 
             this.submit = function () {
+              this.isSubmitted(true);
+
               if ('submit' in params) {
-                params.submit(true);
+                params.submit(ko.toJS(this.formModel));
               }
 
             };
@@ -1056,13 +1133,13 @@
         }
       },
       template: {
-        element: document.getElementById('calculation-settings-fine-bonus-modal-dialog-template')
+        element: document.getElementById('calculation-settings-stimulation-modal-dialog-template')
       }
     });
   });
 </script>
 
-<template id="calculation-settings-fine-bonus-modal-dialog-template">
+<template id="calculation-settings-stimulation-modal-dialog-template">
 
   <button class="hrm-button hrm-basic-modal-dialog__close-button"
           data-bind="click: function() { cancel(); }"
@@ -1075,7 +1152,234 @@
     </h2>
   </div>
 
-  <div class="hrm-basic-modal-dialog__body fine-bonus-settings">
+  <div class="hrm-basic-modal-dialog__body stimulation-settings"
+       data-bind="using: formModel">
+    <div class="stimulation-settings__row">
+      <!-- Category select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__category"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Категория
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: category,
+                   hrmSelect,
+                   hrmSelectPlaceholder: 'Все', hrmSelectAllowClear: true,
+                   hrmFormFieldSelectControl: control">
+            <option></option>
+            <option value="production">Производство</option>
+            <option value="delivery">Доставка</option>
+          </select>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Category select -->
+
+
+      <!-- Type toggler -->
+      <div class="hrm-radio-group stimulation-settings__type">
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_negative">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: stimulationType"
+                 type="radio"
+                 value="fine"
+                 id="fine-radio" />
+          <label class="hrm-radio-group__radio-label"
+                 for="fine-radio">
+            Штраф
+          </label>
+        </div>
+
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_positive">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: stimulationType"
+                 type="radio"
+                 value="bonus"
+                 id="bonus-radio" />
+          <label class="hrm-radio-group__radio-label"
+                 for="bonus-radio">
+            Премия
+          </label>
+        </div>
+      </div>
+      <!-- /Type toggler -->
+    </div>
+
+
+    <div class="stimulation-settings__row">
+      <!-- Base select -->
+
+      <!-- ko if: stimulationType() === 'fine' -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div class="stimulation-settings__select stimulation-settings__base"
+            data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">
+            Основание штрафа
+          </label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <select data-bind="value: base,
+              hrmSelect,
+              hrmSelectSearchEnabled: true,
+              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+              <option></option>
+              <optgroup label="Безопасность">
+                <option value="0">Возврат в кассу</option>
+              </optgroup>
+              <optgroup label="Дисциплина">
+                <option value="1">За отсутствие объяснительной</option>
+                <option value="2">Халатное отношение к работе</option>
+              </optgroup>
+              <optgroup label="Документы">
+                <option value="3">Налог</option>
+              </optgroup>
+              <optgroup label="Производство">
+                <option value="4">Выкуп готовой продукции</option>
+                <option value="5">Порча инвентаря и оборудования</option>
+                <option value="6">Компенсация за халатность</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div data-bind="component: {name: 'hrm-form-field-error'},
+            hrmSlide,
+            hrmSlideValue: control() !== null ? control().errorState : false,
+            hrmSlideDuration: 150">
+            <!-- ko text: $parent.base.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+      <!-- /ko -->
+
+
+      <!-- ko ifnot: stimulationType() === 'fine' -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div class="stimulation-settings__select stimulation-settings__base"
+            data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">
+            Основание премии
+          </label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <select data-bind="value: base,
+              hrmSelect,
+              hrmSelectSearchEnabled: true,
+              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+              <option></option>
+              <optgroup label="Безопасность">
+                <option value="0">Возврат в кассу</option>
+              </optgroup>
+              <optgroup label="Дисциплина">
+                <option value="1">За отсутствие объяснительной</option>
+                <option value="2">Халатное отношение к работе</option>
+              </optgroup>
+              <optgroup label="Документы">
+                <option value="3">Налог</option>
+              </optgroup>
+              <optgroup label="Производство">
+                <option value="4">Выкуп готовой продукции</option>
+                <option value="5">Порча инвентаря и оборудования</option>
+                <option value="6">Компенсация за халатность</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div data-bind="component: {name: 'hrm-form-field-error'},
+            hrmSlide,
+            hrmSlideValue: control() !== null ? control().errorState : false,
+            hrmSlideDuration: 150">
+            <!-- ko text: $parent.base.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+      <!-- /ko -->
+      <!-- /Base select -->
+
+
+    </div>
+
+    <div class="stimulation-settings__row">
+      <!-- Author select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__author"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          <!-- ko text: stimulationType() === 'fine' ? 'Автор штрафа' : 'Автор премии' -->
+          <!-- /ko -->
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: author,
+            hrmSelect,
+            hrmSelectSearchEnabled: true,
+            hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+            hrmFormFieldSelectControl: control,
+            hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+            <option></option>
+            <option value="0">Иван Иванов</option>
+            <option value="1">Петр Петров</option>
+            <option value="2">Николай Николаев</option>
+            <option value="3">Дмитрий Дмитриев</option>
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+        hrmSlide,
+        hrmSlideValue: control() !== null ? control().errorState : false,
+        hrmSlideDuration: 150">
+          <!-- ko text: $parent.author.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Author select -->
+
+      <!-- Sum field -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="stimulation-settings__sum"
+           data-bind="
+           hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+       ">
+        <label data-bind="hrmFormFieldLabel: label">Сумма, ₽</label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input data-bind="
+                   attr: {readonly: stimulationType() === 'fine'},
+                   textInput: sum,
+                   hrmFormFieldInputControl: control,
+                   hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+               "
+                 type="number">
+        </div>
+
+        <div data-bind="
+               component: {name: 'hrm-form-field-error'},
+               hrmSlide,
+               hrmSlideValue: control() !== null ? control().errorState : false,
+               hrmSlideDuration: 150
+           ">
+          <!-- ko text: $parent.sum.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Sum field -->
+    </div>
+
+    <div class="stimulation-settings__row">
+
+    </div>
+
 
   </div>
 
@@ -1098,106 +1402,6 @@
   <script type="text/javascript">
   $(function () {
     const $page = $(document.documentElement);
-
-    function createTimeModel(defaultValue) {
-      return ko.observable(defaultValue).extend({
-        required: {
-          message: 'Обязательное поле'
-        },
-        hrmDate: {
-          params: 'HH:mm',
-          message: 'Неверный формат времени'
-        }
-      })
-    }
-
-    function createIntervalModel(data, needCheck) {
-      const model = ko.validatedObservable(null, { deep: true, live: true });
-      const start = createTimeModel(data.start);
-      const end = createTimeModel(data.end);
-
-      const correct = ko.pureComputed(() => {
-        const endMoment = moment(end(), 'HH:mm');
-        const startMoment = moment(start(), 'HH:mm');
-        if (!needCheck()) return true;
-        return endMoment.isAfter(startMoment);
-      });
-
-      start.extend({
-        validation: { validator: () => correct() }
-      });
-      end.extend({
-        validation: { validator: () => correct() }
-      });
-
-      model({
-        start,
-        end,
-        correct
-      });
-
-      return model;
-    }
-
-    function createPositionModel(positionData) {
-      const visible = ko.observable(true);
-      const employees = ko.observableArray(positionData.employees);
-
-      return ko.observable({
-        ...positionData,
-        employees,
-        visible
-      });
-    };
-
-
-    function PositionsModel(positions, modals) {
-
-      function createPositionsModalDialog() {
-        return {
-          dialogTemplateName: 'calculation-settings-positions-modal-template',
-          data: {
-            positions,
-          },
-          options: {
-            modalClass: 'calculation-page__positions-modal'
-          },
-          close: result => {
-            if (result !== undefined) {
-              // console.log(result)
-            }
-          }
-        }
-      }
-
-      function createFineBonusModalDialog() {
-        return {
-          dialogTemplateName: 'calculation-settings-fine-bonus-modal-template',
-          data: {
-            positions,
-          },
-          options: {
-            modalClass: 'calculation-page__fine-bonus-modal'
-          },
-          close: result => {
-            if (result !== undefined) {
-              // console.log(result)
-            }
-          }
-        }
-      }
-
-      return {
-        positions,
-        openPositionsModal: () => {
-          modals.push(createPositionsModalDialog())
-        },
-        openFineBonusModal: () => {
-          modals.push(createFineBonusModalDialog())
-        }
-      }
-
-    }
 
     const ViewModel = function (positions, settings) {
       /** Initialization */
@@ -1340,6 +1544,41 @@
           production: productionModel
         }
       })();
+
+      this.stimulation = (() => {
+        function Stimulation() {
+          return {
+            base: ko.observable(''),
+            author: ko.observable(''),
+            sum: ko.observable(0),
+            comment: ko.observable('')
+          }
+        }
+
+        const fine = {
+          production: Stimulation(),
+          delivery: Stimulation()
+        };
+        const bonus = {
+          production: Stimulation(),
+          delivery: Stimulation()
+        };
+
+        const setStimulation = () => {
+          this.modalOpens.push(createFineBonusModalDialog(
+            (data) => {
+              console.log('stimulation saved', data)
+            }
+          ))
+        }
+
+        return {
+          fine,
+          bonus,
+          set: setStimulation
+        }
+      })();
+
 
 
 
@@ -1607,6 +1846,105 @@
       viewModel,
       $page.get()[0]
     );
+
+
+
+
+    function createTimeModel(defaultValue) {
+      return ko.observable(defaultValue).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        hrmDate: {
+          params: 'HH:mm',
+          message: 'Неверный формат времени'
+        }
+      })
+    }
+
+    function createIntervalModel(data, needCheck) {
+      const model = ko.validatedObservable(null, { deep: true, live: true });
+      const start = createTimeModel(data.start);
+      const end = createTimeModel(data.end);
+
+      const correct = ko.pureComputed(() => {
+        const endMoment = moment(end(), 'HH:mm');
+        const startMoment = moment(start(), 'HH:mm');
+        if (!needCheck()) return true;
+        return endMoment.isAfter(startMoment);
+      });
+
+      start.extend({
+        validation: { validator: () => correct() }
+      });
+      end.extend({
+        validation: { validator: () => correct() }
+      });
+
+      model({
+        start,
+        end,
+        correct
+      });
+
+      return model;
+    }
+
+    function createPositionModel(positionData) {
+      const visible = ko.observable(true);
+      const employees = ko.observableArray(positionData.employees);
+
+      return ko.observable({
+        ...positionData,
+        employees,
+        visible
+      });
+    };
+
+    function PositionsModel(positions, modals) {
+
+      function createPositionsModalDialog() {
+        return {
+          dialogTemplateName: 'calculation-settings-positions-modal-template',
+          data: {
+            positions,
+          },
+          options: {
+            modalClass: 'calculation-page__positions-modal'
+          },
+          close: result => {
+            if (result !== undefined) {
+              // console.log(result)
+            }
+          }
+        }
+      }
+
+
+
+      return {
+        positions,
+        openPositionsModal: () => {
+          modals.push(createPositionsModalDialog())
+        },
+
+      }
+
+    }
+
+    function createFineBonusModalDialog(onSave) {
+      return {
+        dialogTemplateName: 'calculation-settings-stimulation-modal-template',
+        options: {
+          modalClass: 'calculation-page__stimulation-modal'
+        },
+        close: result => {
+          if (result !== undefined) {
+            onSave(result);
+          }
+        }
+      }
+    }
   });
 </script>
 

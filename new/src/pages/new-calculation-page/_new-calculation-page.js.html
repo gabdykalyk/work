@@ -2,106 +2,6 @@
   $(function () {
     const $page = $(document.documentElement);
 
-    function createTimeModel(defaultValue) {
-      return ko.observable(defaultValue).extend({
-        required: {
-          message: 'Обязательное поле'
-        },
-        hrmDate: {
-          params: 'HH:mm',
-          message: 'Неверный формат времени'
-        }
-      })
-    }
-
-    function createIntervalModel(data, needCheck) {
-      const model = ko.validatedObservable(null, { deep: true, live: true });
-      const start = createTimeModel(data.start);
-      const end = createTimeModel(data.end);
-
-      const correct = ko.pureComputed(() => {
-        const endMoment = moment(end(), 'HH:mm');
-        const startMoment = moment(start(), 'HH:mm');
-        if (!needCheck()) return true;
-        return endMoment.isAfter(startMoment);
-      });
-
-      start.extend({
-        validation: { validator: () => correct() }
-      });
-      end.extend({
-        validation: { validator: () => correct() }
-      });
-
-      model({
-        start,
-        end,
-        correct
-      });
-
-      return model;
-    }
-
-    function createPositionModel(positionData) {
-      const visible = ko.observable(true);
-      const employees = ko.observableArray(positionData.employees);
-
-      return ko.observable({
-        ...positionData,
-        employees,
-        visible
-      });
-    };
-
-
-    function PositionsModel(positions, modals) {
-
-      function createPositionsModalDialog() {
-        return {
-          dialogTemplateName: 'calculation-settings-positions-modal-template',
-          data: {
-            positions,
-          },
-          options: {
-            modalClass: 'calculation-page__positions-modal'
-          },
-          close: result => {
-            if (result !== undefined) {
-              // console.log(result)
-            }
-          }
-        }
-      }
-
-      function createFineBonusModalDialog() {
-        return {
-          dialogTemplateName: 'calculation-settings-fine-bonus-modal-template',
-          data: {
-            positions,
-          },
-          options: {
-            modalClass: 'calculation-page__fine-bonus-modal'
-          },
-          close: result => {
-            if (result !== undefined) {
-              // console.log(result)
-            }
-          }
-        }
-      }
-
-      return {
-        positions,
-        openPositionsModal: () => {
-          modals.push(createPositionsModalDialog())
-        },
-        openFineBonusModal: () => {
-          modals.push(createFineBonusModalDialog())
-        }
-      }
-
-    }
-
     const ViewModel = function (positions, settings) {
       /** Initialization */
       (() => {
@@ -243,6 +143,41 @@
           production: productionModel
         }
       })();
+
+      this.stimulation = (() => {
+        function Stimulation() {
+          return {
+            base: ko.observable(''),
+            author: ko.observable(''),
+            sum: ko.observable(0),
+            comment: ko.observable('')
+          }
+        }
+
+        const fine = {
+          production: Stimulation(),
+          delivery: Stimulation()
+        };
+        const bonus = {
+          production: Stimulation(),
+          delivery: Stimulation()
+        };
+
+        const setStimulation = () => {
+          this.modalOpens.push(createFineBonusModalDialog(
+            (data) => {
+              console.log('stimulation saved', data)
+            }
+          ))
+        }
+
+        return {
+          fine,
+          bonus,
+          set: setStimulation
+        }
+      })();
+
 
 
 
@@ -510,5 +445,104 @@
       viewModel,
       $page.get()[0]
     );
+
+
+
+
+    function createTimeModel(defaultValue) {
+      return ko.observable(defaultValue).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        hrmDate: {
+          params: 'HH:mm',
+          message: 'Неверный формат времени'
+        }
+      })
+    }
+
+    function createIntervalModel(data, needCheck) {
+      const model = ko.validatedObservable(null, { deep: true, live: true });
+      const start = createTimeModel(data.start);
+      const end = createTimeModel(data.end);
+
+      const correct = ko.pureComputed(() => {
+        const endMoment = moment(end(), 'HH:mm');
+        const startMoment = moment(start(), 'HH:mm');
+        if (!needCheck()) return true;
+        return endMoment.isAfter(startMoment);
+      });
+
+      start.extend({
+        validation: { validator: () => correct() }
+      });
+      end.extend({
+        validation: { validator: () => correct() }
+      });
+
+      model({
+        start,
+        end,
+        correct
+      });
+
+      return model;
+    }
+
+    function createPositionModel(positionData) {
+      const visible = ko.observable(true);
+      const employees = ko.observableArray(positionData.employees);
+
+      return ko.observable({
+        ...positionData,
+        employees,
+        visible
+      });
+    };
+
+    function PositionsModel(positions, modals) {
+
+      function createPositionsModalDialog() {
+        return {
+          dialogTemplateName: 'calculation-settings-positions-modal-template',
+          data: {
+            positions,
+          },
+          options: {
+            modalClass: 'calculation-page__positions-modal'
+          },
+          close: result => {
+            if (result !== undefined) {
+              // console.log(result)
+            }
+          }
+        }
+      }
+
+
+
+      return {
+        positions,
+        openPositionsModal: () => {
+          modals.push(createPositionsModalDialog())
+        },
+
+      }
+
+    }
+
+    function createFineBonusModalDialog(onSave) {
+      return {
+        dialogTemplateName: 'calculation-settings-stimulation-modal-template',
+        options: {
+          modalClass: 'calculation-page__stimulation-modal'
+        },
+        close: result => {
+          if (result !== undefined) {
+            onSave(result);
+          }
+        }
+      }
+    }
   });
 </script>
