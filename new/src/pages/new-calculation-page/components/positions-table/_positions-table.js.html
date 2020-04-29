@@ -1,0 +1,124 @@
+@@include('./_positions-table.html')
+@@include('./_positions.settings.modal.js.html')
+
+<script type="text/javascript">
+  $(function () {
+    function Column(id, title, fullTitle, total) {
+      return ko.observable({
+        id,
+        title,
+        fullTitle,
+        visible: true,
+        total,
+        hasTotal: total !== undefined
+      })
+    }
+
+    function createPositionsModalDialog(positions) {
+      return {
+        dialogTemplateName: 'calculation-settings-positions-modal-template',
+        data: {
+          positions,
+        },
+        options: {
+          modalClass: 'calculation-modal calculation-page__positions-modal'
+        }
+      }
+    }
+
+    ko.components.register('calculation-page-positions-table', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const positions = params.tab.positions;
+
+          const hasOtherSection = ko.pureComputed(() => {
+            return positions.some(p => {
+              return !p().visible();
+            });
+          });
+
+          const total = {
+            workTime: ko.pureComputed(() => {
+              return 0;
+            }),
+            salaryMain: ko.pureComputed(() => {
+              return 0;
+            }),
+            bonusExceed: ko.pureComputed(() => {
+              return 0;
+            }),
+            normalizationRatio: ko.pureComputed(() => {
+              return 0;
+            }),
+            revenueStandart: ko.pureComputed(() => {
+              return 0;
+            }),
+            bonusRatio: ko.pureComputed(() => {
+              return 0;
+            }),
+            correctedTime: ko.pureComputed(() => {
+              return 0;
+            }),
+            total: ko.pureComputed(() => {
+              return 0;
+            }),
+            toPayment: ko.pureComputed(() => {
+              return 0;
+            }),
+          }
+
+          const columns = [
+            Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
+            Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
+            Column('level', 'Разряд', 'Разряд'),
+            Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
+            Column('workTime', 'Рабочее время', 'Рабочее время', total.workTime),
+            Column('compensation', 'Компенс.', 'Компенсация'),
+            Column('workload', 'Нагрузка', 'Нагрузка'),
+            Column('salary', 'Оклад, ₽', 'Оклад'),
+            Column('salary-main', 'Осн. часть зп, ₽', 'Основная часть зарплаты', total.salaryMain),
+            Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
+            Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования', total.normalizationRatio),
+            Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки', total.revenueStandart),
+            Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования', total.bonusRatio),
+            Column('corrected-time', 'Корр. время', 'Корректированное время', total.correctedTime),
+            Column('bonus-exceed', 'Прем. за превыш. норм., ₽', 'Премия за превышение норматива', total.bonusExceed),
+            Column('depremation', 'Депр., ₽', 'Депремирование'),
+            Column('premation', 'Прем., ₽', 'Премирование'),
+            Column('fine', 'Штраф, ₽', 'Штраф'),
+          ];
+
+          const activeColumns = ko.pureComputed(() => {
+            return columns.filter(c => c().visible).length;
+          });
+
+          const columnCount = ko.pureComputed(() => {
+            return activeColumns() + 3;
+          });
+
+          const setPositions = () => {
+            params.settings.openModal(createPositionsModalDialog(positions))
+          }
+
+          return {
+            viewportSize: params.settings.viewportSize,
+            tabName: params.tabName,
+
+            columns,
+            activeColumns,
+            columnCount,
+
+            setPositions,
+
+            positions,
+            hasOtherSection,
+            total,
+          };
+        }
+      },
+      template: {
+        element: document.getElementById('calculation-page-positions-table-template')
+      }
+    });
+  })
+</script>
