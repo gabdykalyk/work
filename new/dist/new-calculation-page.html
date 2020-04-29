@@ -728,18 +728,36 @@
               </div>
 
               <script type="text/html"
-                    id="calculation-settings-positions-modal-template">
+        id="calculation-settings-positions-modal-template">
 
-                <div data-bind="component: {
-                    name: 'calculation-settings-positions-modal-dialog',
-                    params: {
-                      data, modalElement,
-                      cancel: function () { close(); },
-                      submit: function ($data) {close($data);}
-                    }}" role="document">
-                </div>
+  <div data-bind="component: {
+      name: 'calculation-settings-positions-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
 
-              </script>
+</script>
+
+<script type="text/html"
+        id="calculation-settings-fine-bonus-modal-template">
+
+  <div data-bind="component: {
+      name: 'calculation-settings-fine-bonus-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
+
+</script>
+
+
+<!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
+
 
               <!-- ko template: {
                 foreach: hrmTemplateIf(settings.activeTab() === 0, $data),
@@ -749,59 +767,64 @@
                 <div class="calculation-page__tab">
                   <!-- ko let: {'$tab': $root.settings.production, tabName: 'production'} -->
   <div class="calculation-tab calculation-production"
-data-bind="class: 'calculation-' + tabName">
-<div class="calculation-tab__settings">
-        <script id="employees-dropdown-template"
-        type="text/html">
-          <div class="hrm-dropdown-menu__item">Добавить сотрудников</div>
-         <div class="hrm-dropdown-menu__item">Новый сотрудник</div>
-        </script>
+     data-bind="class: 'calculation-' + tabName">
+        <div class="calculation-tab__settings">
+                <script id="employees-dropdown-template"
+                        type="text/html">
+                        <div class="hrm-dropdown-menu__item">Добавить сотрудников</div>
+                        <div class="hrm-dropdown-menu__item">Новый сотрудник</div>
+                </script>
 
-<div>
-<!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-<button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary"
-data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'employees-dropdown-template'">Сотрудники</button>
+                <div>
+                        <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                        <button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary"
+                                data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'employees-dropdown-template'">
+                                Сотрудники
+                        </button>
 
-<button class="hrm-button hrm-basic-button hrm-button--size_medium"
-data-bind="click: $tab.openPositionsModal">Должности</button>
+                        <button class="hrm-button hrm-basic-button hrm-button--size_medium"
+                                data-bind="click: $tab.openPositionsModal">
+                                Должности
+                        </button>
 
-<button class="hrm-button hrm-basic-button hrm-button--size_medium">Штраф/премия смене</button>
-<!-- /ko -->
+                        <button class="hrm-button hrm-basic-button hrm-button--size_medium" data-bind="click: $tab.openFineBonusModal">
+                                Штраф/премия смене
+                        </button>
+                        <!-- /ko -->
 
-<!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-<button
-class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-person-icon hrm-button-with-icon--theme_secondary"
-data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'employees-dropdown-template'"></button>
+                        <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-person-icon hrm-button-with-icon--theme_secondary"
+                                data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'employees-dropdown-template'"></button>
 
-<button
-class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-badge-icon hrm-button-with-icon--theme_secondary" data-bind="click: $tab.openPositionsModal"></button>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-badge-icon hrm-button-with-icon--theme_secondary"
+                                data-bind="click: $tab.openPositionsModal"></button>
 
-<button
-class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary"></button>
-<!-- /ko -->
-</div>
-<div>
-<button
-class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon">
-Настроить столбцы
-</button>
+                        <button  data-bind="click: $tab.openFineBonusModal"
+                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary"></button>
+                        <!-- /ko -->
+                </div>
+                <div>
+                        <button
+                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon">
+                                Настроить столбцы
+                        </button>
 
-<button
-class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon">
-Меньше информации
-</button>
+                        <button
+                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon">
+                                Меньше информации
+                        </button>
 
-<button
-class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon hrm-button-with-icon--hide_tablet">
-Больше информации
-</button>
-</div>
-</div>
+                        <button
+                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon hrm-button-with-icon--hide_tablet">
+                                Больше информации
+                        </button>
+                </div>
+        </div>
 
-<!-- ko foreach: $tab.positions -->
-<div data-bind="text: $data.name"></div>
-<div data-bind="text: $data.visible()"></div>
-<!-- /ko -->
+        <!-- ko foreach: $tab.positions -->
+        <div data-bind="text: $data.name"></div>
+        <div data-bind="text: $data.visible()"></div>
+        <!-- /ko -->
 </div>
 
 <!-- /ko -->
@@ -847,7 +870,6 @@ class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-but
       </div>
       <!-- /Page content  -->
 
-      <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
 
 
     </div>
@@ -914,12 +936,6 @@ class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-but
                                 })
                             }
                         });
-
-                        this.formControlErrorStateMatcher = function (formControl) {
-                            return ko.pureComputed(() => {
-                                return this.isSubmitted() && !formControl.isValid();
-                            });
-                        };
 
                         this.reset = function () {
                             this.term('');
@@ -1008,6 +1024,79 @@ class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-but
 
   <script type="text/javascript">
   $(function () {
+    ko.components.register('calculation-settings-fine-bonus-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              if ('submit' in params) {
+                params.submit(true);
+              }
+
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('calculation-settings-fine-bonus-modal-dialog-template')
+      }
+    });
+  });
+</script>
+
+<template id="calculation-settings-fine-bonus-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Выписать штраф/премию смене
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body fine-bonus-settings">
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>
+
+  <script type="text/javascript">
+  $(function () {
     const $page = $(document.documentElement);
 
     function createTimeModel(defaultValue) {
@@ -1050,7 +1139,7 @@ class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-but
       return model;
     }
 
-    function createPositionModel (positionData) {
+    function createPositionModel(positionData) {
       const visible = ko.observable(true);
       const employees = ko.observableArray(positionData.employees);
 
@@ -1062,11 +1151,11 @@ class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-but
     };
 
 
-    function PositionsModel(positions, settings, modals) {
+    function PositionsModel(positions, modals) {
 
       function createPositionsModalDialog() {
         return {
-          dialogTemplateName: settings.dialogTemplateName,
+          dialogTemplateName: 'calculation-settings-positions-modal-template',
           data: {
             positions,
           },
@@ -1075,7 +1164,24 @@ class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-but
           },
           close: result => {
             if (result !== undefined) {
-              console.log(result)
+              // console.log(result)
+            }
+          }
+        }
+      }
+
+      function createFineBonusModalDialog() {
+        return {
+          dialogTemplateName: 'calculation-settings-fine-bonus-modal-template',
+          data: {
+            positions,
+          },
+          options: {
+            modalClass: 'calculation-page__fine-bonus-modal'
+          },
+          close: result => {
+            if (result !== undefined) {
+              // console.log(result)
             }
           }
         }
@@ -1085,6 +1191,9 @@ class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-but
         positions,
         openPositionsModal: () => {
           modals.push(createPositionsModalDialog())
+        },
+        openFineBonusModal: () => {
+          modals.push(createFineBonusModalDialog())
         }
       }
 
@@ -1221,11 +1330,9 @@ class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-but
         const activeTab = ko.observable(0);
 
         const productionPositions = this.summaryModel.positions
-        .filter(position => position().type === 'production');
+          .filter(position => position().type === 'production');
 
-        const productionModel = new PositionsModel(productionPositions, {
-          dialogTemplateName: 'calculation-settings-positions-modal-template',
-        }, this.modalOpens);
+        const productionModel = new PositionsModel(productionPositions, this.modalOpens);
 
         return {
           tabs,

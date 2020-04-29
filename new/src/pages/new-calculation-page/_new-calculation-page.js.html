@@ -42,7 +42,7 @@
       return model;
     }
 
-    function createPositionModel (positionData) {
+    function createPositionModel(positionData) {
       const visible = ko.observable(true);
       const employees = ko.observableArray(positionData.employees);
 
@@ -54,11 +54,11 @@
     };
 
 
-    function PositionsModel(positions, settings, modals) {
+    function PositionsModel(positions, modals) {
 
       function createPositionsModalDialog() {
         return {
-          dialogTemplateName: settings.dialogTemplateName,
+          dialogTemplateName: 'calculation-settings-positions-modal-template',
           data: {
             positions,
           },
@@ -67,7 +67,24 @@
           },
           close: result => {
             if (result !== undefined) {
-              console.log(result)
+              // console.log(result)
+            }
+          }
+        }
+      }
+
+      function createFineBonusModalDialog() {
+        return {
+          dialogTemplateName: 'calculation-settings-fine-bonus-modal-template',
+          data: {
+            positions,
+          },
+          options: {
+            modalClass: 'calculation-page__fine-bonus-modal'
+          },
+          close: result => {
+            if (result !== undefined) {
+              // console.log(result)
             }
           }
         }
@@ -77,6 +94,9 @@
         positions,
         openPositionsModal: () => {
           modals.push(createPositionsModalDialog())
+        },
+        openFineBonusModal: () => {
+          modals.push(createFineBonusModalDialog())
         }
       }
 
@@ -213,11 +233,9 @@
         const activeTab = ko.observable(0);
 
         const productionPositions = this.summaryModel.positions
-        .filter(position => position().type === 'production');
+          .filter(position => position().type === 'production');
 
-        const productionModel = new PositionsModel(productionPositions, {
-          dialogTemplateName: 'calculation-settings-positions-modal-template',
-        }, this.modalOpens);
+        const productionModel = new PositionsModel(productionPositions, this.modalOpens);
 
         return {
           tabs,
