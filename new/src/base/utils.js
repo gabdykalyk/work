@@ -195,3 +195,9 @@ ko.bindingHandlers.hrmLog = {
         console.groupEnd('hrmLog');
     }
 };
+
+ko.bindingHandlers.hrmAutoresize = {
+    init: function (element) {
+        $(element).addClass('hrm-auto-resize').autoResize();
+    },
+};
