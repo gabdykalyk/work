@@ -755,6 +755,20 @@
 
 </script>
 
+<script type="text/html"
+        id="calculation-settings-employee-form-modal-template">
+
+  <div data-bind="component: {
+      name: 'calculation-settings-employee-form-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
+
+</script>
+
 
 <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
 
@@ -772,7 +786,7 @@
                 <script id="employees-dropdown-template"
                         type="text/html">
                         <div class="hrm-dropdown-menu__item">Добавить сотрудников</div>
-                        <div class="hrm-dropdown-menu__item">Новый сотрудник</div>
+                        <div class="hrm-dropdown-menu__item" data-bind="click: $root.addEmployee">Новый сотрудник</div>
                 </script>
 
                 <div>
@@ -1421,6 +1435,88 @@
 
   <script type="text/javascript">
   $(function () {
+
+    ko.components.register('calculation-settings-employee-form-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formModel = {
+
+            }
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if ('submit' in params) {
+                params.submit(true);
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('calculation-settings-employee-form-modal-dialog-template')
+      }
+    });
+  });
+</script>
+
+<template id="calculation-settings-employee-form-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Создать сотрудника
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body employee-form"
+       data-bind="using: formModel">
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>
+
+  <script type="text/javascript">
+  $(function () {
     const $page = $(document.documentElement);
 
     const ViewModel = function (positions, settings) {
@@ -1599,7 +1695,23 @@
         }
       })();
 
+      this.addEmployee = function () {
+        /*const index = Math.floor(Math.random() * 1000);
 
+        position.employees.push(this.createEmployeeModel({
+          name: position.name + ' #' + index,
+          workingIntervals: [''],
+          rate: position.rate() !== '' ? position.rate() : 600,
+          returnRate: 30,
+          salaryBulk: 7200,
+          bonus: 100,
+          fine: 20
+        }));*/
+
+        this.modalOpens.push(createEmployeeModalDialog((data) => {
+          console.log('employee saved', data);
+        }));
+      };
 
 
 
@@ -1625,19 +1737,7 @@
         employee.workingIntervals.push(this.createEmployeeWorkingIntervalModel(''));
       };
 
-      this.addEmployee = function (position) {
-        const index = Math.floor(Math.random() * 1000);
 
-        position.employees.push(this.createEmployeeModel({
-          name: position.name + ' #' + index,
-          workingIntervals: [''],
-          rate: position.rate() !== '' ? position.rate() : 600,
-          returnRate: 30,
-          salaryBulk: 7200,
-          bonus: 100,
-          fine: 20
-        }));
-      };
 
       this.onRateInput = function (position) {
         position.employees().forEach(employee => {
@@ -1957,6 +2057,20 @@
         dialogTemplateName: 'calculation-settings-stimulation-modal-template',
         options: {
           modalClass: 'calculation-page__stimulation-modal'
+        },
+        close: result => {
+          if (result !== undefined) {
+            onSave(result);
+          }
+        }
+      }
+    }
+
+    function createEmployeeModalDialog(onSave) {
+      return {
+        dialogTemplateName: 'calculation-settings-employee-form-modal-template',
+        options: {
+          modalClass: 'calculation-page__employee-modal'
         },
         close: result => {
           if (result !== undefined) {

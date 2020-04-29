@@ -178,7 +178,23 @@
         }
       })();
 
+      this.addEmployee = function () {
+        /*const index = Math.floor(Math.random() * 1000);
 
+        position.employees.push(this.createEmployeeModel({
+          name: position.name + ' #' + index,
+          workingIntervals: [''],
+          rate: position.rate() !== '' ? position.rate() : 600,
+          returnRate: 30,
+          salaryBulk: 7200,
+          bonus: 100,
+          fine: 20
+        }));*/
+
+        this.modalOpens.push(createEmployeeModalDialog((data) => {
+          console.log('employee saved', data);
+        }));
+      };
 
 
 
@@ -204,19 +220,7 @@
         employee.workingIntervals.push(this.createEmployeeWorkingIntervalModel(''));
       };
 
-      this.addEmployee = function (position) {
-        const index = Math.floor(Math.random() * 1000);
 
-        position.employees.push(this.createEmployeeModel({
-          name: position.name + ' #' + index,
-          workingIntervals: [''],
-          rate: position.rate() !== '' ? position.rate() : 600,
-          returnRate: 30,
-          salaryBulk: 7200,
-          bonus: 100,
-          fine: 20
-        }));
-      };
 
       this.onRateInput = function (position) {
         position.employees().forEach(employee => {
@@ -536,6 +540,20 @@
         dialogTemplateName: 'calculation-settings-stimulation-modal-template',
         options: {
           modalClass: 'calculation-page__stimulation-modal'
+        },
+        close: result => {
+          if (result !== undefined) {
+            onSave(result);
+          }
+        }
+      }
+    }
+
+    function createEmployeeModalDialog(onSave) {
+      return {
+        dialogTemplateName: 'calculation-settings-employee-form-modal-template',
+        options: {
+          modalClass: 'calculation-page__employee-modal'
         },
         close: result => {
           if (result !== undefined) {
