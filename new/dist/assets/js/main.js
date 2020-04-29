@@ -995,6 +995,10 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
       this._$element.focus();
     }
 
+    onBasicReset() {
+      this._$element.val('');
+    }
+
     onBasisMousedown() {}
 
     _setValue(value) {
@@ -1488,12 +1492,16 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 
 (() => {
   class HrmFormFieldBasisViewModel {
-    constructor(element, control) {
+    constructor(element, control, withReset) {
       this._subscriptions = [];
       this._$element = $(element);
       this._control = control;
       this._clickHandler = null;
       this._mousedownHandler = null;
+      this._inputHandler = null;
+      this._resetHandler = null;
+      this._withReset = withReset;
+      this._reset = null;
       this.element = element;
 
       this._init();
@@ -1501,6 +1509,30 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 
     _init() {
       this._$element.addClass('hrm-form-field__basis');
+
+      if (this._withReset) {
+        this._reset = $('<i class="hrm-form-field__basis-prefix hrm-form-field-icon hrm-form-field-reset-icon"></i>');
+
+        this._reset.hide();
+
+        this._$element.append(this._reset);
+
+        this._resetHandler = () => {
+          this._control().onBasicReset();
+
+          this._reset.hide();
+
+          ;
+        };
+
+        this._reset.click(this._resetHandler);
+
+        this._inputHandler = event => {
+          if (event.target.value.length) this._reset.show();else this._reset.hide();
+        };
+
+        this._$element.on('input', this._inputHandler);
+      }
 
       this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
         this._$element.toggleClass('hrm-form-field__basis--focused', this._control().focused());
@@ -1535,6 +1567,12 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
       this._$element.off('click', this._clickHandler);
 
       this._$element.off('mousedown', this._mousedownHandler);
+
+      if (this._reset) {
+        this._$element.off('input', this._inputHandler);
+
+        this._$reset.off('click', this._resetHandler);
+      }
     }
 
   }
@@ -1542,7 +1580,8 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
   ko.bindingHandlers.hrmFormFieldBasis = {
     init: function (element, valueAccessor, allBindings) {
       const control = allBindings.get('hrmFormFieldBasisControl');
-      const viewModel = new HrmFormFieldBasisViewModel(element, control);
+      const withReset = allBindings.has('hrmFormFieldWithReset');
+      const viewModel = new HrmFormFieldBasisViewModel(element, control, withReset);
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
         viewModel.dispose();
       });

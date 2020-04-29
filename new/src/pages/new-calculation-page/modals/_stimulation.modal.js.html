@@ -53,7 +53,7 @@
                   message: 'Обязательное поле'
                 }
               }),
-              sum: ko.observable(null).extend({
+              sum: ko.observable(0).extend({
                 required: {
                   message: 'Обязательное поле'
                 },
@@ -80,7 +80,7 @@
             this.formModel.base.subscribe((value) => {
               if (this.formModel.stimulationType() !== this.stimulationTypes.FINE) return;
               if (!value) this.formModel.sum(0);
-              this.formModel.sum(finesTable[value]);
+              this.formModel.sum(finesTable[value] || 0);
             })
 
             this.validationObject = ko.validatedObservable({
@@ -98,8 +98,10 @@
             this.submit = function () {
               this.isSubmitted(true);
 
-              if ('submit' in params) {
-                params.submit(ko.toJS(this.formModel));
+              if (this.validationObject.isValid()) {
+                if ('submit' in params) {
+                  params.submit(ko.toJS(this.formModel));
+                }
               }
 
             };
@@ -188,96 +190,96 @@
       <!-- Base select -->
 
       <!-- ko if: stimulationType() === 'fine' -->
-        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
-        <div class="stimulation-settings__select stimulation-settings__base"
-            data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-          <label data-bind="hrmFormFieldLabel: label">
-            Основание штрафа
-          </label>
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание штрафа
+        </label>
 
-          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="value: base,
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
               hrmSelect,
               hrmSelectSearchEnabled: true,
               hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
               hrmFormFieldSelectControl: control,
               hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
 
-              <option></option>
-              <optgroup label="Безопасность">
-                <option value="0">Возврат в кассу</option>
-              </optgroup>
-              <optgroup label="Дисциплина">
-                <option value="1">За отсутствие объяснительной</option>
-                <option value="2">Халатное отношение к работе</option>
-              </optgroup>
-              <optgroup label="Документы">
-                <option value="3">Налог</option>
-              </optgroup>
-              <optgroup label="Производство">
-                <option value="4">Выкуп готовой продукции</option>
-                <option value="5">Порча инвентаря и оборудования</option>
-                <option value="6">Компенсация за халатность</option>
-              </optgroup>
-            </select>
-          </div>
+            <option></option>
+            <optgroup label="Безопасность">
+              <option value="0">Возврат в кассу</option>
+            </optgroup>
+            <optgroup label="Дисциплина">
+              <option value="1">За отсутствие объяснительной</option>
+              <option value="2">Халатное отношение к работе</option>
+            </optgroup>
+            <optgroup label="Документы">
+              <option value="3">Налог</option>
+            </optgroup>
+            <optgroup label="Производство">
+              <option value="4">Выкуп готовой продукции</option>
+              <option value="5">Порча инвентаря и оборудования</option>
+              <option value="6">Компенсация за халатность</option>
+            </optgroup>
+          </select>
+        </div>
 
-          <div data-bind="component: {name: 'hrm-form-field-error'},
+        <div data-bind="component: {name: 'hrm-form-field-error'},
             hrmSlide,
             hrmSlideValue: control() !== null ? control().errorState : false,
             hrmSlideDuration: 150">
-            <!-- ko text: $parent.base.error() -->
-            <!-- /ko -->
-          </div>
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
         </div>
-        <!-- /ko -->
+      </div>
+      <!-- /ko -->
       <!-- /ko -->
 
 
       <!-- ko ifnot: stimulationType() === 'fine' -->
-        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
-        <div class="stimulation-settings__select stimulation-settings__base"
-            data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-          <label data-bind="hrmFormFieldLabel: label">
-            Основание премии
-          </label>
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание премии
+        </label>
 
-          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="value: base,
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
               hrmSelect,
               hrmSelectSearchEnabled: true,
               hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
               hrmFormFieldSelectControl: control,
               hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
 
-              <option></option>
-              <optgroup label="Безопасность">
-                <option value="0">Возврат в кассу</option>
-              </optgroup>
-              <optgroup label="Дисциплина">
-                <option value="1">За отсутствие объяснительной</option>
-                <option value="2">Халатное отношение к работе</option>
-              </optgroup>
-              <optgroup label="Документы">
-                <option value="3">Налог</option>
-              </optgroup>
-              <optgroup label="Производство">
-                <option value="4">Выкуп готовой продукции</option>
-                <option value="5">Порча инвентаря и оборудования</option>
-                <option value="6">Компенсация за халатность</option>
-              </optgroup>
-            </select>
-          </div>
+            <option></option>
+            <optgroup label="Безопасность">
+              <option value="0">Возврат в кассу</option>
+            </optgroup>
+            <optgroup label="Дисциплина">
+              <option value="1">За отсутствие объяснительной</option>
+              <option value="2">Халатное отношение к работе</option>
+            </optgroup>
+            <optgroup label="Документы">
+              <option value="3">Налог</option>
+            </optgroup>
+            <optgroup label="Производство">
+              <option value="4">Выкуп готовой продукции</option>
+              <option value="5">Порча инвентаря и оборудования</option>
+              <option value="6">Компенсация за халатность</option>
+            </optgroup>
+          </select>
+        </div>
 
-          <div data-bind="component: {name: 'hrm-form-field-error'},
+        <div data-bind="component: {name: 'hrm-form-field-error'},
             hrmSlide,
             hrmSlideValue: control() !== null ? control().errorState : false,
             hrmSlideDuration: 150">
-            <!-- ko text: $parent.base.error() -->
-            <!-- /ko -->
-          </div>
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
         </div>
-        <!-- /ko -->
+      </div>
+      <!-- /ko -->
       <!-- /ko -->
       <!-- /Base select -->
 
@@ -354,20 +356,19 @@
 
     <div class="stimulation-settings__row">
       <!-- Comment field -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <!-- ko let: {control: ko.observable(null)} -->
       <div class="stimulation-settings__comment"
            data-bind="
-           hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+           hrmFormField, hrmFormFieldControlRef: control
        ">
-        <label data-bind="hrmFormFieldLabel: label">Комментарий</label>
 
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldWithReset">
           <textarea data-bind="
-                   value: comment,
-                   textInput: sum,
+                   textInput: comment,
                    hrmFormFieldInputControl: control,
                    hrmAutoresize
-               "></textarea>
+               "
+                    placeholder="Комментарий"></textarea>
         </div>
 
       </div>

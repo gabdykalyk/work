@@ -104,6 +104,10 @@
             this._$element.focus();
         }
 
+        onBasicReset() {
+            this._$element.val('');
+        }
+
         onBasisMousedown() {}
 
         _setValue(value) {
