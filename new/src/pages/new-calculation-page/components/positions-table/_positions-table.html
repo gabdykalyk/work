@@ -1,109 +1,153 @@
+<!-- Выпадающее меню сотрудников -->
 <script id="employees-dropdown-template"
         type="text/html">
         <div class="hrm-dropdown-menu__item" data-bind="click: $root.addEmployees">Добавить сотрудников</div>
         <div class="hrm-dropdown-menu__item" data-bind="click: $root.addEmployee">Новый сотрудник</div>
 </script>
 
+<!-- Заголовок позиции в таблице -->
+<script id="position-header-template"
+        type="text/html">
+  <button data-bind="hrmTooltip, hrmTooltipText: 'Добавить сотрудников'"
+    class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-plus-icon-button hrm-circle-icon-button--theme_neutral positions-table__action">
+  </button>
+  <span data-bind="text: name"></span>
+</script>
+
+<!-- Блок сотрудника в таблице -->
+<script id="employee-block-template"
+        type="text/html">
+  <div class="employee">
+    <div class="employee__remove">
+      <button data-bind="hrmTooltip, hrmTooltipText: 'Удалить из расчета'"
+              class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary positions-table__action employe__remove-button">
+      </button>
+    </div>
+
+    <div class="employee__info">
+      <a class="employee__name"
+        href="#"
+        data-bind="text: employee.name"></a>
+      <!-- ko if: position -->
+        <div class="employee__position" data-bind="text: position"></div>
+      <!-- /ko -->
+    </div>
+
+    <div class="employee__actions">
+      <button
+              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button employee__action employee__action--documents" data-bind="hrmTooltip, hrmTooltipText: 'Есть проблемы с документами'"></button>
+      <button
+              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-down-icon-button employee__action employee__action--down" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется понижение разряда'"></button>
+      <!-- ko if: false -->
+      <button
+              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-up-icon-button employee__action employee__action--up" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется повышение разряда'"></button>
+      <!-- /ko -->
+
+    </div>
+  </div>
+</script>
+
+
 <template id="calculation-page-positions-table-template">
-  <div class="calculation-tab calculation-production"
+  <div class="calculation-tab"
        data-bind="class: 'calculation-' + tabName">
+
     <div class="calculation-tab__settings">
-
-
-      <div>
+      <div class="calculation-tab__settings-group">
         <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-        <button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary"
+        <!-- Сотрудники -->
+        <button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
                 data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'employees-dropdown-template'">
           Сотрудники
         </button>
 
-        <button class="hrm-button hrm-basic-button hrm-button--size_medium"
+        <!-- Должности -->
+        <button class="hrm-button hrm-basic-button hrm-button--size_medium  calculation-tab__settings-button calculation-tab__settings-positions"
                 data-bind="click: setPositions">
           Должности
         </button>
 
-        <button class="hrm-button hrm-basic-button hrm-button--size_medium"
+        <!-- Штраф/премия -->
+        <button class="hrm-button hrm-basic-button hrm-button--size_medium  calculation-tab__settings-button calculation-tab__settings-stimulation"
                 data-bind="click: $root.stimulation.set">
           Штраф/премия смене
         </button>
         <!-- /ko -->
 
         <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-person-icon hrm-button-with-icon--theme_secondary"
+        <!-- Сотрудники -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-person-icon hrm-button-with-icon--theme_secondary  calculation-tab__settings-button calculation-tab__settings-employees"
                 data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'employees-dropdown-template'"></button>
 
-        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-badge-icon hrm-button-with-icon--theme_secondary"
+        <!-- Должности -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-badge-icon hrm-button-with-icon--theme_secondary  calculation-tab__settings-button calculation-tab__settings-positions"
                 data-bind="click: setPositions"></button>
 
+        <!-- Штраф/премия -->
         <button data-bind="click: $root.stimulation.set"
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary"></button>
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary  calculation-tab__settings-button calculation-tab__settings-stimulation"></button>
         <!-- /ko -->
-      </div>
-      <div>
+      </div><!-- .calculation-tab__settings-group -->
+      <div class="calculation-tab__settings-group">
+        <!-- Столбцы -->
         <button
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon">
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns">
           Настроить столбцы
         </button>
 
+        <!-- Меньше информации -->
         <button
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon">
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon  calculation-tab__settings-button calculation-tab__settings-less-info">
           Меньше информации
         </button>
 
+        <!-- Больше информации -->
         <button
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon hrm-button-with-icon--hide_tablet">
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon hrm-button-with-icon--hide_tablet  calculation-tab__settings-button calculation-tab__settings-more-info">
           Больше информации
         </button>
-      </div>
-    </div>
+      </div><!-- .calculation-tab__settings-group -->
+    </div><!-- .calculation-tab__settings -->
 
     <div class="hrm-table__fixed-section-container positions-table">
       <!-- Fixed section -->
       <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
-      <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section"
-             data-bind="hrmTable">
+      <table data-bind="hrmTable"
+             class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section">
         <thead>
-          <tr>
-            <th class="calculation-summary__cell">
-              <div class="hrm-table__head-cell-content">Сотрудник</div>
+          <tr class="positions-table__row positions-table__head-row">
+            <th class="positions-table__cell positions-table__head-cell">
+              <div class="positions-table__cell-content">Сотрудник</div>
             </th>
           </tr>
-
-
-
         </thead>
         <tbody>
-
           <!-- ko foreach: { data: positions, as: 'position' } -->
+
+          <!-- Блок позиции -->
           <!-- ko if: position.visible -->
-          <tr class="positions-table__position">
-            <td>
-              <div class="hrm-table__cell-content">
-                <button title="Добавить сотрудников"
-                        class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-plus-icon-button hrm-circle-icon-button--theme_neutral">
-                </button>
-                <span data-bind="text: position.name"></span>
+          <!-- Заголовок позиции -->
+          <tr class="positions-table__row postions-table__row-highlighted positions-table__section-header">
+            <td class="positions-table__cell positions-table__position-title">
+              <div class="positions-table__cell-content">
+                <div data-bind="template: {name: 'position-header-template', data: position}"></div>
               </div>
             </td>
           </tr>
+          <!-- /Заголовок позиции -->
+
+          <!-- Список сотрудников по позиции -->
           <!-- ko foreach: { data: position.employees, as: 'employee' } -->
           <!-- ko if: employee.visible -->
-          <tr>
-            <td>
-              <div class="hrm-table__cell-content">
-                <div class="positions-table__employee"><button title="Удалить из расчета"
-                          class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary">
-                  </button>
-                  <a href="#"
-                     class="positions-table__employee-name"
-                     data-bind="text: employee.name"></a>
-                  <div class="positions-table__employee-actions">
-                    <button
-                            class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button "></button>
-                    <button
-                            class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-down-icon-button"></button>
-                  </div>
+          <tr class="positions-table__row">
+            <td class="positions-table__cell">
+              <div class="positions-table__cell-content">
+
+                <!-- Данные сотрудника -->
+                <div
+                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, position: false} }">
                 </div>
+                <!-- /Данные сотрудника -->
 
               </div>
 
@@ -111,42 +155,36 @@
           </tr>
           <!-- /ko -->
           <!-- /ko -->
+          <!-- /Список сотрудников по позиции -->
           <!-- /ko -->
+          <!-- /Блок позиции -->
+
           <!-- /ko -->
 
+          <!-- Блок Прочее -->
           <!-- ko if: hasOtherSection -->
-          <tr class="positions-table__position">
-            <td>
-              <div class="hrm-table__cell-content">
-                <span>Прочие</span>
+          <tr class="positions-table__row positions-table__row-highlighted positions-table__section-header">
+            <td class="positions-table__cell positions-table__position-title">
+              <div class="positions-table__cell-content">
+                <div data-bind="template: {name: 'position-header-template', data: {name: 'Прочее'}}"></div>
               </div>
             </td>
           </tr>
 
-
+          <!-- Список сотрудников по остальным позициям -->
           <!-- ko foreach: { data: positions, as: 'position' } -->
           <!-- ko ifnot: position.visible -->
           <!-- ko foreach: { data: position.employees, as: 'employee' } -->
           <!-- ko if: employee.visible -->
-          <tr>
-            <td>
-              <div class="hrm-table__cell-content">
-                <div class="positions-table__employee"><button title="Удалить из расчета"
-                          class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary">
-                  </button>
+          <tr class="positions-table__row">
+            <td class="positions-table__cell">
+              <div class="positions-table__cell-content">
 
-                  <div class="positions-table__employee-name">
-                    <a href="#"
-                       data-bind="text: employee.name"></a>
-                    <div data-bind="text: position.name"></div>
-                  </div>
-                  <div class="positions-table__employee-actions">
-                    <button
-                            class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button "></button>
-                    <button
-                            class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-down-icon-button"></button>
-                  </div>
+                <!-- Данные сотрудника -->
+                <div
+                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, position: position.name} }">
                 </div>
+                <!-- /Данные сотрудника -->
 
               </div>
             </td>
@@ -155,12 +193,16 @@
           <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
+          <!-- /Список сотрудников по остальным позициям -->
           <!-- /ko -->
+          <!-- /Блок Прочее -->
 
 
           <!-- Total section -->
-          <tr class="positions-table__total">
-            <td></td>
+          <tr class="positions-table__row positions-table__row-highlighted positions-table__total">
+            <td class="positions-table__cell">
+              <div class="positions-table__cell-content"></div>
+            </td>
           </tr>
           <!-- /Total section -->
         </tbody>
@@ -169,51 +211,49 @@
       <!-- /Fixed section -->
 
 
-      <div data-bind="component: {
-                        name: 'hrm-scrollable-wrapper',
-                        params: { options: {left: {disabled: true}} }
-                       }">
-        <table class="positions-table__main-table"
-               data-bind="hrmTable">
+      <div data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}">
+        <table data-bind="hrmTable"
+               class="positions-table__main-table">
 
           <colgroup>
-            <col class="positions-table__col--name">
+            <col class="positions-table__col positions-table__col--name">
             <!-- ko foreach: columns -->
-            <col data-bind="class: 'position-table__col--' + id">
+            <col class="positions-table__col"
+                 data-bind="class: 'position-table__col--' + id">
             <!-- /ko -->
-            <col class="positions-table__col--total">
-            <col class="positions-table__col--payment">
+            <col class="positions-table__col positions-table__col--total">
+            <col class="positions-table__col positions-table__col--payment">
           </colgroup>
 
           <thead>
-            <tr>
-              <th class="positions-table__cell">
-                <div class="hrm-table__head-cell-content">Сотрудник</div>
+            <tr class="positions-table__row positions-table__head-row">
+              <th class="positions-table__cell positions-table__head-cell positions-table__cell--name">
+                <div class="positions-table__cell-content">Сотрудник</div>
               </th>
 
               <!-- ko foreach: columns -->
-              <th class="positions-table__cell"
-                  data-bind="class: 'positions-table__' + id">
-                <div class="hrm-table__head-cell-content">
+              <th class="positions-table__cell positions-table__head-cell"
+                  data-bind="class: 'positions-table__cell--' + id">
+                <div class="positions-table__cell-content">
                   <span data-bind="text: title"></span>
-                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button"
+                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                           data-bind="hrmTooltip, hrmTooltipText: fullTitle"></button>
                 </div>
               </th>
               <!-- /ko -->
 
-              <th class="positions-table__cell positions-table__col--total">
-                <div class="hrm-table__head-cell-content">
+              <th class="positions-table__cell positions-table__head-cell positions-table__cell--total positions-table__cell--colored">
+                <div class="positions-table__cell-content">
                   <span>Всего начислено, ₽</span>
-                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button"
+                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                           data-bind="hrmTooltip, hrmTooltipText: 'Всего начислено'"></button>
                 </div>
               </th>
 
-              <th class="positions-table__cell__cell positions-table__col--payment">
-                <div class="hrm-table__head-cell-content">
+              <th class="positions-table__cell positions-table__head-cell positions-table__cell--payment positions-table__cell--colored">
+                <div class="positions-table__cell-content">
                   <span>К выплате, ₽</span>
-                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button"
+                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                           data-bind="hrmTooltip, hrmTooltipText: 'К выплате'"></button>
                 </div>
               </th>
@@ -221,62 +261,62 @@
           </thead>
 
           <tbody>
-            <!-- ko foreach: { data:positions, as: 'position' } -->
+            <!-- Блок позиции -->
+            <!-- ko foreach: { data: positions, as: 'position' } -->
+            <!-- Название позиции -->
             <!-- ko if: position.visible -->
-            <tr class="positions-table__position">
-              <td data-bind="attr: {colspan: $parent.columnCount}">
+            <tr class="positions-table__row positions-table__row-highlighted positions-table__section-header">
+              <td class="positions-table__cell positions-table__position-title"
+                  data-bind="attr: {colspan: $parent.columnCount}">
 
-                <div class="hrm-table__cell-content">
-
-                  <button title="Добавить сотрудников"
-                          class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-plus-icon-button hrm-circle-icon-button--theme_neutral">
-                  </button>
-                  <span data-bind="text: position.name"></span>
+                <div class="positions-table__cell-content">
+                  <div data-bind="template: {name: 'position-header-template', data: position}"></div>
                 </div>
               </td>
             </tr>
+            <!-- /Название позиции -->
 
-
+            <!-- Список сотрудников по позиции -->
             <!-- ko foreach: position.employees -->
             <!-- ko if: $data.visible -->
-            <tr data-bind="hrm">
-              <td>
-                <div class="hrm-table__cell-content">
-                  <div class="positions-table__employee"><button title="Удалить из расчета"
-                            class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary">
-                    </button>
-                    <a href="#"
-                       class="positions-table__employee-name"
-                       data-bind="text: $data.name"></a>
-                    <div class="positions-table__employee-actions">
-                      <button
-                              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button "></button>
-                      <button
-                              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-down-icon-button"></button>
-                    </div>
+            <tr class="positions-table__row">
+              <td class="positions-table__cell positions-table__cell--name">
+                <div class="positions-table__cell-content">
+
+                  <!-- Данные сотрудника -->
+                  <div
+                       data-bind="template: { name: 'employee-block-template', data: {employee: $data, position: false} }">
                   </div>
+                  <!-- /Данные сотрудника -->
+
+
 
                 </div>
               </td>
 
               <!-- ko foreach: $parent.columns -->
-              <td></td>
+              <td class="positions-table__cell"
+                  data-bind="class: 'positions-table__cell--' + id"></td>
               <!-- /ko -->
 
-              <td></td>
-              <td></td>
+              <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
+              <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
             </tr>
             <!-- /ko -->
             <!-- /ko -->
+            <!-- Список сотрудников по позиции -->
 
             <!-- /ko -->
             <!-- /ko -->
+            <!-- /Блок позиции -->
 
+            <!-- Блок Прочее -->
             <!-- ko if: hasOtherSection() -->
-            <tr class="positions-table__position">
-              <td data-bind="attr: {colspan: columnCount}">
-                <div class="hrm-table__cell-content">
-                  <span>Прочие</span>
+            <tr class="positions-table__row positions-table__row-highlighted positions-table__section-header">
+              <td class="positions-table__cell  positions-table__position-title"
+                  data-bind="attr: {colspan: columnCount}">
+                <div class="positions-table__cell-content">
+                  <div data-bind="template: {name: 'position-header-template', data: {name: 'Прочее'}}"></div>
                 </div>
               </td>
             </tr>
@@ -285,35 +325,27 @@
             <!-- ko ifnot: position.visible -->
             <!-- ko foreach: { data: position.employees, as: 'employee' } -->
             <!-- ko if: employee.visible -->
-            <tr class="">
-              <td>
-                <div class="hrm-table__cell-content">
-                  <div class="positions-table__employee"><button title="Удалить из расчета"
-                            class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary">
-                    </button>
-                    <div class="positions-table__employee-name">
-                      <a href="#"
-                         data-bind="text: employee.name"></a>
-                      <div data-bind="text: position.name"></div>
-                    </div>
-                    <div class="positions-table__employee-actions">
-                      <button
-                              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button "></button>
-                      <button
-                              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-down-icon-button"></button>
-                    </div>
+            <tr class="positions-table__row">
+              <td class="positions-table__cell  positions-table__cell--name">
+                <div class="positions-table__cell-content">
+
+                  <!-- Данные сотрудника -->
+                  <div
+                       data-bind="template: { name: 'employee-block-template', data: {employee: $data, position: position.name} }">
                   </div>
+                  <!-- /Данные сотрудника -->
 
                 </div>
               </td>
 
 
               <!-- ko foreach: $parents[3].columns -->
-              <td></td>
+              <td class="positions-table__cell"
+                  data-bind="class: 'positions-table__cell--' + id"></td>
               <!-- /ko -->
 
-              <td></td>
-              <td></td>
+              <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
+              <td class="positions-table__cell positions-table__cell--payment positions-table__cell--colored"></td>
 
             </tr>
             <!-- /ko -->
@@ -321,42 +353,37 @@
             <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
-
-
-
+            <!-- /Блок Прочее -->
 
             <!-- Total section -->
-            <tr class="positions-table__total">
-              <td class="positions-table__cell positions-table__empty">
+            <tr class="positions-table__row positions-table__row-highlighted positions-table__total">
+              <td class="positions-table__cell  positions-table__cell--name positions-table__empty">
 
               </td>
 
               <!-- ko foreach: columns -->
               <td class="positions-table__cell"
-                  data-bind="css: {'positions-table__empty': !hasTotal}">
-                <div class="hrm-table__cell-content">
+                  data-bind="class: 'positions-table__cell--' + id, css: {'positions-table__cell--empty': !hasTotal}">
+                <div class="positions-table__cell-content">
                   <span data-bind="text: total"></span>
                 </div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell positions-table__col--total">
-                <div class="hrm-table__cell-content">
+              <td class="positions-table__cell positions-table__cell--total positions-table__cell--colored">
+                <div class="positions-table__cell-content">
                   <span data-bind="text: total.total"></span>
                 </div>
               </td>
 
-              <td class="calculation-summary__cell positions-table__col--payment">
-                <div class="hrm-table__cell-content">
+              <td class="positions-table__cell positions-table__cell--payment positions-table__cell--colored">
+                <div class="positions-table__cell-content">
                   <span data-bind="text: total.toPayment"></span>
                 </div>
               </td>
             </tr>
             <!-- /Total section -->
-
           </tbody>
-
-
         </table>
 
       </div>
