@@ -21,36 +21,10 @@
         }
       })();
 
-
-
       this.summaryModel = (() => {
         const positions = ko.observableArray([]);
-
-        const total = ko.pureComputed(() => {
-          return positions().reduce((acc, p) => {
-            p = p();
-            return {
-              name: '',
-              workload: (acc.workload || 0) + p.workload,
-              workloadType: '',
-              units: '',
-              additionalWorkload: '',
-              fotCategory: 100,
-              fotRevenue: 100,
-              performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
-              employees: (acc.employees || 0) + p.employees().length
-            }
-          }, {})
-        });
-
         return {
           positions,
-          total
         }
       })();
       this.updateSummary = (positionsList) => {
@@ -60,16 +34,6 @@
         this.summaryModel.positions(positions);
       }
       this.updateSummary(defaultPositions);
-
-      /** Calculation created */
-      this.isBuilt = ko.observable(false);
-
-
-      this.formControlErrorStateMatcher = function (formControl) {
-        return ko.pureComputed(() => {
-          return !formControl.isValid();
-        });
-      };
 
       this.inputModel = {
         filial: ko.observable(''),
@@ -81,6 +45,8 @@
         }
       };
 
+      /** Calculation created */
+      this.isBuilt = ko.observable(false);
       /** Получение данных для расчета */
       this.buildCalculation = () => {
         /** Данные */

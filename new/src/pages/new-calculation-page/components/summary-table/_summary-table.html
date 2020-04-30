@@ -1,0 +1,292 @@
+<script type="text/html"
+        id="lateness-template">
+<div class="lateness">
+  <div class="lateness__cell"></div>
+  <div class="lateness__cell"></div>
+  <div class="lateness__cell"></div>
+  <div class="lateness__cell"></div>
+</div>
+</script>
+
+<template id="calculation-page-summary-table-template">
+
+  <div class="calculation-summary"
+       data-bind="let: {table: $component}">
+
+    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+    <div data-bind="component: {
+      name: 'hrm-scrollable-wrapper',
+      params: { options: {left: {disabled: true}} }
+     }">
+      <table class="calculation-summary__table calculation-summary__desktop"
+             data-bind="hrmTable">
+
+        <thead>
+          <tr class="calculation-summary__row">
+            <!-- ko foreach: { data: table.columns, as: 'column' } -->
+            <th class="calculation-summary__cell calculation-summary__head-cell"
+                data-bind="class: 'calculation-summary__cell--' + column.id">
+              <div class="calculation-summary__cell-content">
+                <span data-bind="text: column.title"></span>
+                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button  calculation-summary__info-icon"
+                        data-bind="hrmTooltip, hrmTooltipText: column.fullTitle"></button>
+              </div>
+            </th>
+            <!-- /ko -->
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- ko foreach: table.positions -->
+          <!-- ko template: {name: 'position-row-template', data: {position: $data}} -->
+          <!-- /ko -->
+          <!-- /ko -->
+
+          <tr class="calculation-summary__row calculation-summary__row--total">
+            <!-- ko foreach: { data: table.columns, as: 'column' } -->
+            <td class="calculation-summary__cell"
+                data-bind="css: {'calculation-summary__cell--empty': !column.hasTotal }">
+              <!-- ko if: column.hasTotal -->
+              <div class="calculation-summary__cell-content"
+                   data-bind="text: column.total">
+              </div>
+              <!-- /ko -->
+            </td>
+            <!-- /ko -->
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+    <div class="hrm-table__fixed-section-container">
+
+      <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left calculation-summary__table calculation-summary__fixed"
+             data-bind="hrmTable">
+        <tbody>
+          <!-- ko foreach: { data: table.columns, as: 'column' } -->
+          <tr class="calculation-form__row">
+            <th class="calculation-summary__cell calculation-summary__head-cell"
+                data-bind="class: 'calculation-summary__cell--' + column.id">
+              <div class="calculation-summary__cell-content"
+                   data-bind="text: column.title"></div>
+            </th>
+          </tr>
+          <!-- /ko -->
+        </tbody>
+      </table>
+
+
+      <div data-bind="component: {
+                     name: 'hrm-scrollable-wrapper',
+                     params: { options: {left: {disabled: true}} }
+                    }">
+        <table class=" calculation-summary__table calculation-summary__mobile"
+               data-bind="hrmTable">
+          <tbody>
+            <tr class="calculation-summary__row calculation-summary__row--job">
+              <th class="calculation-summary__cell calculation-summary__head-cell calculation-summary__cell--job">
+                <div class="calculation-summary__cell-content">
+                  Должность
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--job">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: name"></div>
+              </td>
+              <!-- /ko -->
+
+              <td class="calculation-summary__cell  calculation-summary__cell--job calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content">Итого</div>
+              </td>
+            </tr>
+
+            <tr class="calculation-summary__row calculation-summary__row--workload-type">
+              <th
+                  class="calculation-summary__cell calculation-summary__head-cell calculation-summary__cell--workload-type">
+                <div class="calculation-summary__cell-content">
+                  Тип нагрузки
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--workload-type">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: workloadType"></div>
+              </td>
+              <!-- /ko -->
+
+              <td
+                  class="calculation-summary__cell calculation-summary__cell--workload-type  calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.total().workloadType"></div>
+              </td>
+            </tr>
+
+            <tr class="calculation-summary__row calculation-summary__row--workload">
+              <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--workload">
+                <div class="calculation-summary__cell-content">
+                  Нагрузка
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--workload">
+                <div class="position-workload">
+
+                  <div class="position-workload__value"
+                       data-bind="text: workload"></div>
+                  <div class="position-workload__units"
+                       data-bind="text: units"></div>
+
+                </div>
+              </td>
+              <!-- /ko -->
+
+              <td
+                  class="calculation-summary__cell calculation-summary__cell--workload  calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.total().workload"></div>
+              </td>
+            </tr>
+
+            <tr class="calculation-summary__row calculation-summary__row--additional-workload">
+              <th
+                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--additional-wokload">
+                <div class="calculation-summary__cell-content">
+                  Доп. нагрузка
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--additional-wokload">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: additionalWorkload"></div>
+              </td>
+              <!-- /ko -->
+
+              <td
+                  class="calculation-summary__cell calculation-summary__cell--additional-wokload  calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.total().additionalWorkload"></div>
+              </td>
+            </tr>
+
+            <tr class="calculation-summary__row calculation-summary__row--count">
+              <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--count">
+                <div class="calculation-summary__cell-content">
+                  Сотрудники
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--count">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: employees.length"></div>
+              </td>
+              <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--count  calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.total().employees.length"></div>
+              </td>
+            </tr>
+
+            <tr class="calculation-summary__row calculation-summary__row--fot-category">
+              <th
+                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--fot-category">
+                <div class="calculation-summary__cell-content">
+                  ФОТ, % в категории
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--fot-category">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: fotCategory"></div>
+              </td>
+              <!-- /ko -->
+
+              <td
+                  class="calculation-summary__cell  calculation-summary__cell--fot-category calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.total().fotCategory"></div>
+              </td>
+            </tr>
+
+            <tr class="calculation-summary__row calculation-summary__row--fot-revenue">
+              <th
+                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--fot-revenue">
+                <div class="calculation-summary__cell-content">
+                  ФОТ, % от выручки
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: fotRevenue"></div>
+              </td>
+              <!-- /ko -->
+
+              <td
+                  class="calculation-summary__cell calculation-summary__cell--fot-revenue  calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.total().fotRevenue"></div>
+              </td>
+            </tr>
+
+            <tr class="calculation-summary__row calculation-summary__row--performance-standart">
+              <th
+                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--performance-standart">
+                <div class="calculation-summary__cell-content">
+                  Норм. выр-ки, %
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: fotRevenue"></div>
+              </td>
+              <!-- /ko -->
+
+              <td
+                  class="calculation-summary__cell calculation-summary__cell--performance-standart  calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.total().performanceStandart"></div>
+              </td>
+            </tr>
+
+            <tr class="calculation-summary__row calculation-summary__row--lateness">
+              <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--lateness">
+                <div class="calculation-summary__cell-content">
+                  Опоздания
+                </div>
+              </th>
+
+              <!-- ko foreach: table.positions -->
+              <td class="calculation-summary__cell calculation-summary__cell--lateness">
+                <!-- ko template: { name: 'lateness-template', data: {lateness: $data.lateness} } -->
+                <!-- /ko -->
+              </td>
+              <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--lateness   calculation-summary__cell--total">
+                <div class="calculation-summary__cell-content">
+                  <!-- ko template: { name: 'lateness-template', data: {lateness: $data.lateness} } -->
+                  <!-- /ko -->
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- /ko -->
+  </div>
+</template>
