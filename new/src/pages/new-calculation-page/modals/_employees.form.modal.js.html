@@ -240,31 +240,27 @@
       } -->
       <!-- ko if: activePosition -->
       <!-- Вкладка позиции -->
-
       <div class="employees-form__employees-scrollable-list"
            data-bind="hrmScrollable">
-        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-        <div class="employees-form__checkbox-group">
+
+        <!-- ko foreach: {data: $parent.activePosition().employees, as: 'employee'} -->
+        <div class="employees-form__checkbox"
+             data-bind="if: $data.visible">
+
+          <!-- ko let: {checkboxGroup: ko.observable(null)} -->
           <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-
-            <!-- ko foreach: $parent.activePosition().employees -->
-            <div class="employees-form__checkbox"
-                 data-bind="if: $data.visible">
-              <div
-                   data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: $data.checked }}">
-              </div>
-              <label
-                     data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: $data.name"></label>
-
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
             </div>
-
-            <!-- /ko -->
-
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
           </div>
+          <!-- /ko -->
+
         </div>
         <!-- /ko -->
-      </div>
 
+      </div>
       <!-- /Вкладка позиции -->
       <!-- /ko -->
 
@@ -284,17 +280,29 @@
                  data-bind="if: hasVisibleEmployees">
               <div class="employees-form__position-name"
                    data-bind="text: $data.name"></div>
-              <!-- ko foreach: $data.employees -->
+
+
+              <!-- ko foreach: {data: $data.employees, as: 'employee'} -->
               <div class="employees-form__checkbox"
                    data-bind="if: $data.visible">
-                <div
-                     data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: $data.checked }}">
-                </div>
-                <label
-                       data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: $data.name"></label>
-              </div>
 
+                <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+                <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+                  <div
+                       data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
+                  </div>
+                  <label
+                         data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
+                </div>
+                <!-- /ko -->
+
+
+              </div>
               <!-- /ko -->
+
+
+
+
             </div>
             <!-- /ko -->
 
