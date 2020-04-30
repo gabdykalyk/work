@@ -1,4 +1,5 @@
 @@include('./_positions-table.html')
+@@include('./_positions.settings.modal.html')
 @@include('./_positions.settings.modal.js.html')
 
 <script type="text/javascript">
@@ -29,15 +30,17 @@
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-
           const positions = params.tab.positions;
 
+          /** Наличие неактивных позиций - для секции Прочее */
           const hasOtherSection = ko.pureComputed(() => {
             return positions().some(p => {
+              console.log(!p().visible())
               return !p().visible();
             });
           });
 
+          /** Итого: вычисляемые значения - последний ряд таблицы */
           const total = {
             workTime: ko.pureComputed(() => {
               return 0;
@@ -68,6 +71,7 @@
             }),
           }
 
+          /* Настраиваемые колонки таблицы */
           const columns = [
             Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
@@ -88,17 +92,16 @@
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
           ];
-
           const activeColumns = ko.pureComputed(() => {
             return columns.filter(c => c().visible).length;
           });
 
-          
-
+          /** Общее количество колонок (для растягивания заголовков) */
           const columnCount = ko.pureComputed(() => {
             return activeColumns() + 3;
           });
 
+          /** Установить видимость позиций (модальное окно) */
           const setPositions = () => {
             params.settings.openModal(createPositionsModalDialog(positions))
           }

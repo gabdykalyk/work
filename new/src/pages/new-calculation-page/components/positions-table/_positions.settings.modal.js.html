@@ -4,7 +4,6 @@
             viewModel: {
                 createViewModel: function (params, componentInfo) {
                     const $element = $(componentInfo.element);
-
                     $element.addClass([
                         'modal-dialog',
                         'modal-dialog-centered',
@@ -14,28 +13,34 @@
                     ]);
 
                     return new (function () {
-                        this.term = ko.observable('');
-
+                        /** Positions model */
                         this.positions = params.data.positions().map((p) => {
                             const positionData = p();
                             return {
                                 name: positionData.name,
                                 checked: ko.observable(positionData.visible()),
                                 position: p,
-                                visible: ko.pureComputed(() => {
-                                    const term = this.term();
-
-                                    if (!term || term.length < 2) return true;
-
-                                    const formattedTerm = term.toLowerCase();
-                                    const formattedName = positionData.name.toLowerCase();
-                                    return formattedName.indexOf(formattedTerm) !== -1;
-
-
-                                })
+                                visible: ko.observable(true)
                             }
                         });
 
+                        /** Поисковый запрос */
+                        this.term = ko.observable('');
+                        /** Скрыть/Показать позиции в списке */
+                        this.term.subscribe(value => {
+                            const formattedTerm = value.toLowerCase();
+
+                            this.positions.forEach(p => {
+                                let isVisible = true;
+                                if (formattedTerm.length >= 2) {
+                                    const formattedName = p.name.toLowerCase();
+                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
+                                }
+                                p.visible(isVisible);
+                            })
+                        });
+
+                        /** Сбросить все чекбоксы и поисковый запрос */
                         this.reset = function () {
                             this.term('');
                             this.positions.forEach(p => {
@@ -43,20 +48,25 @@
                             });
                         }
 
+                        /** Закрыть окно без изменений */
                         this.cancel = function () {
                             if ('cancel' in params) {
                                 params.cancel();
                             }
                         };
 
+                        /** Применить изменения */
+                        this.apply = function() {
+                            this.positions.forEach(p => {
+                                p.position().visible(p.checked());
+                            });
+                        }
+
                         this.submit = function () {
                             if ('submit' in params) {
-                                this.positions.forEach(p => {
-                                    p.position().visible(p.checked());
-                                });
+                                this.apply();
                                 params.submit(true);
                             }
-
                         };
                     });
                 }
@@ -67,56 +77,3 @@
         });
     });
 </script>
-
-<template id="calculation-settings-positions-modal-dialog-template">
-
-    <button class="hrm-button hrm-basic-modal-dialog__close-button"
-            data-bind="click: function() { cancel(); }"
-            aria-label="Close">
-    </button>
-
-    <div class="hrm-basic-modal-dialog__header">
-        <h2 class="hrm-basic-modal-dialog__title">
-            Показывать в таблице должности
-        </h2>
-    </div>
-
-    <div class="hrm-basic-modal-dialog__body positions-settings">
-        <div class="positions-settings__search"
-             data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}"></div>
-
-        <div class="positions-settings__list">
-            <!-- ko foreach: { data: $component.positions, as: 'position' } -->
-
-            <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
-            <div class="positions-settings__list-item" data-bind="if: visible">
-                <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-                    <div
-                         data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
-                    </div>
-                    <label
-                           data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
-                </div>
-            </div>
-            <!-- /ko -->
-
-            <!-- /ko -->
-        </div>
-
-    </div>
-
-    <div class="hrm-basic-modal-dialog__action-list">
-        <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
-           position-page__speciality-modal-dialog-cancel-button"
-                data-bind="click: function() {reset();}">
-            Сбросить
-        </button>
-
-        <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
-           position-page__speciality-modal-dialog-submit-button"
-                data-bind="click: function() {submit();}">
-            Применить
-        </button>
-    </div>
-
-</template>

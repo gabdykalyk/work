@@ -21,6 +21,8 @@
         }
       })();
 
+
+
       this.summaryModel = (() => {
         const positions = ko.observableArray([]);
 
@@ -61,9 +63,30 @@
 
       /** Calculation created */
       this.isBuilt = ko.observable(false);
-      this.buildCalculation = () => {
 
-        /* Get data */
+
+      this.formControlErrorStateMatcher = function (formControl) {
+        return ko.pureComputed(() => {
+          return !formControl.isValid();
+        });
+      };
+
+      this.inputModel = {
+        filial: ko.observable(''),
+        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
+        shift: ko.observable(''),
+        interval: {
+          start: ko.observable(''),
+          end: ko.observable(''),
+        }
+      };
+
+      /** Получение данных для расчета */
+      this.buildCalculation = () => {
+        /** Данные */
+        const inputData = ko.toJS(this.inputModel);
+
+        /* Получение списка позиций */
         const positions = [
           {
             name: 'Администратор филиала',
@@ -84,6 +107,7 @@
             employees: [
               {
                 name: 'Администратор #1',
+                id: '1'
               }
             ]
           },
@@ -106,6 +130,7 @@
             employees: [
               {
                 name: 'Сушист #1',
+                id: '2'
               }
             ]
           },
@@ -128,8 +153,10 @@
             employees: [
               {
                 name: 'Пиццмейкер #1',
+                id: '3'
               },{
-                name: 'Пиццмейкер #1',
+                name: 'Пиццмейкер #2',
+                id: '4'
               }
             ]
           },
@@ -152,6 +179,7 @@
             employees: [
               {
                 name: 'Официант #1',
+                id: '5'
               }
             ]
           },
@@ -172,36 +200,17 @@
               red: 0
             },
             employees: [
-              { name: 'Водитель #1'},
-              { name: 'Водитель #2'},
-              { name: 'Водитель #3'}
+              { name: 'Водитель #1', id: '6' },
+              { name: 'Водитель #2', id: '6' },
+              { name: 'Водитель #3', id: '6' }
             ]
           },
         ];
+
+        /** Обновление представления */
         this.updateSummary(positions);
         this.isBuilt(true);
-
-        console.log('after build', ko.toJS(positions))
       };
-
-      this.formControlErrorStateMatcher = function (formControl) {
-        return ko.pureComputed(() => {
-          return !formControl.isValid();
-        });
-      };
-
-      this.inputModel = {
-        filial: ko.observable(''),
-        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
-        shift: ko.observable(''),
-        interval: {
-          start: ko.observable(''),
-          end: ko.observable(''),
-        }
-      };
-
-
-
 
       this.tabs = (() => {
         const tabs = [
@@ -483,7 +492,7 @@
     function createEmployeeModel(employee, visible) {
       return {
         name: employee.name,
-        id: employee.name,
+        id: employee.id,
         visible: ko.observable(!!visible),
       }
     }

@@ -1029,9 +1029,12 @@
 <!-- Блок сотрудника в таблице -->
 <script id="employee-block-template"
         type="text/html">
-  <div class="employee">
+  <div class="employee" data-bind="hrmLog">
     <div class="employee__remove">
-      <button data-bind="hrmTooltip, hrmTooltipText: 'Удалить из расчета'"
+      <button data-bind="
+      hrmTooltip,
+      hrmTooltipText: 'Удалить из расчета',
+      click: function(a) { employee.visible(false) }"
               class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary positions-table__action employe__remove-button">
       </button>
     </div>
@@ -1174,7 +1177,7 @@
           <!-- /ko -->
 
           <!-- Блок Прочее -->
-          <!-- ko if: table.hasOtherSection() -->
+          <!-- ko if: table.hasOtherSection -->
           <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
             <td class="positions-table__cell positions-table__position-title">
               <div class="positions-table__cell-content">
@@ -1321,7 +1324,7 @@
             <!-- /Блок позиции -->
 
             <!-- Блок Прочее -->
-            <!-- ko if: table.hasOtherSection() -->
+            <!-- ko if: table.hasOtherSection -->
             <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
               <td class="positions-table__cell  positions-table__position-title"
                   data-bind="attr: {colspan: columnCount}">
@@ -1401,13 +1404,66 @@
   </div>
 </template>
 
+<template id="calculation-settings-positions-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Показывать в таблице должности
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body positions-settings">
+    <div class="positions-settings__search"
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}"></div>
+
+    <div class="positions-settings__list">
+      <!-- ko foreach: { data: $component.positions, as: 'position' } -->
+
+      <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
+      <div class="positions-settings__list-item"
+           data-bind="if: visible">
+        <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+          <div
+               data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
+          </div>
+          <label
+                 data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
+        </div>
+      </div>
+      <!-- /ko -->
+
+      <!-- /ko -->
+    </div>
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {reset();}">
+      Сбросить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Применить
+    </button>
+  </div>
+
+</template>
+
 <script type="text/javascript">
     $(function () {
         ko.components.register('calculation-settings-positions-modal-dialog', {
             viewModel: {
                 createViewModel: function (params, componentInfo) {
                     const $element = $(componentInfo.element);
-
                     $element.addClass([
                         'modal-dialog',
                         'modal-dialog-centered',
@@ -1417,28 +1473,34 @@
                     ]);
 
                     return new (function () {
-                        this.term = ko.observable('');
-
+                        /** Positions model */
                         this.positions = params.data.positions().map((p) => {
                             const positionData = p();
                             return {
                                 name: positionData.name,
                                 checked: ko.observable(positionData.visible()),
                                 position: p,
-                                visible: ko.pureComputed(() => {
-                                    const term = this.term();
-
-                                    if (!term || term.length < 2) return true;
-
-                                    const formattedTerm = term.toLowerCase();
-                                    const formattedName = positionData.name.toLowerCase();
-                                    return formattedName.indexOf(formattedTerm) !== -1;
-
-
-                                })
+                                visible: ko.observable(true)
                             }
                         });
 
+                        /** Поисковый запрос */
+                        this.term = ko.observable('');
+                        /** Скрыть/Показать позиции в списке */
+                        this.term.subscribe(value => {
+                            const formattedTerm = value.toLowerCase();
+
+                            this.positions.forEach(p => {
+                                let isVisible = true;
+                                if (formattedTerm.length >= 2) {
+                                    const formattedName = p.name.toLowerCase();
+                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
+                                }
+                                p.visible(isVisible);
+                            })
+                        });
+
+                        /** Сбросить все чекбоксы и поисковый запрос */
                         this.reset = function () {
                             this.term('');
                             this.positions.forEach(p => {
@@ -1446,20 +1508,25 @@
                             });
                         }
 
+                        /** Закрыть окно без изменений */
                         this.cancel = function () {
                             if ('cancel' in params) {
                                 params.cancel();
                             }
                         };
 
+                        /** Применить изменения */
+                        this.apply = function() {
+                            this.positions.forEach(p => {
+                                p.position().visible(p.checked());
+                            });
+                        }
+
                         this.submit = function () {
                             if ('submit' in params) {
-                                this.positions.forEach(p => {
-                                    p.position().visible(p.checked());
-                                });
+                                this.apply();
                                 params.submit(true);
                             }
-
                         };
                     });
                 }
@@ -1470,59 +1537,6 @@
         });
     });
 </script>
-
-<template id="calculation-settings-positions-modal-dialog-template">
-
-    <button class="hrm-button hrm-basic-modal-dialog__close-button"
-            data-bind="click: function() { cancel(); }"
-            aria-label="Close">
-    </button>
-
-    <div class="hrm-basic-modal-dialog__header">
-        <h2 class="hrm-basic-modal-dialog__title">
-            Показывать в таблице должности
-        </h2>
-    </div>
-
-    <div class="hrm-basic-modal-dialog__body positions-settings">
-        <div class="positions-settings__search"
-             data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}"></div>
-
-        <div class="positions-settings__list">
-            <!-- ko foreach: { data: $component.positions, as: 'position' } -->
-
-            <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
-            <div class="positions-settings__list-item" data-bind="if: visible">
-                <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-                    <div
-                         data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
-                    </div>
-                    <label
-                           data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
-                </div>
-            </div>
-            <!-- /ko -->
-
-            <!-- /ko -->
-        </div>
-
-    </div>
-
-    <div class="hrm-basic-modal-dialog__action-list">
-        <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
-           position-page__speciality-modal-dialog-cancel-button"
-                data-bind="click: function() {reset();}">
-            Сбросить
-        </button>
-
-        <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
-           position-page__speciality-modal-dialog-submit-button"
-                data-bind="click: function() {submit();}">
-            Применить
-        </button>
-    </div>
-
-</template>
 
 
 <script type="text/javascript">
@@ -1553,15 +1567,17 @@
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-
           const positions = params.tab.positions;
 
+          /** Наличие неактивных позиций - для секции Прочее */
           const hasOtherSection = ko.pureComputed(() => {
             return positions().some(p => {
+              console.log(!p().visible())
               return !p().visible();
             });
           });
 
+          /** Итого: вычисляемые значения - последний ряд таблицы */
           const total = {
             workTime: ko.pureComputed(() => {
               return 0;
@@ -1592,6 +1608,7 @@
             }),
           }
 
+          /* Настраиваемые колонки таблицы */
           const columns = [
             Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
@@ -1612,17 +1629,16 @@
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
           ];
-
           const activeColumns = ko.pureComputed(() => {
             return columns.filter(c => c().visible).length;
           });
 
-          
-
+          /** Общее количество колонок (для растягивания заголовков) */
           const columnCount = ko.pureComputed(() => {
             return activeColumns() + 3;
           });
 
+          /** Установить видимость позиций (модальное окно) */
           const setPositions = () => {
             params.settings.openModal(createPositionsModalDialog(positions))
           }
@@ -2647,6 +2663,8 @@
         }
       })();
 
+
+
       this.summaryModel = (() => {
         const positions = ko.observableArray([]);
 
@@ -2687,9 +2705,30 @@
 
       /** Calculation created */
       this.isBuilt = ko.observable(false);
-      this.buildCalculation = () => {
 
-        /* Get data */
+
+      this.formControlErrorStateMatcher = function (formControl) {
+        return ko.pureComputed(() => {
+          return !formControl.isValid();
+        });
+      };
+
+      this.inputModel = {
+        filial: ko.observable(''),
+        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
+        shift: ko.observable(''),
+        interval: {
+          start: ko.observable(''),
+          end: ko.observable(''),
+        }
+      };
+
+      /** Получение данных для расчета */
+      this.buildCalculation = () => {
+        /** Данные */
+        const inputData = ko.toJS(this.inputModel);
+
+        /* Получение списка позиций */
         const positions = [
           {
             name: 'Администратор филиала',
@@ -2710,6 +2749,7 @@
             employees: [
               {
                 name: 'Администратор #1',
+                id: '1'
               }
             ]
           },
@@ -2732,6 +2772,7 @@
             employees: [
               {
                 name: 'Сушист #1',
+                id: '2'
               }
             ]
           },
@@ -2754,8 +2795,10 @@
             employees: [
               {
                 name: 'Пиццмейкер #1',
+                id: '3'
               },{
-                name: 'Пиццмейкер #1',
+                name: 'Пиццмейкер #2',
+                id: '4'
               }
             ]
           },
@@ -2778,6 +2821,7 @@
             employees: [
               {
                 name: 'Официант #1',
+                id: '5'
               }
             ]
           },
@@ -2798,36 +2842,17 @@
               red: 0
             },
             employees: [
-              { name: 'Водитель #1'},
-              { name: 'Водитель #2'},
-              { name: 'Водитель #3'}
+              { name: 'Водитель #1', id: '6' },
+              { name: 'Водитель #2', id: '6' },
+              { name: 'Водитель #3', id: '6' }
             ]
           },
         ];
+
+        /** Обновление представления */
         this.updateSummary(positions);
         this.isBuilt(true);
-
-        console.log('after build', ko.toJS(positions))
       };
-
-      this.formControlErrorStateMatcher = function (formControl) {
-        return ko.pureComputed(() => {
-          return !formControl.isValid();
-        });
-      };
-
-      this.inputModel = {
-        filial: ko.observable(''),
-        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
-        shift: ko.observable(''),
-        interval: {
-          start: ko.observable(''),
-          end: ko.observable(''),
-        }
-      };
-
-
-
 
       this.tabs = (() => {
         const tabs = [
@@ -3109,7 +3134,7 @@
     function createEmployeeModel(employee, visible) {
       return {
         name: employee.name,
-        id: employee.name,
+        id: employee.id,
         visible: ko.observable(!!visible),
       }
     }

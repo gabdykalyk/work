@@ -3566,6 +3566,8 @@ ko.bindingHandlers.hrmTable = {
     }
 
     _destroy() {
+      this._tippyInstance.destroy();
+
       this._subscriptions.forEach(s => s.dispose());
 
       if (this._mode === 'large') {
