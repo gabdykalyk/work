@@ -109,7 +109,7 @@
       </div><!-- .calculation-tab__settings-group -->
     </div><!-- .calculation-tab__settings -->
 
-    <div class="hrm-table__fixed-section-container positions-table">
+    <div class="hrm-table__fixed-section-container positions-table" data-bind="let: {table: $data}">
       <!-- Fixed section -->
       <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
       <table data-bind="hrmTable"
@@ -122,12 +122,12 @@
           </tr>
         </thead>
         <tbody>
-          <!-- ko foreach: { data: positions, as: 'position' } -->
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
 
           <!-- Блок позиции -->
           <!-- ko if: position.visible -->
           <!-- Заголовок позиции -->
-          <tr class="positions-table__row postions-table__row-highlighted positions-table__section-header">
+          <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
             <td class="positions-table__cell positions-table__position-title">
               <div class="positions-table__cell-content">
                 <div data-bind="template: {name: 'position-header-template', data: position}"></div>
@@ -162,8 +162,8 @@
           <!-- /ko -->
 
           <!-- Блок Прочее -->
-          <!-- ko if: hasOtherSection -->
-          <tr class="positions-table__row positions-table__row-highlighted positions-table__section-header">
+          <!-- ko if: table.hasOtherSection() -->
+          <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
             <td class="positions-table__cell positions-table__position-title">
               <div class="positions-table__cell-content">
                 <div data-bind="template: {name: 'position-header-template', data: {name: 'Прочее'}}"></div>
@@ -172,7 +172,7 @@
           </tr>
 
           <!-- Список сотрудников по остальным позициям -->
-          <!-- ko foreach: { data: positions, as: 'position' } -->
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
           <!-- ko ifnot: position.visible -->
           <!-- ko foreach: { data: position.employees, as: 'employee' } -->
           <!-- ko if: employee.visible -->
@@ -199,7 +199,7 @@
 
 
           <!-- Total section -->
-          <tr class="positions-table__row positions-table__row-highlighted positions-table__total">
+          <tr class="positions-table__row positions-table__row--highlighted positions-table__total">
             <td class="positions-table__cell">
               <div class="positions-table__cell-content"></div>
             </td>
@@ -217,7 +217,7 @@
 
           <colgroup>
             <col class="positions-table__col positions-table__col--name">
-            <!-- ko foreach: columns -->
+            <!-- ko foreach: table.columns -->
             <col class="positions-table__col"
                  data-bind="class: 'position-table__col--' + id">
             <!-- /ko -->
@@ -231,7 +231,7 @@
                 <div class="positions-table__cell-content">Сотрудник</div>
               </th>
 
-              <!-- ko foreach: columns -->
+              <!-- ko foreach: table.columns -->
               <th class="positions-table__cell positions-table__head-cell"
                   data-bind="class: 'positions-table__cell--' + id">
                 <div class="positions-table__cell-content">
@@ -262,10 +262,10 @@
 
           <tbody>
             <!-- Блок позиции -->
-            <!-- ko foreach: { data: positions, as: 'position' } -->
+            <!-- ko foreach: { data: table.positions, as: 'position' } -->
             <!-- Название позиции -->
             <!-- ko if: position.visible -->
-            <tr class="positions-table__row positions-table__row-highlighted positions-table__section-header">
+            <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
               <td class="positions-table__cell positions-table__position-title"
                   data-bind="attr: {colspan: $parent.columnCount}">
 
@@ -289,12 +289,10 @@
                   </div>
                   <!-- /Данные сотрудника -->
 
-
-
                 </div>
               </td>
 
-              <!-- ko foreach: $parent.columns -->
+              <!-- ko foreach: table.columns -->
               <td class="positions-table__cell"
                   data-bind="class: 'positions-table__cell--' + id"></td>
               <!-- /ko -->
@@ -311,8 +309,8 @@
             <!-- /Блок позиции -->
 
             <!-- Блок Прочее -->
-            <!-- ko if: hasOtherSection() -->
-            <tr class="positions-table__row positions-table__row-highlighted positions-table__section-header">
+            <!-- ko if: table.hasOtherSection() -->
+            <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
               <td class="positions-table__cell  positions-table__position-title"
                   data-bind="attr: {colspan: columnCount}">
                 <div class="positions-table__cell-content">
@@ -321,7 +319,7 @@
               </td>
             </tr>
 
-            <!-- ko foreach: { data: positions, as: 'position' } -->
+            <!-- ko foreach: { data: table.positions, as: 'position' } -->
             <!-- ko ifnot: position.visible -->
             <!-- ko foreach: { data: position.employees, as: 'employee' } -->
             <!-- ko if: employee.visible -->
@@ -339,7 +337,7 @@
               </td>
 
 
-              <!-- ko foreach: $parents[3].columns -->
+              <!-- ko foreach: table.columns -->
               <td class="positions-table__cell"
                   data-bind="class: 'positions-table__cell--' + id"></td>
               <!-- /ko -->
@@ -356,12 +354,12 @@
             <!-- /Блок Прочее -->
 
             <!-- Total section -->
-            <tr class="positions-table__row positions-table__row-highlighted positions-table__total">
+            <tr class="positions-table__row positions-table__row--highlighted positions-table__total">
               <td class="positions-table__cell  positions-table__cell--name positions-table__empty">
 
               </td>
 
-              <!-- ko foreach: columns -->
+              <!-- ko foreach: table.columns -->
               <td class="positions-table__cell"
                   data-bind="class: 'positions-table__cell--' + id, css: {'positions-table__cell--empty': !hasTotal}">
                 <div class="positions-table__cell-content">
