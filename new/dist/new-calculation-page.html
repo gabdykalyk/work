@@ -91,93 +91,80 @@
       </thead>
 
       <tbody>
-        <!-- ko foreach: $root.summaryModel.positions -->
-        <!-- ko  let: { isTotal: false } -->
+        <!-- ko foreach: $root.summaryModel.positions() -->
+        <!-- ko  let: { isTotal: false, data: $data } -->
         <tr data-bind="css: { 'calculation-summary__total': isTotal }">
   <!-- Должность -->
   <td class="calculation-summary__cell">
     <div class=""
-         data-bind="text: name"></div>
+         data-bind="text: data.name"></div>
   </td>
 
   <!-- Тип нагрузки -->
   <td class="calculation-summary__cell">
     <div class=""
-         data-bind="text: workloadType"></div>
+         data-bind="text: data.workloadType"></div>
   </td>
 
   <!-- Нагрузка -->
   <td class="calculation-summary__cell" align="right">
     <div class=""
-         data-bind="text: workload"></div>
+         data-bind="text: data.workload"></div>
   </td>
 
   <!-- Юниты нагрузки -->
   <td class="calculation-summary__cell">
     <div class=""
-         data-bind="text: units"></div>
+         data-bind="text: data.units"></div>
   </td>
 
   <!-- Доп. нагрузка -->
   <td class="calculation-summary__cell">
     <div class=""
-         data-bind="text: additionalWorkload"></div>
+         data-bind="text: data.additionalWorkload"></div>
   </td>
 
   <!-- Сотрудники -->
   <td class="calculation-summary__cell" align="right">
     <div class=""
-         data-bind="text: ko.isObservable(employees) ? employees().length : employees"></div>
+         data-bind="text: ko.isObservable(data.employees) ? data.employees().length : data.employees"></div>
   </td>
 
   <!-- ФОТ, % в категории -->
   <td class="calculation-summary__cell"
       data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}"  align="right">
     <div class=""
-         data-bind="text: fotCategory"></div>
+         data-bind="text: data.fotCategory"></div>
   </td>
 
   <!-- ФОТ, % от выручки -->
   <td class="calculation-summary__cell"
       data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}" align="right">
     <div class=""
-         data-bind="text: fotRevenue"></div>
+         data-bind="text: data.fotRevenue"></div>
   </td>
 
   <!-- Норм. выработки -->
   <td class="calculation-summary__cell"
       data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}" align="right">
     <div class=""
-         data-bind="text: performanceStandart"></div>
+         data-bind="text: data.performanceStandart"></div>
   </td>
 
   <!-- Опоздания -->
   <td class="calculation-summary__cell calculation-summary__lateness-row-cell">
     <div class="calculation-summary__lateness-row">
-      <div class="calculation-summary__lateness-cell"
-           data-bind="style: {
-        backgroundColor: lateness.green > 0 ? '#D0F4E3' : 'transparent'
-      }">
-        <!-- ko text: lateness.green > 0 ? lateness.green : '' -->
-        <!-- /ko -->
-      </div>
-      <div class="calculation-summary__lateness-cell"
-           data-bind="style: {
-        backgroundColor: lateness.yellow > 0 ? '#FDFFB3' : 'transparent'
-      }">
-        <!-- ko text: lateness.yellow > 0 ? lateness.yellow : '' -->
-        <!-- /ko -->
-      </div>
-      <div class="calculation-summary__lateness-cell"
-           data-bind="style: {
-        backgroundColor: lateness.red > 0 ? '#FFD3E8' : 'transparent'
-      }">
-        <!-- ko text: lateness.red > 0 ? lateness.red : '' -->
-        <!-- /ko -->
+      <div class="calculation-summary__lateness-cell">
+
       </div>
       <div class="calculation-summary__lateness-cell">
-        <!-- ko text: lateness.green + lateness.yellow + lateness.red -->
-        <!-- /ko -->
+
+      </div>
+      <div class="calculation-summary__lateness-cell">
+
+      </div>
+      <div class="calculation-summary__lateness-cell">
+
       </div>
     </div>
   </td>
@@ -186,101 +173,86 @@
         <!-- /ko -->
         <!-- /ko -->
 
-
-        <!-- ko using: $root.summaryModel.total() -->
-        <!-- ko  let: { isTotal: true } -->
+        <!-- ko  let: { isTotal: true, data: $root.summaryModel.total() } -->
         <tr data-bind="css: { 'calculation-summary__total': isTotal }">
   <!-- Должность -->
   <td class="calculation-summary__cell">
     <div class=""
-         data-bind="text: name"></div>
+         data-bind="text: data.name"></div>
   </td>
 
   <!-- Тип нагрузки -->
   <td class="calculation-summary__cell">
     <div class=""
-         data-bind="text: workloadType"></div>
+         data-bind="text: data.workloadType"></div>
   </td>
 
   <!-- Нагрузка -->
   <td class="calculation-summary__cell" align="right">
     <div class=""
-         data-bind="text: workload"></div>
+         data-bind="text: data.workload"></div>
   </td>
 
   <!-- Юниты нагрузки -->
   <td class="calculation-summary__cell">
     <div class=""
-         data-bind="text: units"></div>
+         data-bind="text: data.units"></div>
   </td>
 
   <!-- Доп. нагрузка -->
   <td class="calculation-summary__cell">
     <div class=""
-         data-bind="text: additionalWorkload"></div>
+         data-bind="text: data.additionalWorkload"></div>
   </td>
 
   <!-- Сотрудники -->
   <td class="calculation-summary__cell" align="right">
     <div class=""
-         data-bind="text: ko.isObservable(employees) ? employees().length : employees"></div>
+         data-bind="text: ko.isObservable(data.employees) ? data.employees().length : data.employees"></div>
   </td>
 
   <!-- ФОТ, % в категории -->
   <td class="calculation-summary__cell"
       data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}"  align="right">
     <div class=""
-         data-bind="text: fotCategory"></div>
+         data-bind="text: data.fotCategory"></div>
   </td>
 
   <!-- ФОТ, % от выручки -->
   <td class="calculation-summary__cell"
       data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}" align="right">
     <div class=""
-         data-bind="text: fotRevenue"></div>
+         data-bind="text: data.fotRevenue"></div>
   </td>
 
   <!-- Норм. выработки -->
   <td class="calculation-summary__cell"
       data-bind="style: { backgroundColor: isTotal ? '#D0F4E3' : 'transparent'}" align="right">
     <div class=""
-         data-bind="text: performanceStandart"></div>
+         data-bind="text: data.performanceStandart"></div>
   </td>
 
   <!-- Опоздания -->
   <td class="calculation-summary__cell calculation-summary__lateness-row-cell">
     <div class="calculation-summary__lateness-row">
-      <div class="calculation-summary__lateness-cell"
-           data-bind="style: {
-        backgroundColor: lateness.green > 0 ? '#D0F4E3' : 'transparent'
-      }">
-        <!-- ko text: lateness.green > 0 ? lateness.green : '' -->
-        <!-- /ko -->
-      </div>
-      <div class="calculation-summary__lateness-cell"
-           data-bind="style: {
-        backgroundColor: lateness.yellow > 0 ? '#FDFFB3' : 'transparent'
-      }">
-        <!-- ko text: lateness.yellow > 0 ? lateness.yellow : '' -->
-        <!-- /ko -->
-      </div>
-      <div class="calculation-summary__lateness-cell"
-           data-bind="style: {
-        backgroundColor: lateness.red > 0 ? '#FFD3E8' : 'transparent'
-      }">
-        <!-- ko text: lateness.red > 0 ? lateness.red : '' -->
-        <!-- /ko -->
+      <div class="calculation-summary__lateness-cell">
+
       </div>
       <div class="calculation-summary__lateness-cell">
-        <!-- ko text: lateness.green + lateness.yellow + lateness.red -->
-        <!-- /ko -->
+
+      </div>
+      <div class="calculation-summary__lateness-cell">
+
+      </div>
+      <div class="calculation-summary__lateness-cell">
+
       </div>
     </div>
   </td>
 </tr>
 
         <!-- /ko -->
-        <!-- /ko -->
+
       </tbody>
     </table>
   </div>
@@ -1271,7 +1243,7 @@
                     return new (function () {
                         this.term = ko.observable('');
 
-                        this.positions = params.data.positions.map((p) => {
+                        this.positions = params.data.positions().map((p) => {
                             const positionData = p();
                             return {
                                 name: positionData.name,
@@ -1405,10 +1377,11 @@
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
+
           const positions = params.tab.positions;
 
           const hasOtherSection = ko.pureComputed(() => {
-            return positions.some(p => {
+            return positions().some(p => {
               return !p().visible();
             });
           });
@@ -2139,7 +2112,7 @@
   $(function () {
     const $page = $(document.documentElement);
 
-    const ViewModel = function (positions, settings) {
+    const ViewModel = function (defaultPositions, settings) {
       /** Initialization */
       (() => {
         this.subscriptions = [];
@@ -2158,38 +2131,11 @@
         }
       })();
 
-      /** Calculation created */
-      this.isBuilt = ko.observable(false);
-      this.buildCalculation = () => {
-        this.isBuilt(true);
-      };
-
-      this.formControlErrorStateMatcher = function (formControl) {
-        return ko.pureComputed(() => {
-
-          console.log(1, formControl, formControl())
-          return !formControl.isValid();
-        });
-      };
-
-      this.inputModel = {
-        filial: ko.observable(''),
-        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
-        shift: ko.observable(''),
-        interval: {
-          start: ko.observable(''),
-          end: ko.observable(''),
-        }
-      }
-
-      /** Data for summary table */
-      this.summaryModel = ((defaultPositions) => {
-        const positions = defaultPositions.map(position => {
-          return createPositionModel(position)
-        });
+      this.summaryModel = (() => {
+        const positions = ko.observableArray([]);
 
         const total = ko.pureComputed(() => {
-          return positions.reduce((acc, p) => {
+          return positions().reduce((acc, p) => {
             p = p();
             return {
               name: '',
@@ -2211,9 +2157,157 @@
         });
 
         return {
-          positions, total
+          positions,
+          total
         }
-      })(positions);
+      })();
+      this.updateSummary = (positionsList) => {
+        const positions = positionsList.map(position => {
+          return createPositionModel(position)
+        });
+        this.summaryModel.positions(positions);
+      }
+      this.updateSummary(defaultPositions);
+
+      /** Calculation created */
+      this.isBuilt = ko.observable(false);
+      this.buildCalculation = () => {
+
+        /* Get data */
+        const positions = [
+          {
+            name: 'Администратор филиала',
+            id: 1,
+            type: 'production',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {
+                name: 'Сергеева Мария Владиславовна',
+              }
+            ]
+          },
+          {
+            name: 'Повар-сушист',
+            id: 3,
+            type: 'production',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {
+                name: 'Сергеева Мария Владиславовна',
+              }
+            ]
+          },
+          {
+            name: 'Повар-пиццмейкер',
+            id: 2,
+            type: 'production',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {
+                name: 'Сергеева Мария Владиславовна',
+              }
+            ]
+          },
+          {
+            name: 'Официант',
+            id: 4,
+            type: 'production',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {
+                name: 'Сергеева Мария Владиславовна',
+              }
+            ]
+          },
+          {
+            name: 'Водители',
+            id: 5,
+            type: 'delivery',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: '',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {},
+              {},
+              {}
+            ]
+          },
+        ];
+        this.updateSummary(positions);
+        this.isBuilt(true);
+      };
+
+      this.formControlErrorStateMatcher = function (formControl) {
+        return ko.pureComputed(() => {
+          return !formControl.isValid();
+        });
+      };
+
+      this.inputModel = {
+        filial: ko.observable(''),
+        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
+        shift: ko.observable(''),
+        interval: {
+          start: ko.observable(''),
+          end: ko.observable(''),
+        }
+      };
+
+
+
 
       this.tabs = (() => {
         const tabs = [
@@ -2224,8 +2318,10 @@
 
         const activeTab = ko.observable(0);
 
-        const productionPositions = this.summaryModel.positions
+        const productionPositions = ko.pureComputed(() => {
+          return this.summaryModel.positions()
           .filter(position => position().type === 'production');
+        })
 
         return {
           tabs,
@@ -2235,7 +2331,6 @@
           }
         }
       })();
-
 
 
       this.stimulation = (() => {
@@ -2435,120 +2530,9 @@
     };
 
     /***** Model activation *******/
-    const positions = [
-      {
-        name: 'Администратор филиала',
-        id: 1,
-        type: 'production',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {
-            name: 'Сергеева Мария Владиславовна',
-          }
-        ]
-      },
-      {
-        name: 'Повар-сушист',
-        id: 3,
-        type: 'production',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {
-            name: 'Сергеева Мария Владиславовна',
-          }
-        ]
-      },
-      {
-        name: 'Повар-пиццмейкер',
-        id: 2,
-        type: 'production',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {
-            name: 'Сергеева Мария Владиславовна',
-          }
-        ]
-      },
-      {
-        name: 'Официант',
-        id: 4,
-        type: 'production',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {
-            name: 'Сергеева Мария Владиславовна',
-          }
-        ]
-      },
-      {
-        name: 'Водители',
-        id: 5,
-        type: 'delivery',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: '',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {},
-          {},
-          {}
-        ]
-      },
-    ];
+    const defaultPositions = [];
+    const viewModel = new ViewModel(defaultPositions);
 
-    const viewModel = new ViewModel(positions);
     ko.applyBindings(
       viewModel,
       $page.get()[0]

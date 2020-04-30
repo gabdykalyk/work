@@ -2,7 +2,7 @@
   $(function () {
     const $page = $(document.documentElement);
 
-    const ViewModel = function (positions, settings) {
+    const ViewModel = function (defaultPositions, settings) {
       /** Initialization */
       (() => {
         this.subscriptions = [];
@@ -21,38 +21,11 @@
         }
       })();
 
-      /** Calculation created */
-      this.isBuilt = ko.observable(false);
-      this.buildCalculation = () => {
-        this.isBuilt(true);
-      };
-
-      this.formControlErrorStateMatcher = function (formControl) {
-        return ko.pureComputed(() => {
-
-          console.log(1, formControl, formControl())
-          return !formControl.isValid();
-        });
-      };
-
-      this.inputModel = {
-        filial: ko.observable(''),
-        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
-        shift: ko.observable(''),
-        interval: {
-          start: ko.observable(''),
-          end: ko.observable(''),
-        }
-      }
-
-      /** Data for summary table */
-      this.summaryModel = ((defaultPositions) => {
-        const positions = defaultPositions.map(position => {
-          return createPositionModel(position)
-        });
+      this.summaryModel = (() => {
+        const positions = ko.observableArray([]);
 
         const total = ko.pureComputed(() => {
-          return positions.reduce((acc, p) => {
+          return positions().reduce((acc, p) => {
             p = p();
             return {
               name: '',
@@ -74,9 +47,157 @@
         });
 
         return {
-          positions, total
+          positions,
+          total
         }
-      })(positions);
+      })();
+      this.updateSummary = (positionsList) => {
+        const positions = positionsList.map(position => {
+          return createPositionModel(position)
+        });
+        this.summaryModel.positions(positions);
+      }
+      this.updateSummary(defaultPositions);
+
+      /** Calculation created */
+      this.isBuilt = ko.observable(false);
+      this.buildCalculation = () => {
+
+        /* Get data */
+        const positions = [
+          {
+            name: 'Администратор филиала',
+            id: 1,
+            type: 'production',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {
+                name: 'Сергеева Мария Владиславовна',
+              }
+            ]
+          },
+          {
+            name: 'Повар-сушист',
+            id: 3,
+            type: 'production',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {
+                name: 'Сергеева Мария Владиславовна',
+              }
+            ]
+          },
+          {
+            name: 'Повар-пиццмейкер',
+            id: 2,
+            type: 'production',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {
+                name: 'Сергеева Мария Владиславовна',
+              }
+            ]
+          },
+          {
+            name: 'Официант',
+            id: 4,
+            type: 'production',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {
+                name: 'Сергеева Мария Владиславовна',
+              }
+            ]
+          },
+          {
+            name: 'Водители',
+            id: 5,
+            type: 'delivery',
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: '',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: [
+              {},
+              {},
+              {}
+            ]
+          },
+        ];
+        this.updateSummary(positions);
+        this.isBuilt(true);
+      };
+
+      this.formControlErrorStateMatcher = function (formControl) {
+        return ko.pureComputed(() => {
+          return !formControl.isValid();
+        });
+      };
+
+      this.inputModel = {
+        filial: ko.observable(''),
+        date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
+        shift: ko.observable(''),
+        interval: {
+          start: ko.observable(''),
+          end: ko.observable(''),
+        }
+      };
+
+
+
 
       this.tabs = (() => {
         const tabs = [
@@ -87,8 +208,10 @@
 
         const activeTab = ko.observable(0);
 
-        const productionPositions = this.summaryModel.positions
+        const productionPositions = ko.pureComputed(() => {
+          return this.summaryModel.positions()
           .filter(position => position().type === 'production');
+        })
 
         return {
           tabs,
@@ -98,7 +221,6 @@
           }
         }
       })();
-
 
 
       this.stimulation = (() => {
@@ -298,120 +420,9 @@
     };
 
     /***** Model activation *******/
-    const positions = [
-      {
-        name: 'Администратор филиала',
-        id: 1,
-        type: 'production',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {
-            name: 'Сергеева Мария Владиславовна',
-          }
-        ]
-      },
-      {
-        name: 'Повар-сушист',
-        id: 3,
-        type: 'production',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {
-            name: 'Сергеева Мария Владиславовна',
-          }
-        ]
-      },
-      {
-        name: 'Повар-пиццмейкер',
-        id: 2,
-        type: 'production',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {
-            name: 'Сергеева Мария Владиславовна',
-          }
-        ]
-      },
-      {
-        name: 'Официант',
-        id: 4,
-        type: 'production',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {
-            name: 'Сергеева Мария Владиславовна',
-          }
-        ]
-      },
-      {
-        name: 'Водители',
-        id: 5,
-        type: 'delivery',
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: '',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: [
-          {},
-          {},
-          {}
-        ]
-      },
-    ];
+    const defaultPositions = [];
+    const viewModel = new ViewModel(defaultPositions);
 
-    const viewModel = new ViewModel(positions);
     ko.applyBindings(
       viewModel,
       $page.get()[0]
