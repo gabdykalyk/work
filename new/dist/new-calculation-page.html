@@ -2259,17 +2259,18 @@
             this.term = ko.observable('');
             this.term.subscribe(value => {
               const formattedValue = value.toLowerCase();
+              console.log(formattedValue)
 
               this.positions.forEach(p => {
                 let hasVisibleEmployees = 0;
                 p.employees().forEach(e => {
-                  if (formattedValue.length < 2) e.visible(true);
-                  else {
+                  let isVisible = true;
+                  if (formattedValue.length >= 2) {
                     const name = e.name.toLowerCase();
-                    const isVisible = name.indexOf(formattedValue) !== -1;
-                    e.visible(isVisible);
-                    if (isVisible) hasVisibleEmployees++;
+                    isVisible = name.indexOf(formattedValue) !== -1;
                   }
+                  e.visible(isVisible);
+                  if (isVisible) hasVisibleEmployees++;
                 });
                 p.hasVisibleEmployees(hasVisibleEmployees);
               })
