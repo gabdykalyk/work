@@ -21,7 +21,9 @@
 
         _destroy() {
             this._subscriptions.forEach(s => s.dispose());
-            this._disabledSubscription.dispose();
+            if (this._disabledSubscription !== null) {
+                this._disabledSubscription.dispose();
+            }
         }
 
         _setDisabled(disabled) {

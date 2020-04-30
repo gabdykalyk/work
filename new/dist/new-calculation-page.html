@@ -1080,6 +1080,9 @@
               <div class="hrm-table__head-cell-content">Сотрудник</div>
             </th>
           </tr>
+
+
+
         </thead>
         <tbody>
 
@@ -1095,6 +1098,15 @@
               </div>
             </td>
           </tr>
+          <!-- ko foreach: { data: position.employees, as: 'employee' } -->
+          <!-- ko if: employee.visible -->
+          <tr>
+            <td>
+              <div data-bind="text: employee.name"></div>
+            </td>
+          </tr>
+          <!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
 
@@ -1106,6 +1118,19 @@
               </div>
             </td>
           </tr>
+
+
+          <!-- ko foreach: { data: positions, as: 'position' } -->
+          <!-- ko ifnot: position.visible -->
+          <!-- ko foreach: { data: position.employees, as: 'employee' } -->
+          <tr>
+            <td>
+              <div data-bind="text: employee.name"></div>
+            </td>
+          </tr>
+          <!-- /ko -->
+          <!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
 
 
@@ -1186,6 +1211,25 @@
                 </div>
               </td>
             </tr>
+
+
+            <!-- ko foreach: position.employees -->
+            <!-- ko if: $data.visible -->
+            <tr data-bind="hrm">
+              <td>
+                <div data-bind="text: $data.name"></div>
+              </td>
+
+              <!-- ko foreach: $parent.columns -->
+              <td></td>
+              <!-- /ko -->
+
+              <td></td>
+              <td></td>
+            </tr>
+            <!-- /ko -->
+            <!-- /ko -->
+
             <!-- /ko -->
             <!-- /ko -->
 
@@ -1197,7 +1241,30 @@
                 </div>
               </td>
             </tr>
+
+            <!-- ko foreach: { data: positions, as: 'position' } -->
+            <!-- ko ifnot: position.visible -->
+            <!-- ko foreach: { data: position.employees, as: 'employee' } -->
+            <tr class="" data-bind="hrmLog">
+              <td>
+                <div data-bind="text: employee.name"></div>
+              </td>
+
+
+              <!-- ko foreach: $parents[3].columns -->
+              <td></td>
+              <!-- /ko -->
+
+              <td></td>
+              <td></td>
+
+            </tr>
             <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+
+
 
 
             <!-- Total section -->
@@ -1454,6 +1521,8 @@
           const activeColumns = ko.pureComputed(() => {
             return columns.filter(c => c().visible).length;
           });
+
+          
 
           const columnCount = ko.pureComputed(() => {
             return activeColumns() + 3;
@@ -2120,74 +2189,44 @@
 
   <script type="text/javascript">
   $(function () {
-    const positionsTable = [
-      {
-        id: 1,
-        name: 'Администратор филиала',
-        levels: [1, 2, 3]
-      }, {
-        id: 2,
-        name: 'Повар-пиццмейкер',
-        levels: [1, 2]
-      }, {
-        id: 3,
-        name: 'Повар-сушист',
-        levels: [1, 2]
-      }, {
-        id: 4,
-        name: 'Официант',
-        levels: []
-      }, {
-        id: 5,
-        name: 'Водитель',
-        levels: []
+    function EmployeeModel(employee) {
+      return {
+        id: employee.id,
+        name: employee.name,
+        checked: ko.observable(employee.visible()),
+        visible: ko.observable(true)
       }
-    ];
+    }
+
+    function PositionModel(positionObservable) {
+      const positionData = positionObservable();
+      const employees = ko.observableArray(positionData.employees().map(EmployeeModel));
+      const hasVisibleEmployees = ko.observable(true);
+
+      return {
+        name: positionData.name,
+        id: positionData.id,
+        employees,
+        visible: positionData.visible(),
+        hasVisibleEmployees,
+      }
+    }
+
+    function NewEmployeeModel(employeeData) {
+      return {
+        id: employee.id,
+        name: employee.name,
+        checked: ko.observable(false),
+        visible: ko.observable(true),
+        loaded: true,
+      }
+    }
 
     ko.components.register('calculation-settings-employees-form-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-
+          console.log(ko.toJS(params.data.positions))
           const originalPositions = params.data.positions;
-
-          function createTempPositionModel(position, term) {
-            const positionData = position();
-
-            const employees = ko.observableArray(positionData.employees().map(employee => {
-              return {
-                id: employee.id,
-                name: employee.name,
-                checked: ko.observable(employee.visible()),
-                visible: ko.pureComputed(() => {
-                  return true;
-                  /*
-                  const term = term();
-                  if (term.length < 2) return true;
-
-                  const formattedTerm = term.toLowerCase();
-                  const formattedName = employee.name.toLowerCase();
-                  return formattedName.indexOf(formattedTerm) !== -1;
-                  */
-                }),
-                employee
-              };
-            }));
-
-
-            const hasVisibleEmployees = ko.pureComputed(() => {
-              return true;
-              //return employees.some((e) => e.visible());
-            })
-
-            return {
-              name: positionData.name,
-              id: positionData.id,
-              employees,
-              visible: positionData.visible(),
-              hasVisibleEmployees,
-              position
-            }
-          }
 
           const $element = $(componentInfo.element);
           $element.addClass([
@@ -2199,7 +2238,7 @@
           ]);
 
           const ViewModel = function () {
-            this.term = ko.observable('');
+
             this.isSubmitted = ko.observable(false);
 
             this.formControlErrorStateMatcher = (formControl) => {
@@ -2208,14 +2247,29 @@
               });
             };
 
-            this.positions = this.originalPositions = ko.observableArray(originalPositions().map(position => {
-              return createTempPositionModel(position, this.term);
-            }));
+            this.positions = originalPositions().map(PositionModel);
 
             this.visiblePositions = this.positions.filter(position => position.visible);
             this.invisiblePositions = this.positions.filter(position => !position.visible);
 
-            this.activeTab = ko.observable(0);
+            this.term = ko.observable('');
+            this.term.subscribe(value => {
+              const formattedValue = value.toLowerCase();
+
+              this.positions.forEach(p => {
+                let hasVisibleEmployees = 0;
+                p.employees().forEach(e => {
+                  if (formattedValue.length < 2) e.visible(true);
+                  else {
+                    const name = e.name.toLowerCase();
+                    const isVisible = name.indexOf(formattedValue) !== -1;
+                    e.visible(isVisible);
+                    if (isVisible) hasVisibleEmployees++;
+                  }
+                });
+                p.hasVisibleEmployees(hasVisibleEmployees);
+              })
+            })
 
             this.tabs = (() => {
               const tabs = this.visiblePositions.map(position => new HrmTabGroupItem(position.name));
@@ -2243,26 +2297,34 @@
             })
 
             this.restoreEmployeesList = () => {
-              
+              this.positions.forEach(p => {
+                const oldEmployeesList = p.employees().filter(e => !e.loaded)
+                p.employees(oldEmployeesList)
+              })
             }
 
             this.loadBranches = (cb) => {
-                const activeTab = this.activeTab.peek();
-                if (activeTab) {
-                  console.log('Сделать запрос, категория', this.visiblePositions[activeTab].name);
-                  this.visiblePositions[activeTab].employees.push({ name: 'Рабочий #1' });
-                  this.visiblePositions[activeTab].employees.push({ name: 'Рабочий #2' });
-                  this.visiblePositions[activeTab].employees.push({ name: 'Рабочий #3' });
-                } else {
-                  console.log('Сделать запрос, категории', this.invisiblePositions.map(p => p.name));
-                  updatedEmployees = this.invisiblePositions.forEach(p => {
-                    p.employees.push({ name: 'Рабочий #1' });
-                    p.employees.push({ name: 'Рабочий #2' });
-                    p.employees.push({ name: 'Рабочий #3' });
-                  })
-                }
 
-                setTimeout(cb, 3000)
+              const activePosition = this.activePosition.peek();
+              if (activePosition) {
+                console.log('Сделать запрос, категория', activePosition.name);
+
+                // Добавить новых работников
+                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #1', id: 'test1' }));
+                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #2', id: 'test1' }));
+                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #3', id: 'test1' }));
+              } else {
+                console.log('Сделать запрос, категории', this.invisiblePositions().map(p => p.name));
+
+                // Добавить новых работников
+                updatedEmployees = this.invisiblePositions().forEach(p => {
+                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #1', id: p.name + 'test1' }));
+                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #2', id: p.name + 'test2' }));
+                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #3', id: p.name + 'test3' }));
+                })
+              }
+
+              setTimeout(cb, 3000)
             }
 
             this.formModel = {
@@ -2281,12 +2343,13 @@
               }
             };
 
+
             this.submit = function () {
               this.isSubmitted(true);
 
               if (this.validationObject.isValid()) {
                 if ('submit' in params) {
-                  // params.submit(ko.toJS(this.formModel));
+                  params.submit(ko.toJS(this.positions));
                 }
               }
             };
@@ -2337,7 +2400,7 @@
         <!-- /ko -->
 
         <div class="templates__form-field"
-             data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}">
+             data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по ФИО' }}">
         </div>
 
       </div>
@@ -2364,12 +2427,6 @@
         afterAdd: hrmFadeAfterAddFactory(200, 200),
         beforeRemove: hrmFadeBeforeRemoveFactory(200)
       } -->
-        no loading
-      <!-- /ko -->
-
-
-
-
       <!-- ko if: activePosition -->
       <!-- Вкладка позиции -->
 
@@ -2381,7 +2438,7 @@
 
             <!-- ko foreach: $parent.activePosition().employees -->
             <div class="employees-form__checkbox"
-                 data-bind="if: visible">
+                 data-bind="if: $data.visible">
               <div
                    data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: $data.checked }}">
               </div>
@@ -2418,7 +2475,7 @@
                    data-bind="text: $data.name"></div>
               <!-- ko foreach: $data.employees -->
               <div class="employees-form__checkbox"
-                   data-bind="if: visible">
+                   data-bind="if: $data.visible">
                 <div
                      data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: $data.checked }}">
                 </div>
@@ -2435,11 +2492,14 @@
         <!-- /ko -->
       </div>
 
-
-
-
       <!-- /Вкладка Прочие -->
       <!-- /ko -->
+      <!-- /ko -->
+
+
+
+
+
 
     </div><!-- /.employees-form__tab -->
   </div>
@@ -2642,6 +2702,8 @@
         ];
         this.updateSummary(positions);
         this.isBuilt(true);
+
+        console.log('after build', ko.toJS(positions))
       };
 
       this.formControlErrorStateMatcher = function (formControl) {
@@ -2742,9 +2804,45 @@
       this.addEmployees = () => {
         this.modalOpens.push(createEmployeesModalDialog({
           positions: this.summaryModel.positions
-        }, (data) => {
-          console.log('employees saved', data);
+        }, (updatedPositionsList) => {
+          console.log('after save', ko.toJS(updatedPositionsList))
+          const originalPositionsList = this.summaryModel.positions();
+
+          updatedPositionsList.forEach(updatedPosition => {
+            const employees = updatedPosition.employees;
+            const updatedIds = employees.map(e => e.id);
+
+            const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
+
+            const originalPositionEmployees = originalPosition().employees();
+            const originalIds = originalPositionEmployees.map(e => e.id);
+
+
+            const notFoundIds = _.difference(originalIds, updatedIds);
+            const newEmployeesIds = _.difference(updatedIds, originalIds);
+
+            // удалить тех, которых нет
+            const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
+
+            // отметить видимость
+            updated.forEach(e => {
+              const updatedEmployee = employees.find(employee => employee.id === e.id);
+              e.visible(updatedEmployee.checked);
+            });
+
+            // добавить новых
+            newEmployees = newEmployeesIds.map(id => {
+              const data = employees.find(e => e.id === id);
+              const employee = createEmployeeModel('visible');
+              return employee;
+            });
+
+            originalPosition().employees(updated.concat(newEmployees));
+          });
+
+          console.log('after merge', ko.toJS(this.summaryModel.positions))
         }));
+
       };
 
 
@@ -2904,17 +3002,17 @@
     /*****/
 
 
-    function createEmployeeModel(employee) {
+    function createEmployeeModel(employee, visible) {
       return {
         name: employee.name,
         id: employee.name,
-        visible: ko.observable(false),
+        visible: ko.observable(!!visible),
       }
     }
 
     function createPositionModel(positionData) {
       const visible = ko.observable(false);
-      const employees = ko.observableArray(positionData.employees.map(createEmployeeModel));
+      const employees = ko.observableArray(positionData.employees.map((e) => createEmployeeModel(e, false)));
 
       return ko.observable({
         ...positionData,

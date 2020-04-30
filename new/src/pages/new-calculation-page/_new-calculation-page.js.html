@@ -180,6 +180,8 @@
         ];
         this.updateSummary(positions);
         this.isBuilt(true);
+
+        console.log('after build', ko.toJS(positions))
       };
 
       this.formControlErrorStateMatcher = function (formControl) {
@@ -280,9 +282,45 @@
       this.addEmployees = () => {
         this.modalOpens.push(createEmployeesModalDialog({
           positions: this.summaryModel.positions
-        }, (data) => {
-          console.log('employees saved', data);
+        }, (updatedPositionsList) => {
+          console.log('after save', ko.toJS(updatedPositionsList))
+          const originalPositionsList = this.summaryModel.positions();
+
+          updatedPositionsList.forEach(updatedPosition => {
+            const employees = updatedPosition.employees;
+            const updatedIds = employees.map(e => e.id);
+
+            const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
+
+            const originalPositionEmployees = originalPosition().employees();
+            const originalIds = originalPositionEmployees.map(e => e.id);
+
+
+            const notFoundIds = _.difference(originalIds, updatedIds);
+            const newEmployeesIds = _.difference(updatedIds, originalIds);
+
+            // удалить тех, которых нет
+            const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
+
+            // отметить видимость
+            updated.forEach(e => {
+              const updatedEmployee = employees.find(employee => employee.id === e.id);
+              e.visible(updatedEmployee.checked);
+            });
+
+            // добавить новых
+            newEmployees = newEmployeesIds.map(id => {
+              const data = employees.find(e => e.id === id);
+              const employee = createEmployeeModel('visible');
+              return employee;
+            });
+
+            originalPosition().employees(updated.concat(newEmployees));
+          });
+
+          console.log('after merge', ko.toJS(this.summaryModel.positions))
         }));
+
       };
 
 
@@ -442,17 +480,17 @@
     /*****/
 
 
-    function createEmployeeModel(employee) {
+    function createEmployeeModel(employee, visible) {
       return {
         name: employee.name,
         id: employee.name,
-        visible: ko.observable(false),
+        visible: ko.observable(!!visible),
       }
     }
 
     function createPositionModel(positionData) {
       const visible = ko.observable(false);
-      const employees = ko.observableArray(positionData.employees.map(createEmployeeModel));
+      const employees = ko.observableArray(positionData.employees.map((e) => createEmployeeModel(e, false)));
 
       return ko.observable({
         ...positionData,

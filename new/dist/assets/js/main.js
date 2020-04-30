@@ -2284,7 +2284,9 @@ ko.components.register('hrm-modal-container', {
     _destroy() {
       this._subscriptions.forEach(s => s.dispose());
 
-      this._disabledSubscription.dispose();
+      if (this._disabledSubscription !== null) {
+        this._disabledSubscription.dispose();
+      }
     }
 
     _setDisabled(disabled) {

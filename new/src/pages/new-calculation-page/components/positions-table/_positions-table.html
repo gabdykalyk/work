@@ -68,6 +68,9 @@
               <div class="hrm-table__head-cell-content">Сотрудник</div>
             </th>
           </tr>
+
+
+
         </thead>
         <tbody>
 
@@ -83,6 +86,15 @@
               </div>
             </td>
           </tr>
+          <!-- ko foreach: { data: position.employees, as: 'employee' } -->
+          <!-- ko if: employee.visible -->
+          <tr>
+            <td>
+              <div data-bind="text: employee.name"></div>
+            </td>
+          </tr>
+          <!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
 
@@ -94,6 +106,19 @@
               </div>
             </td>
           </tr>
+
+
+          <!-- ko foreach: { data: positions, as: 'position' } -->
+          <!-- ko ifnot: position.visible -->
+          <!-- ko foreach: { data: position.employees, as: 'employee' } -->
+          <tr>
+            <td>
+              <div data-bind="text: employee.name"></div>
+            </td>
+          </tr>
+          <!-- /ko -->
+          <!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
 
 
@@ -174,6 +199,25 @@
                 </div>
               </td>
             </tr>
+
+
+            <!-- ko foreach: position.employees -->
+            <!-- ko if: $data.visible -->
+            <tr data-bind="hrm">
+              <td>
+                <div data-bind="text: $data.name"></div>
+              </td>
+
+              <!-- ko foreach: $parent.columns -->
+              <td></td>
+              <!-- /ko -->
+
+              <td></td>
+              <td></td>
+            </tr>
+            <!-- /ko -->
+            <!-- /ko -->
+
             <!-- /ko -->
             <!-- /ko -->
 
@@ -185,7 +229,30 @@
                 </div>
               </td>
             </tr>
+
+            <!-- ko foreach: { data: positions, as: 'position' } -->
+            <!-- ko ifnot: position.visible -->
+            <!-- ko foreach: { data: position.employees, as: 'employee' } -->
+            <tr class="" data-bind="hrmLog">
+              <td>
+                <div data-bind="text: employee.name"></div>
+              </td>
+
+
+              <!-- ko foreach: $parents[3].columns -->
+              <td></td>
+              <!-- /ko -->
+
+              <td></td>
+              <td></td>
+
+            </tr>
             <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
+
+
 
 
             <!-- Total section -->
