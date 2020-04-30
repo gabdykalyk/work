@@ -35,10 +35,11 @@
       }
     }
 
+
+
     ko.components.register('add-employees-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-          console.log(ko.toJS(params.data.positions))
           const originalPositions = params.data.positions;
 
           const $element = $(componentInfo.element);
@@ -118,38 +119,38 @@
             }
 
             this.loadBranches = (cb) => {
-
               const activePosition = this.activePosition.peek();
               if (activePosition) {
                 console.log('Сделать запрос, категория', activePosition.name);
+                // Данные
+                const employeesList = [
+                  { name: 'Рабочий #1', id: activePosition.name + '1' },
+                  { name: 'Рабочий #2', id: activePosition.name + '2' },
+                  { name: 'Рабочий #3', id: activePosition.name + '3' }
+                ];
 
                 // Добавить новых работников
-                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #1', id: 'test1' }));
-                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #2', id: 'test1' }));
-                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #3', id: 'test1' }));
+                employeesList.forEach(e => {
+                  activePosition.employees.push(NewEmployeeModel(e))
+                });
               } else {
-                console.log('Сделать запрос, категории', this.invisiblePositions.map(p => p.name));
-
-                // Добавить новых работников
+                const positionsList = this.invisiblePositions.map(p => p.name)
+                console.log('Сделать запрос, категории', positionsList);
+                // Добавить новых работников в каждую категию
                 updatedEmployees = this.invisiblePositions.forEach(p => {
-                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #1', id: p.name + 'test1' }));
-                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #2', id: p.name + 'test2' }));
-                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #3', id: p.name + 'test3' }));
+                  const employeesList = [
+                    { name: 'Рабочий #1', id: p.name + '1' },
+                    { name: 'Рабочий #2', id: p.name + '2' },
+                    { name: 'Рабочий #3', id: p.name + '3' }
+                  ];
+                  employeesList.forEach(e => {
+                    p.employees.push(NewEmployeeModel(e))
+                  });
                 })
               }
 
               setTimeout(cb, 3000)
             }
-
-            this.formModel = {
-
-            }
-
-
-            this.validationObject = ko.validatedObservable({
-
-            });
-
 
             this.cancel = function () {
               if ('cancel' in params) {

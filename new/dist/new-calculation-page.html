@@ -977,7 +977,7 @@
 <script id="employees-dropdown-template"
         type="text/html">
         <div class="hrm-dropdown-menu__item" data-bind="click: $root.addEmployees">Добавить сотрудников</div>
-        <div class="hrm-dropdown-menu__item" data-bind="click: $root.addEmployee">Новый сотрудник</div>
+        <div class="hrm-dropdown-menu__item" data-bind="click: $root.createEmployee">Новый сотрудник</div>
 </script>
 
 <!-- Заголовок позиции в таблице -->
@@ -1530,18 +1530,6 @@
       })
     }
 
-    function createPositionsModalDialog(positions) {
-      return {
-        dialogTemplateName: 'positions-modal-template',
-        data: {
-          positions,
-        },
-        options: {
-          modalClass: 'calculation-modal calculation-page__positions-modal'
-        }
-      }
-    }
-
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -1618,7 +1606,7 @@
 
           /** Установить видимость позиций (модальное окно) */
           const setPositions = () => {
-            params.settings.openModal(createPositionsModalDialog(positions))
+            params.settings.openModal('positions', {positions: positions})
           }
 
           return {
@@ -2079,10 +2067,11 @@
       }
     }
 
+
+
     ko.components.register('add-employees-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-          console.log(ko.toJS(params.data.positions))
           const originalPositions = params.data.positions;
 
           const $element = $(componentInfo.element);
@@ -2162,38 +2151,38 @@
             }
 
             this.loadBranches = (cb) => {
-
               const activePosition = this.activePosition.peek();
               if (activePosition) {
                 console.log('Сделать запрос, категория', activePosition.name);
+                // Данные
+                const employeesList = [
+                  { name: 'Рабочий #1', id: activePosition.name + '1' },
+                  { name: 'Рабочий #2', id: activePosition.name + '2' },
+                  { name: 'Рабочий #3', id: activePosition.name + '3' }
+                ];
 
                 // Добавить новых работников
-                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #1', id: 'test1' }));
-                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #2', id: 'test1' }));
-                activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #3', id: 'test1' }));
+                employeesList.forEach(e => {
+                  activePosition.employees.push(NewEmployeeModel(e))
+                });
               } else {
-                console.log('Сделать запрос, категории', this.invisiblePositions.map(p => p.name));
-
-                // Добавить новых работников
+                const positionsList = this.invisiblePositions.map(p => p.name)
+                console.log('Сделать запрос, категории', positionsList);
+                // Добавить новых работников в каждую категию
                 updatedEmployees = this.invisiblePositions.forEach(p => {
-                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #1', id: p.name + 'test1' }));
-                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #2', id: p.name + 'test2' }));
-                  p.employees.push(NewEmployeeModel({ name: 'Рабочий #3', id: p.name + 'test3' }));
+                  const employeesList = [
+                    { name: 'Рабочий #1', id: p.name + '1' },
+                    { name: 'Рабочий #2', id: p.name + '2' },
+                    { name: 'Рабочий #3', id: p.name + '3' }
+                  ];
+                  employeesList.forEach(e => {
+                    p.employees.push(NewEmployeeModel(e))
+                  });
                 })
               }
 
               setTimeout(cb, 3000)
             }
-
-            this.formModel = {
-
-            }
-
-
-            this.validationObject = ko.validatedObservable({
-
-            });
-
 
             this.cancel = function () {
               if ('cancel' in params) {
@@ -2638,25 +2627,89 @@
         this.modalOpens = ko.observableArray([]);
 
         this.settings = {
-          openModal: (modal) => { this.modalOpens.push(modal) },
+          openModal: (id, data, onSave) => {
+            const modal = createModalDialog(id, data, onSave);
+            this.modalOpens.push(modal)
+          },
           viewportSize: this.viewportSize
         }
       })();
 
       this.summaryModel = (() => {
         const positions = ko.observableArray([]);
+
+        /* Creates new list from data */
+        function setPositions(positionsList) {
+          positions(positionsList.map(position => {
+            return PositionModel(position)
+          }))
+        }
+
+        /* Updates employees set and visibility */
+        function updateEmployeesList(updatedPositionsList) {
+          const originalPositionsList = positions();
+
+          updatedPositionsList.forEach(updatedPosition => {
+            const employees = updatedPosition.employees;
+            const updatedIds = employees.map(e => e.id);
+
+            const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
+
+            const originalPositionEmployees = originalPosition().employees();
+            const originalIds = originalPositionEmployees.map(e => e.id);
+
+            const notFoundIds = _.difference(originalIds, updatedIds);
+            const newEmployeesIds = _.difference(updatedIds, originalIds);
+
+            // удалить тех, которых нет
+            const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
+
+            // отметить видимость
+            updated.forEach(e => {
+              const updatedEmployee = employees.find(employee => employee.id === e.id);
+              e.visible(updatedEmployee.checked);
+            });
+
+            // добавить новых
+            newEmployees = newEmployeesIds.map(id => {
+              const data = employees.find(e => e.id === id);
+              const employee = EmployeeModel(data, data.checked);
+              return employee;
+            });
+
+            originalPosition().employees(updated.concat(newEmployees));
+          });
+        }
+
+        function EmployeeModel(employee, visible) {
+          return {
+            name: employee.name,
+            id: employee.id,
+            visible: ko.observable(!!visible),
+          }
+        }
+
+        function PositionModel(positionData) {
+          const visible = ko.observable(false);
+          const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, false)));
+
+          return ko.observable({
+            ...positionData,
+            employees,
+            visible
+          });
+        };
+
         return {
           positions,
+          setPositions,
+          updateEmployeesList,
         }
       })();
-      this.updateSummary = (positionsList) => {
-        const positions = positionsList.map(position => {
-          return createPositionModel(position)
-        });
-        this.summaryModel.positions(positions);
-      }
-      this.updateSummary(defaultPositions);
 
+      this.summaryModel.setPositions(defaultPositions);
+
+      /** Input data */
       this.inputModel = {
         filial: ko.observable(''),
         date: ko.observable(moment().format('DD.MM.YYYY, dddd')),
@@ -2667,9 +2720,9 @@
         }
       };
 
-      /** Calculation created */
+      /** Calculation */
       this.isBuilt = ko.observable(false);
-      /** Получение данных для расчета */
+      /** Get data for calculation */
       this.buildCalculation = () => {
         /** Данные */
         const inputData = ko.toJS(this.inputModel);
@@ -2742,7 +2795,7 @@
               {
                 name: 'Пиццмейкер #1',
                 id: '3'
-              },{
+              }, {
                 name: 'Пиццмейкер #2',
                 id: '4'
               }
@@ -2800,6 +2853,7 @@
         this.isBuilt(true);
       };
 
+      /** Tabs: production, delivery, lateness */
       this.tabs = (() => {
         const tabs = [
           new HrmTabGroupItem('Производство'),
@@ -2811,7 +2865,7 @@
 
         const productionPositions = ko.pureComputed(() => {
           return this.summaryModel.positions()
-          .filter(position => position().type === 'production');
+            .filter(position => position().type === 'production');
         })
 
         return {
@@ -2824,6 +2878,7 @@
       })();
 
 
+      /** Stimulation model (fine/bonus) */
       this.stimulation = (() => {
         function Stimulation() {
           return {
@@ -2844,11 +2899,13 @@
         };
 
         const setStimulation = () => {
-          this.modalOpens.push(createFineBonusModalDialog(
+          this.settings.openModal(
+            'stimulation',
+            null,
             (data) => {
               console.log('stimulation saved', data)
             }
-          ))
+          )
         }
 
         return {
@@ -2858,8 +2915,28 @@
         }
       })();
 
-      this.addEmployee = () => {
-        /*const index = Math.floor(Math.random() * 1000);
+
+      this.createEmployee = () => {
+        this.settings.openModal(
+          'create-employee',
+          null,
+          (data) => {
+            console.log('employee created', data);
+          });
+      };
+
+      this.addEmployees = () => {
+        this.settings.openModal('add-employees', {
+          positions: this.summaryModel.positions
+        }, (updatedPositionsList) => {
+          this.summaryModel.updateEmployeesList(updatedPositionsList);
+        });
+      };
+
+
+      /*
+        addEmployee
+      const index = Math.floor(Math.random() * 1000);
 
         position.employees.push(this.createEmployeeModel({
           name: position.name + ' #' + index,
@@ -2870,58 +2947,6 @@
           bonus: 100,
           fine: 20
         }));*/
-
-        this.modalOpens.push(createEmployeeModalDialog((data) => {
-          console.log('employee saved', data);
-        }));
-      };
-
-      this.addEmployees = () => {
-        this.modalOpens.push(createEmployeesModalDialog({
-          positions: this.summaryModel.positions
-        }, (updatedPositionsList) => {
-          console.log('after save', ko.toJS(updatedPositionsList))
-          const originalPositionsList = this.summaryModel.positions();
-
-          updatedPositionsList.forEach(updatedPosition => {
-            const employees = updatedPosition.employees;
-            const updatedIds = employees.map(e => e.id);
-
-            const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
-
-            const originalPositionEmployees = originalPosition().employees();
-            const originalIds = originalPositionEmployees.map(e => e.id);
-
-
-            const notFoundIds = _.difference(originalIds, updatedIds);
-            const newEmployeesIds = _.difference(updatedIds, originalIds);
-
-            // удалить тех, которых нет
-            const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
-
-            // отметить видимость
-            updated.forEach(e => {
-              const updatedEmployee = employees.find(employee => employee.id === e.id);
-              e.visible(updatedEmployee.checked);
-            });
-
-            // добавить новых
-            newEmployees = newEmployeesIds.map(id => {
-              const data = employees.find(e => e.id === id);
-              const employee = createEmployeeModel(data, data.checked);
-              return employee;
-            });
-
-            originalPosition().employees(updated.concat(newEmployees));
-          });
-
-          console.log('after merge', ko.toJS(this.summaryModel.positions))
-        }));
-
-      };
-
-
-
 
 
       this.isEmployeesCalculated = ko.observable(false);
@@ -3077,64 +3102,16 @@
     /*****/
 
 
-    function createEmployeeModel(employee, visible) {
+
+    function createModalDialog(id, data, onSave) {
       return {
-        name: employee.name,
-        id: employee.id,
-        visible: ko.observable(!!visible),
-      }
-    }
-
-    function createPositionModel(positionData) {
-      const visible = ko.observable(false);
-      const employees = ko.observableArray(positionData.employees.map((e) => createEmployeeModel(e, false)));
-
-      return ko.observable({
-        ...positionData,
-        employees,
-        visible
-      });
-    };
-
-
-
-    function createFineBonusModalDialog(onSave) {
-      return {
-        dialogTemplateName: 'stimulation-modal-template',
-        options: {
-          modalClass: 'calculation-modal calculation-page__stimulation-modal'
-        },
-        close: result => {
-          if (result !== undefined) {
-            onSave(result);
-          }
-        }
-      }
-    }
-
-    function createEmployeeModalDialog(onSave) {
-      return {
-        dialogTemplateName: 'create-employee-modal-template',
-        options: {
-          modalClass: 'calculation-modal calculation-page__employee-modal'
-        },
-        close: result => {
-          if (result !== undefined) {
-            onSave(result);
-          }
-        }
-      }
-    }
-
-    function createEmployeesModalDialog(data, onSave) {
-      return {
-        dialogTemplateName: 'add-employees-modal-template',
+        dialogTemplateName: id + '-modal-template',
         data: data,
         options: {
-          modalClass: 'calculation-modal calculation-page__employees-modal'
+          modalClass: 'calculation-modal calculation-modal--' + id
         },
         close: result => {
-          if (result !== undefined) {
+          if (result !== undefined && typeof onSave === 'function') {
             onSave(result);
           }
         }
