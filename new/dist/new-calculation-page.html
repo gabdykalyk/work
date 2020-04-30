@@ -2153,7 +2153,7 @@
           function createTempPositionModel(position, term) {
             const positionData = position();
 
-            const employees = positionData.employees().map(employee => {
+            const employees = ko.observableArray(positionData.employees().map(employee => {
               return {
                 id: employee.id,
                 name: employee.name,
@@ -2171,7 +2171,8 @@
                 }),
                 employee
               };
-            });
+            }));
+
 
             const hasVisibleEmployees = ko.pureComputed(() => {
               return true;
@@ -2207,9 +2208,9 @@
               });
             };
 
-            this.positions = originalPositions().map(position => {
+            this.positions = this.originalPositions = ko.observableArray(originalPositions().map(position => {
               return createTempPositionModel(position, this.term);
-            });
+            }));
 
             this.visiblePositions = this.positions.filter(position => position.visible);
             this.invisiblePositions = this.positions.filter(position => !position.visible);
@@ -2229,31 +2230,40 @@
             this.activeTab(0);
 
             this.allBranches = ko.observable(false);
-            this.loadingBranches = ko.pureComputed((value) => {
-              console.log('update', value)
-              if (this.allBranches()) {
-                console.log('обновить активную вкладку')
+            this.loadingBranches = ko.observable(false);
+            this.allBranches.subscribe(value => {
+              if (value) {
+                this.loadingBranches(true)
+                this.loadBranches(() => {
+                  this.loadingBranches(false);
+                });
               } else {
-                console.log('Обновить прочие')
+                this.restoreEmployeesList();
               }
-              if (this.allBranches()) {
+            })
+
+            this.restoreEmployeesList = () => {
+              
+            }
+
+            this.loadBranches = (cb) => {
                 const activeTab = this.activeTab.peek();
-
-                let updatedEmployees = [];
-
                 if (activeTab) {
                   console.log('Сделать запрос, категория', this.visiblePositions[activeTab].name);
-                  updatedEmployees = this.visiblePositions[activeTab].employees.concat([
-                    { name: 'Рабочий #1' },
-                    { name: 'Рабочий #2' },
-                    { name: 'Рабочий #3' },
-                    { name: 'Рабочий #4' },
-                  ]);
+                  this.visiblePositions[activeTab].employees.push({ name: 'Рабочий #1' });
+                  this.visiblePositions[activeTab].employees.push({ name: 'Рабочий #2' });
+                  this.visiblePositions[activeTab].employees.push({ name: 'Рабочий #3' });
                 } else {
                   console.log('Сделать запрос, категории', this.invisiblePositions.map(p => p.name));
+                  updatedEmployees = this.invisiblePositions.forEach(p => {
+                    p.employees.push({ name: 'Рабочий #1' });
+                    p.employees.push({ name: 'Рабочий #2' });
+                    p.employees.push({ name: 'Рабочий #3' });
+                  })
                 }
-              }
-            });
+
+                setTimeout(cb, 3000)
+            }
 
             this.formModel = {
 
