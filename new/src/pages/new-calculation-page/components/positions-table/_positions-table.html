@@ -17,7 +17,7 @@
 <!-- Блок сотрудника в таблице -->
 <script id="employee-block-template"
         type="text/html">
-  <div class="employee" data-bind="hrmLog">
+  <div class="employee">
     <div class="employee__remove">
       <button data-bind="
       hrmTooltip,
@@ -112,7 +112,8 @@
       </div><!-- .calculation-tab__settings-group -->
     </div><!-- .calculation-tab__settings -->
 
-    <div class="hrm-table__fixed-section-container positions-table" data-bind="let: {table: $data}">
+    <div class="hrm-table__fixed-section-container positions-table"
+         data-bind="let: {table: $data}">
       <!-- Fixed section -->
       <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
       <table data-bind="hrmTable"
@@ -141,7 +142,10 @@
 
           <!-- Список сотрудников по позиции -->
           <!-- ko foreach: { data: position.employees, as: 'employee' } -->
-          <!-- ko if: employee.visible -->
+          <!-- ko template: {
+              foreach: hrmTemplateIf(employee.visible(), $data),
+              beforeRemove: hrmFadeBeforeRemoveFactory(500)
+          } -->
           <tr class="positions-table__row">
             <td class="positions-table__cell">
               <div class="positions-table__cell-content">
@@ -178,7 +182,10 @@
           <!-- ko foreach: { data: table.positions, as: 'position' } -->
           <!-- ko ifnot: position.visible -->
           <!-- ko foreach: { data: position.employees, as: 'employee' } -->
-          <!-- ko if: employee.visible -->
+          <!-- ko template: {
+              foreach: hrmTemplateIf(employee.visible(), $data),
+              beforeRemove: hrmFadeBeforeRemoveFactory(500)
+          } -->
           <tr class="positions-table__row">
             <td class="positions-table__cell">
               <div class="positions-table__cell-content">
@@ -245,7 +252,8 @@
               </th>
               <!-- /ko -->
 
-              <th class="positions-table__cell positions-table__head-cell positions-table__cell--total positions-table__cell--colored">
+              <th
+                  class="positions-table__cell positions-table__head-cell positions-table__cell--total positions-table__cell--colored">
                 <div class="positions-table__cell-content">
                   <span>Всего начислено, ₽</span>
                   <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
@@ -253,7 +261,8 @@
                 </div>
               </th>
 
-              <th class="positions-table__cell positions-table__head-cell positions-table__cell--payment positions-table__cell--colored">
+              <th
+                  class="positions-table__cell positions-table__head-cell positions-table__cell--payment positions-table__cell--colored">
                 <div class="positions-table__cell-content">
                   <span>К выплате, ₽</span>
                   <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
@@ -281,7 +290,10 @@
 
             <!-- Список сотрудников по позиции -->
             <!-- ko foreach: position.employees -->
-            <!-- ko if: $data.visible -->
+            <!-- ko template: {
+              foreach: hrmTemplateIf($data.visible(), $data),
+              beforeRemove: hrmFadeBeforeRemoveFactory(500)
+          } -->
             <tr class="positions-table__row">
               <td class="positions-table__cell positions-table__cell--name">
                 <div class="positions-table__cell-content">
@@ -325,7 +337,10 @@
             <!-- ko foreach: { data: table.positions, as: 'position' } -->
             <!-- ko ifnot: position.visible -->
             <!-- ko foreach: { data: position.employees, as: 'employee' } -->
-            <!-- ko if: employee.visible -->
+            <!-- ko template: {
+              foreach: hrmTemplateIf(employee.visible(), $data),
+              beforeRemove: hrmFadeBeforeRemoveFactory(500)
+          } -->
             <tr class="positions-table__row">
               <td class="positions-table__cell  positions-table__cell--name">
                 <div class="positions-table__cell-content">
