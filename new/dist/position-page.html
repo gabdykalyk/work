@@ -59,7 +59,7 @@
                         } -->
                             <div class="position-page__title-wrapper">
                                 <span class="position-page__title"
-                                      data-bind="text: formModel.mode() === 'create' ? 'Новая должности' : formModel.value().name()">
+                                      data-bind="text: formModel.mode() === 'create' ? 'Новая должность' : formModel.value().name()">
                                 </span>
 
                                 <!-- ko template: {
@@ -154,16 +154,35 @@
                     </div>
                 </div>
 
-                <div class="position-page__navigation"
-                     data-bind="component: {name: 'hrm-tab-group', params: {items: navigationTabs, activeItem: activeTab}}">
-                </div>
-
                 <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 0, $data),
+                    foreach: hrmTemplateIf($root.formModel.changingBranch(), $data),
                     afterAdd: hrmFadeAfterAddFactory(200, 200),
                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                 } -->
-                    <!-- ko let: {'$tab': $root.workloadTabViewModel} -->
+                    <div>
+                        <div class="position-page__calculating">
+                            <i class="fa fa-spinner fa-pulse
+                            position-page__calculating-indicator">
+                            </i>
+                        </div>
+                    </div>
+                <!-- /ko -->
+
+                <!-- ko template: {
+                    foreach: hrmTemplateIf(!$root.formModel.changingBranch(), $data),
+                    afterAdd: hrmFadeAfterAddFactory(200, 200),
+                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                    <div class="position-page__navigation"
+                        data-bind="component: {name: 'hrm-tab-group', params: {items: navigationTabs, activeItem: activeTab}}">
+                    </div>
+
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 0, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko let: {'$tab': $root.workloadTabViewModel} -->
     <div class="position-page__tab-pane position-page__workload-tab-pane"
          data-bind="using: $tab.formModel.value">
         <!-- ko if: !$tab.isResetting() -->
@@ -726,14 +745,14 @@
     </div>
 <!-- /ko -->
 
-                <!-- /ko -->
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 1, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <!-- ko let: {'$tab': $root.salaryTabViewModel} -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 1, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko let: {'$tab': $root.salaryTabViewModel} -->
     <div class="position-page__tab-pane position-page__salary-tab-pane"
          data-bind="using: $tab.formModel.value">
         <div class="position-page__section">
@@ -1074,14 +1093,14 @@
     </div>
 <!-- /ko -->
 
-                <!-- /ko -->
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 2, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <!-- ko let: {'$tab': $root.ranksTabViewModel} -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 2, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko let: {'$tab': $root.ranksTabViewModel} -->
     <div class="position-page__tab-pane position-page__ranks-tab-pane"
          data-bind="using: $tab.formModel.value">
         <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
@@ -1336,14 +1355,14 @@
     </div>
 <!-- /ko -->
 
-                <!-- /ko -->
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 3, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <!-- ko let: {'$tab': $root.specialitiesTabViewModel} -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 3, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko let: {'$tab': $root.specialitiesTabViewModel} -->
     <div class="position-page__tab-pane position-page__specialities-tab-pane"
          data-bind="using: $tab.formModel.value">
         <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
@@ -1431,14 +1450,14 @@
     </div>
 <!-- /ko -->
 
-                <!-- /ko -->
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 4, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <!-- ko let: {'$tab': $root.shiftsTabViewModel} -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 4, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko let: {'$tab': $root.shiftsTabViewModel} -->
     <div class="position-page__tab-pane position-page__shifts-tab-pane"
          data-bind="using: $tab.formModel.value">
         <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
@@ -1897,14 +1916,14 @@
     </div>
 <!-- /ko -->
 
-                <!-- /ko -->
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 5, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <!-- ko let: {'$tab': $root.depositTabViewModel} -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 5, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko let: {'$tab': $root.depositTabViewModel} -->
     <div class="position-page__tab-pane position-page__deposit-tab-pane"
          data-bind="using: $tab.formModel.value">
         <div class="position-page__section">
@@ -2164,14 +2183,14 @@
     </div>
 <!-- /ko -->
 
-                <!-- /ko -->
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 6, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <!-- ko let: {'$tab': $root.equipmentTabViewModel} -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 6, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko let: {'$tab': $root.equipmentTabViewModel} -->
     <!-- ko template: { afterRender: $tab.afterRender } -->
         <div class="position-page__tab-pane position-page__equipment-tab-pane"
              data-bind="using: $tab.formModel.value">
@@ -2225,14 +2244,14 @@
     <!-- /ko -->
 <!-- /ko -->
 
-                <!-- /ko -->
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 7, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    <!-- ko let: {'$tab': $root.recruitingTabViewModel} -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 7, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        <!-- ko let: {'$tab': $root.recruitingTabViewModel} -->
     <div class="position-page__tab-pane position-page__recruiting-tab-pane"
          data-bind="using: $tab.formModel.value">
         <div class="position-page__section">
@@ -2424,6 +2443,8 @@
         </div>
     </div>
 <!-- /ko -->
+
+                    <!-- /ko -->
 
                 <!-- /ko -->
             </div>
@@ -3751,6 +3772,17 @@
             this.mode = ko.observable('create');
 
             this.branch = ko.observable('');
+            this.changingBranch = ko.observable(false);
+            this.changeBranch = function(branch) {
+                this.changingBranch(true);
+
+                setTimeout(() => {
+                    this.changingBranch(0);
+                }, 5000);
+            }
+            this.branch.subscribe(value => {
+                this.changeBranch(value);
+            })
 
             this.value = ko.validatedObservable(null, {deep: true, live: true});
 

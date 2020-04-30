@@ -44,7 +44,7 @@
                         } -->
                             <div class="position-page__title-wrapper">
                                 <span class="position-page__title"
-                                      data-bind="text: formModel.mode() === 'create' ? 'Новая должности' : formModel.value().name()">
+                                      data-bind="text: formModel.mode() === 'create' ? 'Новая должность' : formModel.value().name()">
                                 </span>
 
                                 <!-- ko template: {
@@ -139,72 +139,93 @@
                     </div>
                 </div>
 
-                <div class="position-page__navigation"
-                     data-bind="component: {name: 'hrm-tab-group', params: {items: navigationTabs, activeItem: activeTab}}">
-                </div>
-
                 <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 0, $data),
+                    foreach: hrmTemplateIf($root.formModel.changingBranch(), $data),
                     afterAdd: hrmFadeAfterAddFactory(200, 200),
                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                 } -->
-                    @@include('tabs/_workload.html')
+                    <div>
+                        <div class="position-page__calculating">
+                            <i class="fa fa-spinner fa-pulse
+                            position-page__calculating-indicator">
+                            </i>
+                        </div>
+                    </div>
                 <!-- /ko -->
 
                 <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 1, $data),
+                    foreach: hrmTemplateIf(!$root.formModel.changingBranch(), $data),
                     afterAdd: hrmFadeAfterAddFactory(200, 200),
                     beforeRemove: hrmFadeBeforeRemoveFactory(200)
                 } -->
-                    @@include('tabs/_salary.html')
-                <!-- /ko -->
+                    <div class="position-page__navigation"
+                        data-bind="component: {name: 'hrm-tab-group', params: {items: navigationTabs, activeItem: activeTab}}">
+                    </div>
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 2, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    @@include('tabs/_ranks.html')
-                <!-- /ko -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 0, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        @@include('tabs/_workload.html')
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 3, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    @@include('tabs/_specialities.html')
-                <!-- /ko -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 1, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        @@include('tabs/_salary.html')
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 4, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    @@include('tabs/_shifts.html')
-                <!-- /ko -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 2, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        @@include('tabs/_ranks.html')
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 5, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    @@include('tabs/_deposit.html')
-                <!-- /ko -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 3, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        @@include('tabs/_specialities.html')
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 6, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    @@include('tabs/_equipment.html')
-                <!-- /ko -->
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 4, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        @@include('tabs/_shifts.html')
+                    <!-- /ko -->
 
-                <!-- ko template: {
-                    foreach: hrmTemplateIf($root.activeTab() === 7, $data),
-                    afterAdd: hrmFadeAfterAddFactory(200, 200),
-                    beforeRemove: hrmFadeBeforeRemoveFactory(200)
-                } -->
-                    @@include('tabs/_recruiting.html')
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 5, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        @@include('tabs/_deposit.html')
+                    <!-- /ko -->
+
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 6, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        @@include('tabs/_equipment.html')
+                    <!-- /ko -->
+
+                    <!-- ko template: {
+                        foreach: hrmTemplateIf($root.activeTab() === 7, $data),
+                        afterAdd: hrmFadeAfterAddFactory(200, 200),
+                        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                    } -->
+                        @@include('tabs/_recruiting.html')
+                    <!-- /ko -->
+
                 <!-- /ko -->
             </div>
         </div>

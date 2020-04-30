@@ -159,6 +159,17 @@
             this.mode = ko.observable('create');
 
             this.branch = ko.observable('');
+            this.changingBranch = ko.observable(false);
+            this.changeBranch = function(branch) {
+                this.changingBranch(true);
+
+                setTimeout(() => {
+                    this.changingBranch(0);
+                }, 5000);
+            }
+            this.branch.subscribe(value => {
+                this.changeBranch(value);
+            })
 
             this.value = ko.validatedObservable(null, {deep: true, live: true});
 
