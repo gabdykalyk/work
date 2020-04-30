@@ -1,0 +1,111 @@
+@@include('./_create-employee-modal.html')
+
+<script type="text/javascript">
+  $(function () {
+    const positionsTable = [
+      {
+        id: 1,
+        name: 'Администратор филиала',
+        levels: [1, 2, 3]
+      }, {
+        id: 2,
+        name: 'Повар-пиццмейкер',
+        levels: [1, 2]
+      }, {
+        id: 3,
+        name: 'Повар-сушист',
+        levels: [1, 2]
+      }, {
+        id: 4,
+        name: 'Официант',
+        levels: []
+      }, {
+        id: 5,
+        name: 'Водитель',
+        levels: []
+      }
+    ];
+
+    ko.components.register('create-employee-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                console.log(formControl, formControl())
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.positions = positionsTable;
+            this.levels = ko.observable([]);
+
+            this.formModel = {
+              position: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              level: ko.observable(null),
+              name: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              })
+            }
+
+            this.validationObject = ko.validatedObservable({
+              name: this.formModel.name,
+              position: this.formModel.position,
+            });
+
+            this.formModel.position.subscribe(positionId => {
+              this.formModel.level(null);
+              if (!positionId) {
+                this.levels([]);
+                return;
+              }
+
+              const position = positionsTable.find(p => p.id === positionId);
+              if (!position) this.levels([]);
+              else this.levels(position.levels);
+            })
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if (this.validationObject.isValid()) {
+                if ('submit' in params) {
+                  params.submit(ko.toJS(this.formModel));
+                }
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('create-employee-modal-dialog-template')
+      }
+    });
+  });
+</script>
