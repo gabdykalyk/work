@@ -83,7 +83,7 @@
             },
             employees: [
               {
-                name: 'Сергеева Мария Владиславовна',
+                name: 'Администратор #1',
               }
             ]
           },
@@ -105,7 +105,7 @@
             },
             employees: [
               {
-                name: 'Сергеева Мария Владиславовна',
+                name: 'Сушист #1',
               }
             ]
           },
@@ -127,7 +127,9 @@
             },
             employees: [
               {
-                name: 'Сергеева Мария Владиславовна',
+                name: 'Пиццмейкер #1',
+              },{
+                name: 'Пиццмейкер #1',
               }
             ]
           },
@@ -149,7 +151,7 @@
             },
             employees: [
               {
-                name: 'Сергеева Мария Владиславовна',
+                name: 'Официант #1',
               }
             ]
           },
@@ -170,9 +172,9 @@
               red: 0
             },
             employees: [
-              {},
-              {},
-              {}
+              { name: 'Водитель #1'},
+              { name: 'Водитель #2'},
+              { name: 'Водитель #3'}
             ]
           },
         ];
@@ -272,6 +274,14 @@
 
         this.modalOpens.push(createEmployeeModalDialog((data) => {
           console.log('employee saved', data);
+        }));
+      };
+
+      this.addEmployees = () => {
+        this.modalOpens.push(createEmployeesModalDialog({
+          positions: this.summaryModel.positions
+        }, (data) => {
+          console.log('employees saved', data);
         }));
       };
 
@@ -432,10 +442,17 @@
     /*****/
 
 
+    function createEmployeeModel(employee) {
+      return {
+        name: employee.name,
+        id: employee.name,
+        visible: ko.observable(false),
+      }
+    }
 
     function createPositionModel(positionData) {
       const visible = ko.observable(false);
-      const employees = ko.observableArray(positionData.employees);
+      const employees = ko.observableArray(positionData.employees.map(createEmployeeModel));
 
       return ko.observable({
         ...positionData,
@@ -465,6 +482,21 @@
         dialogTemplateName: 'calculation-settings-employee-form-modal-template',
         options: {
           modalClass: 'calculation-modal calculation-page__employee-modal'
+        },
+        close: result => {
+          if (result !== undefined) {
+            onSave(result);
+          }
+        }
+      }
+    }
+
+    function createEmployeesModalDialog(data, onSave) {
+      return {
+        dialogTemplateName: 'calculation-settings-employees-form-modal-template',
+        data: data,
+        options: {
+          modalClass: 'calculation-modal calculation-page__employees-modal'
         },
         close: result => {
           if (result !== undefined) {

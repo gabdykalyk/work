@@ -580,6 +580,20 @@
 
 </script>
 
+<script type="text/html"
+        id="calculation-settings-employees-form-modal-template">
+
+  <div data-bind="component: {
+      name: 'calculation-settings-employees-form-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
+
+</script>
+
 
 <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
 
@@ -998,7 +1012,7 @@
 
   <script id="employees-dropdown-template"
         type="text/html">
-        <div class="hrm-dropdown-menu__item">Добавить сотрудников</div>
+        <div class="hrm-dropdown-menu__item" data-bind="click: $root.addEmployees">Добавить сотрудников</div>
         <div class="hrm-dropdown-menu__item" data-bind="click: $root.addEmployee">Новый сотрудник</div>
 </script>
 
@@ -1935,10 +1949,6 @@
               })
             }
 
-            window.changeOptions = () => {
-              this.positions([10,11,212,23,123])
-            }
-
             this.validationObject = ko.validatedObservable({
               name: this.formModel.name,
               position: this.formModel.position,
@@ -2110,6 +2120,338 @@
 
   <script type="text/javascript">
   $(function () {
+    const positionsTable = [
+      {
+        id: 1,
+        name: 'Администратор филиала',
+        levels: [1, 2, 3]
+      }, {
+        id: 2,
+        name: 'Повар-пиццмейкер',
+        levels: [1, 2]
+      }, {
+        id: 3,
+        name: 'Повар-сушист',
+        levels: [1, 2]
+      }, {
+        id: 4,
+        name: 'Официант',
+        levels: []
+      }, {
+        id: 5,
+        name: 'Водитель',
+        levels: []
+      }
+    ];
+
+    ko.components.register('calculation-settings-employees-form-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+
+          const originalPositions = params.data.positions;
+
+          function createTempPositionModel(position, term) {
+            const positionData = position();
+
+            const employees = positionData.employees().map(employee => {
+              return {
+                id: employee.id,
+                name: employee.name,
+                checked: ko.observable(employee.visible()),
+                visible: ko.pureComputed(() => {
+                  return true;
+                  /*
+                  const term = term();
+                  if (term.length < 2) return true;
+
+                  const formattedTerm = term.toLowerCase();
+                  const formattedName = employee.name.toLowerCase();
+                  return formattedName.indexOf(formattedTerm) !== -1;
+                  */
+                }),
+                employee
+              };
+            });
+
+            const hasVisibleEmployees = ko.pureComputed(() => {
+              return true;
+              //return employees.some((e) => e.visible());
+            })
+
+            return {
+              name: positionData.name,
+              id: positionData.id,
+              employees,
+              visible: positionData.visible(),
+              hasVisibleEmployees,
+              position
+            }
+          }
+
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            this.term = ko.observable('');
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.positions = originalPositions().map(position => {
+              return createTempPositionModel(position, this.term);
+            });
+
+            this.visiblePositions = this.positions.filter(position => position.visible);
+            this.invisiblePositions = this.positions.filter(position => !position.visible);
+
+            this.activeTab = ko.observable(0);
+
+            this.tabs = (() => {
+              const tabs = this.visiblePositions.map(position => new HrmTabGroupItem(position.name));
+              if (this.invisiblePositions.length) tabs.push(new HrmTabGroupItem('Прочие'));
+              return tabs;
+            })();
+
+            this.activeTab = ko.observable(0);
+            this.activePosition = ko.pureComputed(() => {
+              return this.visiblePositions[this.activeTab()];
+            });
+            this.activeTab(0);
+
+            this.allBranches = ko.observable(false);
+            this.loadingBranches = ko.pureComputed((value) => {
+              console.log('update', value)
+              if (this.allBranches()) {
+                console.log('обновить активную вкладку')
+              } else {
+                console.log('Обновить прочие')
+              }
+              if (this.allBranches()) {
+                const activeTab = this.activeTab.peek();
+
+                let updatedEmployees = [];
+
+                if (activeTab) {
+                  console.log('Сделать запрос, категория', this.visiblePositions[activeTab].name);
+                  updatedEmployees = this.visiblePositions[activeTab].employees.concat([
+                    { name: 'Рабочий #1' },
+                    { name: 'Рабочий #2' },
+                    { name: 'Рабочий #3' },
+                    { name: 'Рабочий #4' },
+                  ]);
+                } else {
+                  console.log('Сделать запрос, категории', this.invisiblePositions.map(p => p.name));
+                }
+              }
+            });
+
+            this.formModel = {
+
+            }
+
+
+            this.validationObject = ko.validatedObservable({
+
+            });
+
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if (this.validationObject.isValid()) {
+                if ('submit' in params) {
+                  // params.submit(ko.toJS(this.formModel));
+                }
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('calculation-settings-employees-form-modal-dialog-template')
+      }
+    });
+  });
+</script>
+
+<template id="calculation-settings-employees-form-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Добавить сотрудников
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body employees-form">
+
+    <div class="employees-form__tabs">
+      <div style="width: 100%"
+           data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
+      </div>
+    </div>
+
+    <div class="employees-form__tab">
+
+      <div class="employees-form__row">
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+        <div class="hrm-form-field-switch-group"
+             data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+          <div data-bind="component: {name: 'hrm-switch', params: {exportAs: control, checked: allBranches}}"></div>
+          <label data-bind="hrmSwitchGroupLabel: label">
+            Все филиалы
+          </label>
+        </div>
+        <!-- /ko -->
+
+        <div class="templates__form-field"
+             data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}">
+        </div>
+
+      </div>
+
+
+      <!-- ko template: {
+        foreach: hrmTemplateIf(loadingBranches(), $data),
+        afterAdd: hrmFadeAfterAddFactory(200, 200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+
+      <div>
+        <div class="employees-form__calculating">
+          <i class="fa fa-spinner fa-pulse
+                            employees-form__calculating-indicator">
+          </i>
+        </div>
+      </div>
+      <!-- /ko -->
+
+
+      <!-- ko template: {
+        foreach: hrmTemplateIf(!loadingBranches(), $data),
+        afterAdd: hrmFadeAfterAddFactory(200, 200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+        no loading
+      <!-- /ko -->
+
+
+
+
+      <!-- ko if: activePosition -->
+      <!-- Вкладка позиции -->
+
+      <div class="employees-form__employees-scrollable-list"
+           data-bind="hrmScrollable">
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="employees-form__checkbox-group">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+
+            <!-- ko foreach: $parent.activePosition().employees -->
+            <div class="employees-form__checkbox"
+                 data-bind="if: visible">
+              <div
+                   data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: $data.checked }}">
+              </div>
+              <label
+                     data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: $data.name"></label>
+
+            </div>
+
+            <!-- /ko -->
+
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+
+      <!-- /Вкладка позиции -->
+      <!-- /ko -->
+
+
+      <!-- ko ifnot: activePosition -->
+      <!-- Вкладка Прочие -->
+
+
+      <div class="employees-form__employees-scrollable-list"
+           data-bind="hrmScrollable">
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="employees-form__checkbox-group">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+
+            <!-- ko foreach: $parent.invisiblePositions -->
+            <div class="employees-form__position"
+                 data-bind="if: hasVisibleEmployees">
+              <div class="employees-form__position-name"
+                   data-bind="text: $data.name"></div>
+              <!-- ko foreach: $data.employees -->
+              <div class="employees-form__checkbox"
+                   data-bind="if: visible">
+                <div
+                     data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: $data.checked }}">
+                </div>
+                <label
+                       data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: $data.name"></label>
+              </div>
+
+              <!-- /ko -->
+            </div>
+            <!-- /ko -->
+
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+
+
+
+
+      <!-- /Вкладка Прочие -->
+      <!-- /ko -->
+
+    </div><!-- /.employees-form__tab -->
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>
+
+  <script type="text/javascript">
+  $(function () {
     const $page = $(document.documentElement);
 
     const ViewModel = function (defaultPositions, settings) {
@@ -2193,7 +2535,7 @@
             },
             employees: [
               {
-                name: 'Сергеева Мария Владиславовна',
+                name: 'Администратор #1',
               }
             ]
           },
@@ -2215,7 +2557,7 @@
             },
             employees: [
               {
-                name: 'Сергеева Мария Владиславовна',
+                name: 'Сушист #1',
               }
             ]
           },
@@ -2237,7 +2579,9 @@
             },
             employees: [
               {
-                name: 'Сергеева Мария Владиславовна',
+                name: 'Пиццмейкер #1',
+              },{
+                name: 'Пиццмейкер #1',
               }
             ]
           },
@@ -2259,7 +2603,7 @@
             },
             employees: [
               {
-                name: 'Сергеева Мария Владиславовна',
+                name: 'Официант #1',
               }
             ]
           },
@@ -2280,9 +2624,9 @@
               red: 0
             },
             employees: [
-              {},
-              {},
-              {}
+              { name: 'Водитель #1'},
+              { name: 'Водитель #2'},
+              { name: 'Водитель #3'}
             ]
           },
         ];
@@ -2382,6 +2726,14 @@
 
         this.modalOpens.push(createEmployeeModalDialog((data) => {
           console.log('employee saved', data);
+        }));
+      };
+
+      this.addEmployees = () => {
+        this.modalOpens.push(createEmployeesModalDialog({
+          positions: this.summaryModel.positions
+        }, (data) => {
+          console.log('employees saved', data);
         }));
       };
 
@@ -2542,10 +2894,17 @@
     /*****/
 
 
+    function createEmployeeModel(employee) {
+      return {
+        name: employee.name,
+        id: employee.name,
+        visible: ko.observable(false),
+      }
+    }
 
     function createPositionModel(positionData) {
       const visible = ko.observable(false);
-      const employees = ko.observableArray(positionData.employees);
+      const employees = ko.observableArray(positionData.employees.map(createEmployeeModel));
 
       return ko.observable({
         ...positionData,
@@ -2575,6 +2934,21 @@
         dialogTemplateName: 'calculation-settings-employee-form-modal-template',
         options: {
           modalClass: 'calculation-modal calculation-page__employee-modal'
+        },
+        close: result => {
+          if (result !== undefined) {
+            onSave(result);
+          }
+        }
+      }
+    }
+
+    function createEmployeesModalDialog(data, onSave) {
+      return {
+        dialogTemplateName: 'calculation-settings-employees-form-modal-template',
+        data: data,
+        options: {
+          modalClass: 'calculation-modal calculation-page__employees-modal'
         },
         close: result => {
           if (result !== undefined) {
