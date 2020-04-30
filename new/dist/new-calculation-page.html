@@ -2259,8 +2259,8 @@
 
     function NewEmployeeModel(employeeData) {
       return {
-        id: employee.id,
-        name: employee.name,
+        id: employeeData.id,
+        name: employeeData.name,
         checked: ko.observable(false),
         visible: ko.observable(true),
         loaded: true,
@@ -2360,10 +2360,10 @@
                 activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #2', id: 'test1' }));
                 activePosition.employees.push(NewEmployeeModel({ name: 'Рабочий #3', id: 'test1' }));
               } else {
-                console.log('Сделать запрос, категории', this.invisiblePositions().map(p => p.name));
+                console.log('Сделать запрос, категории', this.invisiblePositions.map(p => p.name));
 
                 // Добавить новых работников
-                updatedEmployees = this.invisiblePositions().forEach(p => {
+                updatedEmployees = this.invisiblePositions.forEach(p => {
                   p.employees.push(NewEmployeeModel({ name: 'Рабочий #1', id: p.name + 'test1' }));
                   p.employees.push(NewEmployeeModel({ name: 'Рабочий #2', id: p.name + 'test2' }));
                   p.employees.push(NewEmployeeModel({ name: 'Рабочий #3', id: p.name + 'test3' }));
@@ -2887,7 +2887,7 @@
             // добавить новых
             newEmployees = newEmployeesIds.map(id => {
               const data = employees.find(e => e.id === id);
-              const employee = createEmployeeModel('visible');
+              const employee = createEmployeeModel(data, data.checked);
               return employee;
             });
 
