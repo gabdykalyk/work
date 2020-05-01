@@ -27,6 +27,10 @@
       this.summaryModel = (() => {
         const positions = ko.observableArray([]);
 
+        function getPositionById(id) {
+          return positions().find(p => p().id === id);
+        }
+
         /* Creates new list from data */
         function setPositions(positionsList) {
           positions(positionsList.map(position => {
@@ -74,6 +78,7 @@
           return {
             name: employee.name,
             id: employee.id,
+            level: employee.level,
             visible: ko.observable(!!visible),
           }
         }
@@ -89,10 +94,17 @@
           });
         };
 
+        function addEmployee(positionId, employee) {
+          const model = EmployeeModel(employee, 'visible');
+          const position = getPositionById(positionId);
+          position().employees.push(model);
+        }
+
         return {
           positions,
           setPositions,
           updateEmployeesList,
+          addEmployee
         }
       })();
 
@@ -118,123 +130,11 @@
 
         /* Получение списка позиций */
         const positions = [
-          {
-            name: 'Администратор филиала',
-            id: 1,
-            type: 'production',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: 'Время без дела 0%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              {
-                name: 'Администратор #1',
-                id: '1'
-              }
-            ]
-          },
-          {
-            name: 'Повар-сушист',
-            id: 3,
-            type: 'production',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: 'Время без дела 0%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              {
-                name: 'Сушист #1',
-                id: '2'
-              }
-            ]
-          },
-          {
-            name: 'Повар-пиццмейкер',
-            id: 2,
-            type: 'production',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: 'Время без дела 0%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              {
-                name: 'Пиццмейкер #1',
-                id: '3'
-              }, {
-                name: 'Пиццмейкер #2',
-                id: '4'
-              }
-            ]
-          },
-          {
-            name: 'Официант',
-            id: 4,
-            type: 'production',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: 'Время без дела 0%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              {
-                name: 'Официант #1',
-                id: '5'
-              }
-            ]
-          },
-          {
-            name: 'Водители',
-            id: 5,
-            type: 'delivery',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: '',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              { name: 'Водитель #1', id: '6' },
-              { name: 'Водитель #2', id: '6' },
-              { name: 'Водитель #3', id: '6' }
-            ]
-          },
+          TestPosition('Администратор филиала', 1, { levelCount: 0 }),
+          TestPosition('Повар-сушист', 2),
+          TestPosition('Повар-пиццмейкер', 3),
+          TestPosition('Официант', 4),
+          TestPosition('Водитель', 5, { type: 'delivery'}),
         ];
 
         /** Обновление представления */
@@ -469,8 +369,47 @@
 
 
     /*****/
+    function TestEmployee(name, id, index, levelsCount) {
+      return {
+        name: name + ' #' + index,
+        id: id + '-' + index,
+        level: Math.floor(Math.random() * levelsCount + 1)
+      }
+    }
+    function TestPosition(name, id, config) {
+      config = config || {};
 
+      let levelCount = 'levelCount' in config ? config.levelCount : Math.floor(Math.random() * 4);
+      if (levelCount === 1) levelCount = 2;
+      const levels = [...Array(levelCount)].map((_, i) => i + 1);
 
+      const employeeCount = 'employeeCount' in config ? config.employeeCount : Math.floor(Math.random() * 4 + 1);
+      const employees = [...Array(employeeCount)].map((_, i) => {
+        return TestEmployee(name, id, i + 1, levelCount);
+
+      })
+
+      return {
+        name: name,
+        id: id,
+        levels: levels,
+        type: config.type || 'production',
+
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkload: 'Время без дела 0%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        performanceStandart: -100,
+        lateness: {
+          green: 0,
+          yellow: 0,
+          red: 0
+        },
+        employees: employees
+      };
+    }
 
     function createModalDialog(id, data, onSave) {
       return {

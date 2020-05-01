@@ -14,7 +14,8 @@
   <span data-bind="text: name"></span>
 </script>
 
-<script id="employee-row-template" type="text/html">
+<script id="employee-row-template"
+        type="text/html">
   <tr class="positions-table__row" data-bind="hrmLog">
     <td class="positions-table__cell positions-table__cell--name">
       <div class="positions-table__cell-content">
@@ -31,7 +32,30 @@
     <td class="positions-table__cell positions-table__cell--account"></td>
     <td class="positions-table__cell positions-table__cell--account-operations"
       data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
-    <td class="positions-table__cell positions-table__cell--level"></td>
+
+      <!-- ko if: position.levels.length > 0 -->
+      <!-- ko let: {editableCell: ko.observable(null)} -->
+        <td  data-bind="hrmTableEditableCell: editableCell" class="positions-table__cell positions-table__cell--level">
+          <select data-bind="
+                  options: position.levels,
+                  value: employee.level,
+                  hrmSelect,
+                  hrmTableEditableCellSelectControl,
+                  hrmTableEditableCellSelectControlOwner: editableCell
+              ">
+          </select>
+        </td>
+      <!-- /ko -->
+      <!-- /ko -->
+
+      <!-- ko ifnot: position.levels.length > 0 -->
+      <td class="positions-table__cell positions-table__cell--level">
+      </td>
+      <!-- /ko -->
+
+
+
+
     <td class="positions-table__cell positions-table__cell--interval"></td>
     <td class="positions-table__cell positions-table__cell--work-time"></td>
     <td class="positions-table__cell positions-table__cell--compensation"></td>
@@ -339,7 +363,7 @@
 
             <!-- ko template: {
               name: 'employee-row-template',
-              data: { employee: employee, positionName: false }
+              data: { employee: employee, position: position, positionName: false }
             } -->
             <!-- /ko -->
 
@@ -374,7 +398,7 @@
             <!-- ko template: {
               name: 'employee-row-template',
               data: {
-                employee: employee, positionName: position.name
+                employee: employee, position: position, positionName: position.name
               }
             } -->
             <!-- /ko -->

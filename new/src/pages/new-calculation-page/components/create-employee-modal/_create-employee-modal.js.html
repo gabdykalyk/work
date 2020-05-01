@@ -2,30 +2,6 @@
 
 <script type="text/javascript">
   $(function () {
-    const positionsTable = [
-      {
-        id: 1,
-        name: 'Администратор филиала',
-        levels: [1, 2, 3]
-      }, {
-        id: 2,
-        name: 'Повар-пиццмейкер',
-        levels: [1, 2]
-      }, {
-        id: 3,
-        name: 'Повар-сушист',
-        levels: [1, 2]
-      }, {
-        id: 4,
-        name: 'Официант',
-        levels: []
-      }, {
-        id: 5,
-        name: 'Водитель',
-        levels: []
-      }
-    ];
-
     ko.components.register('create-employee-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -44,12 +20,18 @@
 
             this.formControlErrorStateMatcher = (formControl) => {
               return ko.pureComputed(() => {
-                console.log(formControl, formControl())
                 return this.isSubmitted() && !formControl.isValid();
               });
             };
 
-            this.positions = positionsTable;
+            this.positions = params.data.positions.map((p) => {
+              p = p();
+              return {
+                id: p.id,
+                name: p.name,
+                levels: p.levels
+              }
+            });
             this.levels = ko.observable([]);
 
             this.formModel = {
@@ -78,7 +60,7 @@
                 return;
               }
 
-              const position = positionsTable.find(p => p.id === positionId);
+              const position = this.positions.find(p => p.id === positionId);
               if (!position) this.levels([]);
               else this.levels(position.levels);
             })

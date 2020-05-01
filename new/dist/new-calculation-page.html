@@ -652,30 +652,6 @@
 
 <script type="text/javascript">
   $(function () {
-    const positionsTable = [
-      {
-        id: 1,
-        name: 'Администратор филиала',
-        levels: [1, 2, 3]
-      }, {
-        id: 2,
-        name: 'Повар-пиццмейкер',
-        levels: [1, 2]
-      }, {
-        id: 3,
-        name: 'Повар-сушист',
-        levels: [1, 2]
-      }, {
-        id: 4,
-        name: 'Официант',
-        levels: []
-      }, {
-        id: 5,
-        name: 'Водитель',
-        levels: []
-      }
-    ];
-
     ko.components.register('create-employee-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -694,12 +670,18 @@
 
             this.formControlErrorStateMatcher = (formControl) => {
               return ko.pureComputed(() => {
-                console.log(formControl, formControl())
                 return this.isSubmitted() && !formControl.isValid();
               });
             };
 
-            this.positions = positionsTable;
+            this.positions = params.data.positions.map((p) => {
+              p = p();
+              return {
+                id: p.id,
+                name: p.name,
+                levels: p.levels
+              }
+            });
             this.levels = ko.observable([]);
 
             this.formModel = {
@@ -728,7 +710,7 @@
                 return;
               }
 
-              const position = positionsTable.find(p => p.id === positionId);
+              const position = this.positions.find(p => p.id === positionId);
               if (!position) this.levels([]);
               else this.levels(position.levels);
             })
@@ -2336,8 +2318,7 @@
   })
 </script>
 
-  
-<!-- Выпадающее меню сотрудников -->
+  <!-- Выпадающее меню сотрудников -->
 <script id="employees-dropdown-template"
         type="text/html">
         <div class="hrm-dropdown-menu__item" data-bind="click: addEmployees">Добавить сотрудников</div>
@@ -2353,7 +2334,8 @@
   <span data-bind="text: name"></span>
 </script>
 
-<script id="employee-row-template" type="text/html">
+<script id="employee-row-template"
+        type="text/html">
   <tr class="positions-table__row" data-bind="hrmLog">
     <td class="positions-table__cell positions-table__cell--name">
       <div class="positions-table__cell-content">
@@ -2370,7 +2352,30 @@
     <td class="positions-table__cell positions-table__cell--account"></td>
     <td class="positions-table__cell positions-table__cell--account-operations"
       data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
-    <td class="positions-table__cell positions-table__cell--level"></td>
+
+      <!-- ko if: position.levels.length > 0 -->
+      <!-- ko let: {editableCell: ko.observable(null)} -->
+        <td  data-bind="hrmTableEditableCell: editableCell" class="positions-table__cell positions-table__cell--level">
+          <select data-bind="
+                  options: position.levels,
+                  value: employee.level,
+                  hrmSelect,
+                  hrmTableEditableCellSelectControl,
+                  hrmTableEditableCellSelectControlOwner: editableCell
+              ">
+          </select>
+        </td>
+      <!-- /ko -->
+      <!-- /ko -->
+
+      <!-- ko ifnot: position.levels.length > 0 -->
+      <td class="positions-table__cell positions-table__cell--level">
+      </td>
+      <!-- /ko -->
+
+
+
+
     <td class="positions-table__cell positions-table__cell--interval"></td>
     <td class="positions-table__cell positions-table__cell--work-time"></td>
     <td class="positions-table__cell positions-table__cell--compensation"></td>
@@ -2678,7 +2683,7 @@
 
             <!-- ko template: {
               name: 'employee-row-template',
-              data: { employee: employee, positionName: false }
+              data: { employee: employee, position: position, positionName: false }
             } -->
             <!-- /ko -->
 
@@ -2713,7 +2718,7 @@
             <!-- ko template: {
               name: 'employee-row-template',
               data: {
-                employee: employee, positionName: position.name
+                employee: employee, position: position, positionName: position.name
               }
             } -->
             <!-- /ko -->
@@ -2858,9 +2863,12 @@
           const createEmployee = () => {
             params.settings.openModal(
               'create-employee',
-              null,
+              { positions: positions() },
               (data) => {
-                console.log('employee created', data);
+                model.addEmployee(data.position, {
+                  name: data.name,
+                  level: data.level
+                })
               });
           };
 
@@ -2983,6 +2991,10 @@
       this.summaryModel = (() => {
         const positions = ko.observableArray([]);
 
+        function getPositionById(id) {
+          return positions().find(p => p().id === id);
+        }
+
         /* Creates new list from data */
         function setPositions(positionsList) {
           positions(positionsList.map(position => {
@@ -3030,6 +3042,7 @@
           return {
             name: employee.name,
             id: employee.id,
+            level: employee.level,
             visible: ko.observable(!!visible),
           }
         }
@@ -3045,10 +3058,17 @@
           });
         };
 
+        function addEmployee(positionId, employee) {
+          const model = EmployeeModel(employee, 'visible');
+          const position = getPositionById(positionId);
+          position().employees.push(model);
+        }
+
         return {
           positions,
           setPositions,
           updateEmployeesList,
+          addEmployee
         }
       })();
 
@@ -3074,123 +3094,11 @@
 
         /* Получение списка позиций */
         const positions = [
-          {
-            name: 'Администратор филиала',
-            id: 1,
-            type: 'production',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: 'Время без дела 0%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              {
-                name: 'Администратор #1',
-                id: '1'
-              }
-            ]
-          },
-          {
-            name: 'Повар-сушист',
-            id: 3,
-            type: 'production',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: 'Время без дела 0%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              {
-                name: 'Сушист #1',
-                id: '2'
-              }
-            ]
-          },
-          {
-            name: 'Повар-пиццмейкер',
-            id: 2,
-            type: 'production',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: 'Время без дела 0%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              {
-                name: 'Пиццмейкер #1',
-                id: '3'
-              }, {
-                name: 'Пиццмейкер #2',
-                id: '4'
-              }
-            ]
-          },
-          {
-            name: 'Официант',
-            id: 4,
-            type: 'production',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: 'Время без дела 0%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              {
-                name: 'Официант #1',
-                id: '5'
-              }
-            ]
-          },
-          {
-            name: 'Водители',
-            id: 5,
-            type: 'delivery',
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkload: '',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: [
-              { name: 'Водитель #1', id: '6' },
-              { name: 'Водитель #2', id: '6' },
-              { name: 'Водитель #3', id: '6' }
-            ]
-          },
+          TestPosition('Администратор филиала', 1, { levelCount: 0 }),
+          TestPosition('Повар-сушист', 2),
+          TestPosition('Повар-пиццмейкер', 3),
+          TestPosition('Официант', 4),
+          TestPosition('Водитель', 5, { type: 'delivery'}),
         ];
 
         /** Обновление представления */
@@ -3425,8 +3333,47 @@
 
 
     /*****/
+    function TestEmployee(name, id, index, levelsCount) {
+      return {
+        name: name + ' #' + index,
+        id: id + '-' + index,
+        level: Math.floor(Math.random() * levelsCount + 1)
+      }
+    }
+    function TestPosition(name, id, config) {
+      config = config || {};
 
+      let levelCount = 'levelCount' in config ? config.levelCount : Math.floor(Math.random() * 4);
+      if (levelCount === 1) levelCount = 2;
+      const levels = [...Array(levelCount)].map((_, i) => i + 1);
 
+      const employeeCount = 'employeeCount' in config ? config.employeeCount : Math.floor(Math.random() * 4 + 1);
+      const employees = [...Array(employeeCount)].map((_, i) => {
+        return TestEmployee(name, id, i + 1, levelCount);
+
+      })
+
+      return {
+        name: name,
+        id: id,
+        levels: levels,
+        type: config.type || 'production',
+
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkload: 'Время без дела 0%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        performanceStandart: -100,
+        lateness: {
+          green: 0,
+          yellow: 0,
+          red: 0
+        },
+        employees: employees
+      };
+    }
 
     function createModalDialog(id, data, onSave) {
       return {
