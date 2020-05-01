@@ -3481,12 +3481,13 @@ ko.bindingHandlers.hrmTable = {
 // hrmTooltip
 (() => {
   class ViewModel {
-    constructor(element, text, mode = 'basic') {
+    constructor(element, text, mode = 'basic', hideOnClick) {
       this._subscriptions = [];
       this._textSubscription = null;
       this._clickHandler = null;
       this._text = null;
       this._mode = mode;
+      this._hideOnClick = hideOnClick;
       this.element = element;
       this._tippyInstance = null;
 
@@ -3510,6 +3511,11 @@ ko.bindingHandlers.hrmTable = {
         };
       }
 
+      const triggers = [];
+      if (this._mode !== 'basic') triggers.push('manual');else {
+        triggers.push('mouseenter');
+        if (!this._hideOnClick) triggers.push('click');
+      }
       this._tippyInstance = tippy(this.element, {
         arrow: false,
         distance: 7,
@@ -3518,7 +3524,7 @@ ko.bindingHandlers.hrmTable = {
         appendTo: document.body,
         boundary: 'viewport',
         hideOnClick: true,
-        trigger: this._mode === 'basic' ? 'mouseenter click' : 'manual',
+        trigger: triggers.join(' '),
         onCreate: instance => {
           $(instance.popperChildren.tooltip).addClass('hrm-tooltip');
           $(instance.popperChildren.tooltip).addClass(this._mode === 'basic' ? 'hrm-tooltip--mode_basic' : 'hrm-tooltip--mode_large');
@@ -3583,7 +3589,8 @@ ko.bindingHandlers.hrmTable = {
     init: function (element, valueAccessor, allBindings) {
       const text = allBindings.get('hrmTooltipText');
       const mode = allBindings.get('hrmTooltipMode');
-      const viewModel = new ViewModel(element, text, mode);
+      const hideOnClick = allBindings.has('hrmTooltipHideOnClick');
+      const viewModel = new ViewModel(element, text, mode, hideOnClick);
       instances.set(element, viewModel);
 
       if (valueAccessor() !== undefined) {
