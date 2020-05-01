@@ -238,7 +238,7 @@
         ];
 
         /** Обновление представления */
-        this.updateSummary(positions);
+        this.summaryModel.setPositions(positions);
         this.isBuilt(true);
       };
 
@@ -249,22 +249,17 @@
           new HrmTabGroupItem('Доставка'),
           new HrmTabGroupItem('Опоздания')
         ];
-
         const activeTab = ko.observable(0);
-
-        const productionPositions = ko.pureComputed(() => {
-          return this.summaryModel.positions()
-            .filter(position => position().type === 'production');
-        })
-
         return {
           tabs,
           activeTab,
-          production: {
-            positions: productionPositions,
-          }
         }
       })();
+
+      this.productionPositions = ko.pureComputed(() => {
+        return this.summaryModel.positions()
+          .filter(position => position().type === 'production');
+      })
 
 
       /** Stimulation model (fine/bonus) */
@@ -305,22 +300,7 @@
       })();
 
 
-      this.createEmployee = () => {
-        this.settings.openModal(
-          'create-employee',
-          null,
-          (data) => {
-            console.log('employee created', data);
-          });
-      };
 
-      this.addEmployees = () => {
-        this.settings.openModal('add-employees', {
-          positions: this.summaryModel.positions
-        }, (updatedPositionsList) => {
-          this.summaryModel.updateEmployeesList(updatedPositionsList);
-        });
-      };
 
 
       /*

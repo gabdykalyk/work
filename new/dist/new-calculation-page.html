@@ -130,7 +130,7 @@
               } -->
                 <div class="calculation-page__tab">
                   <!-- ko let: {'$tab': $root.settings.production, tabName: 'production'} -->
-<div data-bind="component: {name: 'calculation-page-positions-table', params: { tabName: 'production', tab: $root.tabs.production, settings: $root.settings }}"></div>
+<div data-bind="component: {name: 'calculation-page-positions-table', params: { tabName: 'production', positions: $root.productionPositions, settings: $root.settings, model: $root.summaryModel }}"></div>
 <!-- /ko -->
 
                 </div>
@@ -976,14 +976,14 @@
   <!-- Выпадающее меню сотрудников -->
 <script id="employees-dropdown-template"
         type="text/html">
-        <div class="hrm-dropdown-menu__item" data-bind="click: $root.addEmployees">Добавить сотрудников</div>
-        <div class="hrm-dropdown-menu__item" data-bind="click: $root.createEmployee">Новый сотрудник</div>
+        <div class="hrm-dropdown-menu__item" data-bind="click: addEmployees">Добавить сотрудников</div>
+        <div class="hrm-dropdown-menu__item" data-bind="click: createEmployee">Новый сотрудник</div>
 </script>
 
 <!-- Заголовок позиции в таблице -->
 <script id="position-header-template"
         type="text/html">
-  <button data-bind="hrmTooltip, hrmTooltipText: 'Добавить сотрудников'"
+  <button data-bind="hrmTooltip, hrmTooltipText: 'Добавить сотрудников', click: table.addEmployeesInPosition"
     class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-plus-icon-button hrm-circle-icon-button--theme_neutral positions-table__action">
   </button>
   <span data-bind="text: name"></span>
@@ -1533,12 +1533,12 @@
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-          const positions = params.tab.positions;
+          const positions = params.positions;
+          const model = params.model;
 
           /** Наличие неактивных позиций - для секции Прочее */
           const hasOtherSection = ko.pureComputed(() => {
             return positions().some(p => {
-              console.log(!p().visible())
               return !p().visible();
             });
           });
@@ -1606,7 +1606,46 @@
 
           /** Установить видимость позиций (модальное окно) */
           const setPositions = () => {
-            params.settings.openModal('positions', {positions: positions})
+            params.settings.openModal('positions', { positions: positions })
+          }
+
+          /* Создать сотрудника*/
+          const createEmployee = () => {
+            params.settings.openModal(
+              'create-employee',
+              null,
+              (data) => {
+                console.log('employee created', data);
+              });
+          };
+
+          /* Добавить сотрудников */
+          const addEmployees = () => {
+            params.settings.openModal('add-employees', {
+              positions: positions(),
+              mode: 'tabs',
+            }, (updatedPositionsList) => {
+              model.updateEmployeesList(updatedPositionsList);
+            });
+          };
+
+          const addEmployeesInPosition = (position) => {
+            const originalPosition = positions().find(p => p().id === position.id);
+
+            if (originalPosition) {
+              params.settings.openModal('add-employees',
+                { position: originalPosition, mode: 'single' },
+                (updatedPositionsList) => {
+                  model.updateEmployeesList(updatedPositionsList);
+                });
+            } else {
+              const invisiblePositions = positions().filter(p => !p().visible());
+              params.settings.openModal('add-employees',
+                { positions: invisiblePositions, mode: 'list' },
+                (updatedPositionsList) => {
+                  model.updateEmployeesList(updatedPositionsList);
+                });
+            }
           }
 
           return {
@@ -1618,10 +1657,13 @@
             columnCount,
 
             setPositions,
-
             positions,
             hasOtherSection,
             total,
+
+            addEmployees,
+            addEmployeesInPosition,
+            createEmployee
           };
         }
       },
@@ -1868,7 +1910,139 @@
   });
 </script>
 
-  <template id="add-employees-modal-dialog-template">
+  <script type="text/html"
+        id="add-employees-modal-employee-template">
+  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+<div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+  <div data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
+  </div>
+  <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
+</div>
+<!-- /ko -->
+</script>
+
+<script type="text/html"
+        id="add-employees-modal-position-list-template">
+
+        <div class="employees-form__employees-scrollable-list"
+        data-bind="hrmScrollable">
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="employees-form__checkbox-group">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+
+              <!-- ko foreach: {data: $parent.position.employees, as: 'employee'} -->
+              <div class="employees-form__checkbox">
+
+                    <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
+                    <!-- /ko -->
+              </div>
+              <!-- /ko -->
+
+
+          </div>
+        </div>
+        <!-- /ko -->
+
+        </div>
+</script>
+
+<script type="text/html"
+        id="add-employees-modal-other-list-template">
+
+  <div class="employees-form__employees-scrollable-list"
+  data-bind="hrmScrollable">
+
+  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+  <div class="employees-form__checkbox-group">
+    <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+
+      <!-- ko foreach: { data: $parent.positions, as: 'position' } -->
+      <div class="employees-form__position"
+            data-bind="if: position.hasVisibleEmployees">
+        <div class="employees-form__position-name"
+              data-bind="text: position.name"></div>
+
+        <!-- ko foreach: {data: position.employees, as: 'employee'} -->
+        <div class="employees-form__checkbox">
+
+              <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
+              <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+      </div>
+      <!-- /ko -->
+    </div>
+  </div>
+  <!-- /ko -->
+
+  </div>
+
+</script>
+
+
+<template id="add-employees-position-tab-template">
+  <div class="employees-form__row">
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="hrm-form-field-switch-group"
+         data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+      <div data-bind="component: {name: 'hrm-switch', params: {exportAs: control, checked: allBranches}}"></div>
+      <label data-bind="hrmSwitchGroupLabel: label">
+        Все филиалы
+      </label>
+    </div>
+    <!-- /ko -->
+
+    <div class="templates__form-field"
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по ФИО' }}">
+    </div>
+  </div><!-- .employees-form__row -->
+
+
+  <!-- Подгрузка сотрудников -->
+  <!-- ko template: {
+        foreach: hrmTemplateIf(loadingBranches(), $data),
+        afterAdd: hrmFadeAfterAddFactory(200, 200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+  <div>
+    <div class="employees-form__calculating">
+      <i class="fa fa-spinner fa-pulse
+                            employees-form__calculating-indicator">
+      </i>
+    </div>
+  </div>
+  <!-- /ko -->
+
+
+  <!-- Отображение сотрудников -->
+  <!-- ko template: {
+        foreach: hrmTemplateIf(!loadingBranches(), $data),
+        afterAdd: hrmFadeAfterAddFactory(200, 200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+
+  <!-- Список позиций -->
+  <!-- ko ifnot: isSingle -->
+  <!-- ko template: { name: 'add-employees-modal-other-list-template', data: {positions: positions} } -->
+  <!-- /ko -->
+  <!-- /ko -->
+  <!-- /Список позиций -->
+
+  <!-- Одна позиция -->
+  <!-- ko if: isSingle -->
+  <!-- ko template: { name: 'add-employees-modal-position-list-template', data: {position: positions[0]} } -->
+  <!-- /ko -->
+  <!-- /ko -->
+  <!-- /Одна позиция -->
+
+  <!-- /ko -->
+  <!-- /Отображение сотрудников -->
+
+</template>
+
+<template id="add-employees-modal-dialog-template">
 
   <button class="hrm-button hrm-basic-modal-dialog__close-button"
           data-bind="click: function() { cancel(); }"
@@ -1882,137 +2056,42 @@
   </div>
 
   <div class="hrm-basic-modal-dialog__body employees-form">
-
+    <!-- ko if: tabs -->
     <div class="employees-form__tabs">
       <div style="width: 100%"
            data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
       </div>
     </div>
+    <!-- /ko -->
 
     <div class="employees-form__tab">
-
-      <div class="employees-form__row">
-        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-        <div class="hrm-form-field-switch-group"
-             data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
-          <div data-bind="component: {name: 'hrm-switch', params: {exportAs: control, checked: allBranches}}"></div>
-          <label data-bind="hrmSwitchGroupLabel: label">
-            Все филиалы
-          </label>
-        </div>
-        <!-- /ko -->
-
-        <div class="templates__form-field"
-             data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по ФИО' }}">
-        </div>
-
-      </div>
-
-
-      <!-- ko template: {
-        foreach: hrmTemplateIf(loadingBranches(), $data),
-        afterAdd: hrmFadeAfterAddFactory(200, 200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-      } -->
-
-      <div>
-        <div class="employees-form__calculating">
-          <i class="fa fa-spinner fa-pulse
-                            employees-form__calculating-indicator">
-          </i>
-        </div>
-      </div>
-      <!-- /ko -->
-
-
-      <!-- ko template: {
-        foreach: hrmTemplateIf(!loadingBranches(), $data),
-        afterAdd: hrmFadeAfterAddFactory(200, 200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-      } -->
       <!-- ko if: activePosition -->
-      <!-- Вкладка позиции -->
-      <div class="employees-form__employees-scrollable-list"
-           data-bind="hrmScrollable">
-
-        <!-- ko foreach: {data: $parent.activePosition().employees, as: 'employee'} -->
-        <div class="employees-form__checkbox"
-             data-bind="if: $data.visible">
-
-          <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-            <div
-                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
-            </div>
-            <label
-                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
-          </div>
-          <!-- /ko -->
-
-        </div>
+        <!-- ko component: {
+          name: 'add-employees-position-tab',
+          params: {
+            term: term,
+            mode: 'single',
+            position: activePosition()
+          }
+        } -->
         <!-- /ko -->
-
-      </div>
-      <!-- /Вкладка позиции -->
       <!-- /ko -->
 
 
       <!-- ko ifnot: activePosition -->
       <!-- Вкладка Прочие -->
-
-
-      <div class="employees-form__employees-scrollable-list"
-           data-bind="hrmScrollable">
-        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-        <div class="employees-form__checkbox-group">
-          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-
-            <!-- ko foreach: $parent.invisiblePositions -->
-            <div class="employees-form__position"
-                 data-bind="if: hasVisibleEmployees">
-              <div class="employees-form__position-name"
-                   data-bind="text: $data.name"></div>
-
-
-              <!-- ko foreach: {data: $data.employees, as: 'employee'} -->
-              <div class="employees-form__checkbox"
-                   data-bind="if: $data.visible">
-
-                <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-                <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-                  <div
-                       data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
-                  </div>
-                  <label
-                         data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
-                </div>
-                <!-- /ko -->
-
-
-              </div>
-              <!-- /ko -->
-
-
-
-
-            </div>
-            <!-- /ko -->
-
-          </div>
-        </div>
+        <!-- ko component: {
+          name: 'add-employees-position-tab',
+          params: {
+            term: term,
+            mode: 'list',
+            positions: list
+          }
+        } -->
         <!-- /ko -->
-      </div>
-
       <!-- /Вкладка Прочие -->
       <!-- /ko -->
-      <!-- /ko -->
-
-
-
-
-
-
-    </div><!-- /.employees-form__tab -->
+    </div>
   </div>
 
   <div class="hrm-basic-modal-dialog__action-list">
@@ -2034,6 +2113,12 @@
 
 <script type="text/javascript">
   $(function () {
+    const modes = {
+      SINGLE: 'single',
+      TABS: 'tabs',
+      LIST: 'list'
+    };
+
     function EmployeeModel(employee) {
       return {
         id: employee.id,
@@ -2067,13 +2152,81 @@
       }
     }
 
+    ko.components.register('add-employees-position-tab', {
+      viewModel: function (params) {
+        this.term = params.term;
+        this.mode = params.mode || ('position' in params ? modes.SINGLE : modes.LIST);
 
+        this.isSingle = this.mode === modes.SINGLE;
+
+        if (this.isSingle) {
+          this.positions = [params.position];
+        } else {
+          this.positions = params.positions;
+        }
+
+        this.allBranches = ko.observable(false);
+        this.loadingBranches = ko.observable(false);
+        this.allBranches.subscribe(value => {
+          if (value) {
+            this.loadingBranches(true)
+            this.loadBranches(() => {
+              this.loadingBranches(false);
+            });
+          } else {
+            this.restoreEmployeesList();
+          }
+        });
+
+        this.restoreEmployeesList = () => {
+          this.positions.forEach(p => {
+            const oldEmployeesList = p.employees().filter(e => !e.loaded)
+            p.employees(oldEmployeesList)
+          })
+        };
+
+        this.loadBranches = (cb) => {
+          if (this.isSingle) {
+            const position = this.positions[0];
+            console.log('Сделать запрос, категория', position.name);
+            // Данные
+            const employeesList = [
+              { name: 'Рабочий #1', id: activePosition.name + '1' },
+              { name: 'Рабочий #2', id: activePosition.name + '2' },
+              { name: 'Рабочий #3', id: activePosition.name + '3' }
+            ];
+
+            // Добавить новых работников
+            employeesList.forEach(e => {
+              position.employees.push(NewEmployeeModel(e))
+            });
+          } else {
+            const positionsList = this.positions.map(p => p.name)
+            console.log('Сделать запрос, категории', positionsList);
+            // Добавить новых работников в каждую категию
+            updatedEmployees = this.positions.forEach(p => {
+              const employeesList = [
+                { name: 'Рабочий #1', id: p.name + '1' },
+                { name: 'Рабочий #2', id: p.name + '2' },
+                { name: 'Рабочий #3', id: p.name + '3' }
+              ];
+              employeesList.forEach(e => {
+                p.employees.push(NewEmployeeModel(e))
+              });
+            })
+          }
+
+          setTimeout(cb, 3000)
+        }
+      },
+      template: {
+        element: 'add-employees-position-tab-template'
+      }
+    })
 
     ko.components.register('add-employees-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-          const originalPositions = params.data.positions;
-
           const $element = $(componentInfo.element);
           $element.addClass([
             'modal-dialog',
@@ -2083,8 +2236,8 @@
             'hrm-modal-dialog--size_large'
           ]);
 
-          const ViewModel = function () {
 
+          const ViewModel = function () {
             this.isSubmitted = ko.observable(false);
 
             this.formControlErrorStateMatcher = (formControl) => {
@@ -2093,16 +2246,15 @@
               });
             };
 
-            this.positions = originalPositions().map(PositionModel);
+            this.mode = params.data.mode || ('position' in params.data ? modes.SINGLE : modes.TABS);
 
-            this.visiblePositions = this.positions.filter(position => position.visible);
-            this.invisiblePositions = this.positions.filter(position => !position.visible);
+            this.positions = this.mode === modes.SINGLE
+              ? [PositionModel(params.data.position)]
+              : params.data.positions.map(PositionModel);
 
             this.term = ko.observable('');
-            this.term.subscribe(value => {
+            function termUpdateHandler(value) {
               const formattedValue = value.toLowerCase();
-              console.log(formattedValue)
-
               this.positions.forEach(p => {
                 let hasVisibleEmployees = 0;
                 p.employees().forEach(e => {
@@ -2116,72 +2268,32 @@
                 });
                 p.hasVisibleEmployees(hasVisibleEmployees);
               })
-            })
-
-            this.tabs = (() => {
-              const tabs = this.visiblePositions.map(position => new HrmTabGroupItem(position.name));
-              if (this.invisiblePositions.length) tabs.push(new HrmTabGroupItem('Прочие'));
-              return tabs;
-            })();
-
-            this.activeTab = ko.observable(0);
-            this.activePosition = ko.pureComputed(() => {
-              return this.visiblePositions[this.activeTab()];
-            });
-            this.activeTab(0);
-
-            this.allBranches = ko.observable(false);
-            this.loadingBranches = ko.observable(false);
-            this.allBranches.subscribe(value => {
-              if (value) {
-                this.loadingBranches(true)
-                this.loadBranches(() => {
-                  this.loadingBranches(false);
-                });
-              } else {
-                this.restoreEmployeesList();
-              }
-            })
-
-            this.restoreEmployeesList = () => {
-              this.positions.forEach(p => {
-                const oldEmployeesList = p.employees().filter(e => !e.loaded)
-                p.employees(oldEmployeesList)
-              })
             }
+            this.term.subscribe(value => {
+              termUpdateHandler(value);
+            });
 
-            this.loadBranches = (cb) => {
-              const activePosition = this.activePosition.peek();
-              if (activePosition) {
-                console.log('Сделать запрос, категория', activePosition.name);
-                // Данные
-                const employeesList = [
-                  { name: 'Рабочий #1', id: activePosition.name + '1' },
-                  { name: 'Рабочий #2', id: activePosition.name + '2' },
-                  { name: 'Рабочий #3', id: activePosition.name + '3' }
-                ];
+            this.tabs = null;
+            this.activePosition = null;
+            this.list = null;
 
-                // Добавить новых работников
-                employeesList.forEach(e => {
-                  activePosition.employees.push(NewEmployeeModel(e))
-                });
-              } else {
-                const positionsList = this.invisiblePositions.map(p => p.name)
-                console.log('Сделать запрос, категории', positionsList);
-                // Добавить новых работников в каждую категию
-                updatedEmployees = this.invisiblePositions.forEach(p => {
-                  const employeesList = [
-                    { name: 'Рабочий #1', id: p.name + '1' },
-                    { name: 'Рабочий #2', id: p.name + '2' },
-                    { name: 'Рабочий #3', id: p.name + '3' }
-                  ];
-                  employeesList.forEach(e => {
-                    p.employees.push(NewEmployeeModel(e))
-                  });
-                })
-              }
-
-              setTimeout(cb, 3000)
+            if (this.mode === modes.SINGLE) {
+              this.activePosition = ko.observable(this.positions[0]);
+            } else if (this.mode === modes.LIST) {
+              this.list = this.positions;
+            } else {
+              this.list = this.positions.filter(position => !position.visible);
+              const visiblePositions = this.positions.filter(position => position.visible);
+              this.tabs = (() => {
+                const tabs = visiblePositions.map(position => new HrmTabGroupItem(position.name));
+                if (this.list.length) tabs.push(new HrmTabGroupItem('Прочие'));
+                return tabs;
+              })();
+              this.activeTab = ko.observable(0);
+              this.activePosition = ko.pureComputed(() => {
+                return visiblePositions[this.activeTab()];
+              });
+              this.activeTab(0);
             }
 
             this.cancel = function () {
@@ -2190,14 +2302,10 @@
               }
             };
 
-
             this.submit = function () {
               this.isSubmitted(true);
-
-              if (this.validationObject.isValid()) {
-                if ('submit' in params) {
-                  params.submit(ko.toJS(this.positions));
-                }
+              if ('submit' in params) {
+                params.submit(ko.toJS(this.positions));
               }
             };
           }
@@ -2849,7 +2957,7 @@
         ];
 
         /** Обновление представления */
-        this.updateSummary(positions);
+        this.summaryModel.setPositions(positions);
         this.isBuilt(true);
       };
 
@@ -2860,22 +2968,17 @@
           new HrmTabGroupItem('Доставка'),
           new HrmTabGroupItem('Опоздания')
         ];
-
         const activeTab = ko.observable(0);
-
-        const productionPositions = ko.pureComputed(() => {
-          return this.summaryModel.positions()
-            .filter(position => position().type === 'production');
-        })
-
         return {
           tabs,
           activeTab,
-          production: {
-            positions: productionPositions,
-          }
         }
       })();
+
+      this.productionPositions = ko.pureComputed(() => {
+        return this.summaryModel.positions()
+          .filter(position => position().type === 'production');
+      })
 
 
       /** Stimulation model (fine/bonus) */
@@ -2916,22 +3019,7 @@
       })();
 
 
-      this.createEmployee = () => {
-        this.settings.openModal(
-          'create-employee',
-          null,
-          (data) => {
-            console.log('employee created', data);
-          });
-      };
 
-      this.addEmployees = () => {
-        this.settings.openModal('add-employees', {
-          positions: this.summaryModel.positions
-        }, (updatedPositionsList) => {
-          this.summaryModel.updateEmployeesList(updatedPositionsList);
-        });
-      };
 
 
       /*

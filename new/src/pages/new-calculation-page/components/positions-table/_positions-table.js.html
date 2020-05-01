@@ -18,12 +18,12 @@
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-          const positions = params.tab.positions;
+          const positions = params.positions;
+          const model = params.model;
 
           /** Наличие неактивных позиций - для секции Прочее */
           const hasOtherSection = ko.pureComputed(() => {
             return positions().some(p => {
-              console.log(!p().visible())
               return !p().visible();
             });
           });
@@ -91,7 +91,46 @@
 
           /** Установить видимость позиций (модальное окно) */
           const setPositions = () => {
-            params.settings.openModal('positions', {positions: positions})
+            params.settings.openModal('positions', { positions: positions })
+          }
+
+          /* Создать сотрудника*/
+          const createEmployee = () => {
+            params.settings.openModal(
+              'create-employee',
+              null,
+              (data) => {
+                console.log('employee created', data);
+              });
+          };
+
+          /* Добавить сотрудников */
+          const addEmployees = () => {
+            params.settings.openModal('add-employees', {
+              positions: positions(),
+              mode: 'tabs',
+            }, (updatedPositionsList) => {
+              model.updateEmployeesList(updatedPositionsList);
+            });
+          };
+
+          const addEmployeesInPosition = (position) => {
+            const originalPosition = positions().find(p => p().id === position.id);
+
+            if (originalPosition) {
+              params.settings.openModal('add-employees',
+                { position: originalPosition, mode: 'single' },
+                (updatedPositionsList) => {
+                  model.updateEmployeesList(updatedPositionsList);
+                });
+            } else {
+              const invisiblePositions = positions().filter(p => !p().visible());
+              params.settings.openModal('add-employees',
+                { positions: invisiblePositions, mode: 'list' },
+                (updatedPositionsList) => {
+                  model.updateEmployeesList(updatedPositionsList);
+                });
+            }
           }
 
           return {
@@ -103,10 +142,13 @@
             columnCount,
 
             setPositions,
-
             positions,
             hasOtherSection,
             total,
+
+            addEmployees,
+            addEmployeesInPosition,
+            createEmployee
           };
         }
       },

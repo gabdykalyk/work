@@ -1,7 +1,14 @@
+@@include('./_add-employees-position-tab.html')
 @@include('./_add-employees-modal.html')
 
 <script type="text/javascript">
   $(function () {
+    const modes = {
+      SINGLE: 'single',
+      TABS: 'tabs',
+      LIST: 'list'
+    };
+
     function EmployeeModel(employee) {
       return {
         id: employee.id,
@@ -35,13 +42,81 @@
       }
     }
 
+    ko.components.register('add-employees-position-tab', {
+      viewModel: function (params) {
+        this.term = params.term;
+        this.mode = params.mode || ('position' in params ? modes.SINGLE : modes.LIST);
 
+        this.isSingle = this.mode === modes.SINGLE;
+
+        if (this.isSingle) {
+          this.positions = [params.position];
+        } else {
+          this.positions = params.positions;
+        }
+
+        this.allBranches = ko.observable(false);
+        this.loadingBranches = ko.observable(false);
+        this.allBranches.subscribe(value => {
+          if (value) {
+            this.loadingBranches(true)
+            this.loadBranches(() => {
+              this.loadingBranches(false);
+            });
+          } else {
+            this.restoreEmployeesList();
+          }
+        });
+
+        this.restoreEmployeesList = () => {
+          this.positions.forEach(p => {
+            const oldEmployeesList = p.employees().filter(e => !e.loaded)
+            p.employees(oldEmployeesList)
+          })
+        };
+
+        this.loadBranches = (cb) => {
+          if (this.isSingle) {
+            const position = this.positions[0];
+            console.log('Сделать запрос, категория', position.name);
+            // Данные
+            const employeesList = [
+              { name: 'Рабочий #1', id: activePosition.name + '1' },
+              { name: 'Рабочий #2', id: activePosition.name + '2' },
+              { name: 'Рабочий #3', id: activePosition.name + '3' }
+            ];
+
+            // Добавить новых работников
+            employeesList.forEach(e => {
+              position.employees.push(NewEmployeeModel(e))
+            });
+          } else {
+            const positionsList = this.positions.map(p => p.name)
+            console.log('Сделать запрос, категории', positionsList);
+            // Добавить новых работников в каждую категию
+            updatedEmployees = this.positions.forEach(p => {
+              const employeesList = [
+                { name: 'Рабочий #1', id: p.name + '1' },
+                { name: 'Рабочий #2', id: p.name + '2' },
+                { name: 'Рабочий #3', id: p.name + '3' }
+              ];
+              employeesList.forEach(e => {
+                p.employees.push(NewEmployeeModel(e))
+              });
+            })
+          }
+
+          setTimeout(cb, 3000)
+        }
+      },
+      template: {
+        element: 'add-employees-position-tab-template'
+      }
+    })
 
     ko.components.register('add-employees-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
-          const originalPositions = params.data.positions;
-
           const $element = $(componentInfo.element);
           $element.addClass([
             'modal-dialog',
@@ -51,8 +126,8 @@
             'hrm-modal-dialog--size_large'
           ]);
 
-          const ViewModel = function () {
 
+          const ViewModel = function () {
             this.isSubmitted = ko.observable(false);
 
             this.formControlErrorStateMatcher = (formControl) => {
@@ -61,16 +136,15 @@
               });
             };
 
-            this.positions = originalPositions().map(PositionModel);
+            this.mode = params.data.mode || ('position' in params.data ? modes.SINGLE : modes.TABS);
 
-            this.visiblePositions = this.positions.filter(position => position.visible);
-            this.invisiblePositions = this.positions.filter(position => !position.visible);
+            this.positions = this.mode === modes.SINGLE
+              ? [PositionModel(params.data.position)]
+              : params.data.positions.map(PositionModel);
 
             this.term = ko.observable('');
-            this.term.subscribe(value => {
+            function termUpdateHandler(value) {
               const formattedValue = value.toLowerCase();
-              console.log(formattedValue)
-
               this.positions.forEach(p => {
                 let hasVisibleEmployees = 0;
                 p.employees().forEach(e => {
@@ -84,72 +158,32 @@
                 });
                 p.hasVisibleEmployees(hasVisibleEmployees);
               })
-            })
-
-            this.tabs = (() => {
-              const tabs = this.visiblePositions.map(position => new HrmTabGroupItem(position.name));
-              if (this.invisiblePositions.length) tabs.push(new HrmTabGroupItem('Прочие'));
-              return tabs;
-            })();
-
-            this.activeTab = ko.observable(0);
-            this.activePosition = ko.pureComputed(() => {
-              return this.visiblePositions[this.activeTab()];
-            });
-            this.activeTab(0);
-
-            this.allBranches = ko.observable(false);
-            this.loadingBranches = ko.observable(false);
-            this.allBranches.subscribe(value => {
-              if (value) {
-                this.loadingBranches(true)
-                this.loadBranches(() => {
-                  this.loadingBranches(false);
-                });
-              } else {
-                this.restoreEmployeesList();
-              }
-            })
-
-            this.restoreEmployeesList = () => {
-              this.positions.forEach(p => {
-                const oldEmployeesList = p.employees().filter(e => !e.loaded)
-                p.employees(oldEmployeesList)
-              })
             }
+            this.term.subscribe(value => {
+              termUpdateHandler(value);
+            });
 
-            this.loadBranches = (cb) => {
-              const activePosition = this.activePosition.peek();
-              if (activePosition) {
-                console.log('Сделать запрос, категория', activePosition.name);
-                // Данные
-                const employeesList = [
-                  { name: 'Рабочий #1', id: activePosition.name + '1' },
-                  { name: 'Рабочий #2', id: activePosition.name + '2' },
-                  { name: 'Рабочий #3', id: activePosition.name + '3' }
-                ];
+            this.tabs = null;
+            this.activePosition = null;
+            this.list = null;
 
-                // Добавить новых работников
-                employeesList.forEach(e => {
-                  activePosition.employees.push(NewEmployeeModel(e))
-                });
-              } else {
-                const positionsList = this.invisiblePositions.map(p => p.name)
-                console.log('Сделать запрос, категории', positionsList);
-                // Добавить новых работников в каждую категию
-                updatedEmployees = this.invisiblePositions.forEach(p => {
-                  const employeesList = [
-                    { name: 'Рабочий #1', id: p.name + '1' },
-                    { name: 'Рабочий #2', id: p.name + '2' },
-                    { name: 'Рабочий #3', id: p.name + '3' }
-                  ];
-                  employeesList.forEach(e => {
-                    p.employees.push(NewEmployeeModel(e))
-                  });
-                })
-              }
-
-              setTimeout(cb, 3000)
+            if (this.mode === modes.SINGLE) {
+              this.activePosition = ko.observable(this.positions[0]);
+            } else if (this.mode === modes.LIST) {
+              this.list = this.positions;
+            } else {
+              this.list = this.positions.filter(position => !position.visible);
+              const visiblePositions = this.positions.filter(position => position.visible);
+              this.tabs = (() => {
+                const tabs = visiblePositions.map(position => new HrmTabGroupItem(position.name));
+                if (this.list.length) tabs.push(new HrmTabGroupItem('Прочие'));
+                return tabs;
+              })();
+              this.activeTab = ko.observable(0);
+              this.activePosition = ko.pureComputed(() => {
+                return visiblePositions[this.activeTab()];
+              });
+              this.activeTab(0);
             }
 
             this.cancel = function () {
@@ -158,14 +192,10 @@
               }
             };
 
-
             this.submit = function () {
               this.isSubmitted(true);
-
-              if (this.validationObject.isValid()) {
-                if ('submit' in params) {
-                  params.submit(ko.toJS(this.positions));
-                }
+              if ('submit' in params) {
+                params.submit(ko.toJS(this.positions));
               }
             };
           }

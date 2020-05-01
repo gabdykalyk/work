@@ -12,137 +12,42 @@
   </div>
 
   <div class="hrm-basic-modal-dialog__body employees-form">
-
+    <!-- ko if: tabs -->
     <div class="employees-form__tabs">
       <div style="width: 100%"
            data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
       </div>
     </div>
+    <!-- /ko -->
 
     <div class="employees-form__tab">
-
-      <div class="employees-form__row">
-        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-        <div class="hrm-form-field-switch-group"
-             data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
-          <div data-bind="component: {name: 'hrm-switch', params: {exportAs: control, checked: allBranches}}"></div>
-          <label data-bind="hrmSwitchGroupLabel: label">
-            Все филиалы
-          </label>
-        </div>
-        <!-- /ko -->
-
-        <div class="templates__form-field"
-             data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по ФИО' }}">
-        </div>
-
-      </div>
-
-
-      <!-- ko template: {
-        foreach: hrmTemplateIf(loadingBranches(), $data),
-        afterAdd: hrmFadeAfterAddFactory(200, 200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-      } -->
-
-      <div>
-        <div class="employees-form__calculating">
-          <i class="fa fa-spinner fa-pulse
-                            employees-form__calculating-indicator">
-          </i>
-        </div>
-      </div>
-      <!-- /ko -->
-
-
-      <!-- ko template: {
-        foreach: hrmTemplateIf(!loadingBranches(), $data),
-        afterAdd: hrmFadeAfterAddFactory(200, 200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-      } -->
       <!-- ko if: activePosition -->
-      <!-- Вкладка позиции -->
-      <div class="employees-form__employees-scrollable-list"
-           data-bind="hrmScrollable">
-
-        <!-- ko foreach: {data: $parent.activePosition().employees, as: 'employee'} -->
-        <div class="employees-form__checkbox"
-             data-bind="if: $data.visible">
-
-          <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-            <div
-                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
-            </div>
-            <label
-                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
-          </div>
-          <!-- /ko -->
-
-        </div>
+        <!-- ko component: {
+          name: 'add-employees-position-tab',
+          params: {
+            term: term,
+            mode: 'single',
+            position: activePosition()
+          }
+        } -->
         <!-- /ko -->
-
-      </div>
-      <!-- /Вкладка позиции -->
       <!-- /ko -->
 
 
       <!-- ko ifnot: activePosition -->
       <!-- Вкладка Прочие -->
-
-
-      <div class="employees-form__employees-scrollable-list"
-           data-bind="hrmScrollable">
-        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-        <div class="employees-form__checkbox-group">
-          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-
-            <!-- ko foreach: $parent.invisiblePositions -->
-            <div class="employees-form__position"
-                 data-bind="if: hasVisibleEmployees">
-              <div class="employees-form__position-name"
-                   data-bind="text: $data.name"></div>
-
-
-              <!-- ko foreach: {data: $data.employees, as: 'employee'} -->
-              <div class="employees-form__checkbox"
-                   data-bind="if: $data.visible">
-
-                <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-                <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-                  <div
-                       data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
-                  </div>
-                  <label
-                         data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
-                </div>
-                <!-- /ko -->
-
-
-              </div>
-              <!-- /ko -->
-
-
-
-
-            </div>
-            <!-- /ko -->
-
-          </div>
-        </div>
+        <!-- ko component: {
+          name: 'add-employees-position-tab',
+          params: {
+            term: term,
+            mode: 'list',
+            positions: list
+          }
+        } -->
         <!-- /ko -->
-      </div>
-
       <!-- /Вкладка Прочие -->
       <!-- /ko -->
-      <!-- /ko -->
-
-
-
-
-
-
-    </div><!-- /.employees-form__tab -->
+    </div>
   </div>
 
   <div class="hrm-basic-modal-dialog__action-list">
