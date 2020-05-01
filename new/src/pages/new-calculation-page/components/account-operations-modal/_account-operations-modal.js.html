@@ -1,0 +1,46 @@
+@@include('./_account-operations-modal.html')
+
+<script>
+  $(function () {
+    ko.components.register('account-operations-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            /** Закрыть окно без изменений */
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            /** Применить изменения */
+            this.apply = function () {
+              
+            }
+
+            this.submit = function () {
+              if ('submit' in params) {
+                this.apply();
+                params.submit(true);
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: 'account-operations-modal-dialog-template'
+      }
+    });
+  })
+</script>

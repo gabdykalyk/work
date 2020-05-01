@@ -14,15 +14,57 @@
   <span data-bind="text: name"></span>
 </script>
 
+<script id="employee-row-template" type="text/html">
+  <tr class="positions-table__row" data-bind="hrmLog">
+    <td class="positions-table__cell positions-table__cell--name">
+      <div class="positions-table__cell-content">
+
+        <!-- Данные сотрудника -->
+        <div
+             data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: positionName} }">
+        </div>
+        <!-- /Данные сотрудника -->
+
+      </div>
+    </td>
+
+    <td class="positions-table__cell positions-table__cell--account"></td>
+    <td class="positions-table__cell positions-table__cell--account-operations"
+      data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
+    <td class="positions-table__cell positions-table__cell--level"></td>
+    <td class="positions-table__cell positions-table__cell--interval"></td>
+    <td class="positions-table__cell positions-table__cell--work-time"></td>
+    <td class="positions-table__cell positions-table__cell--compensation"></td>
+    <td class="positions-table__cell positions-table__cell--workload"></td>
+    <td class="positions-table__cell positions-table__cell--salary"></td>
+    <td class="positions-table__cell positions-table__cell--salary-main"></td>
+    <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
+    <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
+    <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
+    <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+    <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+    <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+    <td class="positions-table__cell positions-table__cell--depremation"></td>
+    <td class="positions-table__cell positions-table__cell--premation"
+    data-bind="click: table.giveBonus.bind(table, employee)"></td>
+    <td class="positions-table__cell positions-table__cell--fine"
+    data-bind="click: table.giveFine.bind(table, employee)"></td>
+
+
+    <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
+    <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
+  </tr>
+</script>
+
 <!-- Блок сотрудника в таблице -->
 <script id="employee-block-template"
         type="text/html">
-  <div class="employee">
+  <div class="employee" data-bind="hrmLog">
     <div class="employee__remove">
       <button data-bind="
       hrmTooltip,
-      hrmTooltipText: 'Удалить из расчета',
-      click: function(a) { employee.visible(false) }"
+      hrmTooltipText: 'Удалить из расчета',,
+      click: table.removeEmployee.bind(table, employee)"
               class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary positions-table__action employe__remove-button">
       </button>
     </div>
@@ -31,8 +73,8 @@
       <a class="employee__name"
         href="#"
         data-bind="text: employee.name"></a>
-      <!-- ko if: position -->
-        <div class="employee__position" data-bind="text: position"></div>
+      <!-- ko if: positionName -->
+        <div class="employee__position" data-bind="text: positionName"></div>
       <!-- /ko -->
     </div>
 
@@ -152,7 +194,7 @@
 
                 <!-- Данные сотрудника -->
                 <div
-                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, position: false} }">
+                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: false} }">
                 </div>
                 <!-- /Данные сотрудника -->
 
@@ -192,7 +234,7 @@
 
                 <!-- Данные сотрудника -->
                 <div
-                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, position: position.name} }">
+                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: position.name} }">
                 </div>
                 <!-- /Данные сотрудника -->
 
@@ -289,32 +331,19 @@
             <!-- /Название позиции -->
 
             <!-- Список сотрудников по позиции -->
-            <!-- ko foreach: position.employees -->
+            <!-- ko foreach: { data: position.employees, as: 'employee' } -->
             <!-- ko template: {
               foreach: hrmTemplateIf($data.visible(), $data),
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
           } -->
-            <tr class="positions-table__row">
-              <td class="positions-table__cell positions-table__cell--name">
-                <div class="positions-table__cell-content">
 
-                  <!-- Данные сотрудника -->
-                  <div
-                       data-bind="template: { name: 'employee-block-template', data: {employee: $data, position: false} }">
-                  </div>
-                  <!-- /Данные сотрудника -->
+            <!-- ko template: {
+              name: 'employee-row-template',
+              data: { employee: employee, positionName: false }
+            } -->
+            <!-- /ko -->
 
-                </div>
-              </td>
 
-              <!-- ko foreach: table.columns -->
-              <td class="positions-table__cell"
-                  data-bind="class: 'positions-table__cell--' + id"></td>
-              <!-- /ko -->
-
-              <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-              <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
-            </tr>
             <!-- /ko -->
             <!-- /ko -->
             <!-- Список сотрудников по позиции -->
@@ -341,29 +370,15 @@
               foreach: hrmTemplateIf(employee.visible(), $data),
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
           } -->
-            <tr class="positions-table__row">
-              <td class="positions-table__cell  positions-table__cell--name">
-                <div class="positions-table__cell-content">
 
-                  <!-- Данные сотрудника -->
-                  <div
-                       data-bind="template: { name: 'employee-block-template', data: {employee: $data, position: position.name} }">
-                  </div>
-                  <!-- /Данные сотрудника -->
+            <!-- ko template: {
+              name: 'employee-row-template',
+              data: {
+                employee: employee, positionName: position.name
+              }
+            } -->
+            <!-- /ko -->
 
-                </div>
-              </td>
-
-
-              <!-- ko foreach: table.columns -->
-              <td class="positions-table__cell"
-                  data-bind="class: 'positions-table__cell--' + id"></td>
-              <!-- /ko -->
-
-              <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-              <td class="positions-table__cell positions-table__cell--payment positions-table__cell--colored"></td>
-
-            </tr>
             <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->

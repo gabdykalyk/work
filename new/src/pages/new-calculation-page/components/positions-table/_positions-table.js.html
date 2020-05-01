@@ -1,6 +1,5 @@
+
 @@include('./_positions-table.html')
-@@include('./_positions.settings.modal.html')
-@@include('./_positions.settings.modal.js.html')
 
 <script type="text/javascript">
   $(function () {
@@ -65,7 +64,7 @@
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
             Column('level', 'Разряд', 'Разряд'),
             Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
-            Column('workTime', 'Рабочее время', 'Рабочее время', total.workTime),
+            Column('work-time', 'Рабочее время', 'Рабочее время', total.workTime),
             Column('compensation', 'Компенс.', 'Компенсация'),
             Column('workload', 'Нагрузка', 'Нагрузка'),
             Column('salary', 'Оклад, ₽', 'Оклад'),
@@ -114,6 +113,11 @@
             });
           };
 
+          /* Удалить сотрудника из расчета */
+          const removeEmployee = (e) => {
+            e.visible(false);
+          }
+
           const addEmployeesInPosition = (position) => {
             const originalPosition = positions().find(p => p().id === position.id);
 
@@ -133,6 +137,31 @@
             }
           }
 
+          const performAccountOperations = (employee) => {
+            console.log(employee)
+            params.settings.openModal('account-operations', {
+              employee: employee,
+            }, (result) => {
+              console.log('account operations performed', result)
+            });
+          }
+
+          const giveBonus = (employee) => {
+            params.settings.openModal('employee-bonus', {
+              employee: employee,
+            }, (result) => {
+              console.log('after bonus', result)
+            });
+          }
+
+          const giveFine = (employee) => {
+            params.settings.openModal('employee-fine', {
+              employee: employee,
+            }, (result) => {
+              console.log('after fine', result)
+            });
+          }
+
           return {
             viewportSize: params.settings.viewportSize,
             tabName: params.tabName,
@@ -148,7 +177,12 @@
 
             addEmployees,
             addEmployeesInPosition,
-            createEmployee
+            createEmployee,
+            removeEmployee,
+
+            performAccountOperations,
+            giveBonus,
+            giveFine
           };
         }
       },

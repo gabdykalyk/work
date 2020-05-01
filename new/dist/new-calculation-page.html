@@ -119,6 +119,48 @@
 
 </script>
 
+<script type="text/html"
+        id="account-operations-modal-template">
+
+  <div data-bind="component: {
+      name: 'account-operations-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
+
+</script>
+
+<script type="text/html"
+        id="employee-bonus-modal-template">
+
+  <div data-bind="component: {
+      name: 'employee-bonus-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
+
+</script>
+
+<script type="text/html"
+        id="employee-fine-modal-template">
+
+  <div data-bind="component: {
+      name: 'employee-fine-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
+
+</script>
+
 
 <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
 
@@ -179,7 +221,6 @@
     </div>
   </div>
 
-
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-debug.js" integrity="sha256-M5ZomNNnrnEB2WjSbnty5GWGqq6UuAAVNnWECisgEis=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
@@ -203,6 +244,1328 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 <script src="assets/js/main.js"></script>
+
+  <template id="positions-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Показывать в таблице должности
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body positions-settings">
+    <div class="positions-settings__search"
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}"></div>
+
+    <div class="positions-settings__list">
+      <!-- ko foreach: { data: $component.positions, as: 'position' } -->
+
+      <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
+      <div class="positions-settings__list-item"
+           data-bind="if: visible">
+        <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+          <div
+               data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
+          </div>
+          <label
+                 data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
+        </div>
+      </div>
+      <!-- /ko -->
+
+      <!-- /ko -->
+    </div>
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {reset();}">
+      Сбросить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Применить
+    </button>
+  </div>
+
+</template>
+
+
+<script type="text/javascript">
+    $(function () {
+        ko.components.register('positions-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'hrm-modal-dialog--size_large'
+                    ]);
+
+                    return new (function () {
+                        /** Positions model */
+                        this.positions = params.data.positions().map((p) => {
+                            const positionData = p();
+                            return {
+                                name: positionData.name,
+                                checked: ko.observable(positionData.visible()),
+                                position: p,
+                                visible: ko.observable(true)
+                            }
+                        });
+
+                        /** Поисковый запрос */
+                        this.term = ko.observable('');
+                        /** Скрыть/Показать позиции в списке */
+                        this.term.subscribe(value => {
+                            const formattedTerm = value.toLowerCase();
+
+                            this.positions.forEach(p => {
+                                let isVisible = true;
+                                if (formattedTerm.length >= 2) {
+                                    const formattedName = p.name.toLowerCase();
+                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
+                                }
+                                p.visible(isVisible);
+                            })
+                        });
+
+                        /** Сбросить все чекбоксы и поисковый запрос */
+                        this.reset = function () {
+                            this.term('');
+                            this.positions.forEach(p => {
+                                p.checked(false);
+                            });
+                        }
+
+                        /** Закрыть окно без изменений */
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        /** Применить изменения */
+                        this.apply = function() {
+                            this.positions.forEach(p => {
+                                p.position().visible(p.checked());
+                            });
+                        }
+
+                        this.submit = function () {
+                            if ('submit' in params) {
+                                this.apply();
+                                params.submit(true);
+                            }
+                        };
+                    });
+                }
+            },
+            template: {
+                element: document.getElementById('positions-modal-dialog-template')
+            }
+        });
+    });
+</script>
+
+  <template id="account-operations-modal-dialog-template"></template>
+
+
+<script>
+  $(function () {
+    ko.components.register('account-operations-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            /** Закрыть окно без изменений */
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            /** Применить изменения */
+            this.apply = function () {
+              
+            }
+
+            this.submit = function () {
+              if ('submit' in params) {
+                this.apply();
+                params.submit(true);
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: 'account-operations-modal-dialog-template'
+      }
+    });
+  })
+</script>
+
+  <template id="employee-fine-modal-dialog-template"></template>
+
+
+<script>
+  $(function () {
+    ko.components.register('employee-fine-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            /** Закрыть окно без изменений */
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            /** Применить изменения */
+            this.apply = function () {
+
+            }
+
+            this.submit = function () {
+              if ('submit' in params) {
+                this.apply();
+                params.submit(true);
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: 'employee-fine-modal-dialog-template'
+      }
+    });
+  })
+</script>
+
+  <template id="employee-bonus-modal-dialog-template"></template>
+
+
+<script>
+  $(function () {
+    ko.components.register('employee-bonus-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            /** Закрыть окно без изменений */
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            /** Применить изменения */
+            this.apply = function () {
+
+            }
+
+            this.submit = function () {
+              if ('submit' in params) {
+                this.apply();
+                params.submit(true);
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: 'employee-bonus-modal-dialog-template'
+      }
+    });
+  })
+</script>
+
+  <template id="create-employee-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Создать сотрудника
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body employee-form"
+       data-bind="using: formModel">
+
+    <div class="employee-form__row">
+      <!-- Name field -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="employee-form__name"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">ФИО сотрудника</label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <input data-bind="
+              textInput: name,
+              hrmFormFieldInputControl: control,
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+          ">
+        </div>
+
+        <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+          <!-- ko text: $parent.name.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Name field -->
+    </div>
+
+    <div class="employee-form__row">
+      <!-- Position select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="employee-form__position"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Должность
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: position,
+              options: $component.positions,
+              optionsText: 'name',
+              optionsValue: 'id',
+              valueAllowUnset: true,
+              hrmSelect,
+              hrmSelectPlaceholder: 'Не выбрано',
+              hrmSelectSearchEnabled: true,
+              hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+          </select>
+        </div>
+
+        <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+          <!-- ko text: $parent.position.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Position select -->
+
+
+      <!-- Levels select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="employee-form__level"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Разряд
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: level,
+              disable: $component.levels().length === 0,
+              options: $component.levels,
+              valueAllowUnset: true,
+              hrmSelect,
+              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control">
+          </select>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Levels select -->
+    </div>
+
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>
+
+
+<script type="text/javascript">
+  $(function () {
+    const positionsTable = [
+      {
+        id: 1,
+        name: 'Администратор филиала',
+        levels: [1, 2, 3]
+      }, {
+        id: 2,
+        name: 'Повар-пиццмейкер',
+        levels: [1, 2]
+      }, {
+        id: 3,
+        name: 'Повар-сушист',
+        levels: [1, 2]
+      }, {
+        id: 4,
+        name: 'Официант',
+        levels: []
+      }, {
+        id: 5,
+        name: 'Водитель',
+        levels: []
+      }
+    ];
+
+    ko.components.register('create-employee-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                console.log(formControl, formControl())
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.positions = positionsTable;
+            this.levels = ko.observable([]);
+
+            this.formModel = {
+              position: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              level: ko.observable(null),
+              name: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              })
+            }
+
+            this.validationObject = ko.validatedObservable({
+              name: this.formModel.name,
+              position: this.formModel.position,
+            });
+
+            this.formModel.position.subscribe(positionId => {
+              this.formModel.level(null);
+              if (!positionId) {
+                this.levels([]);
+                return;
+              }
+
+              const position = positionsTable.find(p => p.id === positionId);
+              if (!position) this.levels([]);
+              else this.levels(position.levels);
+            })
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if (this.validationObject.isValid()) {
+                if ('submit' in params) {
+                  params.submit(ko.toJS(this.formModel));
+                }
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('create-employee-modal-dialog-template')
+      }
+    });
+  });
+</script>
+
+  <script type="text/html"
+        id="add-employees-modal-employee-template">
+  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+<div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+  <div data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
+  </div>
+  <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
+</div>
+<!-- /ko -->
+</script>
+
+<script type="text/html"
+        id="add-employees-modal-position-list-template">
+
+        <div class="employees-form__employees-scrollable-list"
+        data-bind="hrmScrollable">
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="employees-form__checkbox-group">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+
+              <!-- ko foreach: {data: $parent.position.employees, as: 'employee'} -->
+              <div class="employees-form__checkbox">
+
+                    <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
+                    <!-- /ko -->
+              </div>
+              <!-- /ko -->
+
+
+          </div>
+        </div>
+        <!-- /ko -->
+
+        </div>
+</script>
+
+<script type="text/html"
+        id="add-employees-modal-other-list-template">
+
+  <div class="employees-form__employees-scrollable-list"
+  data-bind="hrmScrollable">
+
+  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+  <div class="employees-form__checkbox-group">
+    <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+
+      <!-- ko foreach: { data: $parent.positions, as: 'position' } -->
+      <div class="employees-form__position"
+            data-bind="if: position.hasVisibleEmployees">
+        <div class="employees-form__position-name"
+              data-bind="text: position.name"></div>
+
+        <!-- ko foreach: {data: position.employees, as: 'employee'} -->
+        <div class="employees-form__checkbox">
+
+              <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
+              <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+      </div>
+      <!-- /ko -->
+    </div>
+  </div>
+  <!-- /ko -->
+
+  </div>
+
+</script>
+
+
+<template id="add-employees-position-tab-template">
+  <div class="employees-form__row">
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="hrm-form-field-switch-group"
+         data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+      <div data-bind="component: {name: 'hrm-switch', params: {exportAs: control, checked: allBranches}}"></div>
+      <label data-bind="hrmSwitchGroupLabel: label">
+        Все филиалы
+      </label>
+    </div>
+    <!-- /ko -->
+
+    <div class="templates__form-field"
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по ФИО' }}">
+    </div>
+  </div><!-- .employees-form__row -->
+
+
+  <!-- Подгрузка сотрудников -->
+  <!-- ko template: {
+        foreach: hrmTemplateIf(loadingBranches(), $data),
+        afterAdd: hrmFadeAfterAddFactory(200, 200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+  <div>
+    <div class="employees-form__calculating">
+      <i class="fa fa-spinner fa-pulse
+                            employees-form__calculating-indicator">
+      </i>
+    </div>
+  </div>
+  <!-- /ko -->
+
+
+  <!-- Отображение сотрудников -->
+  <!-- ko template: {
+        foreach: hrmTemplateIf(!loadingBranches(), $data),
+        afterAdd: hrmFadeAfterAddFactory(200, 200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+
+  <!-- Список позиций -->
+  <!-- ko ifnot: isSingle -->
+  <!-- ko template: { name: 'add-employees-modal-other-list-template', data: {positions: positions} } -->
+  <!-- /ko -->
+  <!-- /ko -->
+  <!-- /Список позиций -->
+
+  <!-- Одна позиция -->
+  <!-- ko if: isSingle -->
+  <!-- ko template: { name: 'add-employees-modal-position-list-template', data: {position: positions[0]} } -->
+  <!-- /ko -->
+  <!-- /ko -->
+  <!-- /Одна позиция -->
+
+  <!-- /ko -->
+  <!-- /Отображение сотрудников -->
+
+</template>
+
+<template id="add-employees-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Добавить сотрудников
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body employees-form">
+    <!-- ko if: tabs -->
+    <div class="employees-form__tabs">
+      <div style="width: 100%"
+           data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
+      </div>
+    </div>
+    <!-- /ko -->
+
+    <div class="employees-form__tab">
+      <!-- ko if: activePosition -->
+        <!-- ko component: {
+          name: 'add-employees-position-tab',
+          params: {
+            term: term,
+            mode: 'single',
+            position: activePosition()
+          }
+        } -->
+        <!-- /ko -->
+      <!-- /ko -->
+
+
+      <!-- ko ifnot: activePosition -->
+      <!-- Вкладка Прочие -->
+        <!-- ko component: {
+          name: 'add-employees-position-tab',
+          params: {
+            term: term,
+            mode: 'list',
+            positions: list
+          }
+        } -->
+        <!-- /ko -->
+      <!-- /Вкладка Прочие -->
+      <!-- /ko -->
+    </div>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>
+
+
+<script type="text/javascript">
+  $(function () {
+    const modes = {
+      SINGLE: 'single',
+      TABS: 'tabs',
+      LIST: 'list'
+    };
+
+    function EmployeeModel(employee) {
+      return {
+        id: employee.id,
+        name: employee.name,
+        checked: ko.observable(employee.visible()),
+        visible: ko.observable(true)
+      }
+    }
+
+    function PositionModel(positionObservable) {
+      const positionData = positionObservable();
+      const employees = ko.observableArray(positionData.employees().map(EmployeeModel));
+      const hasVisibleEmployees = ko.observable(true);
+
+      return {
+        name: positionData.name,
+        id: positionData.id,
+        employees,
+        visible: positionData.visible(),
+        hasVisibleEmployees,
+      }
+    }
+
+    function NewEmployeeModel(employeeData) {
+      return {
+        id: employeeData.id,
+        name: employeeData.name,
+        checked: ko.observable(false),
+        visible: ko.observable(true),
+        loaded: true,
+      }
+    }
+
+    ko.components.register('add-employees-position-tab', {
+      viewModel: function (params) {
+        this.term = params.term;
+        this.mode = params.mode || ('position' in params ? modes.SINGLE : modes.LIST);
+
+        this.isSingle = this.mode === modes.SINGLE;
+
+        if (this.isSingle) {
+          this.positions = [params.position];
+        } else {
+          this.positions = params.positions;
+        }
+
+        this.allBranches = ko.observable(false);
+        this.loadingBranches = ko.observable(false);
+        this.allBranches.subscribe(value => {
+          if (value) {
+            this.loadingBranches(true)
+            this.loadBranches(() => {
+              this.loadingBranches(false);
+            });
+          } else {
+            this.restoreEmployeesList();
+          }
+        });
+
+        this.restoreEmployeesList = () => {
+          this.positions.forEach(p => {
+            const oldEmployeesList = p.employees().filter(e => !e.loaded)
+            p.employees(oldEmployeesList)
+          })
+        };
+
+        this.loadBranches = (cb) => {
+          if (this.isSingle) {
+            const position = this.positions[0];
+            console.log('Сделать запрос, категория', position.name);
+            // Данные
+            const employeesList = [
+              { name: 'Рабочий #1', id: position.name + '1' },
+              { name: 'Рабочий #2', id: position.name + '2' },
+              { name: 'Рабочий #3', id: position.name + '3' }
+            ];
+
+            // Добавить новых работников
+            employeesList.forEach(e => {
+              position.employees.push(NewEmployeeModel(e))
+            });
+          } else {
+            const positionsList = this.positions.map(p => p.name)
+            console.log('Сделать запрос, категории', positionsList);
+            // Добавить новых работников в каждую категию
+            updatedEmployees = this.positions.forEach(p => {
+              const employeesList = [
+                { name: 'Рабочий #1', id: p.name + '1' },
+                { name: 'Рабочий #2', id: p.name + '2' },
+                { name: 'Рабочий #3', id: p.name + '3' }
+              ];
+              employeesList.forEach(e => {
+                p.employees.push(NewEmployeeModel(e))
+              });
+            })
+          }
+
+          setTimeout(cb, 3000)
+        }
+      },
+      template: {
+        element: 'add-employees-position-tab-template'
+      }
+    })
+
+    ko.components.register('add-employees-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.mode = params.data.mode || ('position' in params.data ? modes.SINGLE : modes.TABS);
+
+            this.positions = this.mode === modes.SINGLE
+              ? [PositionModel(params.data.position)]
+              : params.data.positions.map(PositionModel);
+
+            this.term = ko.observable('');
+            function termUpdateHandler(value) {
+              const formattedValue = value.toLowerCase();
+              this.positions.forEach(p => {
+                let hasVisibleEmployees = 0;
+                p.employees().forEach(e => {
+                  let isVisible = true;
+                  if (formattedValue.length >= 2) {
+                    const name = e.name.toLowerCase();
+                    isVisible = name.indexOf(formattedValue) !== -1;
+                  }
+                  e.visible(isVisible);
+                  if (isVisible) hasVisibleEmployees++;
+                });
+                p.hasVisibleEmployees(hasVisibleEmployees);
+              })
+            }
+            this.term.subscribe(value => {
+              termUpdateHandler(value);
+            });
+
+            this.tabs = null;
+            this.activePosition = null;
+            this.list = null;
+
+            if (this.mode === modes.SINGLE) {
+              this.activePosition = ko.observable(this.positions[0]);
+            } else if (this.mode === modes.LIST) {
+              this.list = this.positions;
+            } else {
+              this.list = this.positions.filter(position => !position.visible);
+              const visiblePositions = this.positions.filter(position => position.visible);
+              this.tabs = (() => {
+                const tabs = visiblePositions.map(position => new HrmTabGroupItem(position.name));
+                if (this.list.length) tabs.push(new HrmTabGroupItem('Прочие'));
+                return tabs;
+              })();
+              this.activeTab = ko.observable(0);
+              this.activePosition = ko.pureComputed(() => {
+                return visiblePositions[this.activeTab()];
+              });
+              this.activeTab(0);
+            }
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+              if ('submit' in params) {
+                params.submit(ko.toJS(this.positions));
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('add-employees-modal-dialog-template')
+      }
+    });
+  });
+</script>
+
+  <template id="stimulation-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Выписать штраф/премию смене
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body stimulation-settings"
+       data-bind="using: formModel">
+    <div class="stimulation-settings__row">
+      <!-- Category select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__category"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Категория
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: category,
+                   hrmSelect,
+                   hrmSelectPlaceholder: 'Все', hrmSelectAllowClear: true,
+                   hrmFormFieldSelectControl: control">
+            <option></option>
+            <option value="production">Производство</option>
+            <option value="delivery">Доставка</option>
+          </select>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Category select -->
+
+
+      <!-- Type toggler -->
+      <div class="hrm-radio-group stimulation-settings__type">
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_negative">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: stimulationType"
+                 type="radio"
+                 value="fine"
+                 id="fine-radio" />
+          <label class="hrm-radio-group__radio-label"
+                 for="fine-radio">
+            Штраф
+          </label>
+        </div>
+
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_positive">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: stimulationType"
+                 type="radio"
+                 value="bonus"
+                 id="bonus-radio" />
+          <label class="hrm-radio-group__radio-label"
+                 for="bonus-radio">
+            Премия
+          </label>
+        </div>
+      </div>
+      <!-- /Type toggler -->
+    </div>
+
+
+    <div class="stimulation-settings__row">
+      <!-- Base select -->
+
+      <!-- ko if: stimulationType() === 'fine' -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание штрафа
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
+              hrmSelect,
+              hrmSelectSearchEnabled: true,
+              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+            <option></option>
+            <optgroup label="Безопасность">
+              <option value="0">Возврат в кассу</option>
+            </optgroup>
+            <optgroup label="Дисциплина">
+              <option value="1">За отсутствие объяснительной</option>
+              <option value="2">Халатное отношение к работе</option>
+            </optgroup>
+            <optgroup label="Документы">
+              <option value="3">Налог</option>
+            </optgroup>
+            <optgroup label="Производство">
+              <option value="4">Выкуп готовой продукции</option>
+              <option value="5">Порча инвентаря и оборудования</option>
+              <option value="6">Компенсация за халатность</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+            hrmSlide,
+            hrmSlideValue: control() !== null ? control().errorState : false,
+            hrmSlideDuration: 150">
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /ko -->
+
+
+      <!-- ko ifnot: stimulationType() === 'fine' -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание премии
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
+              hrmSelect,
+              hrmSelectSearchEnabled: true,
+              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+            <option></option>
+            <optgroup label="Безопасность">
+              <option value="0">Возврат в кассу</option>
+            </optgroup>
+            <optgroup label="Дисциплина">
+              <option value="1">За отсутствие объяснительной</option>
+              <option value="2">Халатное отношение к работе</option>
+            </optgroup>
+            <optgroup label="Документы">
+              <option value="3">Налог</option>
+            </optgroup>
+            <optgroup label="Производство">
+              <option value="4">Выкуп готовой продукции</option>
+              <option value="5">Порча инвентаря и оборудования</option>
+              <option value="6">Компенсация за халатность</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+            hrmSlide,
+            hrmSlideValue: control() !== null ? control().errorState : false,
+            hrmSlideDuration: 150">
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- /Base select -->
+
+
+    </div>
+
+    <div class="stimulation-settings__row">
+      <!-- Author select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__author"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          <!-- ko text: stimulationType() === 'fine' ? 'Автор штрафа' : 'Автор премии' -->
+          <!-- /ko -->
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: author,
+            hrmSelect,
+            hrmSelectSearchEnabled: true,
+            hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+            hrmFormFieldSelectControl: control,
+            hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+            <option></option>
+            <option value="0">Иван Иванов</option>
+            <option value="1">Петр Петров</option>
+            <option value="2">Николай Николаев</option>
+            <option value="3">Дмитрий Дмитриев</option>
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+        hrmSlide,
+        hrmSlideValue: control() !== null ? control().errorState : false,
+        hrmSlideDuration: 150">
+          <!-- ko text: $parent.author.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Author select -->
+
+      <!-- Sum field -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="stimulation-settings__sum"
+           data-bind="
+           hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+       ">
+        <label data-bind="hrmFormFieldLabel: label">Сумма, ₽</label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input data-bind="
+                   attr: {readonly: stimulationType() === 'fine'},
+                   textInput: sum,
+                   hrmFormFieldInputControl: control,
+                   hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+               "
+                 type="number">
+        </div>
+
+        <div data-bind="
+               component: {name: 'hrm-form-field-error'},
+               hrmSlide,
+               hrmSlideValue: control() !== null ? control().errorState : false,
+               hrmSlideDuration: 150
+           ">
+          <!-- ko text: $parent.sum.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Sum field -->
+    </div>
+
+    <div class="stimulation-settings__row">
+      <!-- Comment field -->
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="stimulation-settings__comment"
+           data-bind="
+           hrmFormField, hrmFormFieldControlRef: control
+       ">
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <textarea data-bind="
+                   textInput: comment,
+                   hrmFormFieldInputControl: control,
+                   hrmAutoResize
+               "
+                    placeholder="Комментарий"></textarea>
+        </div>
+
+      </div>
+      <!-- /ko -->
+      <!-- /Comment field -->
+    </div>
+
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>
+
+
+<script type="text/javascript">
+  $(function () {
+    /* Справочник штрафов */
+    const finesTable = {
+      '0': 200,
+      '1': 300,
+      '2': 400,
+      '3': 500,
+      '4': 600,
+      '5': 700,
+      '6': 800,
+    };
+
+    ko.components.register('stimulation-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large'
+          ]);
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            /* fine/bonus */
+            this.stimulationTypes = {
+              "FINE": 'fine',
+              "BONUS": 'bonus'
+            }
+
+            this.formModel = {
+              category: ko.observable(''),
+              stimulationType: ko.observable(this.stimulationTypes.FINE),
+              base: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              author: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              sum: ko.observable(0).extend({
+                required: {
+                  message: 'Обязательное поле'
+                },
+                number: {
+                  message: 'Некорректный формат'
+                }
+              }),
+              comment: ko.observable('').extend({
+
+              }),
+            };
+
+            this.reset = function () {
+              this.formModel.base('');
+              this.formModel.sum(0);
+              this.formModel.author('');
+              this.formModel.comment('');
+            }
+
+            this.formModel.stimulationType.subscribe(() => {
+              this.reset();
+            })
+
+            this.formModel.base.subscribe((value) => {
+              if (this.formModel.stimulationType() !== this.stimulationTypes.FINE) return;
+              if (!value) this.formModel.sum(0);
+              this.formModel.sum(finesTable[value] || 0);
+            })
+
+            this.validationObject = ko.validatedObservable({
+              base: this.formModel.base,
+              author: this.formModel.author,
+              sum: this.formModel.sum,
+            })
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if (this.validationObject.isValid()) {
+                if ('submit' in params) {
+                  params.submit(ko.toJS(this.formModel));
+                }
+              }
+
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('stimulation-modal-dialog-template')
+      }
+    });
+  });
+</script>
 
   <template id="calculation-page-input-form-template">
   <div class="calculation-input-form">
@@ -973,7 +2336,8 @@
   })
 </script>
 
-  <!-- Выпадающее меню сотрудников -->
+  
+<!-- Выпадающее меню сотрудников -->
 <script id="employees-dropdown-template"
         type="text/html">
         <div class="hrm-dropdown-menu__item" data-bind="click: addEmployees">Добавить сотрудников</div>
@@ -989,15 +2353,57 @@
   <span data-bind="text: name"></span>
 </script>
 
+<script id="employee-row-template" type="text/html">
+  <tr class="positions-table__row" data-bind="hrmLog">
+    <td class="positions-table__cell positions-table__cell--name">
+      <div class="positions-table__cell-content">
+
+        <!-- Данные сотрудника -->
+        <div
+             data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: positionName} }">
+        </div>
+        <!-- /Данные сотрудника -->
+
+      </div>
+    </td>
+
+    <td class="positions-table__cell positions-table__cell--account"></td>
+    <td class="positions-table__cell positions-table__cell--account-operations"
+      data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
+    <td class="positions-table__cell positions-table__cell--level"></td>
+    <td class="positions-table__cell positions-table__cell--interval"></td>
+    <td class="positions-table__cell positions-table__cell--work-time"></td>
+    <td class="positions-table__cell positions-table__cell--compensation"></td>
+    <td class="positions-table__cell positions-table__cell--workload"></td>
+    <td class="positions-table__cell positions-table__cell--salary"></td>
+    <td class="positions-table__cell positions-table__cell--salary-main"></td>
+    <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
+    <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
+    <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
+    <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+    <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+    <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+    <td class="positions-table__cell positions-table__cell--depremation"></td>
+    <td class="positions-table__cell positions-table__cell--premation"
+    data-bind="click: table.giveBonus.bind(table, employee)"></td>
+    <td class="positions-table__cell positions-table__cell--fine"
+    data-bind="click: table.giveFine.bind(table, employee)"></td>
+
+
+    <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
+    <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
+  </tr>
+</script>
+
 <!-- Блок сотрудника в таблице -->
 <script id="employee-block-template"
         type="text/html">
-  <div class="employee">
+  <div class="employee" data-bind="hrmLog">
     <div class="employee__remove">
       <button data-bind="
       hrmTooltip,
-      hrmTooltipText: 'Удалить из расчета',
-      click: function(a) { employee.visible(false) }"
+      hrmTooltipText: 'Удалить из расчета',,
+      click: table.removeEmployee.bind(table, employee)"
               class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary positions-table__action employe__remove-button">
       </button>
     </div>
@@ -1006,8 +2412,8 @@
       <a class="employee__name"
         href="#"
         data-bind="text: employee.name"></a>
-      <!-- ko if: position -->
-        <div class="employee__position" data-bind="text: position"></div>
+      <!-- ko if: positionName -->
+        <div class="employee__position" data-bind="text: positionName"></div>
       <!-- /ko -->
     </div>
 
@@ -1127,7 +2533,7 @@
 
                 <!-- Данные сотрудника -->
                 <div
-                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, position: false} }">
+                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: false} }">
                 </div>
                 <!-- /Данные сотрудника -->
 
@@ -1167,7 +2573,7 @@
 
                 <!-- Данные сотрудника -->
                 <div
-                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, position: position.name} }">
+                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: position.name} }">
                 </div>
                 <!-- /Данные сотрудника -->
 
@@ -1264,32 +2670,19 @@
             <!-- /Название позиции -->
 
             <!-- Список сотрудников по позиции -->
-            <!-- ko foreach: position.employees -->
+            <!-- ko foreach: { data: position.employees, as: 'employee' } -->
             <!-- ko template: {
               foreach: hrmTemplateIf($data.visible(), $data),
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
           } -->
-            <tr class="positions-table__row">
-              <td class="positions-table__cell positions-table__cell--name">
-                <div class="positions-table__cell-content">
 
-                  <!-- Данные сотрудника -->
-                  <div
-                       data-bind="template: { name: 'employee-block-template', data: {employee: $data, position: false} }">
-                  </div>
-                  <!-- /Данные сотрудника -->
+            <!-- ko template: {
+              name: 'employee-row-template',
+              data: { employee: employee, positionName: false }
+            } -->
+            <!-- /ko -->
 
-                </div>
-              </td>
 
-              <!-- ko foreach: table.columns -->
-              <td class="positions-table__cell"
-                  data-bind="class: 'positions-table__cell--' + id"></td>
-              <!-- /ko -->
-
-              <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-              <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
-            </tr>
             <!-- /ko -->
             <!-- /ko -->
             <!-- Список сотрудников по позиции -->
@@ -1316,29 +2709,15 @@
               foreach: hrmTemplateIf(employee.visible(), $data),
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
           } -->
-            <tr class="positions-table__row">
-              <td class="positions-table__cell  positions-table__cell--name">
-                <div class="positions-table__cell-content">
 
-                  <!-- Данные сотрудника -->
-                  <div
-                       data-bind="template: { name: 'employee-block-template', data: {employee: $data, position: position.name} }">
-                  </div>
-                  <!-- /Данные сотрудника -->
+            <!-- ko template: {
+              name: 'employee-row-template',
+              data: {
+                employee: employee, positionName: position.name
+              }
+            } -->
+            <!-- /ko -->
 
-                </div>
-              </td>
-
-
-              <!-- ko foreach: table.columns -->
-              <td class="positions-table__cell"
-                  data-bind="class: 'positions-table__cell--' + id"></td>
-              <!-- /ko -->
-
-              <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-              <td class="positions-table__cell positions-table__cell--payment positions-table__cell--colored"></td>
-
-            </tr>
             <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->
@@ -1381,140 +2760,6 @@
     </div>
   </div>
 </template>
-
-<template id="positions-modal-dialog-template">
-
-  <button class="hrm-button hrm-basic-modal-dialog__close-button"
-          data-bind="click: function() { cancel(); }"
-          aria-label="Close">
-  </button>
-
-  <div class="hrm-basic-modal-dialog__header">
-    <h2 class="hrm-basic-modal-dialog__title">
-      Показывать в таблице должности
-    </h2>
-  </div>
-
-  <div class="hrm-basic-modal-dialog__body positions-settings">
-    <div class="positions-settings__search"
-         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}"></div>
-
-    <div class="positions-settings__list">
-      <!-- ko foreach: { data: $component.positions, as: 'position' } -->
-
-      <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
-      <div class="positions-settings__list-item"
-           data-bind="if: visible">
-        <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-          <div
-               data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
-          </div>
-          <label
-                 data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
-        </div>
-      </div>
-      <!-- /ko -->
-
-      <!-- /ko -->
-    </div>
-
-  </div>
-
-  <div class="hrm-basic-modal-dialog__action-list">
-    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-cancel-button"
-            data-bind="click: function() {reset();}">
-      Сбросить
-    </button>
-
-    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-submit-button"
-            data-bind="click: function() {submit();}">
-      Применить
-    </button>
-  </div>
-
-</template>
-
-<script type="text/javascript">
-    $(function () {
-        ko.components.register('positions-modal-dialog', {
-            viewModel: {
-                createViewModel: function (params, componentInfo) {
-                    const $element = $(componentInfo.element);
-                    $element.addClass([
-                        'modal-dialog',
-                        'modal-dialog-centered',
-                        'hrm-modal-dialog',
-                        'hrm-basic-modal-dialog',
-                        'hrm-modal-dialog--size_large'
-                    ]);
-
-                    return new (function () {
-                        /** Positions model */
-                        this.positions = params.data.positions().map((p) => {
-                            const positionData = p();
-                            return {
-                                name: positionData.name,
-                                checked: ko.observable(positionData.visible()),
-                                position: p,
-                                visible: ko.observable(true)
-                            }
-                        });
-
-                        /** Поисковый запрос */
-                        this.term = ko.observable('');
-                        /** Скрыть/Показать позиции в списке */
-                        this.term.subscribe(value => {
-                            const formattedTerm = value.toLowerCase();
-
-                            this.positions.forEach(p => {
-                                let isVisible = true;
-                                if (formattedTerm.length >= 2) {
-                                    const formattedName = p.name.toLowerCase();
-                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
-                                }
-                                p.visible(isVisible);
-                            })
-                        });
-
-                        /** Сбросить все чекбоксы и поисковый запрос */
-                        this.reset = function () {
-                            this.term('');
-                            this.positions.forEach(p => {
-                                p.checked(false);
-                            });
-                        }
-
-                        /** Закрыть окно без изменений */
-                        this.cancel = function () {
-                            if ('cancel' in params) {
-                                params.cancel();
-                            }
-                        };
-
-                        /** Применить изменения */
-                        this.apply = function() {
-                            this.positions.forEach(p => {
-                                p.position().visible(p.checked());
-                            });
-                        }
-
-                        this.submit = function () {
-                            if ('submit' in params) {
-                                this.apply();
-                                params.submit(true);
-                            }
-                        };
-                    });
-                }
-            },
-            template: {
-                element: document.getElementById('positions-modal-dialog-template')
-            }
-        });
-    });
-</script>
 
 
 <script type="text/javascript">
@@ -1580,7 +2825,7 @@
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
             Column('level', 'Разряд', 'Разряд'),
             Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
-            Column('workTime', 'Рабочее время', 'Рабочее время', total.workTime),
+            Column('work-time', 'Рабочее время', 'Рабочее время', total.workTime),
             Column('compensation', 'Компенс.', 'Компенсация'),
             Column('workload', 'Нагрузка', 'Нагрузка'),
             Column('salary', 'Оклад, ₽', 'Оклад'),
@@ -1629,6 +2874,11 @@
             });
           };
 
+          /* Удалить сотрудника из расчета */
+          const removeEmployee = (e) => {
+            e.visible(false);
+          }
+
           const addEmployeesInPosition = (position) => {
             const originalPosition = positions().find(p => p().id === position.id);
 
@@ -1648,6 +2898,31 @@
             }
           }
 
+          const performAccountOperations = (employee) => {
+            console.log(employee)
+            params.settings.openModal('account-operations', {
+              employee: employee,
+            }, (result) => {
+              console.log('account operations performed', result)
+            });
+          }
+
+          const giveBonus = (employee) => {
+            params.settings.openModal('employee-bonus', {
+              employee: employee,
+            }, (result) => {
+              console.log('after bonus', result)
+            });
+          }
+
+          const giveFine = (employee) => {
+            params.settings.openModal('employee-fine', {
+              employee: employee,
+            }, (result) => {
+              console.log('after fine', result)
+            });
+          }
+
           return {
             viewportSize: params.settings.viewportSize,
             tabName: params.tabName,
@@ -1663,7 +2938,12 @@
 
             addEmployees,
             addEmployeesInPosition,
-            createEmployee
+            createEmployee,
+            removeEmployee,
+
+            performAccountOperations,
+            giveBonus,
+            giveFine
           };
         }
       },
@@ -1672,1049 +2952,6 @@
       }
     });
   })
-</script>
-
-  <template id="create-employee-modal-dialog-template">
-
-  <button class="hrm-button hrm-basic-modal-dialog__close-button"
-          data-bind="click: function() { cancel(); }"
-          aria-label="Close">
-  </button>
-
-  <div class="hrm-basic-modal-dialog__header">
-    <h2 class="hrm-basic-modal-dialog__title">
-      Создать сотрудника
-    </h2>
-  </div>
-
-  <div class="hrm-basic-modal-dialog__body employee-form"
-       data-bind="using: formModel">
-
-    <div class="employee-form__row">
-      <!-- Name field -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-      <div class="employee-form__name"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-        <label data-bind="hrmFormFieldLabel: label">ФИО сотрудника</label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
-          <input data-bind="
-              textInput: name,
-              hrmFormFieldInputControl: control,
-              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
-          ">
-        </div>
-
-        <div data-bind="
-          component: {name: 'hrm-form-field-error'},
-          hrmSlide,
-          hrmSlideValue: control() !== null ? control().errorState : false,
-          hrmSlideDuration: 150
-      ">
-          <!-- ko text: $parent.name.error() -->
-          <!-- /ko -->
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /Name field -->
-    </div>
-
-    <div class="employee-form__row">
-      <!-- Position select -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
-      <div class="employee-form__position"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-        <label data-bind="hrmFormFieldLabel: label">
-          Должность
-        </label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: position,
-              options: $component.positions,
-              optionsText: 'name',
-              optionsValue: 'id',
-              valueAllowUnset: true,
-              hrmSelect,
-              hrmSelectPlaceholder: 'Не выбрано',
-              hrmSelectSearchEnabled: true,
-              hrmSelectAllowClear: true,
-              hrmFormFieldSelectControl: control,
-              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
-          </select>
-        </div>
-
-        <div data-bind="
-          component: {name: 'hrm-form-field-error'},
-          hrmSlide,
-          hrmSlideValue: control() !== null ? control().errorState : false,
-          hrmSlideDuration: 150
-      ">
-          <!-- ko text: $parent.position.error() -->
-          <!-- /ko -->
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /Position select -->
-
-
-      <!-- Levels select -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
-      <div class="employee-form__level"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-        <label data-bind="hrmFormFieldLabel: label">
-          Разряд
-        </label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: level,
-              disable: $component.levels().length === 0,
-              options: $component.levels,
-              valueAllowUnset: true,
-              hrmSelect,
-              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
-              hrmFormFieldSelectControl: control">
-          </select>
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /Levels select -->
-    </div>
-
-
-  </div>
-
-  <div class="hrm-basic-modal-dialog__action-list">
-    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-cancel-button"
-            data-bind="click: function() {cancel();}">
-      Отменить
-    </button>
-
-    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-submit-button"
-            data-bind="click: function() {submit();}">
-      Сохранить
-    </button>
-  </div>
-
-</template>
-
-
-<script type="text/javascript">
-  $(function () {
-    const positionsTable = [
-      {
-        id: 1,
-        name: 'Администратор филиала',
-        levels: [1, 2, 3]
-      }, {
-        id: 2,
-        name: 'Повар-пиццмейкер',
-        levels: [1, 2]
-      }, {
-        id: 3,
-        name: 'Повар-сушист',
-        levels: [1, 2]
-      }, {
-        id: 4,
-        name: 'Официант',
-        levels: []
-      }, {
-        id: 5,
-        name: 'Водитель',
-        levels: []
-      }
-    ];
-
-    ko.components.register('create-employee-modal-dialog', {
-      viewModel: {
-        createViewModel: function (params, componentInfo) {
-          const $element = $(componentInfo.element);
-
-          $element.addClass([
-            'modal-dialog',
-            'modal-dialog-centered',
-            'hrm-modal-dialog',
-            'hrm-basic-modal-dialog',
-            'hrm-modal-dialog--size_large'
-          ]);
-
-          const ViewModel = function () {
-            this.isSubmitted = ko.observable(false);
-
-            this.formControlErrorStateMatcher = (formControl) => {
-              return ko.pureComputed(() => {
-                console.log(formControl, formControl())
-                return this.isSubmitted() && !formControl.isValid();
-              });
-            };
-
-            this.positions = positionsTable;
-            this.levels = ko.observable([]);
-
-            this.formModel = {
-              position: ko.observable('').extend({
-                required: {
-                  message: 'Обязательное поле'
-                }
-              }),
-              level: ko.observable(null),
-              name: ko.observable('').extend({
-                required: {
-                  message: 'Обязательное поле'
-                }
-              })
-            }
-
-            this.validationObject = ko.validatedObservable({
-              name: this.formModel.name,
-              position: this.formModel.position,
-            });
-
-            this.formModel.position.subscribe(positionId => {
-              this.formModel.level(null);
-              if (!positionId) {
-                this.levels([]);
-                return;
-              }
-
-              const position = positionsTable.find(p => p.id === positionId);
-              if (!position) this.levels([]);
-              else this.levels(position.levels);
-            })
-
-            this.cancel = function () {
-              if ('cancel' in params) {
-                params.cancel();
-              }
-            };
-
-            this.submit = function () {
-              this.isSubmitted(true);
-
-              if (this.validationObject.isValid()) {
-                if ('submit' in params) {
-                  params.submit(ko.toJS(this.formModel));
-                }
-              }
-            };
-          }
-
-          return new ViewModel();
-        }
-      },
-      template: {
-        element: document.getElementById('create-employee-modal-dialog-template')
-      }
-    });
-  });
-</script>
-
-  <script type="text/html"
-        id="add-employees-modal-employee-template">
-  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-<div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-  <div data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
-  </div>
-  <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
-</div>
-<!-- /ko -->
-</script>
-
-<script type="text/html"
-        id="add-employees-modal-position-list-template">
-
-        <div class="employees-form__employees-scrollable-list"
-        data-bind="hrmScrollable">
-
-        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-        <div class="employees-form__checkbox-group">
-          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-
-              <!-- ko foreach: {data: $parent.position.employees, as: 'employee'} -->
-              <div class="employees-form__checkbox">
-
-                    <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
-                    <!-- /ko -->
-              </div>
-              <!-- /ko -->
-
-
-          </div>
-        </div>
-        <!-- /ko -->
-
-        </div>
-</script>
-
-<script type="text/html"
-        id="add-employees-modal-other-list-template">
-
-  <div class="employees-form__employees-scrollable-list"
-  data-bind="hrmScrollable">
-
-  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-  <div class="employees-form__checkbox-group">
-    <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-
-      <!-- ko foreach: { data: $parent.positions, as: 'position' } -->
-      <div class="employees-form__position"
-            data-bind="if: position.hasVisibleEmployees">
-        <div class="employees-form__position-name"
-              data-bind="text: position.name"></div>
-
-        <!-- ko foreach: {data: position.employees, as: 'employee'} -->
-        <div class="employees-form__checkbox">
-
-              <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
-              <!-- /ko -->
-        </div>
-        <!-- /ko -->
-
-      </div>
-      <!-- /ko -->
-    </div>
-  </div>
-  <!-- /ko -->
-
-  </div>
-
-</script>
-
-
-<template id="add-employees-position-tab-template">
-  <div class="employees-form__row">
-    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-    <div class="hrm-form-field-switch-group"
-         data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
-      <div data-bind="component: {name: 'hrm-switch', params: {exportAs: control, checked: allBranches}}"></div>
-      <label data-bind="hrmSwitchGroupLabel: label">
-        Все филиалы
-      </label>
-    </div>
-    <!-- /ko -->
-
-    <div class="templates__form-field"
-         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по ФИО' }}">
-    </div>
-  </div><!-- .employees-form__row -->
-
-
-  <!-- Подгрузка сотрудников -->
-  <!-- ko template: {
-        foreach: hrmTemplateIf(loadingBranches(), $data),
-        afterAdd: hrmFadeAfterAddFactory(200, 200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-      } -->
-  <div>
-    <div class="employees-form__calculating">
-      <i class="fa fa-spinner fa-pulse
-                            employees-form__calculating-indicator">
-      </i>
-    </div>
-  </div>
-  <!-- /ko -->
-
-
-  <!-- Отображение сотрудников -->
-  <!-- ko template: {
-        foreach: hrmTemplateIf(!loadingBranches(), $data),
-        afterAdd: hrmFadeAfterAddFactory(200, 200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-      } -->
-
-  <!-- Список позиций -->
-  <!-- ko ifnot: isSingle -->
-  <!-- ko template: { name: 'add-employees-modal-other-list-template', data: {positions: positions} } -->
-  <!-- /ko -->
-  <!-- /ko -->
-  <!-- /Список позиций -->
-
-  <!-- Одна позиция -->
-  <!-- ko if: isSingle -->
-  <!-- ko template: { name: 'add-employees-modal-position-list-template', data: {position: positions[0]} } -->
-  <!-- /ko -->
-  <!-- /ko -->
-  <!-- /Одна позиция -->
-
-  <!-- /ko -->
-  <!-- /Отображение сотрудников -->
-
-</template>
-
-<template id="add-employees-modal-dialog-template">
-
-  <button class="hrm-button hrm-basic-modal-dialog__close-button"
-          data-bind="click: function() { cancel(); }"
-          aria-label="Close">
-  </button>
-
-  <div class="hrm-basic-modal-dialog__header">
-    <h2 class="hrm-basic-modal-dialog__title">
-      Добавить сотрудников
-    </h2>
-  </div>
-
-  <div class="hrm-basic-modal-dialog__body employees-form">
-    <!-- ko if: tabs -->
-    <div class="employees-form__tabs">
-      <div style="width: 100%"
-           data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
-      </div>
-    </div>
-    <!-- /ko -->
-
-    <div class="employees-form__tab">
-      <!-- ko if: activePosition -->
-        <!-- ko component: {
-          name: 'add-employees-position-tab',
-          params: {
-            term: term,
-            mode: 'single',
-            position: activePosition()
-          }
-        } -->
-        <!-- /ko -->
-      <!-- /ko -->
-
-
-      <!-- ko ifnot: activePosition -->
-      <!-- Вкладка Прочие -->
-        <!-- ko component: {
-          name: 'add-employees-position-tab',
-          params: {
-            term: term,
-            mode: 'list',
-            positions: list
-          }
-        } -->
-        <!-- /ko -->
-      <!-- /Вкладка Прочие -->
-      <!-- /ko -->
-    </div>
-  </div>
-
-  <div class="hrm-basic-modal-dialog__action-list">
-    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-cancel-button"
-            data-bind="click: function() {cancel();}">
-      Отменить
-    </button>
-
-    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-submit-button"
-            data-bind="click: function() {submit();}">
-      Сохранить
-    </button>
-  </div>
-
-</template>
-
-
-<script type="text/javascript">
-  $(function () {
-    const modes = {
-      SINGLE: 'single',
-      TABS: 'tabs',
-      LIST: 'list'
-    };
-
-    function EmployeeModel(employee) {
-      return {
-        id: employee.id,
-        name: employee.name,
-        checked: ko.observable(employee.visible()),
-        visible: ko.observable(true)
-      }
-    }
-
-    function PositionModel(positionObservable) {
-      const positionData = positionObservable();
-      const employees = ko.observableArray(positionData.employees().map(EmployeeModel));
-      const hasVisibleEmployees = ko.observable(true);
-
-      return {
-        name: positionData.name,
-        id: positionData.id,
-        employees,
-        visible: positionData.visible(),
-        hasVisibleEmployees,
-      }
-    }
-
-    function NewEmployeeModel(employeeData) {
-      return {
-        id: employeeData.id,
-        name: employeeData.name,
-        checked: ko.observable(false),
-        visible: ko.observable(true),
-        loaded: true,
-      }
-    }
-
-    ko.components.register('add-employees-position-tab', {
-      viewModel: function (params) {
-        this.term = params.term;
-        this.mode = params.mode || ('position' in params ? modes.SINGLE : modes.LIST);
-
-        this.isSingle = this.mode === modes.SINGLE;
-
-        if (this.isSingle) {
-          this.positions = [params.position];
-        } else {
-          this.positions = params.positions;
-        }
-
-        this.allBranches = ko.observable(false);
-        this.loadingBranches = ko.observable(false);
-        this.allBranches.subscribe(value => {
-          if (value) {
-            this.loadingBranches(true)
-            this.loadBranches(() => {
-              this.loadingBranches(false);
-            });
-          } else {
-            this.restoreEmployeesList();
-          }
-        });
-
-        this.restoreEmployeesList = () => {
-          this.positions.forEach(p => {
-            const oldEmployeesList = p.employees().filter(e => !e.loaded)
-            p.employees(oldEmployeesList)
-          })
-        };
-
-        this.loadBranches = (cb) => {
-          if (this.isSingle) {
-            const position = this.positions[0];
-            console.log('Сделать запрос, категория', position.name);
-            // Данные
-            const employeesList = [
-              { name: 'Рабочий #1', id: activePosition.name + '1' },
-              { name: 'Рабочий #2', id: activePosition.name + '2' },
-              { name: 'Рабочий #3', id: activePosition.name + '3' }
-            ];
-
-            // Добавить новых работников
-            employeesList.forEach(e => {
-              position.employees.push(NewEmployeeModel(e))
-            });
-          } else {
-            const positionsList = this.positions.map(p => p.name)
-            console.log('Сделать запрос, категории', positionsList);
-            // Добавить новых работников в каждую категию
-            updatedEmployees = this.positions.forEach(p => {
-              const employeesList = [
-                { name: 'Рабочий #1', id: p.name + '1' },
-                { name: 'Рабочий #2', id: p.name + '2' },
-                { name: 'Рабочий #3', id: p.name + '3' }
-              ];
-              employeesList.forEach(e => {
-                p.employees.push(NewEmployeeModel(e))
-              });
-            })
-          }
-
-          setTimeout(cb, 3000)
-        }
-      },
-      template: {
-        element: 'add-employees-position-tab-template'
-      }
-    })
-
-    ko.components.register('add-employees-modal-dialog', {
-      viewModel: {
-        createViewModel: function (params, componentInfo) {
-          const $element = $(componentInfo.element);
-          $element.addClass([
-            'modal-dialog',
-            'modal-dialog-centered',
-            'hrm-modal-dialog',
-            'hrm-basic-modal-dialog',
-            'hrm-modal-dialog--size_large'
-          ]);
-
-
-          const ViewModel = function () {
-            this.isSubmitted = ko.observable(false);
-
-            this.formControlErrorStateMatcher = (formControl) => {
-              return ko.pureComputed(() => {
-                return this.isSubmitted() && !formControl.isValid();
-              });
-            };
-
-            this.mode = params.data.mode || ('position' in params.data ? modes.SINGLE : modes.TABS);
-
-            this.positions = this.mode === modes.SINGLE
-              ? [PositionModel(params.data.position)]
-              : params.data.positions.map(PositionModel);
-
-            this.term = ko.observable('');
-            function termUpdateHandler(value) {
-              const formattedValue = value.toLowerCase();
-              this.positions.forEach(p => {
-                let hasVisibleEmployees = 0;
-                p.employees().forEach(e => {
-                  let isVisible = true;
-                  if (formattedValue.length >= 2) {
-                    const name = e.name.toLowerCase();
-                    isVisible = name.indexOf(formattedValue) !== -1;
-                  }
-                  e.visible(isVisible);
-                  if (isVisible) hasVisibleEmployees++;
-                });
-                p.hasVisibleEmployees(hasVisibleEmployees);
-              })
-            }
-            this.term.subscribe(value => {
-              termUpdateHandler(value);
-            });
-
-            this.tabs = null;
-            this.activePosition = null;
-            this.list = null;
-
-            if (this.mode === modes.SINGLE) {
-              this.activePosition = ko.observable(this.positions[0]);
-            } else if (this.mode === modes.LIST) {
-              this.list = this.positions;
-            } else {
-              this.list = this.positions.filter(position => !position.visible);
-              const visiblePositions = this.positions.filter(position => position.visible);
-              this.tabs = (() => {
-                const tabs = visiblePositions.map(position => new HrmTabGroupItem(position.name));
-                if (this.list.length) tabs.push(new HrmTabGroupItem('Прочие'));
-                return tabs;
-              })();
-              this.activeTab = ko.observable(0);
-              this.activePosition = ko.pureComputed(() => {
-                return visiblePositions[this.activeTab()];
-              });
-              this.activeTab(0);
-            }
-
-            this.cancel = function () {
-              if ('cancel' in params) {
-                params.cancel();
-              }
-            };
-
-            this.submit = function () {
-              this.isSubmitted(true);
-              if ('submit' in params) {
-                params.submit(ko.toJS(this.positions));
-              }
-            };
-          }
-
-          return new ViewModel();
-        }
-      },
-      template: {
-        element: document.getElementById('add-employees-modal-dialog-template')
-      }
-    });
-  });
-</script>
-
-  <template id="stimulation-modal-dialog-template">
-
-  <button class="hrm-button hrm-basic-modal-dialog__close-button"
-          data-bind="click: function() { cancel(); }"
-          aria-label="Close">
-  </button>
-
-  <div class="hrm-basic-modal-dialog__header">
-    <h2 class="hrm-basic-modal-dialog__title">
-      Выписать штраф/премию смене
-    </h2>
-  </div>
-
-  <div class="hrm-basic-modal-dialog__body stimulation-settings"
-       data-bind="using: formModel">
-    <div class="stimulation-settings__row">
-      <!-- Category select -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
-      <div class="stimulation-settings__select stimulation-settings__category"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-        <label data-bind="hrmFormFieldLabel: label">
-          Категория
-        </label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: category,
-                   hrmSelect,
-                   hrmSelectPlaceholder: 'Все', hrmSelectAllowClear: true,
-                   hrmFormFieldSelectControl: control">
-            <option></option>
-            <option value="production">Производство</option>
-            <option value="delivery">Доставка</option>
-          </select>
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /Category select -->
-
-
-      <!-- Type toggler -->
-      <div class="hrm-radio-group stimulation-settings__type">
-        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_negative">
-          <input class="hrm-radio-group__radio-input"
-                 data-bind="checked: stimulationType"
-                 type="radio"
-                 value="fine"
-                 id="fine-radio" />
-          <label class="hrm-radio-group__radio-label"
-                 for="fine-radio">
-            Штраф
-          </label>
-        </div>
-
-        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_positive">
-          <input class="hrm-radio-group__radio-input"
-                 data-bind="checked: stimulationType"
-                 type="radio"
-                 value="bonus"
-                 id="bonus-radio" />
-          <label class="hrm-radio-group__radio-label"
-                 for="bonus-radio">
-            Премия
-          </label>
-        </div>
-      </div>
-      <!-- /Type toggler -->
-    </div>
-
-
-    <div class="stimulation-settings__row">
-      <!-- Base select -->
-
-      <!-- ko if: stimulationType() === 'fine' -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
-      <div class="stimulation-settings__select stimulation-settings__base"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-        <label data-bind="hrmFormFieldLabel: label">
-          Основание штрафа
-        </label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: base,
-              hrmSelect,
-              hrmSelectSearchEnabled: true,
-              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
-              hrmFormFieldSelectControl: control,
-              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
-
-            <option></option>
-            <optgroup label="Безопасность">
-              <option value="0">Возврат в кассу</option>
-            </optgroup>
-            <optgroup label="Дисциплина">
-              <option value="1">За отсутствие объяснительной</option>
-              <option value="2">Халатное отношение к работе</option>
-            </optgroup>
-            <optgroup label="Документы">
-              <option value="3">Налог</option>
-            </optgroup>
-            <optgroup label="Производство">
-              <option value="4">Выкуп готовой продукции</option>
-              <option value="5">Порча инвентаря и оборудования</option>
-              <option value="6">Компенсация за халатность</option>
-            </optgroup>
-          </select>
-        </div>
-
-        <div data-bind="component: {name: 'hrm-form-field-error'},
-            hrmSlide,
-            hrmSlideValue: control() !== null ? control().errorState : false,
-            hrmSlideDuration: 150">
-          <!-- ko text: $parent.base.error() -->
-          <!-- /ko -->
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /ko -->
-
-
-      <!-- ko ifnot: stimulationType() === 'fine' -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
-      <div class="stimulation-settings__select stimulation-settings__base"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-        <label data-bind="hrmFormFieldLabel: label">
-          Основание премии
-        </label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: base,
-              hrmSelect,
-              hrmSelectSearchEnabled: true,
-              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
-              hrmFormFieldSelectControl: control,
-              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
-
-            <option></option>
-            <optgroup label="Безопасность">
-              <option value="0">Возврат в кассу</option>
-            </optgroup>
-            <optgroup label="Дисциплина">
-              <option value="1">За отсутствие объяснительной</option>
-              <option value="2">Халатное отношение к работе</option>
-            </optgroup>
-            <optgroup label="Документы">
-              <option value="3">Налог</option>
-            </optgroup>
-            <optgroup label="Производство">
-              <option value="4">Выкуп готовой продукции</option>
-              <option value="5">Порча инвентаря и оборудования</option>
-              <option value="6">Компенсация за халатность</option>
-            </optgroup>
-          </select>
-        </div>
-
-        <div data-bind="component: {name: 'hrm-form-field-error'},
-            hrmSlide,
-            hrmSlideValue: control() !== null ? control().errorState : false,
-            hrmSlideDuration: 150">
-          <!-- ko text: $parent.base.error() -->
-          <!-- /ko -->
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /ko -->
-      <!-- /Base select -->
-
-
-    </div>
-
-    <div class="stimulation-settings__row">
-      <!-- Author select -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
-      <div class="stimulation-settings__select stimulation-settings__author"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
-        <label data-bind="hrmFormFieldLabel: label">
-          <!-- ko text: stimulationType() === 'fine' ? 'Автор штрафа' : 'Автор премии' -->
-          <!-- /ko -->
-        </label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: author,
-            hrmSelect,
-            hrmSelectSearchEnabled: true,
-            hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
-            hrmFormFieldSelectControl: control,
-            hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
-            <option></option>
-            <option value="0">Иван Иванов</option>
-            <option value="1">Петр Петров</option>
-            <option value="2">Николай Николаев</option>
-            <option value="3">Дмитрий Дмитриев</option>
-          </select>
-        </div>
-
-        <div data-bind="component: {name: 'hrm-form-field-error'},
-        hrmSlide,
-        hrmSlideValue: control() !== null ? control().errorState : false,
-        hrmSlideDuration: 150">
-          <!-- ko text: $parent.author.error() -->
-          <!-- /ko -->
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /Author select -->
-
-      <!-- Sum field -->
-      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-      <div class="stimulation-settings__sum"
-           data-bind="
-           hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-       ">
-        <label data-bind="hrmFormFieldLabel: label">Сумма, ₽</label>
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <input data-bind="
-                   attr: {readonly: stimulationType() === 'fine'},
-                   textInput: sum,
-                   hrmFormFieldInputControl: control,
-                   hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
-               "
-                 type="number">
-        </div>
-
-        <div data-bind="
-               component: {name: 'hrm-form-field-error'},
-               hrmSlide,
-               hrmSlideValue: control() !== null ? control().errorState : false,
-               hrmSlideDuration: 150
-           ">
-          <!-- ko text: $parent.sum.error() -->
-          <!-- /ko -->
-        </div>
-      </div>
-      <!-- /ko -->
-      <!-- /Sum field -->
-    </div>
-
-    <div class="stimulation-settings__row">
-      <!-- Comment field -->
-      <!-- ko let: {control: ko.observable(null)} -->
-      <div class="stimulation-settings__comment"
-           data-bind="
-           hrmFormField, hrmFormFieldControlRef: control
-       ">
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
-          <textarea data-bind="
-                   textInput: comment,
-                   hrmFormFieldInputControl: control,
-                   hrmAutoResize
-               "
-                    placeholder="Комментарий"></textarea>
-        </div>
-
-      </div>
-      <!-- /ko -->
-      <!-- /Comment field -->
-    </div>
-
-
-  </div>
-
-  <div class="hrm-basic-modal-dialog__action-list">
-    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-cancel-button"
-            data-bind="click: function() {cancel();}">
-      Отменить
-    </button>
-
-    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-submit-button"
-            data-bind="click: function() {submit();}">
-      Сохранить
-    </button>
-  </div>
-
-</template>
-
-
-<script type="text/javascript">
-  $(function () {
-    /* Справочник штрафов */
-    const finesTable = {
-      '0': 200,
-      '1': 300,
-      '2': 400,
-      '3': 500,
-      '4': 600,
-      '5': 700,
-      '6': 800,
-    };
-
-    ko.components.register('stimulation-modal-dialog', {
-      viewModel: {
-        createViewModel: function (params, componentInfo) {
-          const $element = $(componentInfo.element);
-
-          $element.addClass([
-            'modal-dialog',
-            'modal-dialog-centered',
-            'hrm-modal-dialog',
-            'hrm-basic-modal-dialog',
-            'hrm-modal-dialog--size_large'
-          ]);
-
-          const ViewModel = function () {
-            this.isSubmitted = ko.observable(false);
-
-            this.formControlErrorStateMatcher = (formControl) => {
-              return ko.pureComputed(() => {
-                return this.isSubmitted() && !formControl.isValid();
-              });
-            };
-
-            /* fine/bonus */
-            this.stimulationTypes = {
-              "FINE": 'fine',
-              "BONUS": 'bonus'
-            }
-
-            this.formModel = {
-              category: ko.observable(''),
-              stimulationType: ko.observable(this.stimulationTypes.FINE),
-              base: ko.observable('').extend({
-                required: {
-                  message: 'Обязательное поле'
-                }
-              }),
-              author: ko.observable('').extend({
-                required: {
-                  message: 'Обязательное поле'
-                }
-              }),
-              sum: ko.observable(0).extend({
-                required: {
-                  message: 'Обязательное поле'
-                },
-                number: {
-                  message: 'Некорректный формат'
-                }
-              }),
-              comment: ko.observable('').extend({
-
-              }),
-            };
-
-            this.reset = function () {
-              this.formModel.base('');
-              this.formModel.sum(0);
-              this.formModel.author('');
-              this.formModel.comment('');
-            }
-
-            this.formModel.stimulationType.subscribe(() => {
-              this.reset();
-            })
-
-            this.formModel.base.subscribe((value) => {
-              if (this.formModel.stimulationType() !== this.stimulationTypes.FINE) return;
-              if (!value) this.formModel.sum(0);
-              this.formModel.sum(finesTable[value] || 0);
-            })
-
-            this.validationObject = ko.validatedObservable({
-              base: this.formModel.base,
-              author: this.formModel.author,
-              sum: this.formModel.sum,
-            })
-
-            this.cancel = function () {
-              if ('cancel' in params) {
-                params.cancel();
-              }
-            };
-
-            this.submit = function () {
-              this.isSubmitted(true);
-
-              if (this.validationObject.isValid()) {
-                if ('submit' in params) {
-                  params.submit(ko.toJS(this.formModel));
-                }
-              }
-
-            };
-          }
-
-          return new ViewModel();
-        }
-      },
-      template: {
-        element: document.getElementById('stimulation-modal-dialog-template')
-      }
-    });
-  });
 </script>
 
   <script type="text/javascript">
@@ -3207,7 +3444,6 @@
     }
   });
 </script>
-
 
 </body>
 
