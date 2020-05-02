@@ -23,6 +23,17 @@
             });
           };
 
+          function formatDuration(minutes) {
+            if (minutes <= 0) return '00:00';
+
+            let h = Math.floor(minutes / 60).toString();
+            h = h.length === 1 ? '0' + h : h;
+            let m = (minutes % 60).toString();
+            m = m.length === 1 ? '0' + m : m;
+
+            return h + ':' + m;
+          };
+
           const positions = params.positions;
           const model = params.model;
 
@@ -35,8 +46,11 @@
 
           /** Итого: вычисляемые значения - последний ряд таблицы */
           const total = {
-            workTime: ko.pureComputed(() => {
-              return 0;
+            workingTime: ko.pureComputed(() => {
+              const minutes = positions().reduce((minutes, position) => {
+                return minutes + position().workingTime();
+              }, 0);
+              return formatDuration(minutes);
             }),
             salaryMain: ko.pureComputed(() => {
               return 0;
@@ -70,17 +84,17 @@
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
             Column('level', 'Разряд', 'Разряд'),
             Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
-            Column('work-time', 'Рабочее время', 'Рабочее время', total.workTime),
+            Column('work-time', 'Рабочее время', 'Рабочее время'),
             Column('compensation', 'Компенс.', 'Компенсация'),
             Column('workload', 'Нагрузка', 'Нагрузка'),
             Column('salary', 'Оклад, ₽', 'Оклад'),
-            Column('salary-main', 'Осн. часть зп, ₽', 'Основная часть зарплаты', total.salaryMain),
+            Column('salary-main', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
             Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
-            Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования', total.normalizationRatio),
-            Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки', total.revenueStandart),
-            Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования', total.bonusRatio),
-            Column('corrected-time', 'Корр. время', 'Корректированное время', total.correctedTime),
-            Column('bonus-exceed', 'Прем. за превыш. норм., ₽', 'Премия за превышение норматива', total.bonusExceed),
+            Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования'),
+            Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки'),
+            Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования'),
+            Column('corrected-time', 'Корр. время', 'Корректированное время'),
+            Column('bonus-exceed', 'Прем. за превыш. норм., ₽', 'Премия за превышение норматива'),
             Column('depremation', 'Депр., ₽', 'Депремирование'),
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
@@ -105,10 +119,11 @@
               'create-employee',
               { positions: positions() },
               (data) => {
-                model.addEmployee(data.position, {
+                const position = model.getPositionById(data.position);
+                position().addEmployee({
                   name: data.name,
                   level: data.level
-                })
+                });
               });
           };
 
@@ -176,6 +191,7 @@
             tabName: params.tabName,
 
             editableCellErrorStateMatcher,
+            formatDuration,
 
             columns,
             activeColumns,

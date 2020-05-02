@@ -2569,7 +2569,7 @@
     </table>
   </td>
   <td class="positions-table__cell positions-table__cell--work-time">
-    <div class="positions-table__cell-content" data-bind="text: employee.formattedWorkingTime"></div>
+    <div class="positions-table__cell-content" data-bind="text: table.formatDuration(employee.workingTime())"></div>
   </td>
   <td class="positions-table__cell positions-table__cell--compensation">
     <div class="positions-table__cell-content"></div>
@@ -2604,6 +2604,47 @@
       <div class="positions-table__cell-content" data-bind="text: employee.fine"></div>
   </td>
   <!-- /ko -->
+
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
+</tr>
+
+</script>
+
+<!-- Строка Итого -->
+<script id="total-row-template"
+        type="text/html">
+
+<tr class="positions-table__row positions-table__row--highlighted positions-table__total">
+  <td class="positions-table__cell positions-table__cell--name positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--account positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--account-operations positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--level positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--interval positions-table__cell--empty"></td>
+
+  <td class="positions-table__cell positions-table__cell--work-time">
+    <div class="positions-table__cell-content" data-bind="text: total.workingTime"></div>
+  </td>
+
+  <td class="positions-table__cell positions-table__cell--compensation positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--workload positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--salary positions-table__cell--empty"></td>
+
+  <td class="positions-table__cell positions-table__cell--salary-main">
+    <div class="positions-table__cell-content" data-bind="total.salaryBulk"></div>
+  </td>
+
+  <td class="positions-table__cell positions-table__cell--revenue-standart-hour positions-table__cell--empty"></td>
+
+  <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+
+  <td class="positions-table__cell positions-table__cell--depremation positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--premation positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--fine positions-table__cell--empty"></td>
 
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
   <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
@@ -2907,32 +2948,8 @@
             <!-- /Блок Прочее -->
 
             <!-- Total section -->
-            <tr class="positions-table__row positions-table__row--highlighted positions-table__total">
-              <td class="positions-table__cell  positions-table__cell--name positions-table__cell--empty">
-
-              </td>
-
-              <!-- ko foreach: table.columns -->
-              <td class="positions-table__cell"
-                  data-bind="class: 'positions-table__cell--' + id, css: {'positions-table__cell--empty': !hasTotal}">
-                <div class="positions-table__cell-content">
-                  <span data-bind="text: total"></span>
-                </div>
-              </td>
-              <!-- /ko -->
-
-              <td class="positions-table__cell positions-table__cell--total positions-table__cell--colored">
-                <div class="positions-table__cell-content">
-                  <span data-bind="text: total.total"></span>
-                </div>
-              </td>
-
-              <td class="positions-table__cell positions-table__cell--payment positions-table__cell--colored">
-                <div class="positions-table__cell-content">
-                  <span data-bind="text: total.toPayment"></span>
-                </div>
-              </td>
-            </tr>
+            <!-- ko template: { name: 'total-row-template', data: { total: table.total } } -->
+            <!-- /ko -->
             <!-- /Total section -->
           </tbody>
         </table>
@@ -2966,6 +2983,17 @@
             });
           };
 
+          function formatDuration(minutes) {
+            if (minutes <= 0) return '00:00';
+
+            let h = Math.floor(minutes / 60).toString();
+            h = h.length === 1 ? '0' + h : h;
+            let m = (minutes % 60).toString();
+            m = m.length === 1 ? '0' + m : m;
+
+            return h + ':' + m;
+          };
+
           const positions = params.positions;
           const model = params.model;
 
@@ -2978,8 +3006,11 @@
 
           /** Итого: вычисляемые значения - последний ряд таблицы */
           const total = {
-            workTime: ko.pureComputed(() => {
-              return 0;
+            workingTime: ko.pureComputed(() => {
+              const minutes = positions().reduce((minutes, position) => {
+                return minutes + position().workingTime();
+              }, 0);
+              return formatDuration(minutes);
             }),
             salaryMain: ko.pureComputed(() => {
               return 0;
@@ -3013,17 +3044,17 @@
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
             Column('level', 'Разряд', 'Разряд'),
             Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
-            Column('work-time', 'Рабочее время', 'Рабочее время', total.workTime),
+            Column('work-time', 'Рабочее время', 'Рабочее время'),
             Column('compensation', 'Компенс.', 'Компенсация'),
             Column('workload', 'Нагрузка', 'Нагрузка'),
             Column('salary', 'Оклад, ₽', 'Оклад'),
-            Column('salary-main', 'Осн. часть зп, ₽', 'Основная часть зарплаты', total.salaryMain),
+            Column('salary-main', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
             Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
-            Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования', total.normalizationRatio),
-            Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки', total.revenueStandart),
-            Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования', total.bonusRatio),
-            Column('corrected-time', 'Корр. время', 'Корректированное время', total.correctedTime),
-            Column('bonus-exceed', 'Прем. за превыш. норм., ₽', 'Премия за превышение норматива', total.bonusExceed),
+            Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования'),
+            Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки'),
+            Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования'),
+            Column('corrected-time', 'Корр. время', 'Корректированное время'),
+            Column('bonus-exceed', 'Прем. за превыш. норм., ₽', 'Премия за превышение норматива'),
             Column('depremation', 'Депр., ₽', 'Депремирование'),
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
@@ -3048,10 +3079,11 @@
               'create-employee',
               { positions: positions() },
               (data) => {
-                model.addEmployee(data.position, {
+                const position = model.getPositionById(data.position);
+                position().addEmployee({
                   name: data.name,
                   level: data.level
-                })
+                });
               });
           };
 
@@ -3119,6 +3151,7 @@
             tabName: params.tabName,
 
             editableCellErrorStateMatcher,
+            formatDuration,
 
             columns,
             activeColumns,
@@ -3153,18 +3186,6 @@
 
     const PositionsModel = function () {
       const positions = ko.observableArray([]);
-
-      function formatDuration(minutes) {
-        if (minutes <= 0) return '00:00';
-
-        let h = Math.floor(minutes / 60).toString();
-        h = h.length === 1 ? '0' + h : h;
-        let m = (minutes % 60).toString();
-        m = m.length === 1 ? '0' + m : m;
-
-        return h + ':' + m;
-      };
-
       function getPositionById(id) {
         return positions().find(p => p().id === id);
       }
@@ -3253,8 +3274,9 @@
       }
 
       function EmployeeModel(employee, positionData, visible) {
+        const defaultIntervals = employee.workingIntervals || [''];
         const workingIntervals = ko.observableArray(
-          employee.workingIntervals.map(i => WorkingIntervalModel(i))
+          defaultIntervals.map(i => WorkingIntervalModel(i))
         );
 
         const isWorkingIntervalsValid = ko.pureComputed(() => {
@@ -3278,10 +3300,6 @@
           }, 0);
         });
 
-        const formattedWorkingTime = ko.pureComputed(() => {
-          return formatDuration(workingTime());
-        })
-
         return {
           name: employee.name, // имя
           id: employee.id, // идентификатор
@@ -3293,7 +3311,6 @@
           addWorkingInterval,
           removeWorkingInterval,
           workingTime,
-          formattedWorkingTime,
 
           returnRate: 30, // норматив выручки
           salaryBulk: 7200, // основная часть зп
@@ -3301,13 +3318,23 @@
           fine: ko.observable(0), // штраф
 
           visible: ko.observable(!!visible), // участвует в расчете
-
         }
       }
 
       function PositionModel(positionData) {
         const visible = ko.observable(false);
         const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, positionData, false)));
+
+        const workingTime = ko.pureComputed(() => {
+          return employees().reduce((minutes, employee) => {
+            if (!employee.visible()) return minutes;
+            return minutes + employee.workingTime();
+          }, 0)
+        });
+
+        const addEmployee = (employee) => {
+          employees.push(EmployeeModel(employee, positionData, 'visible'));
+        }
 
         return ko.observable({
           id: positionData.id,
@@ -3322,22 +3349,19 @@
           fotCategory: positionData.fotCategory,
           fotRevenue: positionData.fotRevenue,
           employees,
+          addEmployee,
+
+          workingTime,
 
           visible, // отображается в таблице
         });
       };
 
-      function addEmployee(positionId, employee) {
-        const model = EmployeeModel(employee, 'visible');
-        const position = getPositionById(positionId);
-        position().employees.push(model);
-      }
-
       return {
         positions,
         setPositions,
         updateEmployeesList,
-        addEmployee
+        getPositionById,
       }
     }
 
