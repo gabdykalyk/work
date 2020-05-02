@@ -2,6 +2,25 @@
 
 <script>
   $(function () {
+    function AccountOperation(operationData) {
+      operationData = operationData || {};
+
+      this.type = ko.observable(operationData.type || 'fine').extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+      this.sum = ko.observable(operationData.sum || 0).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        number: {
+          message: 'Некорректный формат'
+        }
+      });
+      this.comment = ko.observable(operationData.comment || '');
+    }
+
     ko.components.register('account-operations-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -14,7 +33,25 @@
             'hrm-modal-dialog--size_large'
           ]);
 
-          const ViewModel = function () {
+          const ViewModel = function (operations) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.operations = ko.observableArray(operations.map(o => new AccountOperation(o)));
+
+            this.addOperation = () => {
+              this.operations.push(new AccountOperation());
+            }
+
+            this.removeOperation = (operation) => {
+              this.operations.remove(operation);
+            }
+
             /** Закрыть окно без изменений */
             this.cancel = function () {
               if ('cancel' in params) {
@@ -24,7 +61,7 @@
 
             /** Применить изменения */
             this.apply = function () {
-              
+
             }
 
             this.submit = function () {
@@ -35,7 +72,8 @@
             };
           }
 
-          return new ViewModel();
+          const employee = params.data.employee;
+          return new ViewModel(employee.accountOperations);
         }
       },
       template: {

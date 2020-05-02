@@ -1,3 +1,91 @@
+<template id="account-operation-template">
+  <div class="account-operation"
+       data-bind="hrmLog">
+    <div class="account-operation__action">
+
+      <div class="hrm-radio-group">
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_negative">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: type"
+                 type="radio"
+                 value="fine"
+                 id="templates-negative-radio"
+                 checked />
+          <label class="hrm-radio-group__radio-label"
+                 for="templates-negative-radio">
+            Списать
+          </label>
+        </div>
+
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_positive">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: type"
+                 type="radio"
+                 value="bonus"
+                 id="templates-positive-radio" />
+          <label class="hrm-radio-group__radio-label"
+                 for="templates-positive-radio">
+            Начислить
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ko let: {control: ko.observable(null)} -->
+    <div class="account-operation__sum"
+         data-bind="
+           hrmFormField, hrmFormFieldControlRef: control">
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <input data-bind="
+                   textInput: sum,
+                   hrmFormFieldInputControl: control,
+                   hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+               "
+               type="number">
+        <span>₽</span>
+      </div>
+
+
+
+      <div data-bind="
+               component: {name: 'hrm-form-field-error'},
+               hrmSlide,
+               hrmSlideValue: control() !== null ? control().errorState : false,
+               hrmSlideDuration: 150
+           ">
+        <!-- ko text: sum.error() -->
+        <!-- /ko -->
+      </div>
+      </div>
+      <!-- /ko -->
+
+
+
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="account-operation__comment"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <textarea data-bind="
+            textInput: comment,
+            hrmFormFieldInputControl: control,
+            hrmAutoResize"
+                    placeholder="Комментарий"></textarea>
+        </div>
+
+      </div>
+      <!-- /ko -->
+
+
+
+      <div class="account-operation__remove">
+        <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
+                data-bind="click: $component.removeOperation"></button>
+      </div>
+    </div>
+</template>
+
 <template id="account-operations-modal-dialog-template">
   <button class="hrm-button hrm-basic-modal-dialog__close-button"
           data-bind="click: function() { cancel(); }"
@@ -11,6 +99,18 @@
   </div>
 
   <div class="hrm-basic-modal-dialog__body">
+
+    <!-- ko template: {
+      name: 'account-operation-template',
+      foreach: $component.operations,
+      afterAdd: hrmFadeAfterAddFactory(200),
+      beforeRemove: hrmFadeBeforeRemoveFactory(200)
+    } -->
+    <!-- /ko -->
+
+
+    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_mobile hrm-button-with-icon--theme_positive hrm-button-with-plus-icon"
+            data-bind="click: addOperation">Добавить</button>
   </div>
 
   <div class="hrm-basic-modal-dialog__action-list">
