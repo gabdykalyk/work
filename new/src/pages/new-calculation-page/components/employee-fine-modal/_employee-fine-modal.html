@@ -1,3 +1,148 @@
+<template id="fine-block-template">
+  <div class="fine-block">
+    <div class="fine-block__content">
+      <!-- Base select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="fine-block__row fine-block__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание штрафа
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
+       hrmSelect,
+       hrmSelectSearchEnabled: true,
+       hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+       hrmFormFieldSelectControl: control,
+       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+            <option></option>
+
+            <!-- ko foreach: {data: $component.fineBases, as: 'group'} -->
+            <optgroup data-bind="attr: {label: group.name}">
+              <!-- ko foreach: { data: group.items, as: 'option' } -->
+              <option data-bind="value: option.id, text: option.name"></option>
+              <!-- /ko -->
+
+            </optgroup>
+            <!-- /ko -->
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+     hrmSlide,
+     hrmSlideValue: control() !== null ? control().errorState : false,
+     hrmSlideDuration: 150">
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Base select -->
+
+      <div class="fine-block__row">
+        <!-- Sum field -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+        <div class="fine-block__sum"
+             data-bind="
+      hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+  ">
+          <label data-bind="hrmFormFieldLabel: label">Сумма,
+            <i class="far fa-ruble-sign"></i>
+          </label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="
+              textInput: sum,
+              hrmFormFieldInputControl: control,
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+          "
+                   readonly
+                   type="number">
+          </div>
+
+          <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+            <!-- ko text: $parent.sum.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- /Sum field -->
+
+
+        <!-- Author select -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div class="fine-block__author"
+             data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <select data-bind="value: author,
+       hrmSelect,
+       hrmSelectSearchEnabled: true,
+       hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+       hrmFormFieldSelectControl: control,
+       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+              <option></option>
+              <!-- ko foreach: $component.authors -->
+              <option data-bind="value: id, text: name"></option>
+              <!-- /ko -->
+            </select>
+          </div>
+
+          <div data-bind="component: {name: 'hrm-form-field-error'},
+   hrmSlide,
+   hrmSlideValue: control() !== null ? control().errorState : false,
+   hrmSlideDuration: 150">
+            <!-- ko text: $parent.author.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- /Author select -->
+      </div>
+
+      <!-- Comment field -->
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="fine-block__row fine-block__comment"
+           data-bind="
+     hrmFormField, hrmFormFieldControlRef: control
+ ">
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <textarea data-bind="
+             textInput: comment,
+             hrmFormFieldInputControl: control,
+             hrmAutoResize
+         "
+                    placeholder="Комментарий"></textarea>
+        </div>
+
+      </div>
+      <!-- /ko -->
+      <!-- /Comment field -->
+    </div>
+
+    <div class="fine-block__remove">
+      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
+              data-bind="click: $component.removeFine"></button>
+      <!-- /ko -->
+
+      <!-- ko ifnot: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
+              data-bind="click: $component.removeFine">Удалить</button>
+      <!-- /ko -->
+    </div>
+  </div>
+</template>
+
 <template id="employee-fine-modal-dialog-template">
   <button class="hrm-button hrm-basic-modal-dialog__close-button"
           data-bind="click: function() { cancel(); }"
@@ -10,20 +155,43 @@
     </h2>
   </div>
 
-  <div class="hrm-basic-modal-dialog__body">
-  </div>
+  <div class="hrm-basic-modal-dialog__body fine-form">
 
-  <div class="hrm-basic-modal-dialog__action-list">
-    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+    <!-- ko template: {
+      name: 'fine-block-template',
+      foreach: fines,
+      afterAdd: hrmFadeAfterAddFactory(200),
+      beforeRemove: hrmFadeBeforeRemoveFactory(200)
+    } -->
+    <!-- /ko -->
+
+    <div class="fine-form__actions">
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon"
+              data-bind="click: addFine">Добавить штраф</button>
+
+      <div class="fine-form__total color--secondary">
+        Итого: <span class="fine-form__total-value"
+              data-bind="hrmColoredSign: total">
+          <!-- ko text: $root.utils.formatSign(total) -->
+          <!-- /ko -->
+          <i class="far fa-ruble-sign"
+             aria-hidden="true"></i>
+        </span>
+      </div>
+
+    </div>
+
+    <div class="hrm-basic-modal-dialog__action-list">
+      <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
          position-page__speciality-modal-dialog-cancel-button"
-            data-bind="click: function() {cancel();}">
-      Отменить
-    </button>
+              data-bind="click: function() {cancel();}">
+        Отменить
+      </button>
 
-    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+      <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
          position-page__speciality-modal-dialog-submit-button"
-            data-bind="click: function() {submit();}">
-      Сохранить
-    </button>
-  </div>
+              data-bind="click: function() {submit();}">
+        Сохранить
+      </button>
+    </div>
 </template>

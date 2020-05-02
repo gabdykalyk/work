@@ -504,7 +504,7 @@
       <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon"
               data-bind="click: addOperation">Добавить</button>
 
-      <div class="account-operations-form__total">
+      <div class="account-operations-form__total color--secondary">
         Итого: <span class="account-operations-form__total-value"
               data-bind="hrmColoredSign: total">
           <!-- ko text: $root.utils.formatSign(total) -->
@@ -645,7 +645,152 @@
   })
 </script>
 
-  <template id="employee-fine-modal-dialog-template">
+  <template id="fine-block-template">
+  <div class="fine-block">
+    <div class="fine-block__content">
+      <!-- Base select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="fine-block__row fine-block__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание штрафа
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
+       hrmSelect,
+       hrmSelectSearchEnabled: true,
+       hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+       hrmFormFieldSelectControl: control,
+       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+            <option></option>
+
+            <!-- ko foreach: {data: $component.fineBases, as: 'group'} -->
+            <optgroup data-bind="attr: {label: group.name}">
+              <!-- ko foreach: { data: group.items, as: 'option' } -->
+              <option data-bind="value: option.id, text: option.name"></option>
+              <!-- /ko -->
+
+            </optgroup>
+            <!-- /ko -->
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+     hrmSlide,
+     hrmSlideValue: control() !== null ? control().errorState : false,
+     hrmSlideDuration: 150">
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Base select -->
+
+      <div class="fine-block__row">
+        <!-- Sum field -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+        <div class="fine-block__sum"
+             data-bind="
+      hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+  ">
+          <label data-bind="hrmFormFieldLabel: label">Сумма,
+            <i class="far fa-ruble-sign"></i>
+          </label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="
+              textInput: sum,
+              hrmFormFieldInputControl: control,
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+          "
+                   readonly
+                   type="number">
+          </div>
+
+          <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+            <!-- ko text: $parent.sum.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- /Sum field -->
+
+
+        <!-- Author select -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div class="fine-block__author"
+             data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <select data-bind="value: author,
+       hrmSelect,
+       hrmSelectSearchEnabled: true,
+       hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+       hrmFormFieldSelectControl: control,
+       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+              <option></option>
+              <!-- ko foreach: $component.authors -->
+              <option data-bind="value: id, text: name"></option>
+              <!-- /ko -->
+            </select>
+          </div>
+
+          <div data-bind="component: {name: 'hrm-form-field-error'},
+   hrmSlide,
+   hrmSlideValue: control() !== null ? control().errorState : false,
+   hrmSlideDuration: 150">
+            <!-- ko text: $parent.author.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- /Author select -->
+      </div>
+
+      <!-- Comment field -->
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="fine-block__row fine-block__comment"
+           data-bind="
+     hrmFormField, hrmFormFieldControlRef: control
+ ">
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <textarea data-bind="
+             textInput: comment,
+             hrmFormFieldInputControl: control,
+             hrmAutoResize
+         "
+                    placeholder="Комментарий"></textarea>
+        </div>
+
+      </div>
+      <!-- /ko -->
+      <!-- /Comment field -->
+    </div>
+
+    <div class="fine-block__remove">
+      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
+              data-bind="click: $component.removeFine"></button>
+      <!-- /ko -->
+
+      <!-- ko ifnot: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
+              data-bind="click: $component.removeFine">Удалить</button>
+      <!-- /ko -->
+    </div>
+  </div>
+</template>
+
+<template id="employee-fine-modal-dialog-template">
   <button class="hrm-button hrm-basic-modal-dialog__close-button"
           data-bind="click: function() { cancel(); }"
           aria-label="Close">
@@ -657,22 +802,45 @@
     </h2>
   </div>
 
-  <div class="hrm-basic-modal-dialog__body">
-  </div>
+  <div class="hrm-basic-modal-dialog__body fine-form">
 
-  <div class="hrm-basic-modal-dialog__action-list">
-    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+    <!-- ko template: {
+      name: 'fine-block-template',
+      foreach: fines,
+      afterAdd: hrmFadeAfterAddFactory(200),
+      beforeRemove: hrmFadeBeforeRemoveFactory(200)
+    } -->
+    <!-- /ko -->
+
+    <div class="fine-form__actions">
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon"
+              data-bind="click: addFine">Добавить штраф</button>
+
+      <div class="fine-form__total color--secondary">
+        Итого: <span class="fine-form__total-value"
+              data-bind="hrmColoredSign: total">
+          <!-- ko text: $root.utils.formatSign(total) -->
+          <!-- /ko -->
+          <i class="far fa-ruble-sign"
+             aria-hidden="true"></i>
+        </span>
+      </div>
+
+    </div>
+
+    <div class="hrm-basic-modal-dialog__action-list">
+      <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
          position-page__speciality-modal-dialog-cancel-button"
-            data-bind="click: function() {cancel();}">
-      Отменить
-    </button>
+              data-bind="click: function() {cancel();}">
+        Отменить
+      </button>
 
-    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+      <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
          position-page__speciality-modal-dialog-submit-button"
-            data-bind="click: function() {submit();}">
-      Сохранить
-    </button>
-  </div>
+              data-bind="click: function() {submit();}">
+        Сохранить
+      </button>
+    </div>
 </template>
 
 
@@ -690,7 +858,75 @@
             'hrm-modal-dialog--size_large'
           ]);
 
-          const ViewModel = function () {
+          const employee = params.data.employee;
+
+          const ViewModel = function (defaultFines) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            const fineBases = window.directories.fines.get();
+            const authors = window.directories.authors.get();
+
+            this.fineBases = fineBases;
+            this.authors = authors;
+
+            function Fine(defaultData) {
+              defaultData = defaultData || {};
+              const base = ko.observable(defaultData.base).extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              });
+              const sum = ko.observable(defaultData.sum || 0).extend({
+                required: {
+                  message: 'Обязательное поле'
+                },
+                number: {
+                  message: 'Некорректный формат'
+                }
+              });
+              base.subscribe(baseId => {
+                const baseData = fineBases().find(group => {
+                  return group.items.find(item => item.id === baseId);
+                });
+                if (baseData) sum(baseData.sum);
+                else sum(null);
+              });
+              return {
+                base,
+                author: ko.observable(defaultData.author).extend({
+                  required: {
+                    message: 'Обязательное поле'
+                  }
+                }),
+                sum,
+                comment: ko.observable(defaultData.comment || '').extend({
+
+                }),
+              }
+            }
+
+            this.fines = ko.observableArray(defaultFines.map(Fine));
+
+            this.addFine = () => {
+              this.fines.push(Fine())
+            };
+
+            this.removeFine = (fine) => {
+              this.fines.remove(fine);
+            }
+
+            this.total = ko.pureComputed(() => {
+              return this.fines().reduce((sum, fine) => {
+                return sum + fine.sum();
+              }, 0);
+            })
+
             /** Закрыть окно без изменений */
             this.cancel = function () {
               if ('cancel' in params) {
@@ -698,12 +934,16 @@
               }
             };
 
+
+
             /** Применить изменения */
             this.apply = function () {
-
+              employee.fines(this.fines());
             }
 
             this.submit = function () {
+              this.submitted(true);
+
               if ('submit' in params) {
                 this.apply();
                 params.submit(true);
@@ -711,7 +951,7 @@
             };
           }
 
-          return new ViewModel();
+          return new ViewModel(employee.fines());
         }
       },
       template: {
@@ -3365,8 +3605,70 @@
 </script>
 
   <script type="text/javascript">
+  // Справочники
+  window.directories = {
+    fines: {
+      get: () => {
+        const directory = ko.observable([
+          {
+            name: 'Безопасность',
+            items: [
+              { id: 1, name: 'Возврат в кассу', sum: 200 }
+            ],
+          },
+          {
+            name: 'Дисциплина',
+            items: [
+              { id: 2, name: 'За отсутствие объяснительной', sum: 250 },
+              { id: 3, name: 'Халатное отношение к работе', sum: 300 },
+            ]
+          },
+          {
+            name: 'Документы',
+            items: [
+              { id: 4, name: 'Налог', sum: 350 }
+            ],
+          },
+          {
+            name: 'Производство',
+            items: [
+              { id: 5, name: 'Выкуп готовой продукции', sum: 400 },
+              { id: 6, name: 'Порча инвентаря и оборудования', sum: 450 },
+              { id: 7, name: 'Компенсация за халатность', sum: 500 },
+            ],
+          },
+        ]);
+
+        return directory;
+      }
+    },
+    authors: {
+      get: () => {
+        const directory = ko.observable([
+          {
+            id: 1,
+            name: 'Иван Иванов'
+          },{
+            id: 2,
+            name: 'Петр Петров'
+          },{
+            id: 3,
+            name: 'Николай Николаев'
+          },{
+            id: 4,
+            name: 'Сергей Сергеев'
+          }
+        ]);
+
+        return directory;
+      }
+    }
+  };
+
   $(function () {
     const $page = $(document.documentElement);
+
+
 
     const PositionsModel = function () {
       const positions = ko.observableArray([]);
@@ -3490,7 +3792,14 @@
             const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
             return sum + operationSum;
           }, 0)
-        })
+        });
+
+        const fines = ko.observableArray(employee.fines || []);
+        const finesState = ko.pureComputed(() => {
+          return fines().reduce((sum, fine) => {
+            return sum + fine.sum;
+          }, 0)
+        });
 
         return {
           name: employee.name, // имя
@@ -3508,7 +3817,9 @@
           returnRate: 30, // норматив выручки
           salaryBulk: 7200, // основная часть зп
           bonus: ko.observable(0), // премия
-          fine: ko.observable(0), // штраф
+
+          fines, // штрафы
+          finesState,
 
           visible: ko.observable(!!visible), // участвует в расчете
         }

@@ -1,6 +1,68 @@
 <script type="text/javascript">
+  // Справочники
+  window.directories = {
+    fines: {
+      get: () => {
+        const directory = ko.observable([
+          {
+            name: 'Безопасность',
+            items: [
+              { id: 1, name: 'Возврат в кассу', sum: 200 }
+            ],
+          },
+          {
+            name: 'Дисциплина',
+            items: [
+              { id: 2, name: 'За отсутствие объяснительной', sum: 250 },
+              { id: 3, name: 'Халатное отношение к работе', sum: 300 },
+            ]
+          },
+          {
+            name: 'Документы',
+            items: [
+              { id: 4, name: 'Налог', sum: 350 }
+            ],
+          },
+          {
+            name: 'Производство',
+            items: [
+              { id: 5, name: 'Выкуп готовой продукции', sum: 400 },
+              { id: 6, name: 'Порча инвентаря и оборудования', sum: 450 },
+              { id: 7, name: 'Компенсация за халатность', sum: 500 },
+            ],
+          },
+        ]);
+
+        return directory;
+      }
+    },
+    authors: {
+      get: () => {
+        const directory = ko.observable([
+          {
+            id: 1,
+            name: 'Иван Иванов'
+          },{
+            id: 2,
+            name: 'Петр Петров'
+          },{
+            id: 3,
+            name: 'Николай Николаев'
+          },{
+            id: 4,
+            name: 'Сергей Сергеев'
+          }
+        ]);
+
+        return directory;
+      }
+    }
+  };
+
   $(function () {
     const $page = $(document.documentElement);
+
+
 
     const PositionsModel = function () {
       const positions = ko.observableArray([]);
@@ -124,7 +186,14 @@
             const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
             return sum + operationSum;
           }, 0)
-        })
+        });
+
+        const fines = ko.observableArray(employee.fines || []);
+        const finesState = ko.pureComputed(() => {
+          return fines().reduce((sum, fine) => {
+            return sum + fine.sum;
+          }, 0)
+        });
 
         return {
           name: employee.name, // имя
@@ -142,7 +211,9 @@
           returnRate: 30, // норматив выручки
           salaryBulk: 7200, // основная часть зп
           bonus: ko.observable(0), // премия
-          fine: ko.observable(0), // штраф
+
+          fines, // штрафы
+          finesState,
 
           visible: ko.observable(!!visible), // участвует в расчете
         }

@@ -14,7 +14,75 @@
             'hrm-modal-dialog--size_large'
           ]);
 
-          const ViewModel = function () {
+          const employee = params.data.employee;
+
+          const ViewModel = function (defaultFines) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            const fineBases = window.directories.fines.get();
+            const authors = window.directories.authors.get();
+
+            this.fineBases = fineBases;
+            this.authors = authors;
+
+            function Fine(defaultData) {
+              defaultData = defaultData || {};
+              const base = ko.observable(defaultData.base).extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              });
+              const sum = ko.observable(defaultData.sum || 0).extend({
+                required: {
+                  message: 'Обязательное поле'
+                },
+                number: {
+                  message: 'Некорректный формат'
+                }
+              });
+              base.subscribe(baseId => {
+                const baseData = fineBases().find(group => {
+                  return group.items.find(item => item.id === baseId);
+                });
+                if (baseData) sum(baseData.sum);
+                else sum(null);
+              });
+              return {
+                base,
+                author: ko.observable(defaultData.author).extend({
+                  required: {
+                    message: 'Обязательное поле'
+                  }
+                }),
+                sum,
+                comment: ko.observable(defaultData.comment || '').extend({
+
+                }),
+              }
+            }
+
+            this.fines = ko.observableArray(defaultFines.map(Fine));
+
+            this.addFine = () => {
+              this.fines.push(Fine())
+            };
+
+            this.removeFine = (fine) => {
+              this.fines.remove(fine);
+            }
+
+            this.total = ko.pureComputed(() => {
+              return this.fines().reduce((sum, fine) => {
+                return sum + fine.sum();
+              }, 0);
+            })
+
             /** Закрыть окно без изменений */
             this.cancel = function () {
               if ('cancel' in params) {
@@ -22,12 +90,16 @@
               }
             };
 
+
+
             /** Применить изменения */
             this.apply = function () {
-
+              employee.fines(this.fines());
             }
 
             this.submit = function () {
+              this.submitted(true);
+
               if ('submit' in params) {
                 this.apply();
                 params.submit(true);
@@ -35,7 +107,7 @@
             };
           }
 
-          return new ViewModel();
+          return new ViewModel(employee.fines());
         }
       },
       template: {
