@@ -43,7 +43,7 @@
       <div class="calculation-tab__settings-group">
         <!-- Столбцы -->
         <button
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns">
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns" data-bind="click: setColumns">
           Настроить столбцы
         </button>
 
@@ -178,8 +178,10 @@
           <colgroup>
             <col class="positions-table__col positions-table__col--name">
             <!-- ko foreach: table.columns -->
-            <col class="positions-table__col"
+              <!-- ko if: $data.visible -->
+              <col class="positions-table__col"
                  data-bind="class: 'position-table__col--' + id">
+              <!-- /ko -->
             <!-- /ko -->
             <col class="positions-table__col positions-table__col--total">
             <col class="positions-table__col positions-table__col--payment">
@@ -192,6 +194,7 @@
               </th>
 
               <!-- ko foreach: table.columns -->
+              <!-- ko if: $data.visible -->
               <th class="positions-table__cell positions-table__head-cell"
                   data-bind="class: 'positions-table__cell--' + id">
                 <div class="positions-table__cell-content">
@@ -200,6 +203,7 @@
                           data-bind="hrmTooltip, hrmTooltipText: fullTitle"></button>
                 </div>
               </th>
+              <!-- /ko -->
               <!-- /ko -->
 
               <th

@@ -1,0 +1,80 @@
+@@include('./_columns-settings-modal.html')
+
+<script type="text/javascript">
+    $(function () {
+        ko.components.register('columns-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'hrm-modal-dialog--size_large'
+                    ]);
+
+                    return new (function () {
+                        this.columns = params.data.columns().map((c) => {
+                            const columnData = c();
+                            return {
+                                name: columnData.name,
+                                checked: ko.observable(columnData.visible()),
+                                position: column,
+                                visible: ko.observable(true)
+                            }
+                        });
+
+                        /** Поисковый запрос */
+                        this.term = ko.observable('');
+                        /** Скрыть/Показать позиции в списке */
+                        this.term.subscribe(value => {
+                            const formattedTerm = value.toLowerCase();
+
+                            this.columns.forEach(c => {
+                                let isVisible = true;
+                                if (formattedTerm.length >= 2) {
+                                    const formattedName = c.name.toLowerCase();
+                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
+                                }
+                                c.visible(isVisible);
+                            })
+                        });
+
+                        /** Сбросить все чекбоксы и поисковый запрос */
+                        this.reset = function () {
+                            this.term('');
+                            this.columns.forEach(c => {
+                                c.checked(false);
+                            });
+                        }
+
+                        /** Закрыть окно без изменений */
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        /** Применить изменения */
+                        this.apply = function() {
+                            this.columns.forEach(c => {
+                                c.column().visible(c.checked());
+                            });
+                        }
+
+                        this.submit = function () {
+                            if ('submit' in params) {
+                                this.apply();
+                                params.submit(true);
+                            }
+                        };
+                    });
+                }
+            },
+            template: {
+                element: document.getElementById('columns-modal-dialog-template')
+            }
+        });
+    });
+</script>

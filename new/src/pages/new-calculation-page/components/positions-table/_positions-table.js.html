@@ -3,14 +3,14 @@
 <script type="text/javascript">
   $(function () {
     function Column(id, title, fullTitle, total) {
-      return ko.observable({
+      return {
         id,
         title,
         fullTitle,
-        visible: true,
+        visible: ko.observable(true),
         total,
         hasTotal: total !== undefined
-      })
+      }
     }
 
     ko.components.register('calculation-page-positions-table', {
@@ -88,7 +88,7 @@
             Column('compensation', 'Компенс.', 'Компенсация'),
             Column('workload', 'Нагрузка', 'Нагрузка'),
             Column('salary', 'Оклад, ₽', 'Оклад'),
-            Column('salary-main', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
+            Column('salary-bulk', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
             Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
             Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования'),
             Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки'),
@@ -100,17 +100,27 @@
             Column('fine', 'Штраф, ₽', 'Штраф'),
           ];
           const activeColumns = ko.pureComputed(() => {
-            return columns.filter(c => c().visible).length;
+            return columns.filter(c => c().visible()).length;
           });
+          const isColumnVisible = (columnName) => {
+            const column = columns.fine(c => c.id === columnName);
+            if (column) return column.visible;
+            else return false;
+          };
 
           /** Общее количество колонок (для растягивания заголовков) */
           const columnCount = ko.pureComputed(() => {
             return activeColumns() + 3;
           });
 
-          /** Установить видимость позиций (модальное окно) */
+          /** Установить видимость позиций */
           const setPositions = () => {
             params.utils.openModal('positions', { positions: positions })
+          }
+
+          /** Установить видимость колонок */
+          const setColumns = () => {
+            params.utils.openModal('columns', { columns: columns })
           }
 
           /* Создать сотрудника*/
