@@ -214,6 +214,20 @@ ko.bindingHandlers.hrmAutoResize = {
     $(element).addClass('hrm-auto-resize').autoResize();
   }
 };
+ko.bindingHandlers.hrmColoredSign = {
+  init: function (element, valueAccessor) {
+    let value = parseInt(ko.unwrap(valueAccessor()));
+    $(element).toggleClass('color--positive', value && value > 0);
+    $(element).toggleClass('color--negative', value && value < 0);
+    $(element).toggleClass('color--secondary', value === 0);
+  },
+  update: function (element, valueAccessor) {
+    let value = parseInt(ko.unwrap(valueAccessor()));
+    $(element).toggleClass('color--positive', value && value > 0);
+    $(element).toggleClass('color--negative', value && value < 0);
+    $(element).toggleClass('color--secondary', value === 0);
+  }
+};
 "use strict";
 
 ko.components.register('hrm-basic-footer', {

@@ -110,12 +110,12 @@
 
           /** Установить видимость позиций (модальное окно) */
           const setPositions = () => {
-            params.settings.openModal('positions', { positions: positions })
+            params.utils.openModal('positions', { positions: positions })
           }
 
           /* Создать сотрудника*/
           const createEmployee = () => {
-            params.settings.openModal(
+            params.utils.openModal(
               'create-employee',
               { positions: positions() },
               (data) => {
@@ -129,7 +129,7 @@
 
           /* Добавить сотрудников */
           const addEmployees = () => {
-            params.settings.openModal('add-employees', {
+            params.utils.openModal('add-employees', {
               positions: positions(),
               mode: 'tabs',
             }, (updatedPositionsList) => {
@@ -146,14 +146,14 @@
             const originalPosition = positions().find(p => p().id === position.id);
 
             if (originalPosition) {
-              params.settings.openModal('add-employees',
+              params.utils.openModal('add-employees',
                 { position: originalPosition, mode: 'single' },
                 (updatedPositionsList) => {
                   model.updateEmployeesList(updatedPositionsList);
                 });
             } else {
               const invisiblePositions = positions().filter(p => !p().visible());
-              params.settings.openModal('add-employees',
+              params.utils.openModal('add-employees',
                 { positions: invisiblePositions, mode: 'list' },
                 (updatedPositionsList) => {
                   model.updateEmployeesList(updatedPositionsList);
@@ -162,15 +162,13 @@
           };
 
           const performAccountOperations = (employee) => {
-            params.settings.openModal('account-operations', {
+            params.utils.openModal('account-operations', {
               employee: employee,
-            }, (result) => {
-              console.log('account operations performed', result)
             });
           }
 
           const giveBonus = (employee) => {
-            params.settings.openModal('employee-bonus', {
+            params.utils.openModal('employee-bonus', {
               employee: employee,
             }, (result) => {
               console.log('after bonus', result)
@@ -178,7 +176,7 @@
           }
 
           const giveFine = (employee) => {
-            params.settings.openModal('employee-fine', {
+            params.utils.openModal('employee-fine', {
               employee: employee,
             }, (result) => {
               console.log('after fine', result)
@@ -186,12 +184,11 @@
           }
 
           return {
-            viewportSize: params.settings.viewportSize,
+            viewportSize: params.utils.viewportSize,
             tabName: params.tabName,
 
             editableCellErrorStateMatcher,
             formatDuration,
-
             columns,
             activeColumns,
             columnCount,

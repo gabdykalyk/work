@@ -10,7 +10,7 @@
           message: 'Обязательное поле'
         }
       });
-      this.sum = ko.observable(operationData.sum || 0).extend({
+      this.sum = ko.observable(parseFloat(operationData.sum) || 0).extend({
         required: {
           message: 'Обязательное поле'
         },
@@ -19,6 +19,21 @@
         }
       });
       this.comment = ko.observable(operationData.comment || '');
+      this.commentPlaceholder = ko.pureComputed(() => {
+        return this.type() === 'fine' ? 'Комментарий к списанию' : 'Комментарий к начислению';
+      });
+      this.total = ko.pureComputed(() => {
+        const sign = this.type() === 'fine' ? -1 : 1;
+        return this.sum() * sign;
+      });
+
+      this.getData = () => {
+        return {
+          type: this.type(),
+          sum: parseFloat(this.sum()),
+          comment: this.comment()
+        };
+      }
     }
 
     ko.components.register('account-operations-modal-dialog', {
@@ -29,8 +44,7 @@
             'modal-dialog',
             'modal-dialog-centered',
             'hrm-modal-dialog',
-            'hrm-basic-modal-dialog',
-            'hrm-modal-dialog--size_large'
+            'hrm-basic-modal-dialog'
           ]);
 
           const ViewModel = function (operations) {
@@ -43,6 +57,13 @@
             };
 
             this.operations = ko.observableArray(operations.map(o => new AccountOperation(o)));
+
+            this.total = ko.pureComputed(() => {
+              return this.operations().reduce((sum, operation) => {
+
+                return Math.floor((sum + operation.total()) * 100) / 100;
+              }, 0);
+            })
 
             this.addOperation = () => {
               this.operations.push(new AccountOperation());
@@ -61,7 +82,9 @@
 
             /** Применить изменения */
             this.apply = function () {
-
+              employee.accountOperations(this.operations()
+              .map(operation => operation.getData())
+              .filter(operation => operation.sum));
             }
 
             this.submit = function () {
@@ -73,7 +96,7 @@
           }
 
           const employee = params.data.employee;
-          return new ViewModel(employee.accountOperations);
+          return new ViewModel(employee.accountOperations());
         }
       },
       template: {

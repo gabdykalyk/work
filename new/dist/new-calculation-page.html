@@ -55,7 +55,7 @@
           } -->
           <div class="calculation-form__content">
             <!-- Summary table -->
-            <div data-bind="component: {name: 'calculation-page-summary-table', params: { model: $root.summaryModel, settings: $root.settings }}"></div>
+            <div data-bind="component: {name: 'calculation-page-summary-table', params: { model: $root.summaryModel }}"></div>
             <!-- /Summary table -->
 
             <!-- Tabs -->
@@ -171,8 +171,8 @@
                 beforeRemove: hrmFadeBeforeRemoveFactory(200)
               } -->
                 <div class="calculation-page__tab">
-                  <!-- ko let: {'$tab': $root.settings.production, tabName: 'production'} -->
-<div data-bind="component: {name: 'calculation-page-positions-table', params: { tabName: 'production', positions: $root.productionPositions, settings: $root.settings, model: $root.summaryModel }}"></div>
+                  <!-- ko let: {tabName: 'production'} -->
+<div data-bind="component: {name: 'calculation-page-positions-table', params: { tabName: 'production', positions: $root.productionPositions, utils: $root.utils, model: $root.summaryModel }}"></div>
 <!-- /ko -->
 
                 </div>
@@ -383,30 +383,29 @@
   <template id="account-operation-template">
   <div class="account-operation"
        data-bind="hrmLog">
-    <div class="account-operation__action">
+    <div class="account-operation__type">
 
-      <div class="hrm-radio-group">
+      <div class="hrm-radio-group"
+           data-bind="let: {radioGroupId: 'account-operation-' + $index()}">
         <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_negative">
           <input class="hrm-radio-group__radio-input"
-                 data-bind="checked: type"
+                 data-bind="checked: type, attr: {id: radioGroupId + '-fine'}"
                  type="radio"
                  value="fine"
-                 id="templates-negative-radio"
                  checked />
           <label class="hrm-radio-group__radio-label"
-                 for="templates-negative-radio">
+                 data-bind="attr: {'for': radioGroupId + '-fine'}">
             Списать
           </label>
         </div>
 
         <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_positive">
           <input class="hrm-radio-group__radio-input"
-                 data-bind="checked: type"
+                 data-bind="checked: type, attr: {id: radioGroupId + '-bonus'}"
                  type="radio"
-                 value="bonus"
-                 id="templates-positive-radio" />
+                 value="bonus" />
           <label class="hrm-radio-group__radio-label"
-                 for="templates-positive-radio">
+                 data-bind="attr: {'for': radioGroupId + '-bonus'}">
             Начислить
           </label>
         </div>
@@ -414,58 +413,66 @@
 
     </div>
 
-    <!-- ko let: {control: ko.observable(null)} -->
-    <div class="account-operation__sum"
-         data-bind="
-           hrmFormField, hrmFormFieldControlRef: control">
-      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-        <input data-bind="
-                   textInput: sum,
-                   hrmFormFieldInputControl: control,
-                   hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
-               "
-               type="number">
-        <span>₽</span>
-      </div>
+    <div class="account-operation__sum">
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="account-operation__sum-value"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control">
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input type="number"
+                 data-bind="
+              textInput: sum,
+              hrmFormFieldInputControl: control,
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+          ">
+        </div>
 
-
-
-      <div data-bind="
-               component: {name: 'hrm-form-field-error'},
-               hrmSlide,
-               hrmSlideValue: control() !== null ? control().errorState : false,
-               hrmSlideDuration: 150
-           ">
-        <!-- ko text: sum.error() -->
-        <!-- /ko -->
-      </div>
+        <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+          <!-- ko text: $parent.sum.error() -->
+          <!-- /ko -->
+        </div>
       </div>
       <!-- /ko -->
+      <div class="account-operation__sum-sign">₽</div>
+    </div>
 
 
+    <!-- ko let: {control: ko.observable(null)} -->
+    <div class="account-operation__comment"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control">
 
-      <!-- ko let: {control: ko.observable(null)} -->
-      <div class="account-operation__comment"
-           data-bind="hrmFormField, hrmFormFieldControlRef: control">
-
-        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
-          <textarea data-bind="
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+        <textarea data-bind="
+            attr: {placeholder: commentPlaceholder},
             textInput: comment,
             hrmFormFieldInputControl: control,
             hrmAutoResize"
-                    placeholder="Комментарий"></textarea>
-        </div>
-
+                  placeholder="Комментарий"></textarea>
       </div>
+
+    </div>
+    <!-- /ko -->
+
+
+
+    <div class="account-operation__remove">
+      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
+              data-bind="click: $component.removeOperation"></button>
+      <!-- /ko -->
+
+      <!-- ko ifnot: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
+              data-bind="click: $component.removeOperation">Удалить</button>
       <!-- /ko -->
 
 
-
-      <div class="account-operation__remove">
-        <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
-                data-bind="click: $component.removeOperation"></button>
-      </div>
     </div>
+  </div>
 </template>
 
 <template id="account-operations-modal-dialog-template">
@@ -480,19 +487,40 @@
     </h2>
   </div>
 
-  <div class="hrm-basic-modal-dialog__body">
+  <div class="hrm-basic-modal-dialog__body account-operations-form">
 
-    <!-- ko template: {
-      name: 'account-operation-template',
-      foreach: $component.operations,
-      afterAdd: hrmFadeAfterAddFactory(200),
-      beforeRemove: hrmFadeBeforeRemoveFactory(200)
-    } -->
-    <!-- /ko -->
+    <div class="account-operations-form__list">
+      <!-- ko template: {
+        name: 'account-operation-template',
+        foreach: $component.operations,
+        afterAdd: hrmFadeAfterAddFactory(200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+      <!-- /ko -->
+    </div>
 
 
-    <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_mobile hrm-button-with-icon--theme_positive hrm-button-with-plus-icon"
-            data-bind="click: addOperation">Добавить</button>
+    <div class="account-operations-form__actions">
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon"
+              data-bind="click: addOperation">Добавить</button>
+
+      <div class="account-operations-form__total">
+        Итого: <span class="account-operations-form__total-value"
+              data-bind="hrmColoredSign: total">
+          <!-- ko text: $root.utils.formatSign(total) -->
+          <!-- /ko -->
+          <i class="far fa-ruble-sign"
+             aria-hidden="true"></i>
+        </span>
+
+      </div>
+
+
+
+    </div>
+
+
+
   </div>
 
   <div class="hrm-basic-modal-dialog__action-list">
@@ -521,7 +549,7 @@
           message: 'Обязательное поле'
         }
       });
-      this.sum = ko.observable(operationData.sum || 0).extend({
+      this.sum = ko.observable(parseFloat(operationData.sum) || 0).extend({
         required: {
           message: 'Обязательное поле'
         },
@@ -530,6 +558,21 @@
         }
       });
       this.comment = ko.observable(operationData.comment || '');
+      this.commentPlaceholder = ko.pureComputed(() => {
+        return this.type() === 'fine' ? 'Комментарий к списанию' : 'Комментарий к начислению';
+      });
+      this.total = ko.pureComputed(() => {
+        const sign = this.type() === 'fine' ? -1 : 1;
+        return this.sum() * sign;
+      });
+
+      this.getData = () => {
+        return {
+          type: this.type(),
+          sum: parseFloat(this.sum()),
+          comment: this.comment()
+        };
+      }
     }
 
     ko.components.register('account-operations-modal-dialog', {
@@ -540,8 +583,7 @@
             'modal-dialog',
             'modal-dialog-centered',
             'hrm-modal-dialog',
-            'hrm-basic-modal-dialog',
-            'hrm-modal-dialog--size_large'
+            'hrm-basic-modal-dialog'
           ]);
 
           const ViewModel = function (operations) {
@@ -554,6 +596,13 @@
             };
 
             this.operations = ko.observableArray(operations.map(o => new AccountOperation(o)));
+
+            this.total = ko.pureComputed(() => {
+              return this.operations().reduce((sum, operation) => {
+
+                return Math.floor((sum + operation.total()) * 100) / 100;
+              }, 0);
+            })
 
             this.addOperation = () => {
               this.operations.push(new AccountOperation());
@@ -572,7 +621,9 @@
 
             /** Применить изменения */
             this.apply = function () {
-
+              employee.accountOperations(this.operations()
+              .map(operation => operation.getData())
+              .filter(operation => operation.sum));
             }
 
             this.submit = function () {
@@ -584,7 +635,7 @@
           }
 
           const employee = params.data.employee;
-          return new ViewModel(employee.accountOperations);
+          return new ViewModel(employee.accountOperations());
         }
       },
       template: {
@@ -2193,7 +2244,7 @@
   <div class="calculation-summary"
        data-bind="let: {table: $component}">
 
-    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+    <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
     <div data-bind="component: {
       name: 'hrm-scrollable-wrapper',
       params: { options: {left: {disabled: true}} }
@@ -2240,7 +2291,7 @@
     </div>
     <!-- /ko -->
 
-    <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+    <!-- ko ifnot: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
     <div class="hrm-table__fixed-section-container">
 
       <table class="hrm-table__fixed-section hrm-table__fixed-section--position_left calculation-summary__table calculation-summary__fixed"
@@ -2528,7 +2579,6 @@
           ];
 
           return {
-            viewportSize: params.settings.viewportSize,
             positions,
             total,
             columns
@@ -2665,8 +2715,8 @@
   </td>
   <!-- ko let: {editableCell: ko.observable(null)} -->
   <td class="positions-table__cell positions-table__cell--account-operations"
-      data-bind="click: table.performAccountOperations.bind(table, employee), hrmTableEditableCell: editableCell">
-      <div class="positions-table__cell-content" data-bind="text: employee.accountOperations"></div>
+      data-bind="click: table.performAccountOperations.bind(table, employee), hrmTableEditableCell: editableCell" align="right">
+      <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.accountState), hrmColoredSign: employee.accountState"></div>
   </td>
   <!-- /ko -->
 
@@ -3208,12 +3258,12 @@
 
           /** Установить видимость позиций (модальное окно) */
           const setPositions = () => {
-            params.settings.openModal('positions', { positions: positions })
+            params.utils.openModal('positions', { positions: positions })
           }
 
           /* Создать сотрудника*/
           const createEmployee = () => {
-            params.settings.openModal(
+            params.utils.openModal(
               'create-employee',
               { positions: positions() },
               (data) => {
@@ -3227,7 +3277,7 @@
 
           /* Добавить сотрудников */
           const addEmployees = () => {
-            params.settings.openModal('add-employees', {
+            params.utils.openModal('add-employees', {
               positions: positions(),
               mode: 'tabs',
             }, (updatedPositionsList) => {
@@ -3244,14 +3294,14 @@
             const originalPosition = positions().find(p => p().id === position.id);
 
             if (originalPosition) {
-              params.settings.openModal('add-employees',
+              params.utils.openModal('add-employees',
                 { position: originalPosition, mode: 'single' },
                 (updatedPositionsList) => {
                   model.updateEmployeesList(updatedPositionsList);
                 });
             } else {
               const invisiblePositions = positions().filter(p => !p().visible());
-              params.settings.openModal('add-employees',
+              params.utils.openModal('add-employees',
                 { positions: invisiblePositions, mode: 'list' },
                 (updatedPositionsList) => {
                   model.updateEmployeesList(updatedPositionsList);
@@ -3260,15 +3310,13 @@
           };
 
           const performAccountOperations = (employee) => {
-            params.settings.openModal('account-operations', {
+            params.utils.openModal('account-operations', {
               employee: employee,
-            }, (result) => {
-              console.log('account operations performed', result)
             });
           }
 
           const giveBonus = (employee) => {
-            params.settings.openModal('employee-bonus', {
+            params.utils.openModal('employee-bonus', {
               employee: employee,
             }, (result) => {
               console.log('after bonus', result)
@@ -3276,7 +3324,7 @@
           }
 
           const giveFine = (employee) => {
-            params.settings.openModal('employee-fine', {
+            params.utils.openModal('employee-fine', {
               employee: employee,
             }, (result) => {
               console.log('after fine', result)
@@ -3284,12 +3332,11 @@
           }
 
           return {
-            viewportSize: params.settings.viewportSize,
+            viewportSize: params.utils.viewportSize,
             tabName: params.tabName,
 
             editableCellErrorStateMatcher,
             formatDuration,
-
             columns,
             activeColumns,
             columnCount,
@@ -3437,12 +3484,21 @@
           }, 0);
         });
 
+        const accountOperations = ko.observableArray(employee.accountOperations || []);
+        const accountState = ko.pureComputed(() => {
+          return accountOperations().reduce((sum, operation) => {
+            const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
+            return sum + operationSum;
+          }, 0)
+        })
+
         return {
           name: employee.name, // имя
           id: employee.id, // идентификатор
           level: employee.level, // разряд
 
-          accountOperations: [],
+          accountOperations,
+          accountState,
 
           workingIntervals: workingIntervals, // рабочие интервалы
           addWorkingInterval,
@@ -3506,21 +3562,29 @@
       /** Initialization */
       (() => {
         this.subscriptions = [];
-        this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+        const viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
         this.windowResizeHandler = () => {
-          this.viewportSize({ width: $(window).width(), height: $(window).height() });
+          viewportSize({ width: $(window).width(), height: $(window).height() });
         };
         this.childrenComplete = function () {
           $page.removeClass('hrm-page--initializing');
         };
         this.modalOpens = ko.observableArray([]);
 
-        this.settings = {
+        this.utils = {
           openModal: (id, data, onSave) => {
             const modal = createModalDialog(id, data, onSave);
             this.modalOpens.push(modal)
           },
-          viewportSize: this.viewportSize
+
+          formatSign: (number) => {
+            const formattedNumber = parseFloat(ko.unwrap(number));
+            if (!formattedNumber) return number;
+            if (formattedNumber > 0) return '+' + formattedNumber;
+            return formattedNumber;
+          },
+
+          viewportSize: viewportSize
         }
       })();
 

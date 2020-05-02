@@ -118,12 +118,21 @@
           }, 0);
         });
 
+        const accountOperations = ko.observableArray(employee.accountOperations || []);
+        const accountState = ko.pureComputed(() => {
+          return accountOperations().reduce((sum, operation) => {
+            const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
+            return sum + operationSum;
+          }, 0)
+        })
+
         return {
           name: employee.name, // имя
           id: employee.id, // идентификатор
           level: employee.level, // разряд
 
-          accountOperations: [],
+          accountOperations,
+          accountState,
 
           workingIntervals: workingIntervals, // рабочие интервалы
           addWorkingInterval,
@@ -187,21 +196,29 @@
       /** Initialization */
       (() => {
         this.subscriptions = [];
-        this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+        const viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
         this.windowResizeHandler = () => {
-          this.viewportSize({ width: $(window).width(), height: $(window).height() });
+          viewportSize({ width: $(window).width(), height: $(window).height() });
         };
         this.childrenComplete = function () {
           $page.removeClass('hrm-page--initializing');
         };
         this.modalOpens = ko.observableArray([]);
 
-        this.settings = {
+        this.utils = {
           openModal: (id, data, onSave) => {
             const modal = createModalDialog(id, data, onSave);
             this.modalOpens.push(modal)
           },
-          viewportSize: this.viewportSize
+
+          formatSign: (number) => {
+            const formattedNumber = parseFloat(ko.unwrap(number));
+            if (!formattedNumber) return number;
+            if (formattedNumber > 0) return '+' + formattedNumber;
+            return formattedNumber;
+          },
+
+          viewportSize: viewportSize
         }
       })();
 
