@@ -1,121 +1,4 @@
-<!-- Выпадающее меню сотрудников -->
-<script id="employees-dropdown-template"
-        type="text/html">
-        <div class="hrm-dropdown-menu__item" data-bind="click: addEmployees">Добавить сотрудников</div>
-        <div class="hrm-dropdown-menu__item" data-bind="click: createEmployee">Новый сотрудник</div>
-</script>
-
-<!-- Заголовок позиции в таблице -->
-<script id="position-header-template"
-        type="text/html">
-  <button data-bind="hrmTooltip, hrmTooltipHideOnClick, hrmTooltipText: 'Добавить сотрудников', click: table.addEmployeesInPosition"
-    class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-plus-icon-button hrm-circle-icon-button--theme_neutral positions-table__action">
-  </button>
-  <span data-bind="text: name"></span>
-</script>
-
-<script id="employee-row-template"
-        type="text/html">
-  <tr class="positions-table__row" data-bind="hrmLog">
-    <td class="positions-table__cell positions-table__cell--name">
-      <div class="positions-table__cell-content">
-
-        <!-- Данные сотрудника -->
-        <div
-             data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: positionName} }">
-        </div>
-        <!-- /Данные сотрудника -->
-
-      </div>
-    </td>
-
-    <td class="positions-table__cell positions-table__cell--account"></td>
-    <td class="positions-table__cell positions-table__cell--account-operations"
-      data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
-
-      <!-- ko if: position.levels.length > 0 -->
-      <!-- ko let: {editableCell: ko.observable(null)} -->
-        <td  data-bind="hrmTableEditableCell: editableCell" class="positions-table__cell positions-table__cell--level">
-          <select data-bind="
-                  options: position.levels,
-                  value: employee.level,
-                  hrmSelect,
-                  hrmTableEditableCellSelectControl,
-                  hrmTableEditableCellSelectControlOwner: editableCell
-              ">
-          </select>
-        </td>
-      <!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko ifnot: position.levels.length > 0 -->
-      <td class="positions-table__cell positions-table__cell--level">
-      </td>
-      <!-- /ko -->
-
-
-
-
-    <td class="positions-table__cell positions-table__cell--interval"></td>
-    <td class="positions-table__cell positions-table__cell--work-time"></td>
-    <td class="positions-table__cell positions-table__cell--compensation"></td>
-    <td class="positions-table__cell positions-table__cell--workload"></td>
-    <td class="positions-table__cell positions-table__cell--salary"></td>
-    <td class="positions-table__cell positions-table__cell--salary-main"></td>
-    <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
-    <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
-    <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
-    <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
-    <td class="positions-table__cell positions-table__cell--corrected-time"></td>
-    <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
-    <td class="positions-table__cell positions-table__cell--depremation"></td>
-    <td class="positions-table__cell positions-table__cell--premation"
-    data-bind="click: table.giveBonus.bind(table, employee)"></td>
-    <td class="positions-table__cell positions-table__cell--fine"
-    data-bind="click: table.giveFine.bind(table, employee)"></td>
-
-
-    <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-    <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
-  </tr>
-</script>
-
-<!-- Блок сотрудника в таблице -->
-<script id="employee-block-template"
-        type="text/html">
-  <div class="employee" data-bind="hrmLog">
-    <div class="employee__remove">
-      <button data-bind="
-      hrmTooltip,
-      hrmTooltipText: 'Удалить из расчета',,
-      click: table.removeEmployee.bind(table, employee)"
-              class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary positions-table__action employe__remove-button">
-      </button>
-    </div>
-
-    <div class="employee__info">
-      <a class="employee__name"
-        href="#"
-        data-bind="text: employee.name"></a>
-      <!-- ko if: positionName -->
-        <div class="employee__position" data-bind="text: positionName"></div>
-      <!-- /ko -->
-    </div>
-
-    <div class="employee__actions">
-      <button
-              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button employee__action employee__action--documents" data-bind="hrmTooltip, hrmTooltipText: 'Есть проблемы с документами'"></button>
-      <button
-              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-down-icon-button employee__action employee__action--down" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется понижение разряда'"></button>
-      <!-- ko if: false -->
-      <button
-              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-up-icon-button employee__action employee__action--up" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется повышение разряда'"></button>
-      <!-- /ko -->
-
-    </div>
-  </div>
-</script>
-
+@@include('./_templates.html')
 
 <template id="calculation-page-positions-table-template">
   <div class="calculation-tab"
@@ -183,6 +66,7 @@
       <!-- Fixed section -->
       <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
       <table data-bind="hrmTable"
+
              class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section">
         <thead>
           <tr class="positions-table__row positions-table__head-row">
@@ -214,7 +98,7 @@
           } -->
           <tr class="positions-table__row">
             <td class="positions-table__cell">
-              <div class="positions-table__cell-content">
+              <div class="positions-table__cell-content"  data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
 
                 <!-- Данные сотрудника -->
                 <div
@@ -253,8 +137,8 @@
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
           } -->
           <tr class="positions-table__row">
-            <td class="positions-table__cell">
-              <div class="positions-table__cell-content">
+            <td class="positions-table__cell" >
+              <div class="positions-table__cell-content" data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
 
                 <!-- Данные сотрудника -->
                 <div
@@ -412,7 +296,7 @@
 
             <!-- Total section -->
             <tr class="positions-table__row positions-table__row--highlighted positions-table__total">
-              <td class="positions-table__cell  positions-table__cell--name positions-table__empty">
+              <td class="positions-table__cell  positions-table__cell--name positions-table__cell--empty">
 
               </td>
 

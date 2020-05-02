@@ -16,6 +16,13 @@
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
+          const editableCellErrorStateMatcher = (control) => {
+            return ko.pureComputed(() => {
+              return !control.isValid() ? {message: control.error()} : null;
+
+            });
+          };
+
           const positions = params.positions;
           const model = params.model;
 
@@ -118,7 +125,7 @@
           /* Удалить сотрудника из расчета */
           const removeEmployee = (e) => {
             e.visible(false);
-          }
+          };
 
           const addEmployeesInPosition = (position) => {
             const originalPosition = positions().find(p => p().id === position.id);
@@ -137,7 +144,7 @@
                   model.updateEmployeesList(updatedPositionsList);
                 });
             }
-          }
+          };
 
           const performAccountOperations = (employee) => {
             console.log(employee)
@@ -167,6 +174,8 @@
           return {
             viewportSize: params.settings.viewportSize,
             tabName: params.tabName,
+
+            editableCellErrorStateMatcher,
 
             columns,
             activeColumns,

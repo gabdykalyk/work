@@ -2418,72 +2418,6 @@
   <span data-bind="text: name"></span>
 </script>
 
-<script id="employee-row-template"
-        type="text/html">
-  <tr class="positions-table__row" data-bind="hrmLog">
-    <td class="positions-table__cell positions-table__cell--name">
-      <div class="positions-table__cell-content">
-
-        <!-- Данные сотрудника -->
-        <div
-             data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: positionName} }">
-        </div>
-        <!-- /Данные сотрудника -->
-
-      </div>
-    </td>
-
-    <td class="positions-table__cell positions-table__cell--account"></td>
-    <td class="positions-table__cell positions-table__cell--account-operations"
-      data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
-
-      <!-- ko if: position.levels.length > 0 -->
-      <!-- ko let: {editableCell: ko.observable(null)} -->
-        <td  data-bind="hrmTableEditableCell: editableCell" class="positions-table__cell positions-table__cell--level">
-          <select data-bind="
-                  options: position.levels,
-                  value: employee.level,
-                  hrmSelect,
-                  hrmTableEditableCellSelectControl,
-                  hrmTableEditableCellSelectControlOwner: editableCell
-              ">
-          </select>
-        </td>
-      <!-- /ko -->
-      <!-- /ko -->
-
-      <!-- ko ifnot: position.levels.length > 0 -->
-      <td class="positions-table__cell positions-table__cell--level">
-      </td>
-      <!-- /ko -->
-
-
-
-
-    <td class="positions-table__cell positions-table__cell--interval"></td>
-    <td class="positions-table__cell positions-table__cell--work-time"></td>
-    <td class="positions-table__cell positions-table__cell--compensation"></td>
-    <td class="positions-table__cell positions-table__cell--workload"></td>
-    <td class="positions-table__cell positions-table__cell--salary"></td>
-    <td class="positions-table__cell positions-table__cell--salary-main"></td>
-    <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
-    <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
-    <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
-    <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
-    <td class="positions-table__cell positions-table__cell--corrected-time"></td>
-    <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
-    <td class="positions-table__cell positions-table__cell--depremation"></td>
-    <td class="positions-table__cell positions-table__cell--premation"
-    data-bind="click: table.giveBonus.bind(table, employee)"></td>
-    <td class="positions-table__cell positions-table__cell--fine"
-    data-bind="click: table.giveFine.bind(table, employee)"></td>
-
-
-    <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-    <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
-  </tr>
-</script>
-
 <!-- Блок сотрудника в таблице -->
 <script id="employee-block-template"
         type="text/html">
@@ -2518,6 +2452,138 @@
 
     </div>
   </div>
+</script>
+
+<!-- Рабочий интервал -->
+<script id="working-interval-template"
+        type="text/html">
+
+  <!-- ko let: {editableCell: ko.observable(null)} -->
+<td class="hrm-table__cell positions-table__cell working-interval__cell"
+    data-bind="hrmTableEditableCell: editableCell,
+            hrmTableEditableCellError: table.editableCellErrorStateMatcher(interval.value)">
+  <div class="working-interval">
+    <input class="working-interval__input"
+           data-bind="
+                textInput: interval.value,
+                hrmMask,
+                hrmMaskPattern: '99:99 – 99:99',
+                hrmTableEditableCellInputControl,
+                hrmTableEditableCellInputControlOwner: editableCell
+            "
+           placeholder="00:00 – 00:00">
+
+    <div class="working-interval__actions">
+      <div class="working-interval__action">
+        <!-- ko if: canRemove -->
+        <button class="hrm-button hrm-icon-button hrm-times-icon-button
+                                  hrm-icon-button--theme_negative
+                                  working-interval__remove"
+                data-bind="
+                                click: function () {employee.removeWorkingInterval(interval);},
+                                attr: {title: 'Удалить интервал ' }
+                            ">
+        </button>
+        <!-- /ko -->
+      </div>
+      <div class="working-interval__action">
+        <!-- ko if: canAdd -->
+        <button class="hrm-button hrm-icon-button hrm-plus-icon-button
+                                hrm-icon-button--theme_positive
+                                working-interval__add"
+                title="Добавить рабочий интервал"
+                data-bind="click: function () { employee.addWorkingInterval() }">
+        </button>
+        <!-- /ko -->
+      </div>
+    </div>
+  </div>
+
+</td>
+<!-- /ko -->
+</script>
+
+<!-- Строка сотрудника в таблице -->
+<script id="employee-row-template"
+        type="text/html">
+
+<tr class="positions-table__row">
+  <td class="positions-table__cell positions-table__cell--name">
+    <div class="positions-table__cell-content">
+
+      <!-- Данные сотрудника -->
+      <div
+           data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: positionName} }">
+      </div>
+      <!-- /Данные сотрудника -->
+
+    </div>
+  </td>
+
+  <td class="positions-table__cell positions-table__cell--account"></td>
+  <td class="positions-table__cell positions-table__cell--account-operations"
+      data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
+
+  <!-- ko if: position.levels.length > 0 -->
+  <!-- ko let: {editableCell: ko.observable(null)} -->
+  <td data-bind="hrmTableEditableCell: editableCell"
+      class="positions-table__cell positions-table__cell--level">
+    <select data-bind="
+                  options: position.levels,
+                  value: employee.level,
+                  hrmSelect,
+                  hrmTableEditableCellSelectControl,
+                  hrmTableEditableCellSelectControlOwner: editableCell
+              ">
+    </select>
+  </td>
+  <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko ifnot: position.levels.length > 0 -->
+  <td class="positions-table__cell positions-table__cell--level">
+  </td>
+  <!-- /ko -->
+
+
+  <td class="positions-table__cell positions-table__cell--interval">
+    <table class="working-intervals">
+      <tbody data-bind="let: {intervalsCount: employee.workingIntervals().length}">
+        <!-- ko foreach: employee.workingIntervals() -->
+        <tr class="working-intervals__row">
+
+            <!-- ko template: { name: 'working-interval-template', data: { interval: $data, canRemove: intervalsCount > 1, canAdd: $index() === intervalsCount - 1 } } -->
+            <!-- /ko -->
+
+        </tr>
+        <!-- /ko -->
+      </tbody>
+    </table>
+  </td>
+  <td class="positions-table__cell positions-table__cell--work-time">
+    <div class="positions-table__cell-content" data-bind="text: employee.formattedWorkingTime"></div>
+  </td>
+  <td class="positions-table__cell positions-table__cell--compensation"></td>
+  <td class="positions-table__cell positions-table__cell--workload"></td>
+  <td class="positions-table__cell positions-table__cell--salary"></td>
+  <td class="positions-table__cell positions-table__cell--salary-main"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
+  <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+  <td class="positions-table__cell positions-table__cell--depremation"></td>
+  <td class="positions-table__cell positions-table__cell--premation"
+      data-bind="click: table.giveBonus.bind(table, employee)"></td>
+  <td class="positions-table__cell positions-table__cell--fine"
+      data-bind="click: table.giveFine.bind(table, employee)"></td>
+
+
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
+</tr>
+
 </script>
 
 
@@ -2587,6 +2653,7 @@
       <!-- Fixed section -->
       <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
       <table data-bind="hrmTable"
+
              class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section">
         <thead>
           <tr class="positions-table__row positions-table__head-row">
@@ -2618,7 +2685,7 @@
           } -->
           <tr class="positions-table__row">
             <td class="positions-table__cell">
-              <div class="positions-table__cell-content">
+              <div class="positions-table__cell-content"  data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
 
                 <!-- Данные сотрудника -->
                 <div
@@ -2657,8 +2724,8 @@
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
           } -->
           <tr class="positions-table__row">
-            <td class="positions-table__cell">
-              <div class="positions-table__cell-content">
+            <td class="positions-table__cell" >
+              <div class="positions-table__cell-content" data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
 
                 <!-- Данные сотрудника -->
                 <div
@@ -2816,7 +2883,7 @@
 
             <!-- Total section -->
             <tr class="positions-table__row positions-table__row--highlighted positions-table__total">
-              <td class="positions-table__cell  positions-table__cell--name positions-table__empty">
+              <td class="positions-table__cell  positions-table__cell--name positions-table__cell--empty">
 
               </td>
 
@@ -2867,6 +2934,13 @@
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
+          const editableCellErrorStateMatcher = (control) => {
+            return ko.pureComputed(() => {
+              return !control.isValid() ? {message: control.error()} : null;
+
+            });
+          };
+
           const positions = params.positions;
           const model = params.model;
 
@@ -2969,7 +3043,7 @@
           /* Удалить сотрудника из расчета */
           const removeEmployee = (e) => {
             e.visible(false);
-          }
+          };
 
           const addEmployeesInPosition = (position) => {
             const originalPosition = positions().find(p => p().id === position.id);
@@ -2988,7 +3062,7 @@
                   model.updateEmployeesList(updatedPositionsList);
                 });
             }
-          }
+          };
 
           const performAccountOperations = (employee) => {
             console.log(employee)
@@ -3018,6 +3092,8 @@
           return {
             viewportSize: params.settings.viewportSize,
             tabName: params.tabName,
+
+            editableCellErrorStateMatcher,
 
             columns,
             activeColumns,
@@ -3050,6 +3126,194 @@
   $(function () {
     const $page = $(document.documentElement);
 
+    const PositionsModel = function () {
+      const positions = ko.observableArray([]);
+
+      function formatDuration(minutes) {
+        if (minutes <= 0) return '00:00';
+
+        let h = Math.floor(minutes / 60).toString();
+        h = h.length === 1 ? '0' + h : h;
+        let m = (minutes % 60).toString();
+        m = m.length === 1 ? '0' + m : m;
+
+        return h + ':' + m;
+      };
+
+      function getPositionById(id) {
+        return positions().find(p => p().id === id);
+      }
+
+      /* Creates new list from data */
+      function setPositions(positionsList) {
+        positions(positionsList.map(position => {
+          return PositionModel(position)
+        }))
+      }
+
+      /* Updates employees set and visibility */
+      function updateEmployeesList(updatedPositionsList) {
+        const originalPositionsList = positions();
+
+        updatedPositionsList.forEach(updatedPosition => {
+          const employees = updatedPosition.employees;
+          const updatedIds = employees.map(e => e.id);
+
+          const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
+
+          const originalPositionEmployees = originalPosition().employees();
+          const originalIds = originalPositionEmployees.map(e => e.id);
+
+          const notFoundIds = _.difference(originalIds, updatedIds);
+          const newEmployeesIds = _.difference(updatedIds, originalIds);
+
+          // удалить тех, которых нет
+          const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
+
+          // отметить видимость
+          updated.forEach(e => {
+            const updatedEmployee = employees.find(employee => employee.id === e.id);
+            e.visible(updatedEmployee.checked);
+          });
+
+          // добавить новых
+          newEmployees = newEmployeesIds.map(id => {
+            const data = employees.find(e => e.id === id);
+            const employee = EmployeeModel(data, data.checked);
+            return employee;
+          });
+
+          originalPosition().employees(updated.concat(newEmployees));
+        });
+      }
+
+      function WorkingIntervalModel(interval) {
+        const value = ko.observable(interval).extend({
+          required: {
+            message: 'Обязательное поле'
+          },
+          validation: {
+            validator: value => {
+
+              if (!/^\d\d:\d\d – \d\d:\d\d$/.test(value)) {
+                return false;
+              } else {
+                const boundaries = value.split(' – ');
+
+                if (boundaries[0] === boundaries[1]) {
+                  return false;
+                }
+
+                return boundaries.every(b => moment(b, 'HH:mm', true).isValid());
+              }
+            },
+            message: 'Неверный формат интервала'
+          }
+        });
+
+        const getInterval = () => {
+          const boundaries = value().split(' – ').map(b => moment(b, 'HH:mm'));
+
+          if (boundaries[0].isAfter(boundaries[1])) {
+            boundaries[1].add(1, 'd');
+          }
+
+          return boundaries[1].diff(boundaries[0], 'minutes');
+        };
+
+        return {
+          value,
+          getInterval
+        };
+      }
+
+      function EmployeeModel(employee, positionData, visible) {
+        const workingIntervals = ko.observableArray(
+          employee.workingIntervals.map(i => WorkingIntervalModel(i))
+        );
+
+        const isWorkingIntervalsValid = ko.pureComputed(() => {
+          return workingIntervals().every(i => i.value.isValid())
+        });
+
+        const addWorkingInterval = () => {
+          const model = WorkingIntervalModel('');
+          workingIntervals.push(model);
+        }
+
+        const removeWorkingInterval = (interval) => {
+          workingIntervals.remove(interval);
+        }
+
+        const workingTime = ko.pureComputed(() => {
+          if (!isWorkingIntervalsValid()) return 0;
+
+          return workingIntervals().reduce((minutes, interval) => {
+            return minutes + interval.getInterval();
+          }, 0);
+        });
+
+        const formattedWorkingTime = ko.pureComputed(() => {
+          return formatDuration(workingTime());
+        })
+
+        return {
+          name: employee.name, // имя
+          id: employee.id, // идентификатор
+          level: employee.level, // разряд
+
+          workingIntervals: workingIntervals, // рабочие интервалы
+          addWorkingInterval,
+          removeWorkingInterval,
+          workingTime,
+          formattedWorkingTime,
+
+          returnRate: 30, // норматив выручки
+          salaryBulk: 7200, // основная часть зп
+          bonus: 100, // премия
+          fine: 20, // штраф
+
+          visible: ko.observable(!!visible), // участвует в расчете
+
+        }
+      }
+
+      function PositionModel(positionData) {
+        const visible = ko.observable(false);
+        const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, positionData, false)));
+
+        return ko.observable({
+          id: positionData.id,
+          name: positionData.name, // название
+          workloadType: positionData.workloadType,
+          type: positionData.type, // production/delivery
+          levels: positionData.levels, //
+          rate: positionData.rate, // оклад
+          units: 3,
+          workload: 2.2, // нагрузка
+          additionalWorkload: positionData.additionalWorkload,
+          fotCategory: positionData.fotCategory,
+          fotRevenue: positionData.fotRevenue,
+          employees,
+
+          visible, // отображается в таблице
+        });
+      };
+
+      function addEmployee(positionId, employee) {
+        const model = EmployeeModel(employee, 'visible');
+        const position = getPositionById(positionId);
+        position().employees.push(model);
+      }
+
+      return {
+        positions,
+        setPositions,
+        updateEmployeesList,
+        addEmployee
+      }
+    }
+
     const ViewModel = function (defaultPositions, settings) {
       /** Initialization */
       (() => {
@@ -3072,90 +3336,7 @@
         }
       })();
 
-      this.summaryModel = (() => {
-        const positions = ko.observableArray([]);
-
-        function getPositionById(id) {
-          return positions().find(p => p().id === id);
-        }
-
-        /* Creates new list from data */
-        function setPositions(positionsList) {
-          positions(positionsList.map(position => {
-            return PositionModel(position)
-          }))
-        }
-
-        /* Updates employees set and visibility */
-        function updateEmployeesList(updatedPositionsList) {
-          const originalPositionsList = positions();
-
-          updatedPositionsList.forEach(updatedPosition => {
-            const employees = updatedPosition.employees;
-            const updatedIds = employees.map(e => e.id);
-
-            const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
-
-            const originalPositionEmployees = originalPosition().employees();
-            const originalIds = originalPositionEmployees.map(e => e.id);
-
-            const notFoundIds = _.difference(originalIds, updatedIds);
-            const newEmployeesIds = _.difference(updatedIds, originalIds);
-
-            // удалить тех, которых нет
-            const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
-
-            // отметить видимость
-            updated.forEach(e => {
-              const updatedEmployee = employees.find(employee => employee.id === e.id);
-              e.visible(updatedEmployee.checked);
-            });
-
-            // добавить новых
-            newEmployees = newEmployeesIds.map(id => {
-              const data = employees.find(e => e.id === id);
-              const employee = EmployeeModel(data, data.checked);
-              return employee;
-            });
-
-            originalPosition().employees(updated.concat(newEmployees));
-          });
-        }
-
-        function EmployeeModel(employee, visible) {
-          return {
-            name: employee.name,
-            id: employee.id,
-            level: employee.level,
-            visible: ko.observable(!!visible),
-          }
-        }
-
-        function PositionModel(positionData) {
-          const visible = ko.observable(false);
-          const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, false)));
-
-          return ko.observable({
-            ...positionData,
-            employees,
-            visible
-          });
-        };
-
-        function addEmployee(positionId, employee) {
-          const model = EmployeeModel(employee, 'visible');
-          const position = getPositionById(positionId);
-          position().employees.push(model);
-        }
-
-        return {
-          positions,
-          setPositions,
-          updateEmployeesList,
-          addEmployee
-        }
-      })();
-
+      this.summaryModel = new PositionsModel();
       this.summaryModel.setPositions(defaultPositions);
 
       /** Input data */
@@ -3182,7 +3363,7 @@
           TestPosition('Повар-сушист', 2),
           TestPosition('Повар-пиццмейкер', 3),
           TestPosition('Официант', 4),
-          TestPosition('Водитель', 5, { type: 'delivery'}),
+          TestPosition('Водитель', 5, { type: 'delivery' }),
         ];
 
         /** Обновление представления */
@@ -3246,25 +3427,6 @@
           set: setStimulation
         }
       })();
-
-
-
-
-
-      /*
-        addEmployee
-      const index = Math.floor(Math.random() * 1000);
-
-        position.employees.push(this.createEmployeeModel({
-          name: position.name + ' #' + index,
-          workingIntervals: [''],
-          rate: position.rate() !== '' ? position.rate() : 600,
-          returnRate: 30,
-          salaryBulk: 7200,
-          bonus: 100,
-          fine: 20
-        }));*/
-
 
       this.isEmployeesCalculated = ko.observable(false);
 
@@ -3420,8 +3582,10 @@
     function TestEmployee(name, id, index, levelsCount) {
       return {
         name: name + ' #' + index,
-        id: id + '-' + index,
-        level: Math.floor(Math.random() * levelsCount + 1)
+        id: id + '–' + index,
+        level: Math.floor(Math.random() * levelsCount + 1),
+        workingIntervals: ['09:00 – 16:00'],
+
       }
     }
     function TestPosition(name, id, config) {

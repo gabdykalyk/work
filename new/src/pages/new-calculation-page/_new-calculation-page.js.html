@@ -2,6 +2,194 @@
   $(function () {
     const $page = $(document.documentElement);
 
+    const PositionsModel = function () {
+      const positions = ko.observableArray([]);
+
+      function formatDuration(minutes) {
+        if (minutes <= 0) return '00:00';
+
+        let h = Math.floor(minutes / 60).toString();
+        h = h.length === 1 ? '0' + h : h;
+        let m = (minutes % 60).toString();
+        m = m.length === 1 ? '0' + m : m;
+
+        return h + ':' + m;
+      };
+
+      function getPositionById(id) {
+        return positions().find(p => p().id === id);
+      }
+
+      /* Creates new list from data */
+      function setPositions(positionsList) {
+        positions(positionsList.map(position => {
+          return PositionModel(position)
+        }))
+      }
+
+      /* Updates employees set and visibility */
+      function updateEmployeesList(updatedPositionsList) {
+        const originalPositionsList = positions();
+
+        updatedPositionsList.forEach(updatedPosition => {
+          const employees = updatedPosition.employees;
+          const updatedIds = employees.map(e => e.id);
+
+          const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
+
+          const originalPositionEmployees = originalPosition().employees();
+          const originalIds = originalPositionEmployees.map(e => e.id);
+
+          const notFoundIds = _.difference(originalIds, updatedIds);
+          const newEmployeesIds = _.difference(updatedIds, originalIds);
+
+          // удалить тех, которых нет
+          const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
+
+          // отметить видимость
+          updated.forEach(e => {
+            const updatedEmployee = employees.find(employee => employee.id === e.id);
+            e.visible(updatedEmployee.checked);
+          });
+
+          // добавить новых
+          newEmployees = newEmployeesIds.map(id => {
+            const data = employees.find(e => e.id === id);
+            const employee = EmployeeModel(data, data.checked);
+            return employee;
+          });
+
+          originalPosition().employees(updated.concat(newEmployees));
+        });
+      }
+
+      function WorkingIntervalModel(interval) {
+        const value = ko.observable(interval).extend({
+          required: {
+            message: 'Обязательное поле'
+          },
+          validation: {
+            validator: value => {
+
+              if (!/^\d\d:\d\d – \d\d:\d\d$/.test(value)) {
+                return false;
+              } else {
+                const boundaries = value.split(' – ');
+
+                if (boundaries[0] === boundaries[1]) {
+                  return false;
+                }
+
+                return boundaries.every(b => moment(b, 'HH:mm', true).isValid());
+              }
+            },
+            message: 'Неверный формат интервала'
+          }
+        });
+
+        const getInterval = () => {
+          const boundaries = value().split(' – ').map(b => moment(b, 'HH:mm'));
+
+          if (boundaries[0].isAfter(boundaries[1])) {
+            boundaries[1].add(1, 'd');
+          }
+
+          return boundaries[1].diff(boundaries[0], 'minutes');
+        };
+
+        return {
+          value,
+          getInterval
+        };
+      }
+
+      function EmployeeModel(employee, positionData, visible) {
+        const workingIntervals = ko.observableArray(
+          employee.workingIntervals.map(i => WorkingIntervalModel(i))
+        );
+
+        const isWorkingIntervalsValid = ko.pureComputed(() => {
+          return workingIntervals().every(i => i.value.isValid())
+        });
+
+        const addWorkingInterval = () => {
+          const model = WorkingIntervalModel('');
+          workingIntervals.push(model);
+        }
+
+        const removeWorkingInterval = (interval) => {
+          workingIntervals.remove(interval);
+        }
+
+        const workingTime = ko.pureComputed(() => {
+          if (!isWorkingIntervalsValid()) return 0;
+
+          return workingIntervals().reduce((minutes, interval) => {
+            return minutes + interval.getInterval();
+          }, 0);
+        });
+
+        const formattedWorkingTime = ko.pureComputed(() => {
+          return formatDuration(workingTime());
+        })
+
+        return {
+          name: employee.name, // имя
+          id: employee.id, // идентификатор
+          level: employee.level, // разряд
+
+          workingIntervals: workingIntervals, // рабочие интервалы
+          addWorkingInterval,
+          removeWorkingInterval,
+          workingTime,
+          formattedWorkingTime,
+
+          returnRate: 30, // норматив выручки
+          salaryBulk: 7200, // основная часть зп
+          bonus: 100, // премия
+          fine: 20, // штраф
+
+          visible: ko.observable(!!visible), // участвует в расчете
+
+        }
+      }
+
+      function PositionModel(positionData) {
+        const visible = ko.observable(false);
+        const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, positionData, false)));
+
+        return ko.observable({
+          id: positionData.id,
+          name: positionData.name, // название
+          workloadType: positionData.workloadType,
+          type: positionData.type, // production/delivery
+          levels: positionData.levels, //
+          rate: positionData.rate, // оклад
+          units: 3,
+          workload: 2.2, // нагрузка
+          additionalWorkload: positionData.additionalWorkload,
+          fotCategory: positionData.fotCategory,
+          fotRevenue: positionData.fotRevenue,
+          employees,
+
+          visible, // отображается в таблице
+        });
+      };
+
+      function addEmployee(positionId, employee) {
+        const model = EmployeeModel(employee, 'visible');
+        const position = getPositionById(positionId);
+        position().employees.push(model);
+      }
+
+      return {
+        positions,
+        setPositions,
+        updateEmployeesList,
+        addEmployee
+      }
+    }
+
     const ViewModel = function (defaultPositions, settings) {
       /** Initialization */
       (() => {
@@ -24,90 +212,7 @@
         }
       })();
 
-      this.summaryModel = (() => {
-        const positions = ko.observableArray([]);
-
-        function getPositionById(id) {
-          return positions().find(p => p().id === id);
-        }
-
-        /* Creates new list from data */
-        function setPositions(positionsList) {
-          positions(positionsList.map(position => {
-            return PositionModel(position)
-          }))
-        }
-
-        /* Updates employees set and visibility */
-        function updateEmployeesList(updatedPositionsList) {
-          const originalPositionsList = positions();
-
-          updatedPositionsList.forEach(updatedPosition => {
-            const employees = updatedPosition.employees;
-            const updatedIds = employees.map(e => e.id);
-
-            const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
-
-            const originalPositionEmployees = originalPosition().employees();
-            const originalIds = originalPositionEmployees.map(e => e.id);
-
-            const notFoundIds = _.difference(originalIds, updatedIds);
-            const newEmployeesIds = _.difference(updatedIds, originalIds);
-
-            // удалить тех, которых нет
-            const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
-
-            // отметить видимость
-            updated.forEach(e => {
-              const updatedEmployee = employees.find(employee => employee.id === e.id);
-              e.visible(updatedEmployee.checked);
-            });
-
-            // добавить новых
-            newEmployees = newEmployeesIds.map(id => {
-              const data = employees.find(e => e.id === id);
-              const employee = EmployeeModel(data, data.checked);
-              return employee;
-            });
-
-            originalPosition().employees(updated.concat(newEmployees));
-          });
-        }
-
-        function EmployeeModel(employee, visible) {
-          return {
-            name: employee.name,
-            id: employee.id,
-            level: employee.level,
-            visible: ko.observable(!!visible),
-          }
-        }
-
-        function PositionModel(positionData) {
-          const visible = ko.observable(false);
-          const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, false)));
-
-          return ko.observable({
-            ...positionData,
-            employees,
-            visible
-          });
-        };
-
-        function addEmployee(positionId, employee) {
-          const model = EmployeeModel(employee, 'visible');
-          const position = getPositionById(positionId);
-          position().employees.push(model);
-        }
-
-        return {
-          positions,
-          setPositions,
-          updateEmployeesList,
-          addEmployee
-        }
-      })();
-
+      this.summaryModel = new PositionsModel();
       this.summaryModel.setPositions(defaultPositions);
 
       /** Input data */
@@ -134,7 +239,7 @@
           TestPosition('Повар-сушист', 2),
           TestPosition('Повар-пиццмейкер', 3),
           TestPosition('Официант', 4),
-          TestPosition('Водитель', 5, { type: 'delivery'}),
+          TestPosition('Водитель', 5, { type: 'delivery' }),
         ];
 
         /** Обновление представления */
@@ -198,25 +303,6 @@
           set: setStimulation
         }
       })();
-
-
-
-
-
-      /*
-        addEmployee
-      const index = Math.floor(Math.random() * 1000);
-
-        position.employees.push(this.createEmployeeModel({
-          name: position.name + ' #' + index,
-          workingIntervals: [''],
-          rate: position.rate() !== '' ? position.rate() : 600,
-          returnRate: 30,
-          salaryBulk: 7200,
-          bonus: 100,
-          fine: 20
-        }));*/
-
 
       this.isEmployeesCalculated = ko.observable(false);
 
@@ -372,8 +458,10 @@
     function TestEmployee(name, id, index, levelsCount) {
       return {
         name: name + ' #' + index,
-        id: id + '-' + index,
-        level: Math.floor(Math.random() * levelsCount + 1)
+        id: id + '–' + index,
+        level: Math.floor(Math.random() * levelsCount + 1),
+        workingIntervals: ['09:00 – 16:00'],
+
       }
     }
     function TestPosition(name, id, config) {
