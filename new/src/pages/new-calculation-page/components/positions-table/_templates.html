@@ -17,7 +17,7 @@
 <!-- Блок сотрудника в таблице -->
 <script id="employee-block-template"
         type="text/html">
-  <div class="employee" data-bind="hrmLog">
+  <div class="employee">
     <div class="employee__remove">
       <button data-bind="
       hrmTooltip,
@@ -116,9 +116,15 @@
     </div>
   </td>
 
-  <td class="positions-table__cell positions-table__cell--account"></td>
+  <td class="positions-table__cell positions-table__cell--account">
+    <div class="positions-table__cell-content"></div>
+  </td>
+  <!-- ko let: {editableCell: ko.observable(null)} -->
   <td class="positions-table__cell positions-table__cell--account-operations"
-      data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
+      data-bind="click: table.performAccountOperations.bind(table, employee), hrmTableEditableCell: editableCell">
+      <div class="positions-table__cell-content" data-bind="text: employee.accountOperations"></div>
+  </td>
+  <!-- /ko -->
 
   <!-- ko if: position.levels.length > 0 -->
   <!-- ko let: {editableCell: ko.observable(null)} -->
@@ -159,10 +165,18 @@
   <td class="positions-table__cell positions-table__cell--work-time">
     <div class="positions-table__cell-content" data-bind="text: employee.formattedWorkingTime"></div>
   </td>
-  <td class="positions-table__cell positions-table__cell--compensation"></td>
-  <td class="positions-table__cell positions-table__cell--workload"></td>
-  <td class="positions-table__cell positions-table__cell--salary"></td>
-  <td class="positions-table__cell positions-table__cell--salary-main"></td>
+  <td class="positions-table__cell positions-table__cell--compensation">
+    <div class="positions-table__cell-content"></div>
+  </td>
+  <td class="positions-table__cell positions-table__cell--workload">
+    <div class="positions-table__cell-content"></div>
+  </td>
+  <td class="positions-table__cell positions-table__cell--salary">
+    <div class="positions-table__cell-content"></div>
+  </td>
+  <td class="positions-table__cell positions-table__cell--salary-main">
+    <div class="positions-table__cell-content" data-bind="employee.salaryBulk"></div>
+  </td>
   <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
   <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
   <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
@@ -170,11 +184,20 @@
   <td class="positions-table__cell positions-table__cell--corrected-time"></td>
   <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
   <td class="positions-table__cell positions-table__cell--depremation"></td>
-  <td class="positions-table__cell positions-table__cell--premation"
-      data-bind="click: table.giveBonus.bind(table, employee)"></td>
-  <td class="positions-table__cell positions-table__cell--fine"
-      data-bind="click: table.giveFine.bind(table, employee)"></td>
 
+  <!-- ko let: {editableCell: ko.observable(null)} -->
+  <td class="positions-table__cell positions-table__cell--premation"
+      data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell">
+      <div class="positions-table__cell-content" data-bind="text: employee.bonus"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko let: {editableCell: ko.observable(null)} -->
+  <td class="positions-table__cell positions-table__cell--fine"
+      data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell">
+      <div class="positions-table__cell-content" data-bind="text: employee.fine"></div>
+  </td>
+  <!-- /ko -->
 
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
   <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>

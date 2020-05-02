@@ -966,8 +966,7 @@
   </button>
 
   <div class="hrm-basic-modal-dialog__header">
-    <h2 class="hrm-basic-modal-dialog__title">
-      Добавить сотрудников
+    <h2 class="hrm-basic-modal-dialog__title" data-bind="text: title">
     </h2>
   </div>
 
@@ -1192,11 +1191,14 @@
             this.tabs = null;
             this.activePosition = null;
             this.list = null;
+            this.title = 'Добавить сотрудников';
 
             if (this.mode === modes.SINGLE) {
               this.activePosition = ko.observable(this.positions[0]);
+              this.title = this.activePosition().name;
             } else if (this.mode === modes.LIST) {
               this.list = this.positions;
+              this.title = 'Прочие';
             } else {
               this.list = this.positions.filter(position => !position.visible);
               const visiblePositions = this.positions.filter(position => position.visible);
@@ -1973,7 +1975,7 @@
 
   <script type="text/html"
         id="position-row-template">
-  <tr class="calculation-summary__row" data-bind="hrmLog">
+  <tr class="calculation-summary__row">
     <!-- Должность -->
     <td class="calculation-summary__cell calculation-summary__cell--job">
       <div class="calculation-summary__cell-content"
@@ -2421,7 +2423,7 @@
 <!-- Блок сотрудника в таблице -->
 <script id="employee-block-template"
         type="text/html">
-  <div class="employee" data-bind="hrmLog">
+  <div class="employee">
     <div class="employee__remove">
       <button data-bind="
       hrmTooltip,
@@ -2520,9 +2522,15 @@
     </div>
   </td>
 
-  <td class="positions-table__cell positions-table__cell--account"></td>
+  <td class="positions-table__cell positions-table__cell--account">
+    <div class="positions-table__cell-content"></div>
+  </td>
+  <!-- ko let: {editableCell: ko.observable(null)} -->
   <td class="positions-table__cell positions-table__cell--account-operations"
-      data-bind="click: table.performAccountOperations.bind(table, employee)"></td>
+      data-bind="click: table.performAccountOperations.bind(table, employee), hrmTableEditableCell: editableCell">
+      <div class="positions-table__cell-content" data-bind="text: employee.accountOperations"></div>
+  </td>
+  <!-- /ko -->
 
   <!-- ko if: position.levels.length > 0 -->
   <!-- ko let: {editableCell: ko.observable(null)} -->
@@ -2563,10 +2571,18 @@
   <td class="positions-table__cell positions-table__cell--work-time">
     <div class="positions-table__cell-content" data-bind="text: employee.formattedWorkingTime"></div>
   </td>
-  <td class="positions-table__cell positions-table__cell--compensation"></td>
-  <td class="positions-table__cell positions-table__cell--workload"></td>
-  <td class="positions-table__cell positions-table__cell--salary"></td>
-  <td class="positions-table__cell positions-table__cell--salary-main"></td>
+  <td class="positions-table__cell positions-table__cell--compensation">
+    <div class="positions-table__cell-content"></div>
+  </td>
+  <td class="positions-table__cell positions-table__cell--workload">
+    <div class="positions-table__cell-content"></div>
+  </td>
+  <td class="positions-table__cell positions-table__cell--salary">
+    <div class="positions-table__cell-content"></div>
+  </td>
+  <td class="positions-table__cell positions-table__cell--salary-main">
+    <div class="positions-table__cell-content" data-bind="employee.salaryBulk"></div>
+  </td>
   <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
   <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
   <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
@@ -2574,11 +2590,20 @@
   <td class="positions-table__cell positions-table__cell--corrected-time"></td>
   <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
   <td class="positions-table__cell positions-table__cell--depremation"></td>
-  <td class="positions-table__cell positions-table__cell--premation"
-      data-bind="click: table.giveBonus.bind(table, employee)"></td>
-  <td class="positions-table__cell positions-table__cell--fine"
-      data-bind="click: table.giveFine.bind(table, employee)"></td>
 
+  <!-- ko let: {editableCell: ko.observable(null)} -->
+  <td class="positions-table__cell positions-table__cell--premation"
+      data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell">
+      <div class="positions-table__cell-content" data-bind="text: employee.bonus"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko let: {editableCell: ko.observable(null)} -->
+  <td class="positions-table__cell positions-table__cell--fine"
+      data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell">
+      <div class="positions-table__cell-content" data-bind="text: employee.fine"></div>
+  </td>
+  <!-- /ko -->
 
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
   <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
@@ -2847,13 +2872,13 @@
             <!-- /ko -->
             <!-- /Блок позиции -->
 
-            <!-- Блок Прочее -->
+            <!-- Блок Прочие -->
             <!-- ko if: table.hasOtherSection -->
             <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
               <td class="positions-table__cell  positions-table__position-title"
                   data-bind="attr: {colspan: columnCount}">
                 <div class="positions-table__cell-content">
-                  <div data-bind="template: {name: 'position-header-template', data: {name: 'Прочее'}}"></div>
+                  <div data-bind="template: {name: 'position-header-template', data: {name: 'Прочие'}}"></div>
                 </div>
               </td>
             </tr>
@@ -3262,6 +3287,8 @@
           id: employee.id, // идентификатор
           level: employee.level, // разряд
 
+          accountOperations: ko.observable(0),
+
           workingIntervals: workingIntervals, // рабочие интервалы
           addWorkingInterval,
           removeWorkingInterval,
@@ -3270,8 +3297,8 @@
 
           returnRate: 30, // норматив выручки
           salaryBulk: 7200, // основная часть зп
-          bonus: 100, // премия
-          fine: 20, // штраф
+          bonus: ko.observable(0), // премия
+          fine: ko.observable(0), // штраф
 
           visible: ko.observable(!!visible), // участвует в расчете
 
