@@ -15,6 +15,9 @@
 
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
+        /**
+        * @param {ObservableArray} params.positions
+        */
         createViewModel: function (params, componentInfo) {
           const editableCellErrorStateMatcher = (control) => {
             return ko.pureComputed(() => {
@@ -37,22 +40,22 @@
           const positions = params.positions;
           const model = params.model;
 
-          /** Наличие неактивных позиций - для секции Прочее */
+          /** Invisible positions */
           const hasOtherSection = ko.pureComputed(() => {
-            return positions().some(p => {
-              return !p().visible();
+            return positions().some(position => {
+              return !position.visible();
             });
           });
 
-          /** Итого: вычисляемые значения - последний ряд таблицы */
+          /** Computed total values */
           const total = {
             workingTime: ko.pureComputed(() => {
               const minutes = positions().reduce((minutes, position) => {
-                return minutes + position().workingTime();
+                return minutes + position.workingTime();
               }, 0);
               return formatDuration(minutes);
             }),
-            salaryMain: ko.pureComputed(() => {
+            salaryBulk: ko.pureComputed(() => {
               return 0;
             }),
             bonusExceed: ko.pureComputed(() => {
@@ -78,7 +81,7 @@
             }),
           }
 
-          /* Настраиваемые колонки таблицы */
+          /* Table columns */
           const columns = [
             Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
@@ -100,84 +103,104 @@
             Column('fine', 'Штраф, ₽', 'Штраф'),
           ];
           const activeColumns = ko.pureComputed(() => {
-            return columns.filter(c => c().visible()).length;
+            return columns.filter(c => c.visible()).length;
           });
           const isColumnVisible = (columnName) => {
-            const column = columns.fine(c => c.id === columnName);
+            const column = columns.find(c => c.id === columnName);
             if (column) return column.visible;
             else return false;
           };
-
-          /** Общее количество колонок (для растягивания заголовков) */
           const columnCount = ko.pureComputed(() => {
             return activeColumns() + 3;
           });
 
-          /** Установить видимость позиций */
-          const setPositions = () => {
+          /** Sets positions visibility */
+          function setPositions() {
             params.utils.openModal('positions', { positions: positions })
           }
 
-          /** Установить видимость колонок */
-          const setColumns = () => {
+          /** Sets columns visibility */
+          function setColumns() {
             params.utils.openModal('columns', { columns: columns })
           }
 
-          /* Создать сотрудника*/
-          const createEmployee = () => {
+
+          function updatePositionEmployees(positionData) {
+            const positionModel = model.getPositionById(positionData.id);
+            positionModel.allEmployeesLoaded(positionData.loaded);
+            positionModel.updateEmployees(positionData.employees);
+          }
+
+          /** Creates new employee */
+          function createEmployee() {
             params.utils.openModal(
               'create-employee',
               { positions: positions() },
               (data) => {
                 const position = model.getPositionById(data.position);
-                position().addEmployee({
+                position.addEmployee({
                   name: data.name,
                   level: data.level
                 });
               });
           };
 
-          /* Добавить сотрудников */
-          const addEmployees = () => {
+          /** Adds employees to calculation */
+          function addEmployees() {
             params.utils.openModal('add-employees', {
               positions: positions(),
               mode: 'tabs',
-            }, (updatedPositionsList) => {
-              model.updateEmployeesList(updatedPositionsList);
+            }, (updatedList) => {
+              updatedList.forEach(updatePositionEmployees)
             });
           };
 
-          /* Удалить сотрудника из расчета */
-          const removeEmployee = (e) => {
-            e.visible(false);
-          };
-
-          const addEmployeesInPosition = (position) => {
-            const originalPosition = positions().find(p => p().id === position.id);
+          /**
+          * Adds employees to calculation (specified position)
+          * @param {Object} position
+          */
+          function addEmployeesInPosition(position) {
+            const originalPosition = model.getPositionById(position.id);
 
             if (originalPosition) {
               params.utils.openModal('add-employees',
                 { position: originalPosition, mode: 'single' },
-                (updatedPositionsList) => {
-                  model.updateEmployeesList(updatedPositionsList);
+                (updatedList) => {
+                  updatedList.forEach(updatePositionEmployees)
                 });
             } else {
-              const invisiblePositions = positions().filter(p => !p().visible());
+              const invisiblePositions = positions().filter(p => !p.visible());
               params.utils.openModal('add-employees',
                 { positions: invisiblePositions, mode: 'list' },
-                (updatedPositionsList) => {
-                  model.updateEmployeesList(updatedPositionsList);
+                (updatedList) => {
+                  updatedList.forEach(updatePositionEmployees)
                 });
             }
           };
 
-          const performAccountOperations = (employee) => {
+          /**
+          * Removes employee from calculation
+          * @param {Object} employee
+          */
+          function removeEmployee(employee) {
+            employee.visible(false);
+          };
+
+          /**
+          * Opens Account Operations modal
+          * @param {Object} employee
+          */
+          function performAccountOperations(employee) {
             params.utils.openModal('account-operations', {
               employee: employee,
             });
           }
 
-          const giveBonus = (employee) => {
+          /**
+          * Opens Employee bonus modal
+          * @param {Object} employee
+          */
+          function giveBonus(employee) {
             params.utils.openModal('employee-bonus', {
               employee: employee,
             }, (result) => {
@@ -185,7 +208,11 @@
             });
           }
 
-          const giveFine = (employee) => {
+          /**
+          * Opens Employee fine modal
+          * @param {Object} employee
+          */
+          function giveFine(employee) {
             params.utils.openModal('employee-fine', {
               employee: employee,
             }, (result) => {
@@ -202,6 +229,8 @@
             columns,
             activeColumns,
             columnCount,
+            isColumnVisible,
+            setColumns,
 
             setPositions,
             positions,

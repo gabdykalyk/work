@@ -78,6 +78,20 @@
 </script>
 
 <script type="text/html"
+        id="columns-modal-template">
+
+  <div data-bind="component: {
+      name: 'columns-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
+
+</script>
+
+<script type="text/html"
         id="stimulation-modal-template">
 
   <div data-bind="component: {
@@ -260,7 +274,7 @@
 
   <div class="hrm-basic-modal-dialog__body positions-settings">
     <div class="positions-settings__search"
-         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск' }}"></div>
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по должности' }}"></div>
 
     <div class="positions-settings__list">
       <!-- ko foreach: { data: $component.positions, as: 'position' } -->
@@ -302,6 +316,19 @@
 
 <script type="text/javascript">
     $(function () {
+        function PositionModel(positionData) {
+            const checked =  ko.observable(positionData.visible());
+            function apply() {
+                positionData.visible(checked());
+            }
+            return {
+                name: positionData.name,
+                checked,
+                visible: ko.observable(true),
+                apply
+            }
+        }
+
         ko.components.register('positions-modal-dialog', {
             viewModel: {
                 createViewModel: function (params, componentInfo) {
@@ -314,17 +341,9 @@
                         'hrm-modal-dialog--size_large'
                     ]);
 
-                    return new (function () {
+                    const ViewModel = function(positions) {
                         /** Positions model */
-                        this.positions = params.data.positions().map((p) => {
-                            const positionData = p();
-                            return {
-                                name: positionData.name,
-                                checked: ko.observable(positionData.visible()),
-                                position: p,
-                                visible: ko.observable(true)
-                            }
-                        });
+                        this.positions = positions.map(PositionModel);
 
                         /** Поисковый запрос */
                         this.term = ko.observable('');
@@ -360,7 +379,155 @@
                         /** Применить изменения */
                         this.apply = function() {
                             this.positions.forEach(p => {
-                                p.position().visible(p.checked());
+                                p.apply();
+                            });
+                        }
+
+                        this.submit = function () {
+                            if ('submit' in params) {
+                                this.apply();
+                                params.submit(true);
+                            }
+                        };
+                    }
+
+                    return new ViewModel(params.data.positions());
+                }
+            },
+            template: {
+                element: document.getElementById('positions-modal-dialog-template')
+            }
+        });
+    });
+</script>
+
+  <template id="columns-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Настройка столбцов
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body columns-settings">
+    <div class="columns-settings__search"
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по наименованию' }}">
+    </div>
+
+    <div class="calculation-modal__scroll">
+      <div class="columns-settings__list">
+        <!-- ko foreach: { data: $component.columns, as: 'column' } -->
+
+        <!-- ko if: column.visible() -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="columns-settings__list-item">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
+            </div>
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+
+
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list columns-settings__action-list">
+    <button class="hrm-button hrm-basic-button  hrm-button--size_large hrm-basic-modal-dialog__action-list-item"
+            data-bind="click: function() {reset();}">
+      Сбросить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-button--size_large  hrm-accent-button hrm-basic-modal-dialog__action-list-item"
+            data-bind="click: function() {submit();}">
+      Применить
+    </button>
+  </div>
+
+</template>
+
+
+<script type="text/javascript">
+    $(function () {
+        function ColumnModel(column) {
+            const checked = ko.observable(column.visible());
+            function apply() {
+                column.visible(checked());
+            }
+            return {
+                id: column.id,
+                name: column.fullTitle,
+                checked,
+                visible: ko.observable(true),
+                apply
+            }
+        }
+
+        ko.components.register('columns-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'hrm-modal-dialog--size_large'
+                    ]);
+
+                    return new (function () {
+                        this.columns = params.data.columns.map(ColumnModel);
+
+                        /** Поисковый запрос */
+                        this.term = ko.observable('');
+                        /** Скрыть/Показать позиции в списке */
+                        this.term.subscribe(value => {
+                            const formattedTerm = value.toLowerCase();
+
+                            this.columns.forEach(c => {
+                                let isVisible = true;
+                                if (formattedTerm.length >= 2) {
+                                    const formattedName = c.name.toLowerCase();
+                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
+                                    console.log(isVisible)
+                                }
+                                c.visible(isVisible);
+                            })
+                        });
+
+                        /** Сбросить все чекбоксы и поисковый запрос */
+                        this.reset = function () {
+                            this.term('');
+                            this.columns.forEach(c => {
+                                c.checked(false);
+                            });
+                        }
+
+                        /** Закрыть окно без изменений */
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        /** Применить изменения */
+                        this.apply = function() {
+                            this.columns.forEach(c => {
+                                c.apply()
                             });
                         }
 
@@ -374,7 +541,7 @@
                 }
             },
             template: {
-                element: document.getElementById('positions-modal-dialog-template')
+                element: document.getElementById('columns-modal-dialog-template')
             }
         });
     });
@@ -846,6 +1013,42 @@
 
 <script>
   $(function () {
+    function Fine(defaultData, fineBases) {
+      defaultData = defaultData || {};
+      const base = ko.observable(defaultData.base).extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+      const sum = ko.observable(defaultData.sum || 0).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        number: {
+          message: 'Некорректный формат'
+        }
+      });
+      base.subscribe(baseId => {
+        const baseData = fineBases().find(group => {
+          return group.items.find(item => item.id === baseId);
+        });
+        if (baseData) sum(baseData.sum);
+        else sum(null);
+      });
+      return {
+        base,
+        author: ko.observable(defaultData.author).extend({
+          required: {
+            message: 'Обязательное поле'
+          }
+        }),
+        sum,
+        comment: ko.observable(defaultData.comment || '').extend({
+
+        }),
+      }
+    }
+
     ko.components.register('employee-fine-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -869,49 +1072,12 @@
               });
             };
 
-            const fineBases = window.directories.fines.get();
-            const authors = window.directories.authors.get();
+            this.fineBases = window.directories.fines.get();
+            this.authors = window.directories.authors.get();
 
-            this.fineBases = fineBases;
-            this.authors = authors;
-
-            function Fine(defaultData) {
-              defaultData = defaultData || {};
-              const base = ko.observable(defaultData.base).extend({
-                required: {
-                  message: 'Обязательное поле'
-                }
-              });
-              const sum = ko.observable(defaultData.sum || 0).extend({
-                required: {
-                  message: 'Обязательное поле'
-                },
-                number: {
-                  message: 'Некорректный формат'
-                }
-              });
-              base.subscribe(baseId => {
-                const baseData = fineBases().find(group => {
-                  return group.items.find(item => item.id === baseId);
-                });
-                if (baseData) sum(baseData.sum);
-                else sum(null);
-              });
-              return {
-                base,
-                author: ko.observable(defaultData.author).extend({
-                  required: {
-                    message: 'Обязательное поле'
-                  }
-                }),
-                sum,
-                comment: ko.observable(defaultData.comment || '').extend({
-
-                }),
-              }
-            }
-
-            this.fines = ko.observableArray(defaultFines.map(Fine));
+            this.fines = ko.observableArray(defaultFines.map((fineData) => {
+                return Fine(fineData, this.fineBases);
+            }));
 
             this.addFine = () => {
               this.fines.push(Fine())
@@ -1165,6 +1331,14 @@
 
 <script type="text/javascript">
   $(function () {
+    function PositionModal(position) {
+      return {
+        id: position.id,
+        name: position.name,
+        levels: position.levels
+      };
+    }
+
     ko.components.register('create-employee-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -1187,14 +1361,7 @@
               });
             };
 
-            this.positions = params.data.positions.map((p) => {
-              p = p();
-              return {
-                id: p.id,
-                name: p.name,
-                levels: p.levels
-              }
-            });
+            this.positions = params.data.positions.map(PositionModal);
             this.levels = ko.observable([]);
 
             this.formModel = {
@@ -1408,7 +1575,7 @@
     </div>
     <!-- /ko -->
 
-    <div class="employees-form__tab">
+    <div class="employees-form__tab calculation-modal__scroll">
       <!-- ko if: activePosition -->
         <!-- ko component: {
           name: 'add-employees-position-tab',
@@ -1463,26 +1630,39 @@
       LIST: 'list'
     };
 
-    function EmployeeModel(employee) {
+    function EmployeeModel(employeeData) {
       return {
-        id: employee.id,
-        name: employee.name,
-        checked: ko.observable(employee.visible()),
+        id: employeeData.id,
+        name: employeeData.name,
+        checked: ko.observable(employeeData.visible()),
         visible: ko.observable(true)
       }
     }
 
-    function PositionModel(positionObservable) {
-      const positionData = positionObservable();
+    function PositionModel(positionData) {
+      const name = positionData.name;
+      const id = positionData.id;
       const employees = ko.observableArray(positionData.employees().map(EmployeeModel));
       const hasVisibleEmployees = ko.observable(true);
+      const visible = positionData.visible();
+      const loaded = ko.observable(positionData.allEmployeesLoaded());
+
+      function getData() {
+        return {
+          id,
+          employees: ko.toJS(employees),
+          loaded
+        }
+      }
 
       return {
-        name: positionData.name,
-        id: positionData.id,
+        name,
+        id,
         employees,
-        visible: positionData.visible(),
+        visible,
         hasVisibleEmployees,
+        loaded,
+        getData
       }
     }
 
@@ -1509,7 +1689,9 @@
           this.positions = params.positions;
         }
 
-        this.allBranches = ko.observable(false);
+        const isAlreadyLoaded = this.positions.every(p => p.loaded());
+
+        this.allBranches = ko.observable(isAlreadyLoaded);
         this.loadingBranches = ko.observable(false);
         this.allBranches.subscribe(value => {
           if (value) {
@@ -1524,6 +1706,7 @@
 
         this.restoreEmployeesList = () => {
           this.positions.forEach(p => {
+            p.loaded(false);
             const oldEmployeesList = p.employees().filter(e => !e.loaded)
             p.employees(oldEmployeesList)
           })
@@ -1532,6 +1715,7 @@
         this.loadBranches = (cb) => {
           if (this.isSingle) {
             const position = this.positions[0];
+            position.loaded(true);
             console.log('Сделать запрос, категория', position.name);
             // Данные
             const employeesList = [
@@ -1549,6 +1733,7 @@
             console.log('Сделать запрос, категории', positionsList);
             // Добавить новых работников в каждую категию
             updatedEmployees = this.positions.forEach(p => {
+              p.loaded(true);
               const employeesList = [
                 { name: 'Рабочий #1', id: p.name + '1' },
                 { name: 'Рабочий #2', id: p.name + '2' },
@@ -1597,7 +1782,7 @@
               : params.data.positions.map(PositionModel);
 
             this.term = ko.observable('');
-            function termUpdateHandler(value) {
+            const termUpdateHandler = (value) => {
               const formattedValue = value.toLowerCase();
               this.positions.forEach(p => {
                 let hasVisibleEmployees = 0;
@@ -1652,7 +1837,7 @@
             this.submit = function () {
               this.isSubmitted(true);
               if ('submit' in params) {
-                params.submit(ko.toJS(this.positions));
+                params.submit(this.positions.map(p => p.getData()));
               }
             };
           }
@@ -2776,17 +2961,18 @@
       }
     }
 
-
-
     ko.components.register('calculation-page-summary-table', {
       viewModel: {
+        /**
+        * @param {ObservableArray} params.positions
+        */
         createViewModel: function (params, componentInfo) {
           const model = params.model;
           const positions = model.positions;
 
+          /* TODO */
           const total = ko.pureComputed(() => {
             return positions().reduce((acc, p) => {
-              p = p();
               return {
                 name: '',
                 workload: (acc.workload || 0) + p.workload,
@@ -2950,87 +3136,135 @@
     </div>
   </td>
 
-  <td class="positions-table__cell positions-table__cell--account">
-    <div class="positions-table__cell-content"></div>
-  </td>
-  <!-- ko let: {editableCell: ko.observable(null)} -->
-  <td class="positions-table__cell positions-table__cell--account-operations"
-      data-bind="click: table.performAccountOperations.bind(table, employee), hrmTableEditableCell: editableCell" align="right">
-      <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.accountState), hrmColoredSign: employee.accountState"></div>
-  </td>
+  <!-- ko if: table.isColumnVisible('account') -->
+    <td class="positions-table__cell positions-table__cell--account">
+      <div class="positions-table__cell-content"></div>
+    </td>
   <!-- /ko -->
 
-  <!-- ko if: position.levels.length > 0 -->
-  <!-- ko let: {editableCell: ko.observable(null)} -->
-  <td data-bind="hrmTableEditableCell: editableCell"
-      class="positions-table__cell positions-table__cell--level">
-    <select data-bind="
-                  options: position.levels,
-                  value: employee.level,
-                  hrmSelect,
-                  hrmTableEditableCellSelectControl,
-                  hrmTableEditableCellSelectControlOwner: editableCell
-              ">
-    </select>
-  </td>
-  <!-- /ko -->
+  <!-- ko if: table.isColumnVisible('account-operations') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--account-operations"
+        data-bind="click: table.performAccountOperations.bind(table, employee), hrmTableEditableCell: editableCell" align="right">
+        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.accountState), hrmColoredSign: employee.accountState"></div>
+    </td>
+    <!-- /ko -->
   <!-- /ko -->
 
-  <!-- ko ifnot: position.levels.length > 0 -->
-  <td class="positions-table__cell positions-table__cell--level">
-  </td>
+  <!-- ko if: table.isColumnVisible('level') -->
+    <!-- ko if: position.levels.length > 0 -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td data-bind="hrmTableEditableCell: editableCell"
+        class="positions-table__cell positions-table__cell--level">
+      <select data-bind="
+                    options: position.levels,
+                    value: employee.level,
+                    hrmSelect,
+                    hrmTableEditableCellSelectControl,
+                    hrmTableEditableCellSelectControlOwner: editableCell
+                ">
+      </select>
+    </td>
+    <!-- /ko -->
+    <!-- /ko -->
+
+    <!-- ko ifnot: position.levels.length > 0 -->
+    <td class="positions-table__cell positions-table__cell--level">
+    </td>
+    <!-- /ko -->
   <!-- /ko -->
 
+  <!-- ko if: table.isColumnVisible('interval') -->
+    <td class="positions-table__cell positions-table__cell--interval">
+      <table class="working-intervals">
+        <tbody data-bind="let: {intervalsCount: employee.workingIntervals().length}">
+          <!-- ko foreach: employee.workingIntervals() -->
+          <tr class="working-intervals__row">
 
-  <td class="positions-table__cell positions-table__cell--interval">
-    <table class="working-intervals">
-      <tbody data-bind="let: {intervalsCount: employee.workingIntervals().length}">
-        <!-- ko foreach: employee.workingIntervals() -->
-        <tr class="working-intervals__row">
+              <!-- ko template: { name: 'working-interval-template', data: { interval: $data, canRemove: intervalsCount > 1, canAdd: $index() === intervalsCount - 1 } } -->
+              <!-- /ko -->
 
-            <!-- ko template: { name: 'working-interval-template', data: { interval: $data, canRemove: intervalsCount > 1, canAdd: $index() === intervalsCount - 1 } } -->
-            <!-- /ko -->
+          </tr>
+          <!-- /ko -->
+        </tbody>
+      </table>
+    </td>
+  <!-- /ko -->
 
-        </tr>
-        <!-- /ko -->
-      </tbody>
-    </table>
-  </td>
-  <td class="positions-table__cell positions-table__cell--work-time">
-    <div class="positions-table__cell-content" data-bind="text: table.formatDuration(employee.workingTime())"></div>
-  </td>
-  <td class="positions-table__cell positions-table__cell--compensation">
-    <div class="positions-table__cell-content"></div>
-  </td>
+  <!-- ko if: table.isColumnVisible('work-time') -->
+    <td class="positions-table__cell positions-table__cell--work-time">
+      <div class="positions-table__cell-content" data-bind="text: table.formatDuration(employee.workingTime())"></div>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('compensation') -->
+    <td class="positions-table__cell positions-table__cell--compensation">
+      <div class="positions-table__cell-content"></div>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('workload') -->
   <td class="positions-table__cell positions-table__cell--workload">
     <div class="positions-table__cell-content"></div>
   </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('salary') -->
   <td class="positions-table__cell positions-table__cell--salary">
     <div class="positions-table__cell-content"></div>
   </td>
-  <td class="positions-table__cell positions-table__cell--salary-main">
-    <div class="positions-table__cell-content" data-bind="employee.salaryBulk"></div>
-  </td>
-  <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
-  <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
-  <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
-  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
-  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
-  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
-  <td class="positions-table__cell positions-table__cell--depremation"></td>
+  <!-- /ko -->
 
-  <!-- ko let: {editableCell: ko.observable(null)} -->
-  <td class="positions-table__cell positions-table__cell--premation"
-      data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell">
-      <div class="positions-table__cell-content" data-bind="text: employee.bonus"></div>
+  <!-- ko if: table.isColumnVisible('salary-bulk') -->
+  <td class="positions-table__cell positions-table__cell--salary-bulk">
+    <div class="positions-table__cell-content" data-bind="employee.salaryBulk"></div>
   </td>
   <!-- /ko -->
 
-  <!-- ko let: {editableCell: ko.observable(null)} -->
-  <td class="positions-table__cell positions-table__cell--fine"
-      data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell">
-      <div class="positions-table__cell-content" data-bind="text: employee.fine"></div>
-  </td>
+  <!-- ko if: table.isColumnVisible('revenue-standart-hour') -->
+  <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('normalization-ratio') -->
+  <td class="positions-table__cell positions-table__cell--normalization-ratio"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('revenue-standart') -->
+  <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('bonus-ratio') -->
+  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('corrected-time') -->
+  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('bonus-exceed') -->
+  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('depremation') -->
+  <td class="positions-table__cell positions-table__cell--depremation"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('premation') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--premation" align="right"
+        data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell">
+        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.bonusesState), hrmColoredSign: employee.bonusesState"></div>
+    </td>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('fine') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--fine" align="right"
+        data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell">
+        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.finesState), hrmColoredSign: employee.finesState"></div>
+    </td>
+    <!-- /ko -->
   <!-- /ko -->
 
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
@@ -3043,36 +3277,84 @@
 <script id="total-row-template"
         type="text/html">
 
-<tr class="positions-table__row positions-table__row--highlighted positions-table__total">
+<tr class="positions-table__row positions-table__row--highlighted positions-table__total" data-bind="hrmLog">
   <td class="positions-table__cell positions-table__cell--name positions-table__cell--empty"></td>
-  <td class="positions-table__cell positions-table__cell--account positions-table__cell--empty"></td>
-  <td class="positions-table__cell positions-table__cell--account-operations positions-table__cell--empty"></td>
-  <td class="positions-table__cell positions-table__cell--level positions-table__cell--empty"></td>
-  <td class="positions-table__cell positions-table__cell--interval positions-table__cell--empty"></td>
 
+  <!-- ko if: table.isColumnVisible('account') -->
+  <td class="positions-table__cell positions-table__cell--account positions-table__cell--empty"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('account-operations') -->
+  <td class="positions-table__cell positions-table__cell--account-operations positions-table__cell--empty"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('level') -->
+  <td class="positions-table__cell positions-table__cell--level positions-table__cell--empty"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('interval') -->
+  <td class="positions-table__cell positions-table__cell--interval positions-table__cell--empty"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('work-time') -->
   <td class="positions-table__cell positions-table__cell--work-time">
     <div class="positions-table__cell-content" data-bind="text: total.workingTime"></div>
   </td>
+  <!-- /ko -->
 
+  <!-- ko if: table.isColumnVisible('compensation') -->
   <td class="positions-table__cell positions-table__cell--compensation positions-table__cell--empty"></td>
-  <td class="positions-table__cell positions-table__cell--workload positions-table__cell--empty"></td>
-  <td class="positions-table__cell positions-table__cell--salary positions-table__cell--empty"></td>
+  <!-- /ko -->
 
-  <td class="positions-table__cell positions-table__cell--salary-main">
+  <!-- ko if: table.isColumnVisible('workload') -->
+  <td class="positions-table__cell positions-table__cell--workload positions-table__cell--empty"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('salary') -->
+  <td class="positions-table__cell positions-table__cell--salary positions-table__cell--empty"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('salary-bulk') -->
+  <td class="positions-table__cell positions-table__cell--salary-bulk">
     <div class="positions-table__cell-content" data-bind="total.salaryBulk"></div>
   </td>
+  <!-- /ko -->
 
+  <!-- ko if: table.isColumnVisible('revenue-standart-hour') -->
   <td class="positions-table__cell positions-table__cell--revenue-standart-hour positions-table__cell--empty"></td>
+  <!-- /ko -->
 
-  <td class="positions-table__cell positions-table__cell--normaliation-ratio"></td>
+  <!-- ko if: table.isColumnVisible('normalization-ratio') -->
+  <td class="positions-table__cell positions-table__cell--normalization-ratio"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('revenue-standart') -->
   <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
-  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
-  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
-  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+  <!-- /ko -->
 
+  <!-- ko if: table.isColumnVisible('bonus-ratio') -->
+  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('corrected-time') -->
+  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('bonus-exceed') -->
+  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('depremation') -->
   <td class="positions-table__cell positions-table__cell--depremation positions-table__cell--empty"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('premation') -->
   <td class="positions-table__cell positions-table__cell--premation positions-table__cell--empty"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('fine') -->
   <td class="positions-table__cell positions-table__cell--fine positions-table__cell--empty"></td>
+  <!-- /ko -->
 
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
   <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
@@ -3124,7 +3406,7 @@
       <div class="calculation-tab__settings-group">
         <!-- Столбцы -->
         <button
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns">
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns" data-bind="click: setColumns">
           Настроить столбцы
         </button>
 
@@ -3259,8 +3541,10 @@
           <colgroup>
             <col class="positions-table__col positions-table__col--name">
             <!-- ko foreach: table.columns -->
-            <col class="positions-table__col"
+              <!-- ko if: $data.visible -->
+              <col class="positions-table__col"
                  data-bind="class: 'position-table__col--' + id">
+              <!-- /ko -->
             <!-- /ko -->
             <col class="positions-table__col positions-table__col--total">
             <col class="positions-table__col positions-table__col--payment">
@@ -3273,6 +3557,7 @@
               </th>
 
               <!-- ko foreach: table.columns -->
+              <!-- ko if: $data.visible -->
               <th class="positions-table__cell positions-table__head-cell"
                   data-bind="class: 'positions-table__cell--' + id">
                 <div class="positions-table__cell-content">
@@ -3281,6 +3566,7 @@
                           data-bind="hrmTooltip, hrmTooltipText: fullTitle"></button>
                 </div>
               </th>
+              <!-- /ko -->
               <!-- /ko -->
 
               <th
@@ -3391,18 +3677,21 @@
 <script type="text/javascript">
   $(function () {
     function Column(id, title, fullTitle, total) {
-      return ko.observable({
+      return {
         id,
         title,
         fullTitle,
-        visible: true,
+        visible: ko.observable(true),
         total,
         hasTotal: total !== undefined
-      })
+      }
     }
 
     ko.components.register('calculation-page-positions-table', {
       viewModel: {
+        /**
+        * @param {ObservableArray} params.positions
+        */
         createViewModel: function (params, componentInfo) {
           const editableCellErrorStateMatcher = (control) => {
             return ko.pureComputed(() => {
@@ -3425,22 +3714,22 @@
           const positions = params.positions;
           const model = params.model;
 
-          /** Наличие неактивных позиций - для секции Прочее */
+          /** Invisible positions */
           const hasOtherSection = ko.pureComputed(() => {
-            return positions().some(p => {
-              return !p().visible();
+            return positions().some(position => {
+              return !position.visible();
             });
           });
 
-          /** Итого: вычисляемые значения - последний ряд таблицы */
+          /** Computed total values */
           const total = {
             workingTime: ko.pureComputed(() => {
               const minutes = positions().reduce((minutes, position) => {
-                return minutes + position().workingTime();
+                return minutes + position.workingTime();
               }, 0);
               return formatDuration(minutes);
             }),
-            salaryMain: ko.pureComputed(() => {
+            salaryBulk: ko.pureComputed(() => {
               return 0;
             }),
             bonusExceed: ko.pureComputed(() => {
@@ -3466,7 +3755,7 @@
             }),
           }
 
-          /* Настраиваемые колонки таблицы */
+          /* Table columns */
           const columns = [
             Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
@@ -3476,7 +3765,7 @@
             Column('compensation', 'Компенс.', 'Компенсация'),
             Column('workload', 'Нагрузка', 'Нагрузка'),
             Column('salary', 'Оклад, ₽', 'Оклад'),
-            Column('salary-main', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
+            Column('salary-bulk', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
             Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
             Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования'),
             Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки'),
@@ -3488,74 +3777,104 @@
             Column('fine', 'Штраф, ₽', 'Штраф'),
           ];
           const activeColumns = ko.pureComputed(() => {
-            return columns.filter(c => c().visible).length;
+            return columns.filter(c => c.visible()).length;
           });
-
-          /** Общее количество колонок (для растягивания заголовков) */
+          const isColumnVisible = (columnName) => {
+            const column = columns.find(c => c.id === columnName);
+            if (column) return column.visible;
+            else return false;
+          };
           const columnCount = ko.pureComputed(() => {
             return activeColumns() + 3;
           });
 
-          /** Установить видимость позиций (модальное окно) */
-          const setPositions = () => {
+          /** Sets positions visibility */
+          function setPositions() {
             params.utils.openModal('positions', { positions: positions })
           }
 
-          /* Создать сотрудника*/
-          const createEmployee = () => {
+          /** Sets columns visibility */
+          function setColumns() {
+            params.utils.openModal('columns', { columns: columns })
+          }
+
+
+          function updatePositionEmployees(positionData) {
+            const positionModel = model.getPositionById(positionData.id);
+            positionModel.allEmployeesLoaded(positionData.loaded);
+            positionModel.updateEmployees(positionData.employees);
+          }
+
+          /** Creates new employee */
+          function createEmployee() {
             params.utils.openModal(
               'create-employee',
               { positions: positions() },
               (data) => {
                 const position = model.getPositionById(data.position);
-                position().addEmployee({
+                position.addEmployee({
                   name: data.name,
                   level: data.level
                 });
               });
           };
 
-          /* Добавить сотрудников */
-          const addEmployees = () => {
+          /** Adds employees to calculation */
+          function addEmployees() {
             params.utils.openModal('add-employees', {
               positions: positions(),
               mode: 'tabs',
-            }, (updatedPositionsList) => {
-              model.updateEmployeesList(updatedPositionsList);
+            }, (updatedList) => {
+              updatedList.forEach(updatePositionEmployees)
             });
           };
 
-          /* Удалить сотрудника из расчета */
-          const removeEmployee = (e) => {
-            e.visible(false);
-          };
-
-          const addEmployeesInPosition = (position) => {
-            const originalPosition = positions().find(p => p().id === position.id);
+          /**
+          * Adds employees to calculation (specified position)
+          * @param {Object} position
+          */
+          function addEmployeesInPosition(position) {
+            const originalPosition = model.getPositionById(position.id);
 
             if (originalPosition) {
               params.utils.openModal('add-employees',
                 { position: originalPosition, mode: 'single' },
-                (updatedPositionsList) => {
-                  model.updateEmployeesList(updatedPositionsList);
+                (updatedList) => {
+                  updatedList.forEach(updatePositionEmployees)
                 });
             } else {
-              const invisiblePositions = positions().filter(p => !p().visible());
+              const invisiblePositions = positions().filter(p => !p.visible());
               params.utils.openModal('add-employees',
                 { positions: invisiblePositions, mode: 'list' },
-                (updatedPositionsList) => {
-                  model.updateEmployeesList(updatedPositionsList);
+                (updatedList) => {
+                  updatedList.forEach(updatePositionEmployees)
                 });
             }
           };
 
-          const performAccountOperations = (employee) => {
+          /**
+          * Removes employee from calculation
+          * @param {Object} employee
+          */
+          function removeEmployee(employee) {
+            employee.visible(false);
+          };
+
+          /**
+          * Opens Account Operations modal
+          * @param {Object} employee
+          */
+          function performAccountOperations(employee) {
             params.utils.openModal('account-operations', {
               employee: employee,
             });
           }
 
-          const giveBonus = (employee) => {
+          /**
+          * Opens Employee bonus modal
+          * @param {Object} employee
+          */
+          function giveBonus(employee) {
             params.utils.openModal('employee-bonus', {
               employee: employee,
             }, (result) => {
@@ -3563,7 +3882,11 @@
             });
           }
 
-          const giveFine = (employee) => {
+          /**
+          * Opens Employee fine modal
+          * @param {Object} employee
+          */
+          function giveFine(employee) {
             params.utils.openModal('employee-fine', {
               employee: employee,
             }, (result) => {
@@ -3580,6 +3903,8 @@
             columns,
             activeColumns,
             columnCount,
+            isColumnVisible,
+            setColumns,
 
             setPositions,
             positions,
@@ -3668,57 +3993,32 @@
   $(function () {
     const $page = $(document.documentElement);
 
-
-
     const PositionsModel = function () {
       const positions = ko.observableArray([]);
+
+      /**
+      * Returns position with specified id
+      * @param {string|number} id
+      * @returns {Observable}
+      */
       function getPositionById(id) {
-        return positions().find(p => p().id === id);
+        return positions().find(position => position.id === id);
       }
 
-      /* Creates new list from data */
+      /**
+      * Creates new positions list from data
+      * @param {Object[]} positionsList
+      */
       function setPositions(positionsList) {
-        positions(positionsList.map(position => {
-          return PositionModel(position)
+        positions(positionsList.map(positionData => {
+          return PositionModel(positionData)
         }))
       }
 
-      /* Updates employees set and visibility */
-      function updateEmployeesList(updatedPositionsList) {
-        const originalPositionsList = positions();
-
-        updatedPositionsList.forEach(updatedPosition => {
-          const employees = updatedPosition.employees;
-          const updatedIds = employees.map(e => e.id);
-
-          const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
-
-          const originalPositionEmployees = originalPosition().employees();
-          const originalIds = originalPositionEmployees.map(e => e.id);
-
-          const notFoundIds = _.difference(originalIds, updatedIds);
-          const newEmployeesIds = _.difference(updatedIds, originalIds);
-
-          // удалить тех, которых нет
-          const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
-
-          // отметить видимость
-          updated.forEach(e => {
-            const updatedEmployee = employees.find(employee => employee.id === e.id);
-            e.visible(updatedEmployee.checked);
-          });
-
-          // добавить новых
-          newEmployees = newEmployeesIds.map(id => {
-            const data = employees.find(e => e.id === id);
-            const employee = EmployeeModel(data, data.checked);
-            return employee;
-          });
-
-          originalPosition().employees(updated.concat(newEmployees));
-        });
-      }
-
+      /**
+      * @params {string} interval
+      * @returns {{value: Observable, getInterval: function}}
+      */
       function WorkingIntervalModel(interval) {
         const value = ko.observable(interval).extend({
           required: {
@@ -3743,7 +4043,10 @@
           }
         });
 
-        const getInterval = () => {
+        /**
+        * @returns {number}
+        */
+        function getInterval() {
           const boundaries = value().split(' – ').map(b => moment(b, 'HH:mm'));
 
           if (boundaries[0].isAfter(boundaries[1])) {
@@ -3751,7 +4054,7 @@
           }
 
           return boundaries[1].diff(boundaries[0], 'minutes');
-        };
+        }
 
         return {
           value,
@@ -3759,6 +4062,11 @@
         };
       }
 
+      /**
+      * @param {Object} employee
+      * @param {Object} positionData
+      * @param {boolean} visible
+      */
       function EmployeeModel(employee, positionData, visible) {
         const defaultIntervals = employee.workingIntervals || [''];
         const workingIntervals = ko.observableArray(
@@ -3769,15 +4077,6 @@
           return workingIntervals().every(i => i.value.isValid())
         });
 
-        const addWorkingInterval = () => {
-          const model = WorkingIntervalModel('');
-          workingIntervals.push(model);
-        }
-
-        const removeWorkingInterval = (interval) => {
-          workingIntervals.remove(interval);
-        }
-
         const workingTime = ko.pureComputed(() => {
           if (!isWorkingIntervalsValid()) return 0;
 
@@ -3786,19 +4085,42 @@
           }, 0);
         });
 
+        /**
+        * Adds empty interval
+        */
+        function addWorkingInterval() {
+          const model = WorkingIntervalModel('');
+          workingIntervals.push(model);
+        }
+
+        /**
+        * Removes specified interval from list
+        * @param {WorkingIntervalModel} interval
+        */
+        function removeWorkingInterval(interval) {
+          workingIntervals.remove(interval);
+        }
+
         const accountOperations = ko.observableArray(employee.accountOperations || []);
         const accountState = ko.pureComputed(() => {
           return accountOperations().reduce((sum, operation) => {
             const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
             return sum + operationSum;
-          }, 0)
+          }, 0);
         });
 
         const fines = ko.observableArray(employee.fines || []);
         const finesState = ko.pureComputed(() => {
           return fines().reduce((sum, fine) => {
             return sum + fine.sum;
-          }, 0)
+          }, 0);
+        });
+
+        const bonuses = ko.observableArray(employee.bonuses || []);
+        const bonusesState = ko.pureComputed(() => {
+          return bonuses().reduce((sum, bonus) => {
+            return sum + bonus.sum;
+          }, 0);
         });
 
         return {
@@ -3816,18 +4138,27 @@
 
           returnRate: 30, // норматив выручки
           salaryBulk: 7200, // основная часть зп
-          bonus: ko.observable(0), // премия
+
+
+          bonuses,
+          bonusesState,
 
           fines, // штрафы
           finesState,
 
           visible: ko.observable(!!visible), // участвует в расчете
+          loaded: employee.loaded,
         }
       }
 
+      /**
+      * @param {Object} positionData
+      */
       function PositionModel(positionData) {
         const visible = ko.observable(false);
         const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, positionData, false)));
+
+        const allEmployeesLoaded = ko.observable(false);
 
         const workingTime = ko.pureComputed(() => {
           return employees().reduce((minutes, employee) => {
@@ -3836,11 +4167,49 @@
           }, 0)
         });
 
-        const addEmployee = (employee) => {
+        function findEmployeeById(employeeId) {
+          return employees().find(employee => employee.id === employeeId);
+        }
+
+        /**
+        * Adds new employee to list
+        * @param {Object} employee
+        */
+        function addEmployee (employee) {
           employees.push(EmployeeModel(employee, positionData, 'visible'));
         }
 
-        return ko.observable({
+        /**
+        * Updates employees list, set visibility
+        */
+        function updateEmployees(updatedList) {
+          const updatedIds = updatedList.map(e => e.id);
+          const originalIds = employees().map(e => e.id);
+
+          const notFoundIds = _.difference(originalIds, updatedIds);
+          const newEmployeesIds = _.difference(updatedIds, originalIds);
+
+          // remove not found-s
+          const updated = employees().filter(e => notFoundIds.indexOf(e.id) === -1);
+
+          // set visibility
+          updated.forEach(employee => {
+            const updatedEmployeeData = updatedList.find(updatedEmployee => updatedEmployee.id == employee.id);
+            employee.visible(updatedEmployeeData.checked);
+          });
+
+          // add new-s
+          const newEmployees = newEmployeesIds.map(id => {
+            const employeeData = updatedList.find(e => e.id === id);
+            const employee = EmployeeModel(employeeData, positionData, employeeData.checked);
+            return employee;
+          });
+
+          // update list
+          employees(updated.concat(newEmployees));
+        }
+
+        return {
           id: positionData.id,
           name: positionData.name, // название
           workloadType: positionData.workloadType,
@@ -3853,18 +4222,18 @@
           fotCategory: positionData.fotCategory,
           fotRevenue: positionData.fotRevenue,
           employees,
-          addEmployee,
-
-          workingTime,
-
+          addEmployee, // добавить сотрудника
+          updateEmployees, // обновить список сотрудников
+          allEmployeesLoaded, // загружены сотрудники из всех филиалов
+          workingTime, // общее рабочее время всех сотрудников
           visible, // отображается в таблице
-        });
+        };
       };
+
 
       return {
         positions,
         setPositions,
-        updateEmployeesList,
         getPositionById,
       }
     }
@@ -3917,7 +4286,6 @@
       this.isBuilt = ko.observable(false);
       /** Get data for calculation */
       this.buildCalculation = () => {
-        /** Данные */
         const inputData = ko.toJS(this.inputModel);
 
         /* Получение списка позиций */
@@ -3950,11 +4318,11 @@
 
       this.productionPositions = ko.pureComputed(() => {
         return this.summaryModel.positions()
-          .filter(position => position().type === 'production');
-      })
+          .filter(position => position.type === 'production');
+      });
 
 
-      /** Stimulation model (fine/bonus) */
+      /** Shift stimulation model (fine/bonus) */
       this.stimulation = (() => {
         function Stimulation() {
           return {
@@ -3969,27 +4337,30 @@
           production: Stimulation(),
           delivery: Stimulation()
         };
+
         const bonus = {
           production: Stimulation(),
           delivery: Stimulation()
         };
 
         const setStimulation = () => {
-          this.settings.openModal(
+          this.utils.openModal(
             'stimulation',
             null,
             (data) => {
               console.log('stimulation saved', data)
             }
           )
-        }
+        };
 
         return {
           fine,
           bonus,
           set: setStimulation
-        }
+        };
       })();
+
+
 
       this.isEmployeesCalculated = ko.observable(false);
 

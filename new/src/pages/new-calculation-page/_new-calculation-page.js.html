@@ -62,57 +62,32 @@
   $(function () {
     const $page = $(document.documentElement);
 
-
-
     const PositionsModel = function () {
       const positions = ko.observableArray([]);
+
+      /**
+      * Returns position with specified id
+      * @param {string|number} id
+      * @returns {Observable}
+      */
       function getPositionById(id) {
-        return positions().find(p => p().id === id);
+        return positions().find(position => position.id === id);
       }
 
-      /* Creates new list from data */
+      /**
+      * Creates new positions list from data
+      * @param {Object[]} positionsList
+      */
       function setPositions(positionsList) {
-        positions(positionsList.map(position => {
-          return PositionModel(position)
+        positions(positionsList.map(positionData => {
+          return PositionModel(positionData)
         }))
       }
 
-      /* Updates employees set and visibility */
-      function updateEmployeesList(updatedPositionsList) {
-        const originalPositionsList = positions();
-
-        updatedPositionsList.forEach(updatedPosition => {
-          const employees = updatedPosition.employees;
-          const updatedIds = employees.map(e => e.id);
-
-          const originalPosition = originalPositionsList.find(p => p().id === updatedPosition.id);
-
-          const originalPositionEmployees = originalPosition().employees();
-          const originalIds = originalPositionEmployees.map(e => e.id);
-
-          const notFoundIds = _.difference(originalIds, updatedIds);
-          const newEmployeesIds = _.difference(updatedIds, originalIds);
-
-          // удалить тех, которых нет
-          const updated = originalPositionEmployees.filter(e => notFoundIds.indexOf(e.id) === -1);
-
-          // отметить видимость
-          updated.forEach(e => {
-            const updatedEmployee = employees.find(employee => employee.id === e.id);
-            e.visible(updatedEmployee.checked);
-          });
-
-          // добавить новых
-          newEmployees = newEmployeesIds.map(id => {
-            const data = employees.find(e => e.id === id);
-            const employee = EmployeeModel(data, data.checked);
-            return employee;
-          });
-
-          originalPosition().employees(updated.concat(newEmployees));
-        });
-      }
-
+      /**
+      * @params {string} interval
+      * @returns {{value: Observable, getInterval: function}}
+      */
       function WorkingIntervalModel(interval) {
         const value = ko.observable(interval).extend({
           required: {
@@ -137,7 +112,10 @@
           }
         });
 
-        const getInterval = () => {
+        /**
+        * @returns {number}
+        */
+        function getInterval() {
           const boundaries = value().split(' – ').map(b => moment(b, 'HH:mm'));
 
           if (boundaries[0].isAfter(boundaries[1])) {
@@ -145,7 +123,7 @@
           }
 
           return boundaries[1].diff(boundaries[0], 'minutes');
-        };
+        }
 
         return {
           value,
@@ -153,6 +131,11 @@
         };
       }
 
+      /**
+      * @param {Object} employee
+      * @param {Object} positionData
+      * @param {boolean} visible
+      */
       function EmployeeModel(employee, positionData, visible) {
         const defaultIntervals = employee.workingIntervals || [''];
         const workingIntervals = ko.observableArray(
@@ -163,15 +146,6 @@
           return workingIntervals().every(i => i.value.isValid())
         });
 
-        const addWorkingInterval = () => {
-          const model = WorkingIntervalModel('');
-          workingIntervals.push(model);
-        }
-
-        const removeWorkingInterval = (interval) => {
-          workingIntervals.remove(interval);
-        }
-
         const workingTime = ko.pureComputed(() => {
           if (!isWorkingIntervalsValid()) return 0;
 
@@ -180,19 +154,42 @@
           }, 0);
         });
 
+        /**
+        * Adds empty interval
+        */
+        function addWorkingInterval() {
+          const model = WorkingIntervalModel('');
+          workingIntervals.push(model);
+        }
+
+        /**
+        * Removes specified interval from list
+        * @param {WorkingIntervalModel} interval
+        */
+        function removeWorkingInterval(interval) {
+          workingIntervals.remove(interval);
+        }
+
         const accountOperations = ko.observableArray(employee.accountOperations || []);
         const accountState = ko.pureComputed(() => {
           return accountOperations().reduce((sum, operation) => {
             const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
             return sum + operationSum;
-          }, 0)
+          }, 0);
         });
 
         const fines = ko.observableArray(employee.fines || []);
         const finesState = ko.pureComputed(() => {
           return fines().reduce((sum, fine) => {
             return sum + fine.sum;
-          }, 0)
+          }, 0);
+        });
+
+        const bonuses = ko.observableArray(employee.bonuses || []);
+        const bonusesState = ko.pureComputed(() => {
+          return bonuses().reduce((sum, bonus) => {
+            return sum + bonus.sum;
+          }, 0);
         });
 
         return {
@@ -210,18 +207,27 @@
 
           returnRate: 30, // норматив выручки
           salaryBulk: 7200, // основная часть зп
-          bonus: ko.observable(0), // премия
+
+
+          bonuses,
+          bonusesState,
 
           fines, // штрафы
           finesState,
 
           visible: ko.observable(!!visible), // участвует в расчете
+          loaded: employee.loaded,
         }
       }
 
+      /**
+      * @param {Object} positionData
+      */
       function PositionModel(positionData) {
         const visible = ko.observable(false);
         const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, positionData, false)));
+
+        const allEmployeesLoaded = ko.observable(false);
 
         const workingTime = ko.pureComputed(() => {
           return employees().reduce((minutes, employee) => {
@@ -230,11 +236,49 @@
           }, 0)
         });
 
-        const addEmployee = (employee) => {
+        function findEmployeeById(employeeId) {
+          return employees().find(employee => employee.id === employeeId);
+        }
+
+        /**
+        * Adds new employee to list
+        * @param {Object} employee
+        */
+        function addEmployee (employee) {
           employees.push(EmployeeModel(employee, positionData, 'visible'));
         }
 
-        return ko.observable({
+        /**
+        * Updates employees list, set visibility
+        */
+        function updateEmployees(updatedList) {
+          const updatedIds = updatedList.map(e => e.id);
+          const originalIds = employees().map(e => e.id);
+
+          const notFoundIds = _.difference(originalIds, updatedIds);
+          const newEmployeesIds = _.difference(updatedIds, originalIds);
+
+          // remove not found-s
+          const updated = employees().filter(e => notFoundIds.indexOf(e.id) === -1);
+
+          // set visibility
+          updated.forEach(employee => {
+            const updatedEmployeeData = updatedList.find(updatedEmployee => updatedEmployee.id == employee.id);
+            employee.visible(updatedEmployeeData.checked);
+          });
+
+          // add new-s
+          const newEmployees = newEmployeesIds.map(id => {
+            const employeeData = updatedList.find(e => e.id === id);
+            const employee = EmployeeModel(employeeData, positionData, employeeData.checked);
+            return employee;
+          });
+
+          // update list
+          employees(updated.concat(newEmployees));
+        }
+
+        return {
           id: positionData.id,
           name: positionData.name, // название
           workloadType: positionData.workloadType,
@@ -247,18 +291,18 @@
           fotCategory: positionData.fotCategory,
           fotRevenue: positionData.fotRevenue,
           employees,
-          addEmployee,
-
-          workingTime,
-
+          addEmployee, // добавить сотрудника
+          updateEmployees, // обновить список сотрудников
+          allEmployeesLoaded, // загружены сотрудники из всех филиалов
+          workingTime, // общее рабочее время всех сотрудников
           visible, // отображается в таблице
-        });
+        };
       };
+
 
       return {
         positions,
         setPositions,
-        updateEmployeesList,
         getPositionById,
       }
     }
@@ -311,7 +355,6 @@
       this.isBuilt = ko.observable(false);
       /** Get data for calculation */
       this.buildCalculation = () => {
-        /** Данные */
         const inputData = ko.toJS(this.inputModel);
 
         /* Получение списка позиций */
@@ -344,11 +387,11 @@
 
       this.productionPositions = ko.pureComputed(() => {
         return this.summaryModel.positions()
-          .filter(position => position().type === 'production');
-      })
+          .filter(position => position.type === 'production');
+      });
 
 
-      /** Stimulation model (fine/bonus) */
+      /** Shift stimulation model (fine/bonus) */
       this.stimulation = (() => {
         function Stimulation() {
           return {
@@ -363,27 +406,30 @@
           production: Stimulation(),
           delivery: Stimulation()
         };
+
         const bonus = {
           production: Stimulation(),
           delivery: Stimulation()
         };
 
         const setStimulation = () => {
-          this.settings.openModal(
+          this.utils.openModal(
             'stimulation',
             null,
             (data) => {
               console.log('stimulation saved', data)
             }
           )
-        }
+        };
 
         return {
           fine,
           bonus,
           set: setStimulation
-        }
+        };
       })();
+
+
 
       this.isEmployeesCalculated = ko.observable(false);
 

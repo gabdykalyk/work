@@ -2,6 +2,19 @@
 
 <script type="text/javascript">
     $(function () {
+        function PositionModel(positionData) {
+            const checked =  ko.observable(positionData.visible());
+            function apply() {
+                positionData.visible(checked());
+            }
+            return {
+                name: positionData.name,
+                checked,
+                visible: ko.observable(true),
+                apply
+            }
+        }
+
         ko.components.register('positions-modal-dialog', {
             viewModel: {
                 createViewModel: function (params, componentInfo) {
@@ -14,17 +27,9 @@
                         'hrm-modal-dialog--size_large'
                     ]);
 
-                    return new (function () {
+                    const ViewModel = function(positions) {
                         /** Positions model */
-                        this.positions = params.data.positions().map((p) => {
-                            const positionData = p();
-                            return {
-                                name: positionData.name,
-                                checked: ko.observable(positionData.visible()),
-                                position: p,
-                                visible: ko.observable(true)
-                            }
-                        });
+                        this.positions = positions.map(PositionModel);
 
                         /** Поисковый запрос */
                         this.term = ko.observable('');
@@ -60,7 +65,7 @@
                         /** Применить изменения */
                         this.apply = function() {
                             this.positions.forEach(p => {
-                                p.position().visible(p.checked());
+                                p.apply();
                             });
                         }
 
@@ -70,7 +75,9 @@
                                 params.submit(true);
                             }
                         };
-                    });
+                    }
+
+                    return new ViewModel(params.data.positions());
                 }
             },
             template: {

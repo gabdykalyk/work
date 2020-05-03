@@ -2,6 +2,14 @@
 
 <script type="text/javascript">
   $(function () {
+    function PositionModal(position) {
+      return {
+        id: position.id,
+        name: position.name,
+        levels: position.levels
+      };
+    }
+
     ko.components.register('create-employee-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -24,14 +32,7 @@
               });
             };
 
-            this.positions = params.data.positions.map((p) => {
-              p = p();
-              return {
-                id: p.id,
-                name: p.name,
-                levels: p.levels
-              }
-            });
+            this.positions = params.data.positions.map(PositionModal);
             this.levels = ko.observable([]);
 
             this.formModel = {

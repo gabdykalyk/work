@@ -2,6 +2,42 @@
 
 <script>
   $(function () {
+    function Fine(defaultData, fineBases) {
+      defaultData = defaultData || {};
+      const base = ko.observable(defaultData.base).extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+      const sum = ko.observable(defaultData.sum || 0).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        number: {
+          message: 'Некорректный формат'
+        }
+      });
+      base.subscribe(baseId => {
+        const baseData = fineBases().find(group => {
+          return group.items.find(item => item.id === baseId);
+        });
+        if (baseData) sum(baseData.sum);
+        else sum(null);
+      });
+      return {
+        base,
+        author: ko.observable(defaultData.author).extend({
+          required: {
+            message: 'Обязательное поле'
+          }
+        }),
+        sum,
+        comment: ko.observable(defaultData.comment || '').extend({
+
+        }),
+      }
+    }
+
     ko.components.register('employee-fine-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -25,49 +61,12 @@
               });
             };
 
-            const fineBases = window.directories.fines.get();
-            const authors = window.directories.authors.get();
+            this.fineBases = window.directories.fines.get();
+            this.authors = window.directories.authors.get();
 
-            this.fineBases = fineBases;
-            this.authors = authors;
-
-            function Fine(defaultData) {
-              defaultData = defaultData || {};
-              const base = ko.observable(defaultData.base).extend({
-                required: {
-                  message: 'Обязательное поле'
-                }
-              });
-              const sum = ko.observable(defaultData.sum || 0).extend({
-                required: {
-                  message: 'Обязательное поле'
-                },
-                number: {
-                  message: 'Некорректный формат'
-                }
-              });
-              base.subscribe(baseId => {
-                const baseData = fineBases().find(group => {
-                  return group.items.find(item => item.id === baseId);
-                });
-                if (baseData) sum(baseData.sum);
-                else sum(null);
-              });
-              return {
-                base,
-                author: ko.observable(defaultData.author).extend({
-                  required: {
-                    message: 'Обязательное поле'
-                  }
-                }),
-                sum,
-                comment: ko.observable(defaultData.comment || '').extend({
-
-                }),
-              }
-            }
-
-            this.fines = ko.observableArray(defaultFines.map(Fine));
+            this.fines = ko.observableArray(defaultFines.map((fineData) => {
+                return Fine(fineData, this.fineBases);
+            }));
 
             this.addFine = () => {
               this.fines.push(Fine())

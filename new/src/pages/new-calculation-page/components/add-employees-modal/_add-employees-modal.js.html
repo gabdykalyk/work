@@ -9,26 +9,39 @@
       LIST: 'list'
     };
 
-    function EmployeeModel(employee) {
+    function EmployeeModel(employeeData) {
       return {
-        id: employee.id,
-        name: employee.name,
-        checked: ko.observable(employee.visible()),
+        id: employeeData.id,
+        name: employeeData.name,
+        checked: ko.observable(employeeData.visible()),
         visible: ko.observable(true)
       }
     }
 
-    function PositionModel(positionObservable) {
-      const positionData = positionObservable();
+    function PositionModel(positionData) {
+      const name = positionData.name;
+      const id = positionData.id;
       const employees = ko.observableArray(positionData.employees().map(EmployeeModel));
       const hasVisibleEmployees = ko.observable(true);
+      const visible = positionData.visible();
+      const loaded = ko.observable(positionData.allEmployeesLoaded());
+
+      function getData() {
+        return {
+          id,
+          employees: ko.toJS(employees),
+          loaded
+        }
+      }
 
       return {
-        name: positionData.name,
-        id: positionData.id,
+        name,
+        id,
         employees,
-        visible: positionData.visible(),
+        visible,
         hasVisibleEmployees,
+        loaded,
+        getData
       }
     }
 
@@ -55,7 +68,9 @@
           this.positions = params.positions;
         }
 
-        this.allBranches = ko.observable(false);
+        const isAlreadyLoaded = this.positions.every(p => p.loaded());
+
+        this.allBranches = ko.observable(isAlreadyLoaded);
         this.loadingBranches = ko.observable(false);
         this.allBranches.subscribe(value => {
           if (value) {
@@ -70,6 +85,7 @@
 
         this.restoreEmployeesList = () => {
           this.positions.forEach(p => {
+            p.loaded(false);
             const oldEmployeesList = p.employees().filter(e => !e.loaded)
             p.employees(oldEmployeesList)
           })
@@ -78,6 +94,7 @@
         this.loadBranches = (cb) => {
           if (this.isSingle) {
             const position = this.positions[0];
+            position.loaded(true);
             console.log('Сделать запрос, категория', position.name);
             // Данные
             const employeesList = [
@@ -95,6 +112,7 @@
             console.log('Сделать запрос, категории', positionsList);
             // Добавить новых работников в каждую категию
             updatedEmployees = this.positions.forEach(p => {
+              p.loaded(true);
               const employeesList = [
                 { name: 'Рабочий #1', id: p.name + '1' },
                 { name: 'Рабочий #2', id: p.name + '2' },
@@ -143,7 +161,7 @@
               : params.data.positions.map(PositionModel);
 
             this.term = ko.observable('');
-            function termUpdateHandler(value) {
+            const termUpdateHandler = (value) => {
               const formattedValue = value.toLowerCase();
               this.positions.forEach(p => {
                 let hasVisibleEmployees = 0;
@@ -198,7 +216,7 @@
             this.submit = function () {
               this.isSubmitted(true);
               if ('submit' in params) {
-                params.submit(ko.toJS(this.positions));
+                params.submit(this.positions.map(p => p.getData()));
               }
             };
           }

@@ -13,36 +13,43 @@
 
   <div class="hrm-basic-modal-dialog__body columns-settings">
     <div class="columns-settings__search"
-         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по наименованию' }}"></div>
-
-    <div class="columns-settings__list">
-      <!-- ko foreach: { data: $component.columns, as: 'column' } -->
-
-      <!-- ko let: {checkboxGroup: ko.observable(null), visible: column.visible} -->
-      <div class="columns-settings__list-item"
-           data-bind="if: visible">
-        <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-          <div
-               data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
-          </div>
-          <label
-                 data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
-        </div>
-      </div>
-      <!-- /ko -->
-
-      <!-- /ko -->
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по наименованию' }}">
     </div>
+
+    <div class="calculation-modal__scroll">
+      <div class="columns-settings__list">
+        <!-- ko foreach: { data: $component.columns, as: 'column' } -->
+
+        <!-- ko if: column.visible() -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="columns-settings__list-item">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
+            </div>
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+
+
 
   </div>
 
-  <div class="hrm-basic-modal-dialog__action-list">
-    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item"
+  <div class="hrm-basic-modal-dialog__action-list columns-settings__action-list">
+    <button class="hrm-button hrm-basic-button  hrm-button--size_large hrm-basic-modal-dialog__action-list-item"
             data-bind="click: function() {reset();}">
       Сбросить
     </button>
 
-    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item"
+    <button class="hrm-button hrm-basic-button hrm-button--size_large  hrm-accent-button hrm-basic-modal-dialog__action-list-item"
             data-bind="click: function() {submit();}">
       Применить
     </button>
