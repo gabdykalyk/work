@@ -13,26 +13,32 @@
 
   <div class="hrm-basic-modal-dialog__body positions-settings">
     <div class="positions-settings__search"
-         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по должности' }}"></div>
-
-    <div class="positions-settings__list">
-      <!-- ko foreach: { data: $component.positions, as: 'position' } -->
-
-      <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
-      <div class="positions-settings__list-item"
-           data-bind="if: visible">
-        <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-          <div
-               data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
-          </div>
-          <label
-                 data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
-        </div>
-      </div>
-      <!-- /ko -->
-
-      <!-- /ko -->
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по должности' }}">
     </div>
+
+    <div class="calculation-modal__scroll">
+      <div class="positions-settings__list"
+           data-bind="hrmScrollable">
+        <!-- ko foreach: { data: $component.positions, as: 'position' } -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
+        <div class="positions-settings__list-item"
+             data-bind="if: visible">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
+            </div>
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- /ko -->
+      </div>
+    </div>
+
+
 
   </div>
 

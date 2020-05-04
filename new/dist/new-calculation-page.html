@@ -274,26 +274,32 @@
 
   <div class="hrm-basic-modal-dialog__body positions-settings">
     <div class="positions-settings__search"
-         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по должности' }}"></div>
-
-    <div class="positions-settings__list">
-      <!-- ko foreach: { data: $component.positions, as: 'position' } -->
-
-      <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
-      <div class="positions-settings__list-item"
-           data-bind="if: visible">
-        <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-          <div
-               data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
-          </div>
-          <label
-                 data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
-        </div>
-      </div>
-      <!-- /ko -->
-
-      <!-- /ko -->
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по должности' }}">
     </div>
+
+    <div class="calculation-modal__scroll">
+      <div class="positions-settings__list"
+           data-bind="hrmScrollable">
+        <!-- ko foreach: { data: $component.positions, as: 'position' } -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
+        <div class="positions-settings__list-item"
+             data-bind="if: visible">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: position.checked }}">
+            </div>
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: position.name"></label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- /ko -->
+      </div>
+    </div>
+
+
 
   </div>
 
@@ -1506,7 +1512,7 @@
     </div>
     <!-- /ko -->
 
-    <div class="templates__form-field"
+    <div class="employees-form__search"
          data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по ФИО' }}">
     </div>
   </div><!-- .employees-form__row -->
@@ -1527,7 +1533,7 @@
   </div>
   <!-- /ko -->
 
-
+  <div class="employees-form__tab calculation-modal__scroll">
   <!-- Отображение сотрудников -->
   <!-- ko template: {
         foreach: hrmTemplateIf(!loadingBranches(), $data),
@@ -1551,6 +1557,7 @@
 
   <!-- /ko -->
   <!-- /Отображение сотрудников -->
+  </div>
 
 </template>
 
@@ -1575,7 +1582,7 @@
     </div>
     <!-- /ko -->
 
-    <div class="employees-form__tab calculation-modal__scroll">
+
       <!-- ko if: activePosition -->
         <!-- ko component: {
           name: 'add-employees-position-tab',
@@ -1602,7 +1609,7 @@
         <!-- /ko -->
       <!-- /Вкладка Прочие -->
       <!-- /ko -->
-    </div>
+    
   </div>
 
   <div class="hrm-basic-modal-dialog__action-list">
@@ -3169,7 +3176,7 @@
     <!-- /ko -->
 
     <!-- ko ifnot: position.levels.length > 0 -->
-    <td class="positions-table__cell positions-table__cell--level">
+    <td class="positions-table__cell positions-table__cell--level positions-table__cell--inactive">
     </td>
     <!-- /ko -->
   <!-- /ko -->
