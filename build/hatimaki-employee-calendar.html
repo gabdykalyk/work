@@ -388,356 +388,261 @@
         </div>
 
         <div class="hat-scaffold__body">
-            <div class="employee-calendar__content" data-bind="childrenComplete: onInit.bind($data)">
-                <div class="employee-calendar__header">
-                    <div class="employee-calendar__range-paginator">
-                        <button class="btn btn-default employee-calendar__range-paginator-button employee-calendar__range-paginator-backward-button"
-                            data-bind="click: backward">
-                            <i class="far fa-chevron-left"></i>
-                        </button>
+            <div class="hat-scaffold__body-content">
+                <div class="employee-calendar__content" data-bind="childrenComplete: onInit.bind($data)">
+                    <div class="employee-calendar__header">
+                        <div class="employee-calendar__range-paginator">
+                            <button class="btn btn-default employee-calendar__range-paginator-button employee-calendar__range-paginator-backward-button"
+                                data-bind="click: backward">
+                                <i class="far fa-chevron-left"></i>
+                            </button>
 
-                        <span class="employee-calendar__range-paginator-value" data-bind="html: getRangeLabel()"></span>
+                            <span class="employee-calendar__range-paginator-value" data-bind="html: getRangeLabel()"></span>
 
-                        <button class="btn btn-default employee-calendar__range-paginator-button employee-calendar__range-paginator-forward-button"
-                            data-bind="click: forward">
-                            <i class="far fa-chevron-right"></i>
-                        </button>
-                    </div>
-
-                    <button class="btn btn-default icon-btn employee-calendar__calendar-button"
-                        title="Показать каледарь">
-                        <i class="far fa-calendar-alt"></i>
-                    </button>
-
-                    <button class="btn btn-default employee-calendar__select-today-button">Сегодня</button>
-
-                    <!-- ko if: viewportSize().width >= 1271 -->
-                        <a class="btn btn-default btn-with-icon employee-calendar__print-button" href="#">
-                            <i class="far fa-print"></i>
-                            Распечатать события
-                        </a>
-                    <!-- /ko -->
-
-                    <!-- ko if: viewportSize().width < 1271 -->
-                        <button class="btn btn-default icon-btn employee-calendar__print-button"
-                            title="Распечатать события">
-                            <i class="far fa-print"></i>
-                        </button>
-                    <!-- /ko -->
-
-                    <div class="spacer"></div>
-
-                    <div class="employee-calendar__range-size-selector">
-                        <div class="employee-calendar__range-size-selector-value"
-                            data-bind="click: function() { rangeSize(0); }, css: { 'employee-calendar__range-size-selector-value--active': rangeSize() === 0 }">
-                            День
-                        </div>
-                        <div class="employee-calendar__range-size-selector-value"
-                            data-bind="click: function() { rangeSize(1); }, css: { 'employee-calendar__range-size-selector-value--active': rangeSize() === 1 }">
-                            Неделя
-                        </div>
-                        <div class="employee-calendar__range-size-selector-value"
-                            data-bind="click: function() { rangeSize(2); }, css: { 'employee-calendar__range-size-selector-value--active': rangeSize() === 2 }">
-                            Месяц
-                        </div>
-                        <div class="employee-calendar__range-size-selector-value"
-                            data-bind="click: function() { rangeSize(3); }, css: { 'employee-calendar__range-size-selector-value--active': rangeSize() === 3 }">
-                            Год
-                        </div>
-                    </div>
-
-                    <button class="btn btn-default icon-btn employee-calendar__settings-button"
-                        title="Настройка событий">
-                        <i class="far fa-cog"></i>
-                    </button>
-                </div>
-
-                <div class="employee-calendar__filters" data-bind="css: { 'employee-calendar__filters--collapsed': !isFiltersExpanded() }">
-                    <div class="employee-calendar__filter-wrapper employee-calendar__search-filter-wrapper" data-bind="fade: isFiltersExpanded() || viewportSize().width >= 992">
-                        <div class="form-group search-global search-global--empty employee-calendar__filter">
-                            <input class="form-control" placeholder="Поиск по комментарию">
-
-                            <button type="button" class="btn btn-default search-global__search-clear-button"
-                                    title="Очистить">
-                                <i class="far fa-times"></i>
+                            <button class="btn btn-default employee-calendar__range-paginator-button employee-calendar__range-paginator-forward-button"
+                                data-bind="click: forward">
+                                <i class="far fa-chevron-right"></i>
                             </button>
                         </div>
-                    </div>
 
-                    <div class="employee-calendar__filter-wrapper employee-calendar__positions-filter-wrapper" data-bind="fade: isFiltersExpanded() || viewportSize().width >= 992">
-                        <div class="form-group employee-calendar__filter">
-                            <select class="form-control" name="positions[]" id="positions" multiple data-bind="select2" data-placeholder="Должности">
-                                <option value="1">Должность #1</option>
-                                <option value="2">Должность #2</option>
-                                <option value="3">Должность #3</option>
-                                <option value="4">Должность #4</option>
-                            </select>
-                        </div>
-                    </div>
+                        <button class="btn btn-default icon-btn employee-calendar__calendar-button"
+                            title="Показать каледарь">
+                            <i class="far fa-calendar-alt"></i>
+                        </button>
 
-                    <div class="employee-calendar__filter-wrapper employee-calendar__venues-filter-wrapper" data-bind="fade: isFiltersExpanded() || viewportSize().width >= 992">
-                        <div class="form-group employee-calendar__filter">
-                            <select class="form-control" name="venues[]" id="venues" multiple data-bind="select2" data-placeholder="Места проведения">
-                                <option value="1">Место проведения #1</option>
-                                <option value="2">Место проведения #2</option>
-                                <option value="3">Место проведения #3</option>
-                                <option value="4">Место проведения #4</option>
-                            </select>
-                        </div>
-                    </div>
+                        <button class="btn btn-default employee-calendar__select-today-button">Сегодня</button>
 
-                    <div class="employee-calendar__filter-wrapper employee-calendar__manager-filter-wrapper"
-                         data-bind="fade: isFiltersExpanded() || viewportSize().width >= 992">
-                        <div class="employee-calendar__filter employee-calendar__employee-filter">
-                            <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="События без ответственного"
-                                style="z-index: 6">
-                                <i class="far fa-question"></i>
+                        <!-- ko if: viewportSize().width >= 1271 -->
+                            <a class="btn btn-default btn-with-icon employee-calendar__print-button" href="#">
+                                <i class="far fa-print"></i>
+                                Распечатать события
+                            </a>
+                        <!-- /ko -->
+
+                        <!-- ko if: viewportSize().width < 1271 -->
+                            <button class="btn btn-default icon-btn employee-calendar__print-button"
+                                title="Распечатать события">
+                                <i class="far fa-print"></i>
+                            </button>
+                        <!-- /ko -->
+
+                        <div class="spacer"></div>
+
+                        <div class="employee-calendar__range-size-selector">
+                            <div class="employee-calendar__range-size-selector-value"
+                                data-bind="click: function() { rangeSize(0); }, css: { 'employee-calendar__range-size-selector-value--active': rangeSize() === 0 }">
+                                День
                             </div>
-                            <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
-                                style="z-index: 5">
-                                <img src="images/candidate-avatar.png">
+                            <div class="employee-calendar__range-size-selector-value"
+                                data-bind="click: function() { rangeSize(1); }, css: { 'employee-calendar__range-size-selector-value--active': rangeSize() === 1 }">
+                                Неделя
                             </div>
-                            <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
-                                style="z-index: 4">
-                                <i class="far fa-user"></i>
+                            <div class="employee-calendar__range-size-selector-value"
+                                data-bind="click: function() { rangeSize(2); }, css: { 'employee-calendar__range-size-selector-value--active': rangeSize() === 2 }">
+                                Месяц
                             </div>
-                            <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
-                                style="z-index: 3">
-                                <img src="images/candidate-avatar.png">
-                            </div>
-                            <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
-                                style="z-index: 2">
-                                <img src="images/candidate-avatar.png">
-                            </div>
-                            <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
-                                style="z-index: 1">
-                                <img src="images/candidate-avatar.png">
+                            <div class="employee-calendar__range-size-selector-value"
+                                data-bind="click: function() { rangeSize(3); }, css: { 'employee-calendar__range-size-selector-value--active': rangeSize() === 3 }">
+                                Год
                             </div>
                         </div>
+
+                        <button class="btn btn-default icon-btn employee-calendar__settings-button"
+                            title="Настройка событий">
+                            <i class="far fa-cog"></i>
+                        </button>
                     </div>
 
-                    <!-- ko if: viewportSize().width < 992 -->
-                        <div class="employee-calendar__filters-actions-wrapper">
-                            <div class="employee-calendar__filters-actions">
-                                <button class="btn btn-link employee-calendar__filters-expand-button" type="button"
-                                    data-bind="click: function() { isFiltersExpanded(!isFiltersExpanded()); }">
-                                    <!-- ko if: isFiltersExpanded() -->
-                                        Свернуть фильтры <i class="fas fa-chevron-up" aria-hidden="true"></i>
-                                    <!-- /ko -->
+                    <div class="employee-calendar__filters" data-bind="css: { 'employee-calendar__filters--collapsed': !isFiltersExpanded() }">
+                        <div class="employee-calendar__filter-wrapper employee-calendar__search-filter-wrapper" data-bind="fade: isFiltersExpanded() || viewportSize().width >= 992">
+                            <div class="form-group search-global search-global--empty employee-calendar__filter">
+                                <input class="form-control" placeholder="Поиск по комментарию">
 
-                                    <!-- ko if: !isFiltersExpanded() -->
-                                        Показать фильтры <i class="fas fa-chevron-down" aria-hidden="true"></i>
-                                    <!-- /ko -->
+                                <button type="button" class="btn btn-default search-global__search-clear-button"
+                                        title="Очистить">
+                                    <i class="far fa-times"></i>
                                 </button>
                             </div>
                         </div>
-                    <!-- /ko -->
-                </div>
 
-                <div class="employee-calendar__body" data-bind="class: bodyClass">
-                    <!-- ko if: rangeSize() === 3 -->
-                        <div class="employee-calendar__body-year-content">
-                            <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], as: 'month' } -->
-                                    <div class="employee-calendar__body-year-content-month">
-                                        <span class="employee-calendar__body-year-content-month-name" data-bind="text: $root.getMonthName(month)"></span>
-                                        <table class="employee-calendar__body-year-content-month-days-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>пн</th>
-                                                    <th>вт</th>
-                                                    <th>ср</th>
-                                                    <th>чт</th>
-                                                    <th>пт</th>
-                                                    <th>сб</th>
-                                                    <th>вс</th>
-                                                </tr>
-                                            </thead>
+                        <div class="employee-calendar__filter-wrapper employee-calendar__positions-filter-wrapper" data-bind="fade: isFiltersExpanded() || viewportSize().width >= 992">
+                            <div class="form-group employee-calendar__filter">
+                                <select class="form-control" name="positions[]" id="positions" multiple data-bind="select2" data-placeholder="Должности">
+                                    <option value="1">Должность #1</option>
+                                    <option value="2">Должность #2</option>
+                                    <option value="3">Должность #3</option>
+                                    <option value="4">Должность #4</option>
+                                </select>
+                            </div>
+                        </div>
 
-                                            <tbody>
-                                                <!-- ko foreach: { data: [0, 1, 2, 3, 4, 5], as: 'weekOffset' } -->
+                        <div class="employee-calendar__filter-wrapper employee-calendar__venues-filter-wrapper" data-bind="fade: isFiltersExpanded() || viewportSize().width >= 992">
+                            <div class="form-group employee-calendar__filter">
+                                <select class="form-control" name="venues[]" id="venues" multiple data-bind="select2" data-placeholder="Места проведения">
+                                    <option value="1">Место проведения #1</option>
+                                    <option value="2">Место проведения #2</option>
+                                    <option value="3">Место проведения #3</option>
+                                    <option value="4">Место проведения #4</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="employee-calendar__filter-wrapper employee-calendar__manager-filter-wrapper"
+                             data-bind="fade: isFiltersExpanded() || viewportSize().width >= 992">
+                            <div class="employee-calendar__filter employee-calendar__employee-filter">
+                                <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="События без ответственного"
+                                    style="z-index: 6">
+                                    <i class="far fa-question"></i>
+                                </div>
+                                <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
+                                    style="z-index: 5">
+                                    <img src="images/candidate-avatar.png">
+                                </div>
+                                <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
+                                    style="z-index: 4">
+                                    <i class="far fa-user"></i>
+                                </div>
+                                <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
+                                    style="z-index: 3">
+                                    <img src="images/candidate-avatar.png">
+                                </div>
+                                <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
+                                    style="z-index: 2">
+                                    <img src="images/candidate-avatar.png">
+                                </div>
+                                <div class="employee-calendar__employee-filter-item" data-toggle="tooltip" data-placement="bottom" title="Смирнов Дмитрий Вaсильевич"
+                                    style="z-index: 1">
+                                    <img src="images/candidate-avatar.png">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ko if: viewportSize().width < 992 -->
+                            <div class="employee-calendar__filters-actions-wrapper">
+                                <div class="employee-calendar__filters-actions">
+                                    <button class="btn btn-link employee-calendar__filters-expand-button" type="button"
+                                        data-bind="click: function() { isFiltersExpanded(!isFiltersExpanded()); }">
+                                        <!-- ko if: isFiltersExpanded() -->
+                                            Свернуть фильтры <i class="fas fa-chevron-up" aria-hidden="true"></i>
+                                        <!-- /ko -->
+
+                                        <!-- ko if: !isFiltersExpanded() -->
+                                            Показать фильтры <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                                        <!-- /ko -->
+                                    </button>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    </div>
+
+                    <div class="employee-calendar__body" data-bind="class: bodyClass">
+                        <!-- ko if: rangeSize() === 3 -->
+                            <div class="employee-calendar__body-year-content">
+                                <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], as: 'month' } -->
+                                        <div class="employee-calendar__body-year-content-month">
+                                            <span class="employee-calendar__body-year-content-month-name" data-bind="text: $root.getMonthName(month)"></span>
+                                            <table class="employee-calendar__body-year-content-month-days-table">
+                                                <thead>
                                                     <tr>
-                                                        <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7], as: 'weekDay' } -->
-                                                            <!-- ko let: { date: $root.getDateByMonthWeekOffsetWeekDay(month, weekOffset, weekDay) }  -->
-                                                                <td class="employee-calendar__body-year-content-month-days-table-day"
-                                                                    data-bind="
-                                                                        css: {
-                                                                            'employee-calendar__body-year-content-month-days-table-day--current': $root.isCurrentDay(date) && $root.getMonth(date) === month,
-                                                                            'employee-calendar__body-year-content-month-days-table-day--another-month': $root.getMonth(date) !== month
-                                                                        },
-                                                                        click: function () { $root.openDay(date); }
-                                                                    ">
-                                                                    <!-- ko text: $root.getDateOfMonth(date) --><!-- /ko -->
-
-                                                                    <!-- ko if: $root.getEventsPerDayByDate(date).length > 0 && $root.getMonth(date) === month -->
-                                                                        <div class="employee-calendar__body-year-content-month-days-table-day-event-indicator">
-                                                                        </div>
-                                                                    <!-- /ko -->
-                                                                </td>
-                                                            <!-- /ko -->
-                                                        <!-- /ko -->
+                                                        <th>пн</th>
+                                                        <th>вт</th>
+                                                        <th>ср</th>
+                                                        <th>чт</th>
+                                                        <th>пт</th>
+                                                        <th>сб</th>
+                                                        <th>вс</th>
                                                     </tr>
-                                                <!-- /ko -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                            <!-- /ko -->
-                        </div>
-                    <!-- /ko -->
+                                                </thead>
 
-                    <!-- ko if: rangeSize() === 2 -->
-                        <!-- ko template: { name: 'body-sidebar' } --><!-- /ko -->
-
-                        <div class="employee-calendar__body-month-content employee-calendar__body-with-sidebar-content" data-bind="scrollbar">
-                            <table class="employee-calendar__body-month-content-table">
-                                <thead>
-                                    <tr>
-                                        <th>пн</th>
-                                        <th>вт</th>
-                                        <th>ср</th>
-                                        <th>чт</th>
-                                        <th>пт</th>
-                                        <th>сб</th>
-                                        <th>вс</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    <!-- ko foreach: { data: [0, 1, 2, 3, 4, 5], as: 'weekOffset' } -->
-                                        <tr>
-                                            <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7], as: 'weekDay' } -->
-                                                <!-- ko let: { date: $root.getDateByWeekOffsetWeekDay(weekOffset, weekDay) }  -->
-                                                    <!-- ko let: { events: $root.getEventsPerDayByDate(date) }  -->
-                                                        <td class="employee-calendar__body-month-content-table-cell" data-bind="
-                                                            css: {
-                                                                'employee-calendar__body-month-content-table-cell--current': $root.isCurrentDay(date) && !$root.isAnotherMonth(date),
-                                                                'employee-calendar__body-month-content-table-cell--another-month': $root.isAnotherMonth(date),
-                                                                'employee-calendar__body-month-content-table-cell--weekend': [6, 7].includes(weekDay),
-                                                            },
-                                                            click: function () { $root.selectDay(date); }
-                                                        ">
-                                                            <div class="employee-calendar__body-month-content-table-cell-header">
-                                                                <!-- ko if: events.length > 4 -->
-                                                                    <a class="btn btn-link employee-calendar__body-month-content-table-cell-more-button">
-                                                                        Ещё <!-- ko text: events.length - 4 --><!-- /ko -->
-                                                                    </a>
-                                                                <!-- /ko -->
-
-                                                                <div class="spacer"></div>
-
-                                                                <div class="employee-calendar__body-month-content-table-cell-date" data-bind="text: $root.getDateOfMonth(date)">
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="employee-calendar__body-month-content-table-cell-events">
-                                                                <!-- ko foreach: events.slice(0, 4) -->
-                                                                    <div class="employee-calendar__body-month-content-table-cell-event"
+                                                <tbody>
+                                                    <!-- ko foreach: { data: [0, 1, 2, 3, 4, 5], as: 'weekOffset' } -->
+                                                        <tr>
+                                                            <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7], as: 'weekDay' } -->
+                                                                <!-- ko let: { date: $root.getDateByMonthWeekOffsetWeekDay(month, weekOffset, weekDay) }  -->
+                                                                    <td class="employee-calendar__body-year-content-month-days-table-day"
                                                                         data-bind="
-                                                                            class: $root.getBodyMonthContentTableCellEventClass(type),
-                                                                            css: { 'employee-calendar__body-month-content-table-cell-event--passed': $root.isEventPassed($data) },
-                                                                            click: function (_, event) { $root.selectEvent(id); event.stopPropagation(); }
-                                                                        "
-                                                                    >
-                                                                        <!-- ko text: $root.getTimeByTimestamp(timestamp) --><!-- /ko --> <!-- ko text: branch --><!-- /ko -->
-                                                                    </div>
+                                                                            css: {
+                                                                                'employee-calendar__body-year-content-month-days-table-day--current': $root.isCurrentDay(date) && $root.getMonth(date) === month,
+                                                                                'employee-calendar__body-year-content-month-days-table-day--another-month': $root.getMonth(date) !== month
+                                                                            },
+                                                                            click: function () { $root.openDay(date); }
+                                                                        ">
+                                                                        <!-- ko text: $root.getDateOfMonth(date) --><!-- /ko -->
+
+                                                                        <!-- ko if: $root.getEventsPerDayByDate(date).length > 0 && $root.getMonth(date) === month -->
+                                                                            <div class="employee-calendar__body-year-content-month-days-table-day-event-indicator">
+                                                                            </div>
+                                                                        <!-- /ko -->
+                                                                    </td>
                                                                 <!-- /ko -->
-                                                            </div>
-                                                        </td>
+                                                            <!-- /ko -->
+                                                        </tr>
                                                     <!-- /ko -->
-                                                <!-- /ko -->
-                                            <!-- /ko -->
-                                        </tr>
-                                    <!-- /ko -->
-                                </tbody>
-                            </table>
-                        </div>
-                    <!-- /ko -->
-
-                    <!-- ko if: rangeSize() === 1 -->
-                        <!-- ko template: { name: 'body-sidebar' } --><!-- /ko -->
-
-                        <div class="employee-calendar__body-week-content employee-calendar__body-with-sidebar-content" data-bind="scrollbar">
-                            <div class="employee-calendar__body-week-content-hour-scale">
-                                <div class="employee-calendar__body-week-content-hour-scale-header"></div>
-
-                                <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], as: 'hour' } -->
-                                    <div class="employee-calendar__body-week-content-hour-scale-point" data-bind="text: $root.getTimeByHour(hour)"></div>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                 <!-- /ko -->
                             </div>
+                        <!-- /ko -->
 
-                            <div class="employee-calendar__body-week-content-table-wrapper">
-                                <!-- ko if: isCurrentWeek(rangeDate()) -->
-                                    <div class="employee-calendar__body-time-indicator"
-                                        data-bind="style: {
-                                            top: 25 + (44 * currentHour) + (44 / 60 * currentMinute) + 'px',
-                                            left: 'calc((100% / 7) * ' + (currentWeekDay - 1) + ')'
-                                        }"
-                                    >
-                                    </div>
-                                <!-- /ko -->
-                                <table class="employee-calendar__body-week-content-table">
+                        <!-- ko if: rangeSize() === 2 -->
+                            <!-- ko template: { name: 'body-sidebar' } --><!-- /ko -->
+
+                            <div class="employee-calendar__body-month-content employee-calendar__body-with-sidebar-content" data-bind="scrollbar">
+                                <table class="employee-calendar__body-month-content-table">
                                     <thead>
                                         <tr>
-                                            <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7], as: 'weekDay' } -->
-                                                <!-- ko let: { date: $root.getDateByWeekDay(weekDay) }  -->
-                                                    <th class="employee-calendar__body-week-content-table-head-cell" data-bind="
-                                                        html: $root.getWeekDayHeader(date),
-                                                        click: function () { $root.openDay(date); },
-                                                        css: {
-                                                            'employee-calendar__body-week-content-table-head-cell--weekend': [6, 7].includes($data),
-                                                            'employee-calendar__body-week-content-table-head-cell--current': $root.isCurrentDay(date)
-                                                        }
-                                                    ">
-                                                    </th>
-                                                <!-- /ko -->
-                                            <!-- /ko -->
+                                            <th>пн</th>
+                                            <th>вт</th>
+                                            <th>ср</th>
+                                            <th>чт</th>
+                                            <th>пт</th>
+                                            <th>сб</th>
+                                            <th>вс</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
-                                        <!-- ko foreach: { data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], as: 'hour' } -->
+                                        <!-- ko foreach: { data: [0, 1, 2, 3, 4, 5], as: 'weekOffset' } -->
                                             <tr>
                                                 <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7], as: 'weekDay' } -->
-                                                    <!-- ko let: { date: $root.getDateByWeekDayHour(weekDay, hour) }  -->
-                                                        <!-- ko let: { events: $root.getEventsPerHourByDate(date) }  -->
-                                                            <!-- ko let: { eventGroups: $root.groupEventsByMinute(events) }  -->
-                                                                <!-- ko let: { displayedEventCount: eventGroups.length === 1 ? Math.min(eventGroups[0].length, 4) : Math.min(eventGroups.length, 3) }  -->
-                                                                    <td class="employee-calendar__body-week-content-table-cell" data-bind="
-                                                                        css: {'employee-calendar__body-week-content-table-cell--weekend': [6, 7].includes(weekDay)}
-                                                                    ">
-                                                                        <div class="employee-calendar__body-week-content-table-cell-events">
-                                                                            <div class="employee-calendar__body-week-content-table-cell-event-list">
-                                                                                <!-- ko foreach: { data: eventGroups.slice(0, 3), as: 'eventGroup' } -->
-                                                                                    <div class="employee-calendar__body-week-content-table-cell-event-group"
-                                                                                        data-bind="style: {
-                                                                                            'margin-left': eventGroupIndex() * 22,
-                                                                                        }">
-                                                                                        <!-- ko foreach: { data: eventGroup.slice(0, eventGroups.length === 1 ? 4 : 1), as: 'event' } -->
-                                                                                            <div class="employee-calendar__body-week-content-table-cell-event"
-                                                                                                 data-bind="
-                                                                                                    class: $root.getBodyWeekTableCellEventClass(type),
-                                                                                                    css: { 'employee-calendar__body-week-content-table-cell-event--passed': $root.isEventPassed(event) },
-                                                                                                    click: function (_, event) { $root.selectEvent(id); event.stopPropagation(); }
-                                                                                                "
-                                                                                            >
-                                                                                                <!-- ko text: $root.getTimeByTimestamp(timestamp) --><!-- /ko --> <!-- ko text: branch --><!-- /ko -->
-                                                                                            </div>
-                                                                                        <!-- /ko -->
-                                                                                    </div>
-                                                                                <!-- /ko -->
-                                                                            </div>
+                                                    <!-- ko let: { date: $root.getDateByWeekOffsetWeekDay(weekOffset, weekDay) }  -->
+                                                        <!-- ko let: { events: $root.getEventsPerDayByDate(date) }  -->
+                                                            <td class="employee-calendar__body-month-content-table-cell" data-bind="
+                                                                css: {
+                                                                    'employee-calendar__body-month-content-table-cell--current': $root.isCurrentDay(date) && !$root.isAnotherMonth(date),
+                                                                    'employee-calendar__body-month-content-table-cell--another-month': $root.isAnotherMonth(date),
+                                                                    'employee-calendar__body-month-content-table-cell--weekend': [6, 7].includes(weekDay),
+                                                                },
+                                                                click: function () { $root.selectDay(date); }
+                                                            ">
+                                                                <div class="employee-calendar__body-month-content-table-cell-header">
+                                                                    <!-- ko if: events.length > 4 -->
+                                                                        <a class="btn btn-link employee-calendar__body-month-content-table-cell-more-button">
+                                                                            Ещё <!-- ko text: events.length - 4 --><!-- /ko -->
+                                                                        </a>
+                                                                    <!-- /ko -->
 
-                                                                            <div class="spacer"></div>
+                                                                    <div class="spacer"></div>
 
-                                                                            <!-- ko if: events.length !== displayedEventCount -->
-                                                                                <div class="employee-calendar__body-week-content-table-cell-events-more-button"
-                                                                                    data-bind="click: function () { $root.selectDay(date); } ">
-                                                                                    +<!-- ko text: events.length - displayedEventCount --><!-- /ko -->
-                                                                                </div>
-                                                                            <!-- /ko -->
+                                                                    <div class="employee-calendar__body-month-content-table-cell-date" data-bind="text: $root.getDateOfMonth(date)">
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="employee-calendar__body-month-content-table-cell-events">
+                                                                    <!-- ko foreach: events.slice(0, 4) -->
+                                                                        <div class="employee-calendar__body-month-content-table-cell-event"
+                                                                            data-bind="
+                                                                                class: $root.getBodyMonthContentTableCellEventClass(type),
+                                                                                css: { 'employee-calendar__body-month-content-table-cell-event--passed': $root.isEventPassed($data) },
+                                                                                click: function (_, event) { $root.selectEvent(id); event.stopPropagation(); }
+                                                                            "
+                                                                        >
+                                                                            <!-- ko text: $root.getTimeByTimestamp(timestamp) --><!-- /ko --> <!-- ko text: branch --><!-- /ko -->
                                                                         </div>
-                                                                    </td>
-                                                                <!-- /ko -->
-                                                            <!-- /ko -->
+                                                                    <!-- /ko -->
+                                                                </div>
+                                                            </td>
                                                         <!-- /ko -->
                                                     <!-- /ko -->
                                                 <!-- /ko -->
@@ -746,81 +651,178 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    <!-- /ko -->
+                        <!-- /ko -->
 
-                    <!-- ko if: rangeSize() === 0 -->
-                        <!-- ko template: { name: 'body-sidebar' } --><!-- /ko -->
+                        <!-- ko if: rangeSize() === 1 -->
+                            <!-- ko template: { name: 'body-sidebar' } --><!-- /ko -->
 
-                        <div class="employee-calendar__body-day-content employee-calendar__body-with-sidebar-content" data-bind="scrollbar">
-                            <div class="employee-calendar__body-day-content-hour-scale">
-                                <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], as: 'hour' } -->
-                                    <div class="employee-calendar__body-day-content-hour-scale-point" data-bind="text: $root.getTimeByHour(hour)"></div>
-                                <!-- /ko -->
-                            </div>
+                            <div class="employee-calendar__body-week-content employee-calendar__body-with-sidebar-content" data-bind="scrollbar">
+                                <div class="employee-calendar__body-week-content-hour-scale">
+                                    <div class="employee-calendar__body-week-content-hour-scale-header"></div>
 
-                            <div class="employee-calendar__body-day-content-list-wrapper">
-                                <!-- ko if: isCurrentDay(rangeDate()) -->
-                                    <div class="employee-calendar__body-time-indicator"
-                                         data-bind="style: { top: (44 * currentHour) + (44 / 60 * currentMinute) + 'px' }">
-                                    </div>
-                                <!-- /ko -->
+                                    <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], as: 'hour' } -->
+                                        <div class="employee-calendar__body-week-content-hour-scale-point" data-bind="text: $root.getTimeByHour(hour)"></div>
+                                    <!-- /ko -->
+                                </div>
 
-                                <div class="employee-calendar__body-day-content-list">
-                                    <!-- ko foreach: { data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], as: 'hour' } -->
-                                        <div class="employee-calendar__body-day-content-list-item">
-                                            <!-- ko let: { date: $root.getDateByHour(hour) }  -->
-                                                <!-- ko let: { events: $root.getEventsPerHourByDate(date) }  -->
-                                                    <!-- ko let: { eventGroups: $root.groupEventsByMinute(events) }  -->
-                                                        <!-- ko foreach: { data: eventGroups, as: 'eventGroup' } -->
-                                                            <div class="employee-calendar__body-day-content-list-item-event-group"
-                                                                 data-bind="style: {
-                                                                    'top': 'calc((44px / 60) * ' + $root.getMinute($root.getDateByTimestamp(eventGroup[0].timestamp)) + ')',
-                                                                    'margin-left': eventGroupIndex() * 182,
-                                                                    'width': 'calc(100% - ' + eventGroupIndex() * 182 + 'px)'
-                                                                 }"
-                                                            >
-                                                                <!-- ko foreach: { data: eventGroup, as: 'event' } -->
-                                                                    <div class="employee-calendar__body-day-content-list-item-event"
-                                                                         data-bind="
-                                                                            class: $root.getBodyDayListItemEventClass(type),
-                                                                            css: { 'employee-calendar__body-day-content-list-item-event--passed': $root.isEventPassed(event) },
-                                                                            click: function (_, event) { $root.selectEvent(id); event.stopPropagation(); }
-                                                                        "
-                                                                    >
-                                                                        <!-- ko text: $root.getTimeByTimestamp(timestamp) --><!-- /ko --> <!-- ko text: branch --><!-- /ko -->
-                                                                        <span data-bind="text: $root.getTypeName(type)"></span>
-                                                                        <span>
-                                                                            <i class="far fa-address-card"></i>
-                                                                            <!-- ko text: candidate.position.name --><!-- /ko -->
-                                                                        </span>
-                                                                        <span>
-                                                                            <i class="far fa-user-plus"></i>
-                                                                            <!-- ko text: candidate.name --><!-- /ko -->
-                                                                        </span>
-                                                                        <span>
-                                                                            <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                                <path d="M11.3438 8.23438L8.95312 7.22656C8.83594 7.17969 8.64844 7.13281 8.53125 7.13281C8.25 7.13281 7.875 7.32031 7.71094 7.53125L6.9375 8.46875C5.90625 7.90625 4.59375 6.59375 4.03125 5.5625L4.96875 4.78906C5.17969 4.625 5.36719 4.25 5.36719 3.96875C5.36719 3.85156 5.32031 3.66406 5.27344 3.54688L4.26562 1.15625C4.10156 0.804688 3.65625 0.5 3.28125 0.5C3.21094 0.5 3.09375 0.523438 3.02344 0.546875L0.820312 1.03906C0.351562 1.15625 0 1.625 0 2.09375C0 7.85938 4.66406 12.5234 10.4062 12.5C10.875 12.5 11.3438 12.1484 11.4609 11.6797L11.9531 9.47656C11.9766 9.40625 12 9.28906 12 9.24219C12 8.84375 11.6953 8.39844 11.3438 8.23438ZM10.3594 11.3984C5.27344 11.375 1.14844 7.22656 1.125 2.14062L3.23438 1.64844L4.21875 3.94531L2.625 5.25781C3.72656 7.57812 4.92188 8.77344 7.24219 9.875L8.55469 8.28125L10.8516 9.26562L10.3594 11.3984Z" fill="#888888"/>
-                                                                            </svg>
-                                                                            <!-- ko text: candidate.phone --><!-- /ko -->
-                                                                        </span>
-                                                                        <span>
-                                                                            <i class="far fa-user-tie"></i>
-                                                                            <!-- ko text: manager.name --><!-- /ko -->
-                                                                        </span>
-                                                                    </div>
+                                <div class="employee-calendar__body-week-content-table-wrapper">
+                                    <!-- ko if: isCurrentWeek(rangeDate()) -->
+                                        <div class="employee-calendar__body-time-indicator"
+                                            data-bind="style: {
+                                                top: 25 + (44 * currentHour) + (44 / 60 * currentMinute) + 'px',
+                                                left: 'calc((100% / 7) * ' + (currentWeekDay - 1) + ')'
+                                            }"
+                                        >
+                                        </div>
+                                    <!-- /ko -->
+                                    <table class="employee-calendar__body-week-content-table">
+                                        <thead>
+                                            <tr>
+                                                <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7], as: 'weekDay' } -->
+                                                    <!-- ko let: { date: $root.getDateByWeekDay(weekDay) }  -->
+                                                        <th class="employee-calendar__body-week-content-table-head-cell" data-bind="
+                                                            html: $root.getWeekDayHeader(date),
+                                                            click: function () { $root.openDay(date); },
+                                                            css: {
+                                                                'employee-calendar__body-week-content-table-head-cell--weekend': [6, 7].includes($data),
+                                                                'employee-calendar__body-week-content-table-head-cell--current': $root.isCurrentDay(date)
+                                                            }
+                                                        ">
+                                                        </th>
+                                                    <!-- /ko -->
+                                                <!-- /ko -->
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <!-- ko foreach: { data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], as: 'hour' } -->
+                                                <tr>
+                                                    <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7], as: 'weekDay' } -->
+                                                        <!-- ko let: { date: $root.getDateByWeekDayHour(weekDay, hour) }  -->
+                                                            <!-- ko let: { events: $root.getEventsPerHourByDate(date) }  -->
+                                                                <!-- ko let: { eventGroups: $root.groupEventsByMinute(events) }  -->
+                                                                    <!-- ko let: { displayedEventCount: eventGroups.length === 1 ? Math.min(eventGroups[0].length, 4) : Math.min(eventGroups.length, 3) }  -->
+                                                                        <td class="employee-calendar__body-week-content-table-cell" data-bind="
+                                                                            css: {'employee-calendar__body-week-content-table-cell--weekend': [6, 7].includes(weekDay)}
+                                                                        ">
+                                                                            <div class="employee-calendar__body-week-content-table-cell-events">
+                                                                                <div class="employee-calendar__body-week-content-table-cell-event-list">
+                                                                                    <!-- ko foreach: { data: eventGroups.slice(0, 3), as: 'eventGroup' } -->
+                                                                                        <div class="employee-calendar__body-week-content-table-cell-event-group"
+                                                                                            data-bind="style: {
+                                                                                                'margin-left': eventGroupIndex() * 22,
+                                                                                            }">
+                                                                                            <!-- ko foreach: { data: eventGroup.slice(0, eventGroups.length === 1 ? 4 : 1), as: 'event' } -->
+                                                                                                <div class="employee-calendar__body-week-content-table-cell-event"
+                                                                                                     data-bind="
+                                                                                                        class: $root.getBodyWeekTableCellEventClass(type),
+                                                                                                        css: { 'employee-calendar__body-week-content-table-cell-event--passed': $root.isEventPassed(event) },
+                                                                                                        click: function (_, event) { $root.selectEvent(id); event.stopPropagation(); }
+                                                                                                    "
+                                                                                                >
+                                                                                                    <!-- ko text: $root.getTimeByTimestamp(timestamp) --><!-- /ko --> <!-- ko text: branch --><!-- /ko -->
+                                                                                                </div>
+                                                                                            <!-- /ko -->
+                                                                                        </div>
+                                                                                    <!-- /ko -->
+                                                                                </div>
+
+                                                                                <div class="spacer"></div>
+
+                                                                                <!-- ko if: events.length !== displayedEventCount -->
+                                                                                    <div class="employee-calendar__body-week-content-table-cell-events-more-button"
+                                                                                        data-bind="click: function () { $root.selectDay(date); } ">
+                                                                                        +<!-- ko text: events.length - displayedEventCount --><!-- /ko -->
+                                                                                    </div>
+                                                                                <!-- /ko -->
+                                                                            </div>
+                                                                        </td>
+                                                                    <!-- /ko -->
                                                                 <!-- /ko -->
-                                                            </div>
+                                                            <!-- /ko -->
+                                                        <!-- /ko -->
+                                                    <!-- /ko -->
+                                                </tr>
+                                            <!-- /ko -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+
+                        <!-- ko if: rangeSize() === 0 -->
+                            <!-- ko template: { name: 'body-sidebar' } --><!-- /ko -->
+
+                            <div class="employee-calendar__body-day-content employee-calendar__body-with-sidebar-content" data-bind="scrollbar">
+                                <div class="employee-calendar__body-day-content-hour-scale">
+                                    <!-- ko foreach: { data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], as: 'hour' } -->
+                                        <div class="employee-calendar__body-day-content-hour-scale-point" data-bind="text: $root.getTimeByHour(hour)"></div>
+                                    <!-- /ko -->
+                                </div>
+
+                                <div class="employee-calendar__body-day-content-list-wrapper">
+                                    <!-- ko if: isCurrentDay(rangeDate()) -->
+                                        <div class="employee-calendar__body-time-indicator"
+                                             data-bind="style: { top: (44 * currentHour) + (44 / 60 * currentMinute) + 'px' }">
+                                        </div>
+                                    <!-- /ko -->
+
+                                    <div class="employee-calendar__body-day-content-list">
+                                        <!-- ko foreach: { data: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23], as: 'hour' } -->
+                                            <div class="employee-calendar__body-day-content-list-item">
+                                                <!-- ko let: { date: $root.getDateByHour(hour) }  -->
+                                                    <!-- ko let: { events: $root.getEventsPerHourByDate(date) }  -->
+                                                        <!-- ko let: { eventGroups: $root.groupEventsByMinute(events) }  -->
+                                                            <!-- ko foreach: { data: eventGroups, as: 'eventGroup' } -->
+                                                                <div class="employee-calendar__body-day-content-list-item-event-group"
+                                                                     data-bind="style: {
+                                                                        'top': 'calc((44px / 60) * ' + $root.getMinute($root.getDateByTimestamp(eventGroup[0].timestamp)) + ')',
+                                                                        'margin-left': eventGroupIndex() * 182,
+                                                                        'width': 'calc(100% - ' + eventGroupIndex() * 182 + 'px)'
+                                                                     }"
+                                                                >
+                                                                    <!-- ko foreach: { data: eventGroup, as: 'event' } -->
+                                                                        <div class="employee-calendar__body-day-content-list-item-event"
+                                                                             data-bind="
+                                                                                class: $root.getBodyDayListItemEventClass(type),
+                                                                                css: { 'employee-calendar__body-day-content-list-item-event--passed': $root.isEventPassed(event) },
+                                                                                click: function (_, event) { $root.selectEvent(id); event.stopPropagation(); }
+                                                                            "
+                                                                        >
+                                                                            <!-- ko text: $root.getTimeByTimestamp(timestamp) --><!-- /ko --> <!-- ko text: branch --><!-- /ko -->
+                                                                            <span data-bind="text: $root.getTypeName(type)"></span>
+                                                                            <span>
+                                                                                <i class="far fa-address-card"></i>
+                                                                                <!-- ko text: candidate.position.name --><!-- /ko -->
+                                                                            </span>
+                                                                            <span>
+                                                                                <i class="far fa-user-plus"></i>
+                                                                                <!-- ko text: candidate.name --><!-- /ko -->
+                                                                            </span>
+                                                                            <span>
+                                                                                <svg width="12" height="13" viewBox="0 0 12 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                                    <path d="M11.3438 8.23438L8.95312 7.22656C8.83594 7.17969 8.64844 7.13281 8.53125 7.13281C8.25 7.13281 7.875 7.32031 7.71094 7.53125L6.9375 8.46875C5.90625 7.90625 4.59375 6.59375 4.03125 5.5625L4.96875 4.78906C5.17969 4.625 5.36719 4.25 5.36719 3.96875C5.36719 3.85156 5.32031 3.66406 5.27344 3.54688L4.26562 1.15625C4.10156 0.804688 3.65625 0.5 3.28125 0.5C3.21094 0.5 3.09375 0.523438 3.02344 0.546875L0.820312 1.03906C0.351562 1.15625 0 1.625 0 2.09375C0 7.85938 4.66406 12.5234 10.4062 12.5C10.875 12.5 11.3438 12.1484 11.4609 11.6797L11.9531 9.47656C11.9766 9.40625 12 9.28906 12 9.24219C12 8.84375 11.6953 8.39844 11.3438 8.23438ZM10.3594 11.3984C5.27344 11.375 1.14844 7.22656 1.125 2.14062L3.23438 1.64844L4.21875 3.94531L2.625 5.25781C3.72656 7.57812 4.92188 8.77344 7.24219 9.875L8.55469 8.28125L10.8516 9.26562L10.3594 11.3984Z" fill="#888888"/>
+                                                                                </svg>
+                                                                                <!-- ko text: candidate.phone --><!-- /ko -->
+                                                                            </span>
+                                                                            <span>
+                                                                                <i class="far fa-user-tie"></i>
+                                                                                <!-- ko text: manager.name --><!-- /ko -->
+                                                                            </span>
+                                                                        </div>
+                                                                    <!-- /ko -->
+                                                                </div>
+                                                            <!-- /ko -->
                                                         <!-- /ko -->
                                                     <!-- /ko -->
                                                 <!-- /ko -->
-                                            <!-- /ko -->
-                                        </div>
-                                    <!-- /ko -->
+                                            </div>
+                                        <!-- /ko -->
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    <!-- /ko -->
+                        <!-- /ko -->
+                    </div>
                 </div>
             </div>
         </div>

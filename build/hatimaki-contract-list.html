@@ -386,179 +386,181 @@
         </div>
 
         <div class="hat-scaffold__body">
-            <div class="hat-scaffold__content-wrapper">
-                <div class="contract-list__content" data-bind="childrenComplete: onInit">
-                    <div class="hat-scaffold__head contract-list__head">
-                        <h1>Договоры</h1>
+            <div class="hat-scaffold__body-content">
+                <div class="hat-scaffold__content-wrapper">
+                    <div class="contract-list__content" data-bind="childrenComplete: onInit">
+                        <div class="hat-scaffold__head contract-list__head">
+                            <h1>Договоры</h1>
 
-                        <div class="spacer"></div>
+                            <div class="spacer"></div>
 
-                        <button class="btn btn-success btn-p25">Новый договор</button>
-                    </div>
-
-                    <form action="" method="post" class="contract-list__filters">
-                        <div class="row">
-                            <div class="form-group col-md-4 col-xs-6">
-                                <label for="branches">Филиал</label>
-                                <select class="form-control js-select-multiple" name="branches[]" id="branches"
-                                        multiple="multiple">
-                                    <option value="1">Щербинка</option>
-                                    <option value="2">Бутово</option>
-                                    <option value="3">Ясенево</option>
-                                    <option value="4">Коммунарка</option>
-                                    <option value="5">Подольск</option>
-                                    <option value="6">Московский</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group col-md-4 col-xs-6">
-                                <label for="legalEntities">Юр. лицо</label>
-                                <select class="form-control js-select-multiple" name="legalEntities[]" id="legalEntities"
-                                        multiple="multiple">
-                                    <option value="1">ИП Дмитриева А. А.</option>
-                                    <option value="2">ИП Агафонов В. В.</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group col-md-4 col-xs-6">
-                                <label for="categories">Категория</label>
-                                <select class="form-control js-select-multiple" name="categories[]" id="categories"
-                                        multiple="multiple">
-                                    <option value="1">Коммерческая тайна</option>
-                                    <option value="2">Трудовой договор</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group col-md-4 col-xs-6">
-                                <label for="searchTerm">Поиск</label>
-                                <input type="text" class="form-control" name="searchTerm" id="searchTerm">
-                            </div>
-
-                            <div class="form-group col-md-4 col-xs-6 contract-list__filter--dense-hidden">
-                                <label for="post">Должность</label>
-                                <select class="form-control js-select-multiple" name="post[]" id="post" multiple="multiple">
-                                    <option value="1">Администратор филиал</option>
-                                    <option value="2">Директор IT</option>
-                                    <option value="3">Водитель</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group contract-list__form-group-checkboxes col-md-4 col-xs-6 contract-list__filter--dense-hidden">
-                                <div class="checkbox-nice">
-                                    <label>
-                                        <input type="checkbox" name="">
-                                        <span class="fa fa-check"></span>
-                                        Показать удалённые
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="contract-list__filters-actions col-md-8 col-xs-12">
-                                <div class="contract-list__filters-actions-content">
-                                    <button class="btn btn-link contract-list__filters-expand-button" type="button">
-                                        Меньше фильтров <i class="fa fa-chevron-up" aria-hidden="true"></i>
-                                    </button>
-
-                                    <button class="btn btn-default btn-p25 contract-list__filters-clear-button" type="button">
-                                        Очистить
-                                    </button>
-
-                                    <button class="btn btn-primary btn-p25 contract-list__filters-apply-button" type="button">
-                                        Применить
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-
-                    <div class="contract-list__table">
-                        <div class="contract-list__table-head">
-                            <div class="contract-list__table-head-row">
-                                <div class="contract-list__table-head-cell contract-list__table-name-head-cell">
-                                    Название
-                                </div>
-
-                                <div class="contract-list__table-head-cell contract-list__table-branches-head-cell">
-                                    Филиалы
-                                </div>
-
-                                <div class="contract-list__table-head-cell contract-list__table-positions-head-cell">
-                                    Должности
-                                </div>
-
-                                <div class="contract-list__table-head-cell contract-list__table-actions-head-cell">
-                                    <button class="btn btn-default btn-p25 contract-list__table-add-category-button" type="button"
-                                        data-bind="click: openCreateCategoryModal">
-                                        Добавить категорию
-                                    </button>
-                                </div>
-                            </div>
+                            <button class="btn btn-success btn-p25">Новый договор</button>
                         </div>
 
-                        <ul class="contract-list__table-body" data-bind="contractsSortable: true, contractsSortableCategorySort: categorySort, contractsSortableContractSort: contractSort">
-                            <!-- ko foreach: { data: categories, beforeRemove: tableRowBeforeRemove } -->
-                                <li
-                                    class="contract-list__table-row contract-list__table-category-row"
-                                    data-bind="
-                                        css: {
-                                            'contract-list__table-category-row--empty': !$root.hasContracts($data.id),
-                                            'contract-list__table-category-row--last': $index() === $root.categories().length - 1 && $root.getContracts(null).length > 0
-                                        },
-                                        attr: {
-                                            'data-contracts-category-id': id
-                                        }
-                                    "
-                                >
-                                    <div class="contract-list__table-row-header">
-                                        <div class="contract-list__table-cell contract-list__table-name-cell">
-                                            <div class="contract-list__table-category-row-toggle" data-bind="click: function() { $root.toggleCategory($data.id); }">
-                                                <!-- ko if: $root.hasContracts($data.id) -->
-                                                    <!-- ko if: $root.isCategoryOpen($data.id) -->
-                                                        <i class="fa fa-chevron-circle-up"></i>
-                                                    <!-- /ko -->
+                        <form action="" method="post" class="contract-list__filters">
+                            <div class="row">
+                                <div class="form-group col-md-4 col-xs-6">
+                                    <label for="branches">Филиал</label>
+                                    <select class="form-control js-select-multiple" name="branches[]" id="branches"
+                                            multiple="multiple">
+                                        <option value="1">Щербинка</option>
+                                        <option value="2">Бутово</option>
+                                        <option value="3">Ясенево</option>
+                                        <option value="4">Коммунарка</option>
+                                        <option value="5">Подольск</option>
+                                        <option value="6">Московский</option>
+                                    </select>
+                                </div>
 
-                                                    <!-- ko if: !$root.isCategoryOpen($data.id) -->
-                                                        <i class="fa fa-chevron-circle-down"></i>
+                                <div class="form-group col-md-4 col-xs-6">
+                                    <label for="legalEntities">Юр. лицо</label>
+                                    <select class="form-control js-select-multiple" name="legalEntities[]" id="legalEntities"
+                                            multiple="multiple">
+                                        <option value="1">ИП Дмитриева А. А.</option>
+                                        <option value="2">ИП Агафонов В. В.</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-4 col-xs-6">
+                                    <label for="categories">Категория</label>
+                                    <select class="form-control js-select-multiple" name="categories[]" id="categories"
+                                            multiple="multiple">
+                                        <option value="1">Коммерческая тайна</option>
+                                        <option value="2">Трудовой договор</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-md-4 col-xs-6">
+                                    <label for="searchTerm">Поиск</label>
+                                    <input type="text" class="form-control" name="searchTerm" id="searchTerm">
+                                </div>
+
+                                <div class="form-group col-md-4 col-xs-6 contract-list__filter--dense-hidden">
+                                    <label for="post">Должность</label>
+                                    <select class="form-control js-select-multiple" name="post[]" id="post" multiple="multiple">
+                                        <option value="1">Администратор филиал</option>
+                                        <option value="2">Директор IT</option>
+                                        <option value="3">Водитель</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group contract-list__form-group-checkboxes col-md-4 col-xs-6 contract-list__filter--dense-hidden">
+                                    <div class="checkbox-nice">
+                                        <label>
+                                            <input type="checkbox" name="">
+                                            <span class="fa fa-check"></span>
+                                            Показать удалённые
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="contract-list__filters-actions col-md-8 col-xs-12">
+                                    <div class="contract-list__filters-actions-content">
+                                        <button class="btn btn-link contract-list__filters-expand-button" type="button">
+                                            Меньше фильтров <i class="fa fa-chevron-up" aria-hidden="true"></i>
+                                        </button>
+
+                                        <button class="btn btn-default btn-p25 contract-list__filters-clear-button" type="button">
+                                            Очистить
+                                        </button>
+
+                                        <button class="btn btn-primary btn-p25 contract-list__filters-apply-button" type="button">
+                                            Применить
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="contract-list__table">
+                            <div class="contract-list__table-head">
+                                <div class="contract-list__table-head-row">
+                                    <div class="contract-list__table-head-cell contract-list__table-name-head-cell">
+                                        Название
+                                    </div>
+
+                                    <div class="contract-list__table-head-cell contract-list__table-branches-head-cell">
+                                        Филиалы
+                                    </div>
+
+                                    <div class="contract-list__table-head-cell contract-list__table-positions-head-cell">
+                                        Должности
+                                    </div>
+
+                                    <div class="contract-list__table-head-cell contract-list__table-actions-head-cell">
+                                        <button class="btn btn-default btn-p25 contract-list__table-add-category-button" type="button"
+                                            data-bind="click: openCreateCategoryModal">
+                                            Добавить категорию
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <ul class="contract-list__table-body" data-bind="contractsSortable: true, contractsSortableCategorySort: categorySort, contractsSortableContractSort: contractSort">
+                                <!-- ko foreach: { data: categories, beforeRemove: tableRowBeforeRemove } -->
+                                    <li
+                                        class="contract-list__table-row contract-list__table-category-row"
+                                        data-bind="
+                                            css: {
+                                                'contract-list__table-category-row--empty': !$root.hasContracts($data.id),
+                                                'contract-list__table-category-row--last': $index() === $root.categories().length - 1 && $root.getContracts(null).length > 0
+                                            },
+                                            attr: {
+                                                'data-contracts-category-id': id
+                                            }
+                                        "
+                                    >
+                                        <div class="contract-list__table-row-header">
+                                            <div class="contract-list__table-cell contract-list__table-name-cell">
+                                                <div class="contract-list__table-category-row-toggle" data-bind="click: function() { $root.toggleCategory($data.id); }">
+                                                    <!-- ko if: $root.hasContracts($data.id) -->
+                                                        <!-- ko if: $root.isCategoryOpen($data.id) -->
+                                                            <i class="fa fa-chevron-circle-up"></i>
+                                                        <!-- /ko -->
+
+                                                        <!-- ko if: !$root.isCategoryOpen($data.id) -->
+                                                            <i class="fa fa-chevron-circle-down"></i>
+                                                        <!-- /ko -->
                                                     <!-- /ko -->
-                                                <!-- /ko -->
-                                                <span class="contract-list__table-name" data-bind="text: name"></span>
+                                                    <span class="contract-list__table-name" data-bind="text: name"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="contract-list__table-cell contract-list__table-branches-cell">
+                                            </div>
+
+                                            <div class="contract-list__table-cell contract-list__table-positions-cell">
+                                            </div>
+
+                                            <div class="contract-list__table-cell contract-list__table-actions-cell">
+                                                <a class="btn btn-default btn-w-30 contract-list__table-row-edit-button"
+                                                    title="Редактировать" href="#" data-bind="click: function () { $root.openCreateCategoryModal(); } ">
+                                                    <i class="far fa-pencil"></i>
+                                                </a>
+
+                                                <button type="button" class="btn btn-default btn-w-30 contract-list__table-row-remove-button"
+                                                        title="Удалить" data-bind="click: function() { $root.removeCategory($data.id); }">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
                                         </div>
 
-                                        <div class="contract-list__table-cell contract-list__table-branches-cell">
-                                        </div>
+                                        <ul class="contract-list__table-row-content" data-bind="contractsCategoryOpen: $root.isCategoryOpen($data.id)">
+                                            <!-- ko foreach: { data: $root.getContracts($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
+                                                <!-- ko template: { name: 'table-contract-row-template', data: $data } --><!-- /ko -->
+                                            <!-- /ko -->
+                                        </ul>
+                                    </li>
+                                <!-- /ko -->
 
-                                        <div class="contract-list__table-cell contract-list__table-positions-cell">
-                                        </div>
+                                <!-- ko foreach: { data: getContracts(null), beforeRemove: $root.tableRowBeforeRemove } -->
+                                    <!-- ko template: { name: 'table-contract-row-template', data: $data } --><!-- /ko -->
+                                <!-- /ko -->
+                            </ul>
+                        </div>
 
-                                        <div class="contract-list__table-cell contract-list__table-actions-cell">
-                                            <a class="btn btn-default btn-w-30 contract-list__table-row-edit-button"
-                                                title="Редактировать" href="#" data-bind="click: function () { $root.openCreateCategoryModal(); } ">
-                                                <i class="far fa-pencil"></i>
-                                            </a>
-
-                                            <button type="button" class="btn btn-default btn-w-30 contract-list__table-row-remove-button"
-                                                    title="Удалить" data-bind="click: function() { $root.removeCategory($data.id); }">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <ul class="contract-list__table-row-content" data-bind="contractsCategoryOpen: $root.isCategoryOpen($data.id)">
-                                        <!-- ko foreach: { data: $root.getContracts($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
-                                            <!-- ko template: { name: 'table-contract-row-template', data: $data } --><!-- /ko -->
-                                        <!-- /ko -->
-                                    </ul>
-                                </li>
-                            <!-- /ko -->
-
-                            <!-- ko foreach: { data: getContracts(null), beforeRemove: $root.tableRowBeforeRemove } -->
-                                <!-- ko template: { name: 'table-contract-row-template', data: $data } --><!-- /ko -->
-                            <!-- /ko -->
-                        </ul>
+                        <!-- ko component: { name: 'modal-container', params: { opens: modalOpens } } --><!-- /ko -->
                     </div>
-
-                    <!-- ko component: { name: 'modal-container', params: { opens: modalOpens } } --><!-- /ko -->
                 </div>
             </div>
         </div>

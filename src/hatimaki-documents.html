@@ -19,140 +19,142 @@
         </div>
 
         <div class="hat-scaffold__body">
-            <div class="hat-scaffold__content-wrapper">
-                <div class="documents__content" data-bind="childrenComplete: onInit">
-                    <div class="documents__header">
-                        <h1>Документы</h1>
-                    </div>
-
-                    <div class="documents__sub-header">
-                        <div class="form-group documents__search search-global search-global--empty">
-                            <input class="form-control" placeholder="Поиск" data-bind="textInput: searchValue">
-
-                            <button type="button" class="btn btn-default search-global__search-clear-button"
-                                    title="Удалить">
-                                <i class="far fa-times"></i>
-                            </button>
+            <div class="hat-scaffold__body-content">
+                <div class="hat-scaffold__content-wrapper">
+                    <div class="documents__content" data-bind="childrenComplete: onInit">
+                        <div class="documents__header">
+                            <h1>Документы</h1>
                         </div>
 
-                        <button class="btn btn-primary btn-p25 documents__add-type-button" data-bind="click: function() {addType();}">
-                            Новый тип
-                        </button>
-                        <button class="btn btn-primary btn-p25 documents__add-document-button">Новый документ</button>
-                    </div>
+                        <div class="documents__sub-header">
+                            <div class="form-group documents__search search-global search-global--empty">
+                                <input class="form-control" placeholder="Поиск" data-bind="textInput: searchValue">
 
-                    <div class="documents__table">
-                        <div class="documents__table-head">
-                            <div class="documents__table-head-row">
-                                <div class="documents__table-head-cell documents__table-name-head-cell">
-                                    Название
-                                </div>
-
-                                <div class="documents__table-head-cell documents__table-description-head-cell">
-                                    Описание
-                                </div>
-
-                                <div class="documents__table-head-cell documents__table-actions-head-cell"></div>
+                                <button type="button" class="btn btn-default search-global__search-clear-button"
+                                        title="Удалить">
+                                    <i class="far fa-times"></i>
+                                </button>
                             </div>
+
+                            <button class="btn btn-primary btn-p25 documents__add-type-button" data-bind="click: function() {addType();}">
+                                Новый тип
+                            </button>
+                            <button class="btn btn-primary btn-p25 documents__add-document-button">Новый документ</button>
                         </div>
 
-                        <ul class="documents__table-body" data-bind="documentsSortable: true, documentsSortableTypeSort: typeSort, documentsSortableDocumentSort: documentSort">
-                            <!-- ko foreach: { data: types, beforeRemove: tableRowBeforeRemove } -->
-                                <!-- ko if: $root.isTypeVisible($data.id) -->
-                                    <li
-                                        class="documents__table-row documents__table-type-row"
-                                        data-bind="
-                                            css: {
-                                                'documents__table-type-row--editing': $root.editingTypeId() === $data.id,
-                                                'documents__table-type-row--empty': !$root.hasDocuments($data.id),
-                                                'documents__table-type-row--last': $index() === $root.types().length - 1 && $root.getDocuments(null).length > 0
-                                            },
-                                            attr: { 'data-documents-type-id': id }
-                                        "
-                                    >
-                                        <div class="documents__table-row-header">
-                                            <div class="documents__table-cell documents__table-name-cell">
-                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
-                                                    <div class="documents__table-type-row-toggle" data-bind="click: function() { $root.toggleType($data.id); }">
-                                                        <!-- ko if: $root.hasDocuments($data.id) -->
-                                                            <!-- ko if: $root.isTypeOpen($data.id) -->
-                                                                <i class="fa fa-chevron-circle-up"></i>
-                                                            <!-- /ko -->
+                        <div class="documents__table">
+                            <div class="documents__table-head">
+                                <div class="documents__table-head-row">
+                                    <div class="documents__table-head-cell documents__table-name-head-cell">
+                                        Название
+                                    </div>
 
-                                                            <!-- ko if: !$root.isTypeOpen($data.id) -->
-                                                                <i class="fa fa-chevron-circle-down"></i>
+                                    <div class="documents__table-head-cell documents__table-description-head-cell">
+                                        Описание
+                                    </div>
+
+                                    <div class="documents__table-head-cell documents__table-actions-head-cell"></div>
+                                </div>
+                            </div>
+
+                            <ul class="documents__table-body" data-bind="documentsSortable: true, documentsSortableTypeSort: typeSort, documentsSortableDocumentSort: documentSort">
+                                <!-- ko foreach: { data: types, beforeRemove: tableRowBeforeRemove } -->
+                                    <!-- ko if: $root.isTypeVisible($data.id) -->
+                                        <li
+                                            class="documents__table-row documents__table-type-row"
+                                            data-bind="
+                                                css: {
+                                                    'documents__table-type-row--editing': $root.editingTypeId() === $data.id,
+                                                    'documents__table-type-row--empty': !$root.hasDocuments($data.id),
+                                                    'documents__table-type-row--last': $index() === $root.types().length - 1 && $root.getDocuments(null).length > 0
+                                                },
+                                                attr: { 'data-documents-type-id': id }
+                                            "
+                                        >
+                                            <div class="documents__table-row-header">
+                                                <div class="documents__table-cell documents__table-name-cell">
+                                                    <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                        <div class="documents__table-type-row-toggle" data-bind="click: function() { $root.toggleType($data.id); }">
+                                                            <!-- ko if: $root.hasDocuments($data.id) -->
+                                                                <!-- ko if: $root.isTypeOpen($data.id) -->
+                                                                    <i class="fa fa-chevron-circle-up"></i>
+                                                                <!-- /ko -->
+
+                                                                <!-- ko if: !$root.isTypeOpen($data.id) -->
+                                                                    <i class="fa fa-chevron-circle-down"></i>
+                                                                <!-- /ko -->
                                                             <!-- /ko -->
+                                                            <span class="documents__table-name" data-bind="text: name()"></span>
+                                                        </div>
+                                                    <!-- /ko -->
+
+                                                    <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                        <div class="form-group">
+                                                            <input class="form-control" data-bind="{textInput: $root.newTypeName}">
+                                                        </div>
+                                                    <!-- /ko -->
+                                                </div>
+
+                                                <div class="documents__table-cell documents__table-description-cell">
+                                                    <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                        <!-- ko text: description().length > 0 ? description() : '-' -->
                                                         <!-- /ko -->
-                                                        <span class="documents__table-name" data-bind="text: name()"></span>
-                                                    </div>
-                                                <!-- /ko -->
+                                                    <!-- /ko -->
 
-                                                <!-- ko if: $root.editingTypeId() === $data.id -->
-                                                    <div class="form-group">
-                                                        <input class="form-control" data-bind="{textInput: $root.newTypeName}">
-                                                    </div>
-                                                <!-- /ko -->
+                                                    <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                        <div class="form-group">
+                                                            <input class="form-control" data-bind="{value: $root.newTypeDescription}">
+                                                        </div>
+                                                    <!-- /ko -->
+                                                </div>
+
+                                                <div class="documents__table-cell documents__table-actions-cell">
+                                                    <!-- ko if: $root.editingTypeId() !== $data.id -->
+                                                        <button type="button" class="btn btn-default btn-w-30 documents__table-row-edit-button"
+                                                                title="Редактировать" data-bind="click: function() {$root.editType($data.id);}">
+                                                            <i class="far fa-pencil"></i>
+                                                        </button>
+                                                    <!-- /ko -->
+
+                                                    <!-- ko if: $root.editingTypeId() === $data.id -->
+                                                        <button type="button" class="btn btn-default documents__table-row-reset-button"
+                                                                title="Сбросить значения" data-bind="click: function() { $root.resetEditingType(); }, attr: {disabled: $root.newTypeName().length === 0}">
+                                                            <i class="far fa-broom"></i>
+                                                        </button>
+
+                                                        <button type="button" class="btn btn-default documents__table-row-save-button"
+                                                                title="Сохранить" data-bind="click: function() {$root.saveEditingType();}, attr: {disabled: $root.newTypeName().length === 0}">
+                                                            <i class="far fa-check"></i>
+                                                        </button>
+                                                    <!-- /ko -->
+
+                                                    <!-- ko if: !$data.isSystem -->
+                                                        <button type="button" class="btn btn-default btn-w-30 documents__table-row-remove-button"
+                                                                title="Удалить" data-bind="click: function() {$root.removeType($data.id);}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    <!-- /ko -->
+                                                </div>
                                             </div>
 
-                                            <div class="documents__table-cell documents__table-description-cell">
-                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
-                                                    <!-- ko text: description().length > 0 ? description() : '-' -->
+                                            <ul class="documents__table-row-content" data-bind="documentsTypeOpen: $root.isTypeDocumentsVisible($data.id)">
+                                                <!-- ko foreach: { data: $root.getDocuments($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
+                                                    <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                                       <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
                                                     <!-- /ko -->
                                                 <!-- /ko -->
-
-                                                <!-- ko if: $root.editingTypeId() === $data.id -->
-                                                    <div class="form-group">
-                                                        <input class="form-control" data-bind="{value: $root.newTypeDescription}">
-                                                    </div>
-                                                <!-- /ko -->
-                                            </div>
-
-                                            <div class="documents__table-cell documents__table-actions-cell">
-                                                <!-- ko if: $root.editingTypeId() !== $data.id -->
-                                                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-edit-button"
-                                                            title="Редактировать" data-bind="click: function() {$root.editType($data.id);}">
-                                                        <i class="far fa-pencil"></i>
-                                                    </button>
-                                                <!-- /ko -->
-
-                                                <!-- ko if: $root.editingTypeId() === $data.id -->
-                                                    <button type="button" class="btn btn-default documents__table-row-reset-button"
-                                                            title="Сбросить значения" data-bind="click: function() { $root.resetEditingType(); }, attr: {disabled: $root.newTypeName().length === 0}">
-                                                        <i class="far fa-broom"></i>
-                                                    </button>
-
-                                                    <button type="button" class="btn btn-default documents__table-row-save-button"
-                                                            title="Сохранить" data-bind="click: function() {$root.saveEditingType();}, attr: {disabled: $root.newTypeName().length === 0}">
-                                                        <i class="far fa-check"></i>
-                                                    </button>
-                                                <!-- /ko -->
-
-                                                <!-- ko if: !$data.isSystem -->
-                                                    <button type="button" class="btn btn-default btn-w-30 documents__table-row-remove-button"
-                                                            title="Удалить" data-bind="click: function() {$root.removeType($data.id);}">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <ul class="documents__table-row-content" data-bind="documentsTypeOpen: $root.isTypeDocumentsVisible($data.id)">
-                                            <!-- ko foreach: { data: $root.getDocuments($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
-                                                <!-- ko if: $root.isDocumentVisible($data.id) -->
-                                                   <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
-                                                <!-- /ko -->
-                                            <!-- /ko -->
-                                        </ul>
-                                    </li>
+                                            </ul>
+                                        </li>
+                                    <!-- /ko -->
                                 <!-- /ko -->
-                            <!-- /ko -->
 
-                            <!-- ko foreach: { data: getDocuments(null), beforeRemove: $root.tableRowBeforeRemove } -->
-                                <!-- ko if: $root.isDocumentVisible($data.id) -->
-                                    <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                <!-- ko foreach: { data: getDocuments(null), beforeRemove: $root.tableRowBeforeRemove } -->
+                                    <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                        <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                    <!-- /ko -->
                                 <!-- /ko -->
-                            <!-- /ko -->
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

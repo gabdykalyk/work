@@ -386,73 +386,74 @@
         </div>
 
         <div class="hat-scaffold__body">
-            <div class="hat-scaffold__content-wrapper">
-                <div class="legal-entities__content" data-bind="childrenComplete: onInit">
-                    <div class="hat-scaffold__head">
-                        <h1>Юридические лица</h1>
-                    </div>
+            <div class="hat-scaffold__body-content">
+                <div class="hat-scaffold__content-wrapper">
+                    <div class="legal-entities__content" data-bind="childrenComplete: onInit">
+                        <div class="hat-scaffold__head">
+                            <h1>Юридические лица</h1>
+                        </div>
 
-                    <div class="legal-entities__sub-header">
-                        <div class="form-group legal-entities__search search-global search-global--empty">
-                            <input class="form-control" placeholder="Поиск по названию" data-bind="textInput: searchValue">
+                        <div class="legal-entities__sub-header">
+                            <div class="form-group legal-entities__search search-global search-global--empty">
+                                <input class="form-control" placeholder="Поиск по названию" data-bind="textInput: searchValue">
 
-                            <button type="button" class="btn btn-default search-global__search-clear-button"
-                                    title="Удалить">
-                                <i class="far fa-times"></i>
+                                <button type="button" class="btn btn-default search-global__search-clear-button"
+                                        title="Удалить">
+                                    <i class="far fa-times"></i>
+                                </button>
+                            </div>
+
+                            <button class="btn btn-success btn-p25 legal-entities__add-button">
+                                Добавить юр. лицо
                             </button>
                         </div>
 
-                        <button class="btn btn-success btn-p25 legal-entities__add-button">
-                            Добавить юр. лицо
-                        </button>
-                    </div>
+                        <div class="legal-entities__page-size-selector">
+                            Показать на странице:
+                            <a class="legal-entities__page-size-selector-item legal-entities__page-size-selector-item--active" href="#">20</a>
+                            <a class="legal-entities__page-size-selector-item" href="#">40</a>
+                            <a class="legal-entities__page-size-selector-item" href="#">60</a>
+                            <a class="legal-entities__page-size-selector-item" href="#">Все</a>
+                        </div>
 
-                    <div class="legal-entities__page-size-selector">
-                        Показать на странице:
-                        <a class="legal-entities__page-size-selector-item legal-entities__page-size-selector-item--active" href="#">20</a>
-                        <a class="legal-entities__page-size-selector-item" href="#">40</a>
-                        <a class="legal-entities__page-size-selector-item" href="#">60</a>
-                        <a class="legal-entities__page-size-selector-item" href="#">Все</a>
-                    </div>
+                        <div class="legal-entities__table">
+                            <div class="legal-entities__table-head">
+                                <div class="legal-entities__table-head-row">
+                                    <div class="legal-entities__table-head-cell legal-entities__table-name-head-cell">
+                                        Наименование юр. лица
+                                    </div>
 
-                    <div class="legal-entities__table">
-                        <div class="legal-entities__table-head">
-                            <div class="legal-entities__table-head-row">
-                                <div class="legal-entities__table-head-cell legal-entities__table-name-head-cell">
-                                    Наименование юр. лица
+                                    <div class="legal-entities__table-head-cell legal-entities__table-actions-head-cell"></div>
                                 </div>
+                            </div>
 
-                                <div class="legal-entities__table-head-cell legal-entities__table-actions-head-cell"></div>
+                            <div class="legal-entities__table-body">
+                                <!-- ko foreach: { data: legalEntities, beforeRemove: tableRowBeforeRemove } -->
+                                    <!-- ko if: $root.isVisible($data.id) -->
+                                        <div class="legal-entities__table-row">
+                                            <div class="legal-entities__table-cell legal-entities__table-name-cell">
+                                                <span class="legal-entities__table-name" data-bind="text: name"></span>
+                                            </div>
+
+                                            <div class="legal-entities__table-cell legal-entities__table-actions-cell">
+                                                <a type="button" class="btn btn-default btn-w-30 legal-entities__table-row-edit-button"
+                                                        title="Редактировать" href="#">
+                                                    <i class="far fa-pencil"></i>
+                                                </a>
+
+                                                <button type="button" class="btn btn-default btn-w-30 legal-entities__table-row-remove-button"
+                                                        title="Удалить" data-bind="click: function() { $root.remove($data.id); }">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    <!-- /ko -->
+                                <!-- /ko -->
                             </div>
                         </div>
 
-                        <div class="legal-entities__table-body">
-                            <!-- ko foreach: { data: legalEntities, beforeRemove: tableRowBeforeRemove } -->
-                                <!-- ko if: $root.isVisible($data.id) -->
-                                    <div class="legal-entities__table-row">
-                                        <div class="legal-entities__table-cell legal-entities__table-name-cell">
-                                            <span class="legal-entities__table-name" data-bind="text: name"></span>
-                                        </div>
-
-                                        <div class="legal-entities__table-cell legal-entities__table-actions-cell">
-                                            <a type="button" class="btn btn-default btn-w-30 legal-entities__table-row-edit-button"
-                                                    title="Редактировать" href="#">
-                                                <i class="far fa-pencil"></i>
-                                            </a>
-
-                                            <button type="button" class="btn btn-default btn-w-30 legal-entities__table-row-remove-button"
-                                                    title="Удалить" data-bind="click: function() { $root.remove($data.id); }">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                <!-- /ko -->
-                            <!-- /ko -->
-                        </div>
-                    </div>
-
-                    <div class="legal-entities__pagination-wrapper">
-                        <div class="row hidden-xs">
+                        <div class="legal-entities__pagination-wrapper">
+                            <div class="row hidden-xs">
     <div class="col-lg-6 col-md-6 col-sm-6">
         <div class="showed-text">
             Показаны записи <b>1-10</b> из <b>85</b>
@@ -482,6 +483,7 @@
         </nav>
     </div>
 </div>
+                        </div>
                     </div>
                 </div>
             </div>

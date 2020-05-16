@@ -19,106 +19,108 @@
         </div>
 
         <div class="hat-scaffold__body">
-            <div class="hat-scaffold__content-wrapper">
-                <div class="law-statuses__content" data-bind="childrenComplete: onInit">
-                    <div class="law-statuses__header">
-                        <h1>Правовые статусы</h1>
-                    </div>
-
-                    <div class="law-statuses__sub-header">
-                        <div class="form-group law-statuses__search search-global search-global--empty">
-                            <input class="form-control" placeholder="Поиск" data-bind="textInput: searchValue">
-
-                            <button type="button" class="btn btn-default search-global__search-clear-button"
-                                    title="Удалить">
-                                <i class="far fa-times"></i>
-                            </button>
+            <div class="hat-scaffold__body-content">
+                <div class="hat-scaffold__content-wrapper">
+                    <div class="law-statuses__content" data-bind="childrenComplete: onInit">
+                        <div class="law-statuses__header">
+                            <h1>Правовые статусы</h1>
                         </div>
 
-                        <button class="btn btn-primary btn-p25 law-statuses__add-button">Добавить статус</button>
-                    </div>
+                        <div class="law-statuses__sub-header">
+                            <div class="form-group law-statuses__search search-global search-global--empty">
+                                <input class="form-control" placeholder="Поиск" data-bind="textInput: searchValue">
 
-                    <div class="law-statuses__table">
-                        <div class="law-statuses__table-head">
-                            <div class="law-statuses__table-head-row">
-                                <div class="law-statuses__table-head-cell law-statuses__table-name-head-cell">
-                                    Название
-                                </div>
-
-                                <div class="law-statuses__table-head-cell law-statuses__table-citizenship-head-cell">
-                                    Гражданство
-                                </div>
-
-                                <div class="law-statuses__table-head-cell law-statuses__table-actions-head-cell"></div>
+                                <button type="button" class="btn btn-default search-global__search-clear-button"
+                                        title="Удалить">
+                                    <i class="far fa-times"></i>
+                                </button>
                             </div>
+
+                            <button class="btn btn-primary btn-p25 law-statuses__add-button">Добавить статус</button>
                         </div>
 
-                        <ul class="law-statuses__table-body" data-bind="documentsSortable: true, documentsSortableStatusSort: statusSort, documentsSortableDocumentSort: documentSort">
-                            <!-- ko foreach: { data: statuses, beforeRemove: tableRowBeforeRemove } -->
-                                <!-- ko if: $root.isStatusVisible($data.id) -->
-                                  <li
-                                      class="law-statuses__table-row law-statuses__table-status-row"
-                                      data-bind="
-                                          css: {
-                                              'law-statuses__table-status-row--empty': !$root.hasDocuments($data.id),
-                                              'law-statuses__table-status-row--last': $index() === $root.statuses().length - 1 && $root.getDocuments(null).length > 0
-                                          },
-                                          attr: {
-                                              'data-documents-status-id': id
-                                          }
-                                      "
-                                  >
-                                    <div class="law-statuses__table-row-header">
-                                        <div class="law-statuses__table-cell law-statuses__table-name-cell">
-                                            <div class="law-statuses__table-status-row-toggle" data-bind="click: function() { $root.toggleStatus($data.id); }">
-                                                <!-- ko if: $root.hasDocuments($data.id) -->
-                                                    <!-- ko if: $root.isStatusOpen($data.id) -->
-                                                    <i class="fa fa-chevron-circle-up"></i>
-                                                    <!-- /ko -->
+                        <div class="law-statuses__table">
+                            <div class="law-statuses__table-head">
+                                <div class="law-statuses__table-head-row">
+                                    <div class="law-statuses__table-head-cell law-statuses__table-name-head-cell">
+                                        Название
+                                    </div>
 
-                                                    <!-- ko if: !$root.isStatusOpen($data.id) -->
-                                                    <i class="fa fa-chevron-circle-down"></i>
+                                    <div class="law-statuses__table-head-cell law-statuses__table-citizenship-head-cell">
+                                        Гражданство
+                                    </div>
+
+                                    <div class="law-statuses__table-head-cell law-statuses__table-actions-head-cell"></div>
+                                </div>
+                            </div>
+
+                            <ul class="law-statuses__table-body" data-bind="documentsSortable: true, documentsSortableStatusSort: statusSort, documentsSortableDocumentSort: documentSort">
+                                <!-- ko foreach: { data: statuses, beforeRemove: tableRowBeforeRemove } -->
+                                    <!-- ko if: $root.isStatusVisible($data.id) -->
+                                      <li
+                                          class="law-statuses__table-row law-statuses__table-status-row"
+                                          data-bind="
+                                              css: {
+                                                  'law-statuses__table-status-row--empty': !$root.hasDocuments($data.id),
+                                                  'law-statuses__table-status-row--last': $index() === $root.statuses().length - 1 && $root.getDocuments(null).length > 0
+                                              },
+                                              attr: {
+                                                  'data-documents-status-id': id
+                                              }
+                                          "
+                                      >
+                                        <div class="law-statuses__table-row-header">
+                                            <div class="law-statuses__table-cell law-statuses__table-name-cell">
+                                                <div class="law-statuses__table-status-row-toggle" data-bind="click: function() { $root.toggleStatus($data.id); }">
+                                                    <!-- ko if: $root.hasDocuments($data.id) -->
+                                                        <!-- ko if: $root.isStatusOpen($data.id) -->
+                                                        <i class="fa fa-chevron-circle-up"></i>
+                                                        <!-- /ko -->
+
+                                                        <!-- ko if: !$root.isStatusOpen($data.id) -->
+                                                        <i class="fa fa-chevron-circle-down"></i>
+                                                        <!-- /ko -->
                                                     <!-- /ko -->
+                                                    <span class="law-statuses__table-name" data-bind="text: name()"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="law-statuses__table-cell law-statuses__table-citizenship-cell">
+                                                <!-- ko text: citizenship().length > 0 ? citizenship() : '-' -->
                                                 <!-- /ko -->
-                                                <span class="law-statuses__table-name" data-bind="text: name()"></span>
+                                            </div>
+
+                                            <div class="law-statuses__table-cell law-statuses__table-actions-cell">
+                                                <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-edit-button"
+                                                        title="Редактировать">
+                                                    <i class="far fa-pencil"></i>
+                                                </button>
+
+                                                <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-remove-button"
+                                                        title="Удалить" data-bind="click: function() {$root.removeStatus($data.id);}">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
                                         </div>
 
-                                        <div class="law-statuses__table-cell law-statuses__table-citizenship-cell">
-                                            <!-- ko text: citizenship().length > 0 ? citizenship() : '-' -->
+                                        <ul class="law-statuses__table-row-content" data-bind="documentsTypeOpen: $root.isStatusDocumentsVisible($data.id)">
+                                            <!-- ko foreach: { data: $root.getDocuments($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
+                                                <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                                    <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                                <!-- /ko -->
                                             <!-- /ko -->
-                                        </div>
-
-                                        <div class="law-statuses__table-cell law-statuses__table-actions-cell">
-                                            <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-edit-button"
-                                                    title="Редактировать">
-                                                <i class="far fa-pencil"></i>
-                                            </button>
-
-                                            <button type="button" class="btn btn-default btn-w-30 law-statuses__table-row-remove-button"
-                                                    title="Удалить" data-bind="click: function() {$root.removeStatus($data.id);}">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <ul class="law-statuses__table-row-content" data-bind="documentsTypeOpen: $root.isStatusDocumentsVisible($data.id)">
-                                        <!-- ko foreach: { data: $root.getDocuments($data.id), beforeRemove: $root.tableRowBeforeRemove } -->
-                                            <!-- ko if: $root.isDocumentVisible($data.id) -->
-                                                <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
-                                            <!-- /ko -->
-                                        <!-- /ko -->
-                                    </ul>
-                                </li>
+                                        </ul>
+                                    </li>
+                                    <!-- /ko -->
                                 <!-- /ko -->
-                            <!-- /ko -->
 
-                            <!-- ko foreach: { data: getDocuments(null), beforeRemove: $root.tableRowBeforeRemove } -->
-                                <!-- ko if: $root.isDocumentVisible($data.id) -->
-                                    <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                <!-- ko foreach: { data: getDocuments(null), beforeRemove: $root.tableRowBeforeRemove } -->
+                                    <!-- ko if: $root.isDocumentVisible($data.id) -->
+                                        <!-- ko template: { name: 'table-document-row-template', data: $data } --><!-- /ko -->
+                                    <!-- /ko -->
                                 <!-- /ko -->
-                            <!-- /ko -->
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

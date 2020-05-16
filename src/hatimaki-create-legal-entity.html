@@ -19,445 +19,447 @@
         </div>
 
         <div class="hat-scaffold__body">
-            <div class="hat-scaffold__content-wrapper">
-                <div class="create-legal-entity__content" data-bind="childrenComplete: onInit">
-                    <div class="hat-scaffold__head">
-                        <h1>Создание юр. лица</h1>
+            <div class="hat-scaffold__body-content">
+                <div class="hat-scaffold__content-wrapper">
+                    <div class="create-legal-entity__content" data-bind="childrenComplete: onInit">
+                        <div class="hat-scaffold__head">
+                            <h1>Создание юр. лица</h1>
 
-                        <div class="spacer"></div>
+                            <div class="spacer"></div>
 
-                        <button class="btn btn-default btn-p25">
-                            К списку юр. лиц
-                        </button>
-                    </div>
+                            <button class="btn btn-default btn-p25">
+                                К списку юр. лиц
+                            </button>
+                        </div>
 
 
-                    <div class="create-legal-entity__tab-group">
-                        <ul class="nav nav-tabs" role="tablist" data-bind="element: navElement">
-                            <li role="presentation" class="active">
-                                <a href="#contacts" aria-controls="contacts" role="tab" data-toggle="tab">
-                                    1. Контакты и реквизиты
-                                </a>
-                            </li>
-                            <li role="presentation" data-bind="css: { 'disabled': !contactsFormModel.isValid() }">
-                                <a href="#bills" aria-controls="bills" role="tab"
-                                   data-bind="attr: { 'data-toggle': contactsFormModel.isValid() ? 'tab' : undefined }">
-                                    2. Счета
-                                </a>
-                            </li>
-                            <li role="presentation" data-bind="css: { 'disabled': !(contactsFormModel.isValid() && billsFormModel.isValid()) }">
-                                <a href="#persons-in-charge" aria-controls="persons-in-charge" role="tab"
-                                    data-bind="attr: { 'data-toggle': contactsFormModel.isValid() && billsFormModel.isValid() ? 'tab' : undefined }">
-                                    3. Ответственные лица
-                                </a>
-                            </li>
-                        </ul>
+                        <div class="create-legal-entity__tab-group">
+                            <ul class="nav nav-tabs" role="tablist" data-bind="element: navElement">
+                                <li role="presentation" class="active">
+                                    <a href="#contacts" aria-controls="contacts" role="tab" data-toggle="tab">
+                                        1. Контакты и реквизиты
+                                    </a>
+                                </li>
+                                <li role="presentation" data-bind="css: { 'disabled': !contactsFormModel.isValid() }">
+                                    <a href="#bills" aria-controls="bills" role="tab"
+                                       data-bind="attr: { 'data-toggle': contactsFormModel.isValid() ? 'tab' : undefined }">
+                                        2. Счета
+                                    </a>
+                                </li>
+                                <li role="presentation" data-bind="css: { 'disabled': !(contactsFormModel.isValid() && billsFormModel.isValid()) }">
+                                    <a href="#persons-in-charge" aria-controls="persons-in-charge" role="tab"
+                                        data-bind="attr: { 'data-toggle': contactsFormModel.isValid() && billsFormModel.isValid() ? 'tab' : undefined }">
+                                        3. Ответственные лица
+                                    </a>
+                                </li>
+                            </ul>
 
-                        <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane fade in active" id="contacts"
-                                 data-bind="using: contactsFormModel()">
-                                <div class="row create-legal-entity__row">
-                                    <div class="col-xs-12">
-                                        <div class="form-group">
-                                            <div class="btn-group " role="group">
-                                                <button type="button" class="btn btn-default"
-                                                    data-bind="click: function () { $root.type(0); }, css: { 'active': $root.type() === 0 }">
-                                                    ИП
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane fade in active" id="contacts"
+                                     data-bind="using: contactsFormModel()">
+                                    <div class="row create-legal-entity__row">
+                                        <div class="col-xs-12">
+                                            <div class="form-group">
+                                                <div class="btn-group " role="group">
+                                                    <button type="button" class="btn btn-default"
+                                                        data-bind="click: function () { $root.type(0); }, css: { 'active': $root.type() === 0 }">
+                                                        ИП
+                                                    </button>
+                                                    <button type="button" class="btn btn-default"
+                                                        data-bind="click: function () { $root.type(1); }, css: { 'active': $root.type() === 1 }">
+                                                        ООО
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- ko if: $root.type() === 0 -->
+                                            <div class="col-xs-12">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !shortName.isValid() }">
+                                                    <label for="shortName">Краткое наименование</label>
+                                                    <div class="input-group create-legal-entity__name-input-group create-legal-entity__individual-name-input-group">
+                                                        <div class="input-group-addon">ИП</div>
+                                                        <input class="form-control" id="shortName" data-bind="textInput: shortName">
+                                                    </div>
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !shortName.isValid() -->
+                                                        <span class="help-block" data-bind="text: shortName.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-12">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !fullName.isValid() }">
+                                                    <label for="fullName">Полное наименование</label>
+                                                    <div class="input-group create-legal-entity__name-input-group create-legal-entity__individual-name-input-group">
+                                                        <div class="input-group-addon">ИП</div>
+                                                        <input class="form-control" id="fullName" data-bind="textInput: fullName">
+                                                    </div>
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !fullName.isValid() -->
+                                                        <span class="help-block" data-bind="text: fullName.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-12">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !placeOfRegistration.isValid() }">
+                                                    <label for="placeOfRegistration">Место регистрации</label>
+                                                    <input class="form-control" id="placeOfRegistration" data-bind="textInput: placeOfRegistration">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !placeOfRegistration.isValid() -->
+                                                        <span class="help-block" data-bind="text: placeOfRegistration.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !phone.isValid() }">
+                                                    <label for="phone">Телефон</label>
+                                                    <input class="form-control" id="phone" data-bind="textInput: phone, mask, maskPattern: '8 (999) 9999-99-99'">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !phone.isValid() -->
+                                                        <span class="help-block" data-bind="text: phone.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !fax.isValid() }">
+                                                    <label for="fax">Факс</label>
+                                                    <input class="form-control" id="fax" data-bind="textInput: fax">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !fax.isValid() -->
+                                                        <span class="help-block" data-bind="text: fax.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !email.isValid() }">
+                                                    <label for="email">Email</label>
+                                                    <input class="form-control" id="email" data-bind="textInput: email">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !email.isValid() -->
+                                                        <span class="help-block" data-bind="text: email.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !individualInn.isValid() }">
+                                                    <label for="individualInn">ИНН физ. лица</label>
+                                                    <input class="form-control" id="individualInn" data-bind="textInput: individualInn, mask, maskPattern: '9', maskRepeat: '*'">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !individualInn.isValid() -->
+                                                        <span class="help-block" data-bind="text: individualInn.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-5">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !ogrnip.isValid() }">
+                                                    <label for="ogrnip">ОГРНИП</label>
+                                                    <input class="form-control" id="ogrnip" data-bind="textInput: ogrnip, mask, maskPattern: '9', maskRepeat: '*'">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !ogrnip.isValid() -->
+                                                        <span class="help-block" data-bind="text: ogrnip.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !birthday.isValid() }">
+                                                    <label for="birthday">Дата рождения</label>
+                                                    <div class="input-group create-legal-entity__datepicker datepicker" data-bind="datetimepicker">
+                                                        <input type="text" class="form-control periodDateInput" id="birthday" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10"
+                                                            data-bind="textInput: birthday, mask, maskPattern: '99.99.9999'">
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                                                        </span>
+                                                    </div>
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !birthday.isValid() -->
+                                                        <span class="help-block" data-bind="text: birthday.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-8">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !placeOfBirth.isValid() }">
+                                                    <label for="placeOfBirth">Место рождения</label>
+                                                    <input class="form-control" id="placeOfBirth" data-bind="textInput: placeOfBirth">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !placeOfBirth.isValid() -->
+                                                        <span class="help-block" data-bind="text: placeOfBirth.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !passport.isValid() }">
+                                                    <label for="passport">Паспорт</label>
+                                                    <input class="form-control" id="passport" data-bind="textInput: passport, mask, maskPattern: '9999 999999'">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !passport.isValid() -->
+                                                        <span class="help-block" data-bind="text: passport.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !passportIssuedAt.isValid() }">
+                                                    <label for="passportIssuedAt">Дата выдачи паспорта</label>
+                                                    <div class="input-group create-legal-entity__datepicker datepicker" data-bind="datetimepicker">
+                                                        <input type="text" class="form-control periodDateInput" id="passportIssuedAt" value="01.01.2002" name="fromdate" placeholder="00.00.0000" maxlength="10"
+                                                            data-bind="textInput: passportIssuedAt, mask, maskPattern: '99.99.9999'">
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
+                                                        </span>
+                                                    </div>
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !passportIssuedAt.isValid() -->
+                                                        <span class="help-block" data-bind="text: passportIssuedAt.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-8">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !passportIssuedByName.isValid() }">
+                                                    <label for="passportIssuedByName">Орган, выдавший паспорт</label>
+                                                    <input class="form-control" id="passportIssuedByName" data-bind="textInput: passportIssuedByName">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !passportIssuedByName.isValid() -->
+                                                        <span class="help-block" data-bind="text: passportIssuedByName.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !passportIssuedByCode.isValid() }">
+                                                    <label for="passportIssuedByCode">Код подразделения</label>
+                                                    <input class="form-control" id="passportIssuedByCode" data-bind="textInput: passportIssuedByCode">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !passportIssuedByCode.isValid() -->
+                                                        <span class="help-block" data-bind="text: passportIssuedByCode.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+
+                                        <!-- ko if: $root.type() === 1 -->
+                                            <div class="col-xs-12">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !shortName.isValid() }">
+                                                    <label for="shortName">Краткое наименование организации</label>
+                                                    <div class="input-group create-legal-entity__name-input-group create-legal-entity__ltd-name-input-group">
+                                                        <div class="input-group-addon">ООО</div>
+                                                        <input class="form-control" id="shortName" data-bind="textInput: shortName">
+                                                    </div>
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !shortName.isValid() -->
+                                                        <span class="help-block" data-bind="text: shortName.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-12">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !fullName.isValid() }">
+                                                    <label for="fullName">Полное наименование организации</label>
+                                                    <div class="input-group create-legal-entity__name-input-group create-legal-entity__ltd-name-input-group">
+                                                        <div class="input-group-addon">ООО</div>
+                                                        <input class="form-control" id="fullName" data-bind="textInput: fullName">
+                                                    </div>
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !fullName.isValid() -->
+                                                        <span class="help-block" data-bind="text: fullName.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-12">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !legalAddress.isValid() }">
+                                                    <label for="legalAddress">Юридический адрес</label>
+                                                    <input class="form-control" id="legalAddress" data-bind="textInput: legalAddress">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !legalAddress.isValid() -->
+                                                        <span class="help-block" data-bind="text: legalAddress.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-12">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !mailingAddress.isValid() }">
+                                                    <label for="mailingAddress">Почтовый адрес</label>
+                                                    <input class="form-control" id="mailingAddress" data-bind="textInput: mailingAddress">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !mailingAddress.isValid() -->
+                                                        <span class="help-block" data-bind="text: mailingAddress.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !phone.isValid() }">
+                                                    <label for="phone">Телефон</label>
+                                                    <input class="form-control" id="phone" data-bind="textInput: phone, mask, maskPattern: '8 (999) 9999-99-99'">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !phone.isValid() -->
+                                                        <span class="help-block" data-bind="text: phone.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !fax.isValid() }">
+                                                    <label for="fax">Факс</label>
+                                                    <input class="form-control" id="fax" data-bind="textInput: fax">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !fax.isValid() -->
+                                                        <span class="help-block" data-bind="text: fax.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-6 col-md-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !email.isValid() }">
+                                                    <label for="email">Email</label>
+                                                    <input class="form-control" id="email" data-bind="textInput: email">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !email.isValid() -->
+                                                        <span class="help-block" data-bind="text: email.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !ltdInn.isValid() }">
+                                                    <label for="ltdInn">ИНН юр. лица</label>
+                                                    <input class="form-control" id="ltdInn" data-bind="textInput: ltdInn, mask, maskPattern: '9', maskRepeat: '*'">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !ltdInn.isValid() -->
+                                                        <span class="help-block" data-bind="text: ltdInn.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-3 col-md-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !kpp.isValid() }">
+                                                    <label for="kpp">КПП</label>
+                                                    <input class="form-control" id="kpp" data-bind="textInput: kpp, mask, maskPattern: '9', maskRepeat: '*'">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !kpp.isValid() -->
+                                                        <span class="help-block" data-bind="text: kpp.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+
+                                            <div class="col-xs-4">
+                                                <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !ogrn.isValid() }">
+                                                    <label for="ogrn">ОГРН</label>
+                                                    <input class="form-control" id="ogrn" data-bind="textInput: ogrn, mask, maskPattern: '9', maskRepeat: '*'">
+                                                    <!-- ko if: $root.isContactsFormSubmitted() && !ogrn.isValid() -->
+                                                        <span class="help-block" data-bind="text: ogrn.error()"></span>
+                                                    <!-- /ko -->
+                                                </div>
+                                            </div>
+                                        <!-- /ko -->
+
+                                        <div class="col-xs-12">
+                                            <div class="create-legal-entity__actions">
+                                                <button class="btn btn-success btn-p25" data-bind="click: function () { $root.submitContactsForm(); }">
+                                                    Сохранить и перейти далее
                                                 </button>
-                                                <button type="button" class="btn btn-default"
-                                                    data-bind="click: function () { $root.type(1); }, css: { 'active': $root.type() === 1 }">
-                                                    ООО
-                                                </button>
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- ko if: $root.type() === 0 -->
-                                        <div class="col-xs-12">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !shortName.isValid() }">
-                                                <label for="shortName">Краткое наименование</label>
-                                                <div class="input-group create-legal-entity__name-input-group create-legal-entity__individual-name-input-group">
-                                                    <div class="input-group-addon">ИП</div>
-                                                    <input class="form-control" id="shortName" data-bind="textInput: shortName">
-                                                </div>
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !shortName.isValid() -->
-                                                    <span class="help-block" data-bind="text: shortName.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-12">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !fullName.isValid() }">
-                                                <label for="fullName">Полное наименование</label>
-                                                <div class="input-group create-legal-entity__name-input-group create-legal-entity__individual-name-input-group">
-                                                    <div class="input-group-addon">ИП</div>
-                                                    <input class="form-control" id="fullName" data-bind="textInput: fullName">
-                                                </div>
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !fullName.isValid() -->
-                                                    <span class="help-block" data-bind="text: fullName.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-12">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !placeOfRegistration.isValid() }">
-                                                <label for="placeOfRegistration">Место регистрации</label>
-                                                <input class="form-control" id="placeOfRegistration" data-bind="textInput: placeOfRegistration">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !placeOfRegistration.isValid() -->
-                                                    <span class="help-block" data-bind="text: placeOfRegistration.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !phone.isValid() }">
-                                                <label for="phone">Телефон</label>
-                                                <input class="form-control" id="phone" data-bind="textInput: phone, mask, maskPattern: '8 (999) 9999-99-99'">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !phone.isValid() -->
-                                                    <span class="help-block" data-bind="text: phone.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !fax.isValid() }">
-                                                <label for="fax">Факс</label>
-                                                <input class="form-control" id="fax" data-bind="textInput: fax">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !fax.isValid() -->
-                                                    <span class="help-block" data-bind="text: fax.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !email.isValid() }">
-                                                <label for="email">Email</label>
-                                                <input class="form-control" id="email" data-bind="textInput: email">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !email.isValid() -->
-                                                    <span class="help-block" data-bind="text: email.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !individualInn.isValid() }">
-                                                <label for="individualInn">ИНН физ. лица</label>
-                                                <input class="form-control" id="individualInn" data-bind="textInput: individualInn, mask, maskPattern: '9', maskRepeat: '*'">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !individualInn.isValid() -->
-                                                    <span class="help-block" data-bind="text: individualInn.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-5">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !ogrnip.isValid() }">
-                                                <label for="ogrnip">ОГРНИП</label>
-                                                <input class="form-control" id="ogrnip" data-bind="textInput: ogrnip, mask, maskPattern: '9', maskRepeat: '*'">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !ogrnip.isValid() -->
-                                                    <span class="help-block" data-bind="text: ogrnip.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !birthday.isValid() }">
-                                                <label for="birthday">Дата рождения</label>
-                                                <div class="input-group create-legal-entity__datepicker datepicker" data-bind="datetimepicker">
-                                                    <input type="text" class="form-control periodDateInput" id="birthday" value="01.01.1995" name="fromdate" placeholder="00.00.0000" maxlength="10"
-                                                        data-bind="textInput: birthday, mask, maskPattern: '99.99.9999'">
-                                                    <span class="input-group-btn">
-                                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
-                                                    </span>
-                                                </div>
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !birthday.isValid() -->
-                                                    <span class="help-block" data-bind="text: birthday.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-8">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !placeOfBirth.isValid() }">
-                                                <label for="placeOfBirth">Место рождения</label>
-                                                <input class="form-control" id="placeOfBirth" data-bind="textInput: placeOfBirth">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !placeOfBirth.isValid() -->
-                                                    <span class="help-block" data-bind="text: placeOfBirth.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !passport.isValid() }">
-                                                <label for="passport">Паспорт</label>
-                                                <input class="form-control" id="passport" data-bind="textInput: passport, mask, maskPattern: '9999 999999'">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !passport.isValid() -->
-                                                    <span class="help-block" data-bind="text: passport.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !passportIssuedAt.isValid() }">
-                                                <label for="passportIssuedAt">Дата выдачи паспорта</label>
-                                                <div class="input-group create-legal-entity__datepicker datepicker" data-bind="datetimepicker">
-                                                    <input type="text" class="form-control periodDateInput" id="passportIssuedAt" value="01.01.2002" name="fromdate" placeholder="00.00.0000" maxlength="10"
-                                                        data-bind="textInput: passportIssuedAt, mask, maskPattern: '99.99.9999'">
-                                                    <span class="input-group-btn">
-                                                        <button class="btn btn-default" type="button"><i class="fas fa-calendar-alt"></i></button>
-                                                    </span>
-                                                </div>
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !passportIssuedAt.isValid() -->
-                                                    <span class="help-block" data-bind="text: passportIssuedAt.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-8">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !passportIssuedByName.isValid() }">
-                                                <label for="passportIssuedByName">Орган, выдавший паспорт</label>
-                                                <input class="form-control" id="passportIssuedByName" data-bind="textInput: passportIssuedByName">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !passportIssuedByName.isValid() -->
-                                                    <span class="help-block" data-bind="text: passportIssuedByName.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !passportIssuedByCode.isValid() }">
-                                                <label for="passportIssuedByCode">Код подразделения</label>
-                                                <input class="form-control" id="passportIssuedByCode" data-bind="textInput: passportIssuedByCode">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !passportIssuedByCode.isValid() -->
-                                                    <span class="help-block" data-bind="text: passportIssuedByCode.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-                                    <!-- /ko -->
-
-                                    <!-- ko if: $root.type() === 1 -->
-                                        <div class="col-xs-12">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !shortName.isValid() }">
-                                                <label for="shortName">Краткое наименование организации</label>
-                                                <div class="input-group create-legal-entity__name-input-group create-legal-entity__ltd-name-input-group">
-                                                    <div class="input-group-addon">ООО</div>
-                                                    <input class="form-control" id="shortName" data-bind="textInput: shortName">
-                                                </div>
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !shortName.isValid() -->
-                                                    <span class="help-block" data-bind="text: shortName.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-12">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !fullName.isValid() }">
-                                                <label for="fullName">Полное наименование организации</label>
-                                                <div class="input-group create-legal-entity__name-input-group create-legal-entity__ltd-name-input-group">
-                                                    <div class="input-group-addon">ООО</div>
-                                                    <input class="form-control" id="fullName" data-bind="textInput: fullName">
-                                                </div>
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !fullName.isValid() -->
-                                                    <span class="help-block" data-bind="text: fullName.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-12">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !legalAddress.isValid() }">
-                                                <label for="legalAddress">Юридический адрес</label>
-                                                <input class="form-control" id="legalAddress" data-bind="textInput: legalAddress">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !legalAddress.isValid() -->
-                                                    <span class="help-block" data-bind="text: legalAddress.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-12">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !mailingAddress.isValid() }">
-                                                <label for="mailingAddress">Почтовый адрес</label>
-                                                <input class="form-control" id="mailingAddress" data-bind="textInput: mailingAddress">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !mailingAddress.isValid() -->
-                                                    <span class="help-block" data-bind="text: mailingAddress.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-3 col-md-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !phone.isValid() }">
-                                                <label for="phone">Телефон</label>
-                                                <input class="form-control" id="phone" data-bind="textInput: phone, mask, maskPattern: '8 (999) 9999-99-99'">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !phone.isValid() -->
-                                                    <span class="help-block" data-bind="text: phone.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-3 col-md-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !fax.isValid() }">
-                                                <label for="fax">Факс</label>
-                                                <input class="form-control" id="fax" data-bind="textInput: fax">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !fax.isValid() -->
-                                                    <span class="help-block" data-bind="text: fax.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-6 col-md-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !email.isValid() }">
-                                                <label for="email">Email</label>
-                                                <input class="form-control" id="email" data-bind="textInput: email">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !email.isValid() -->
-                                                    <span class="help-block" data-bind="text: email.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-3 col-md-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !ltdInn.isValid() }">
-                                                <label for="ltdInn">ИНН юр. лица</label>
-                                                <input class="form-control" id="ltdInn" data-bind="textInput: ltdInn, mask, maskPattern: '9', maskRepeat: '*'">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !ltdInn.isValid() -->
-                                                    <span class="help-block" data-bind="text: ltdInn.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-3 col-md-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !kpp.isValid() }">
-                                                <label for="kpp">КПП</label>
-                                                <input class="form-control" id="kpp" data-bind="textInput: kpp, mask, maskPattern: '9', maskRepeat: '*'">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !kpp.isValid() -->
-                                                    <span class="help-block" data-bind="text: kpp.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-
-                                        <div class="col-xs-4">
-                                            <div class="form-group" data-bind="css: { 'has-error': $root.isContactsFormSubmitted() && !ogrn.isValid() }">
-                                                <label for="ogrn">ОГРН</label>
-                                                <input class="form-control" id="ogrn" data-bind="textInput: ogrn, mask, maskPattern: '9', maskRepeat: '*'">
-                                                <!-- ko if: $root.isContactsFormSubmitted() && !ogrn.isValid() -->
-                                                    <span class="help-block" data-bind="text: ogrn.error()"></span>
-                                                <!-- /ko -->
-                                            </div>
-                                        </div>
-                                    <!-- /ko -->
-
-                                    <div class="col-xs-12">
-                                        <div class="create-legal-entity__actions">
-                                            <button class="btn btn-success btn-p25" data-bind="click: function () { $root.submitContactsForm(); }">
-                                                Сохранить и перейти далее
-                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div role="tabpanel" class="tab-pane fade" id="bills" data-bind="using: billsFormModel()">
-                                <div class="row create-legal-entity__row">
-                                    <div class="col-xs-4 col-md-5">
-                                        <div class="form-group" data-bind="css: { 'has-error': $root.isBillsFormSubmitted() && !paymentAccount.isValid() }">
-                                            <label for="paymentAccount">Р/с</label>
-                                            <input class="form-control" id="paymentAccount" data-bind="textInput: paymentAccount, mask, maskPattern: '9', maskRepeat: '*'">
-                                            <!-- ko if: $root.isBillsFormSubmitted() && !paymentAccount.isValid() -->
-                                                <span class="help-block" data-bind="text: paymentAccount.error()"></span>
-                                            <!-- /ko -->
+                                <div role="tabpanel" class="tab-pane fade" id="bills" data-bind="using: billsFormModel()">
+                                    <div class="row create-legal-entity__row">
+                                        <div class="col-xs-4 col-md-5">
+                                            <div class="form-group" data-bind="css: { 'has-error': $root.isBillsFormSubmitted() && !paymentAccount.isValid() }">
+                                                <label for="paymentAccount">Р/с</label>
+                                                <input class="form-control" id="paymentAccount" data-bind="textInput: paymentAccount, mask, maskPattern: '9', maskRepeat: '*'">
+                                                <!-- ko if: $root.isBillsFormSubmitted() && !paymentAccount.isValid() -->
+                                                    <span class="help-block" data-bind="text: paymentAccount.error()"></span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-xs-6 col-md-7">
-                                        <div class="form-group" data-bind="css: { 'has-error': $root.isBillsFormSubmitted() && !bank.isValid() }">
-                                            <label for="bank">Банк</label>
-                                            <input class="form-control" id="bank" data-bind="textInput: bank">
-                                            <!-- ko if: $root.isBillsFormSubmitted() && !bank.isValid() -->
-                                                <span class="help-block" data-bind="text: bank.error()"></span>
-                                            <!-- /ko -->
+                                        <div class="col-xs-6 col-md-7">
+                                            <div class="form-group" data-bind="css: { 'has-error': $root.isBillsFormSubmitted() && !bank.isValid() }">
+                                                <label for="bank">Банк</label>
+                                                <input class="form-control" id="bank" data-bind="textInput: bank">
+                                                <!-- ko if: $root.isBillsFormSubmitted() && !bank.isValid() -->
+                                                    <span class="help-block" data-bind="text: bank.error()"></span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-xs-4 col-md-5">
-                                        <div class="form-group" data-bind="css: { 'has-error': $root.isBillsFormSubmitted() && !correspondentAccount.isValid() }">
-                                            <label for="correspondentAccount">К/с</label>
-                                            <input class="form-control" id="correspondentAccount" data-bind="textInput: correspondentAccount, mask, maskPattern: '9', maskRepeat: '*'">
-                                            <!-- ko if: $root.isBillsFormSubmitted() && !correspondentAccount.isValid() -->
-                                                <span class="help-block" data-bind="text: correspondentAccount.error()"></span>
-                                            <!-- /ko -->
+                                        <div class="col-xs-4 col-md-5">
+                                            <div class="form-group" data-bind="css: { 'has-error': $root.isBillsFormSubmitted() && !correspondentAccount.isValid() }">
+                                                <label for="correspondentAccount">К/с</label>
+                                                <input class="form-control" id="correspondentAccount" data-bind="textInput: correspondentAccount, mask, maskPattern: '9', maskRepeat: '*'">
+                                                <!-- ko if: $root.isBillsFormSubmitted() && !correspondentAccount.isValid() -->
+                                                    <span class="help-block" data-bind="text: correspondentAccount.error()"></span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-xs-3 col-md-3">
-                                        <div class="form-group" data-bind="css: { 'has-error': $root.isBillsFormSubmitted() && !bic.isValid() }">
-                                            <label for="bic">БИК</label>
-                                            <input class="form-control" id="bic" data-bind="textInput: bic, mask, maskPattern: '9', maskRepeat: '*'">
-                                            <!-- ko if: $root.isBillsFormSubmitted() && !bic.isValid() -->
-                                                <span class="help-block" data-bind="text: bic.error()"></span>
-                                            <!-- /ko -->
+                                        <div class="col-xs-3 col-md-3">
+                                            <div class="form-group" data-bind="css: { 'has-error': $root.isBillsFormSubmitted() && !bic.isValid() }">
+                                                <label for="bic">БИК</label>
+                                                <input class="form-control" id="bic" data-bind="textInput: bic, mask, maskPattern: '9', maskRepeat: '*'">
+                                                <!-- ko if: $root.isBillsFormSubmitted() && !bic.isValid() -->
+                                                    <span class="help-block" data-bind="text: bic.error()"></span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-xs-12">
-                                        <div class="create-legal-entity__actions">
-                                            <button class="btn btn-default btn-p25" data-bind="click: function () { $root.openTab('contacts'); }">
-                                                Назад
-                                            </button>
+                                        <div class="col-xs-12">
+                                            <div class="create-legal-entity__actions">
+                                                <button class="btn btn-default btn-p25" data-bind="click: function () { $root.openTab('contacts'); }">
+                                                    Назад
+                                                </button>
 
-                                            <button class="btn btn-success btn-p25" data-bind="click: function () { $root.submitBillsForm(); }">
-                                                Сохранить и перейти далее
-                                            </button>
+                                                <button class="btn btn-success btn-p25" data-bind="click: function () { $root.submitBillsForm(); }">
+                                                    Сохранить и перейти далее
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div role="tabpanel" class="tab-pane fade" id="persons-in-charge"
-                                data-bind="using: personsInChargeFormModel()">
-                                <div class="row create-legal-entity__row">
-                                    <div class="col-xs-12 col-md-5">
-                                        <div class="form-group" data-bind="css: { 'has-error': $root.isPersonsInChargeFormSubmitted() && !authorizedPersonPosition.isValid() }">
-                                            <label for="authorizedPersonPosition">Должность уполномоченного лица</label>
-                                            <input class="form-control" id="authorizedPersonPosition" data-bind="textInput: authorizedPersonPosition">
-                                            <!-- ko if: $root.isPersonsInChargeFormSubmitted() && !authorizedPersonPosition.isValid() -->
-                                                <span class="help-block" data-bind="text: authorizedPersonPosition.error()"></span>
-                                            <!-- /ko -->
+                                <div role="tabpanel" class="tab-pane fade" id="persons-in-charge"
+                                    data-bind="using: personsInChargeFormModel()">
+                                    <div class="row create-legal-entity__row">
+                                        <div class="col-xs-12 col-md-5">
+                                            <div class="form-group" data-bind="css: { 'has-error': $root.isPersonsInChargeFormSubmitted() && !authorizedPersonPosition.isValid() }">
+                                                <label for="authorizedPersonPosition">Должность уполномоченного лица</label>
+                                                <input class="form-control" id="authorizedPersonPosition" data-bind="textInput: authorizedPersonPosition">
+                                                <!-- ko if: $root.isPersonsInChargeFormSubmitted() && !authorizedPersonPosition.isValid() -->
+                                                    <span class="help-block" data-bind="text: authorizedPersonPosition.error()"></span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="create-legal-entity__row-wrap"></div>
+                                        <div class="create-legal-entity__row-wrap"></div>
 
-                                    <div class="col-xs-6 col-md-5">
-                                        <div class="form-group" data-bind="css: { 'has-error': $root.isPersonsInChargeFormSubmitted() && !nominativeName.isValid() }">
-                                            <label for="nominativeName">ФИО в именительном падеже</label>
-                                            <input class="form-control" id="nominativeName" data-bind="textInput: nominativeName">
-                                            <!-- ko if: $root.isPersonsInChargeFormSubmitted() && !nominativeName.isValid() -->
-                                                <span class="help-block" data-bind="text: nominativeName.error()"></span>
-                                            <!-- /ko -->
+                                        <div class="col-xs-6 col-md-5">
+                                            <div class="form-group" data-bind="css: { 'has-error': $root.isPersonsInChargeFormSubmitted() && !nominativeName.isValid() }">
+                                                <label for="nominativeName">ФИО в именительном падеже</label>
+                                                <input class="form-control" id="nominativeName" data-bind="textInput: nominativeName">
+                                                <!-- ko if: $root.isPersonsInChargeFormSubmitted() && !nominativeName.isValid() -->
+                                                    <span class="help-block" data-bind="text: nominativeName.error()"></span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-xs-6 col-md-7">
-                                        <div class="form-group" data-bind="css: { 'has-error': $root.isPersonsInChargeFormSubmitted() && !genitiveName.isValid() }">
-                                            <label for="genitiveName">ФИО в родительном падеже</label>
-                                            <input class="form-control" id="genitiveName" data-bind="textInput: genitiveName">
-                                            <!-- ko if: $root.isPersonsInChargeFormSubmitted() && !genitiveName.isValid() -->
-                                                <span class="help-block" data-bind="text: genitiveName.error()"></span>
-                                            <!-- /ko -->
+                                        <div class="col-xs-6 col-md-7">
+                                            <div class="form-group" data-bind="css: { 'has-error': $root.isPersonsInChargeFormSubmitted() && !genitiveName.isValid() }">
+                                                <label for="genitiveName">ФИО в родительном падеже</label>
+                                                <input class="form-control" id="genitiveName" data-bind="textInput: genitiveName">
+                                                <!-- ko if: $root.isPersonsInChargeFormSubmitted() && !genitiveName.isValid() -->
+                                                    <span class="help-block" data-bind="text: genitiveName.error()"></span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-xs-12">
-                                        <div class="form-group" data-bind="css: { 'has-error': $root.isPersonsInChargeFormSubmitted() && !signatoryAuthority.isValid() }">
-                                            <label for="signatoryAuthority">Основание полномочий подписанта</label>
-                                            <input class="form-control" id="signatoryAuthority" data-bind="textInput: signatoryAuthority">
-                                            <!-- ko if: $root.isPersonsInChargeFormSubmitted() && !signatoryAuthority.isValid() -->
-                                                <span class="help-block" data-bind="text: signatoryAuthority.error()"></span>
-                                            <!-- /ko -->
+                                        <div class="col-xs-12">
+                                            <div class="form-group" data-bind="css: { 'has-error': $root.isPersonsInChargeFormSubmitted() && !signatoryAuthority.isValid() }">
+                                                <label for="signatoryAuthority">Основание полномочий подписанта</label>
+                                                <input class="form-control" id="signatoryAuthority" data-bind="textInput: signatoryAuthority">
+                                                <!-- ko if: $root.isPersonsInChargeFormSubmitted() && !signatoryAuthority.isValid() -->
+                                                    <span class="help-block" data-bind="text: signatoryAuthority.error()"></span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-xs-12">
-                                        <div class="create-legal-entity__actions">
-                                            <button class="btn btn-default btn-p25" data-bind="click: function () { $root.openTab('bills'); }">
-                                                Назад
-                                            </button>
+                                        <div class="col-xs-12">
+                                            <div class="create-legal-entity__actions">
+                                                <button class="btn btn-default btn-p25" data-bind="click: function () { $root.openTab('bills'); }">
+                                                    Назад
+                                                </button>
 
-                                            <button class="btn btn-success btn-p25" data-bind="click: function () { $root.submitPersonsInChargeForm(); }">
-                                                Сохранить и завершить
-                                            </button>
+                                                <button class="btn btn-success btn-p25" data-bind="click: function () { $root.submitPersonsInChargeForm(); }">
+                                                    Сохранить и завершить
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
