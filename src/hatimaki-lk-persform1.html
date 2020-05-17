@@ -104,6 +104,10 @@
                                             </div>
                                         </div>
                                         <div class="clearfix visible-md visible-lg visible-sm"></div>
+                                        <div class="col-xs-12">
+                                            <div class="emplform__social-picker" data-bind="component: {name: 'social-picker', params: {value: socials}}"></div>
+                                        </div>
+                                        <div class="clearfix visible-md visible-lg visible-sm"></div>
                                         <div class="form-group col-md-3 col-sm-3 col-fix-width col-xs-6">
                                             <label for="phone-number">Телефон для связи</label>
                                             <input type="text" class="form-control form-control-sm" value="" name="phone-number" id="phone-number">
@@ -299,18 +303,18 @@
             </div>
 
             <div class="hat-scaffold__bottom-sheet emplform__actions">
-                <a href="#" class="btn btn-default btn-with-icon emplform__action visible-md visible-lg">
+                <a href="#" class="btn btn-default btn-with-icon emplform__action visible-sm visible-md visible-lg">
                     <i class="far fa-print"></i>Печатать
                 </a>
                 <a href="#" class="btn btn-default btn-icon emplform__action visible-xs"><i class="far fa-print"></i></a>
                 <a href="#" class="btn btn-default btn-icon emplform__action visible-xs"><i class="far fa-arrow-left"></i></a>
                 <div class="spacer"></div>
-                <a href="#" class="btn btn-default emplform__action visible-md visible-lg">Вернуться</a>
-                <a href="#" class="btn btn-primary emplform__action visible-md visible-lg">Сохранить и закрыть</a>
+                <a href="#" class="btn btn-default emplform__action visible-sm visible-md visible-lg">Вернуться</a>
+                <a href="#" class="btn btn-primary emplform__action visible-sm visible-md visible-lg">Сохранить и закрыть</a>
                 <a href="#" class="btn btn-primary btn-icon emplform__action visible-xs">
                     <i class="far fa-save"></i> + <i class="far fa-arrow-left"></i>
                 </a>
-                <a href="#" class="btn btn-primary emplform__action visible-md visible-lg">Сохранить</a>
+                <a href="#" class="btn btn-primary emplform__action visible-sm visible-md visible-lg">Сохранить</a>
                 <a href="#" class="btn btn-primary btn-icon emplform__action visible-xs"><i class="far fa-save"></i></a>
             </div>
         </div>
@@ -327,6 +331,13 @@
 
     <script type="text/javascript" src="js/js-emplform.js"></script>
 
+    <!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+    <script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
+
+    <script type="text/javascript" src="js/js-knockout.js"></script>
+
+    <script type="text/javascript" src="js/js-social-picker.js"></script>
+
     <script type="text/javascript">
     $(function () {
         initHatNavbar(document);
@@ -337,6 +348,16 @@
         });
 
         initStep1();
+
+        const viewModel = new (function () {
+            this.socials = ko.observableArray([]);
+
+            this.socials.subscribe(value => {
+                console.log('Социальные сети: ', value);
+            })
+        });
+
+        ko.applyBindings(viewModel, document.documentElement);
     });
     </script>
 </body>
