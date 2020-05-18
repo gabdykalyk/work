@@ -85,23 +85,21 @@ ko.components.register('social-picker', {
                     }
 
                     try {
-                        switch (new URL(url).hostname) {
-                            case 'vk.com':
-                                return SOCIAL_TYPE_VK;
-                            case 'facebook.com':
-                                return SOCIAL_TYPE_FB;
-                            case 'ok.ru':
-                                return SOCIAL_TYPE_OK;
-                            case 'linkedin.com':
-                                return SOCIAL_TYPE_LN;
-                            case 'instagram.com':
-                                return SOCIAL_TYPE_INST;
-                            case 'tiktok.com':
-                                return SOCIAL_TYPE_TT;
-                            case 'youtube.com':
-                                return SOCIAL_TYPE_YT;
-                            default:
-                                return null;
+                        let hostname = new URL(url).hostname;
+
+                        if (hostname.startsWith('www.')) {
+                            hostname = hostname.slice(4);
+                        }
+
+                        switch (hostname) {
+                            case 'vk.com': return SOCIAL_TYPE_VK;
+                            case 'facebook.com': return SOCIAL_TYPE_FB;
+                            case 'ok.ru': return SOCIAL_TYPE_OK;
+                            case 'linkedin.com': return SOCIAL_TYPE_LN;
+                            case 'instagram.com': return SOCIAL_TYPE_INST;
+                            case 'tiktok.com': return SOCIAL_TYPE_TT;
+                            case 'youtube.com': return SOCIAL_TYPE_YT;
+                            default: return null;
                         }
                     } catch (error) {
                         return null;
@@ -279,7 +277,7 @@ ko.components.register('social-picker', {
                             <!-- /ko -->
                             
                             <button class="btn btn-danger icon-btn social-picker__editing-form-list-item-remove-button"
-                                    data-bind="click: function() {$component.editingFormRemoveItem($data);}" type="button">
+                                    data-bind="click: function() {$component.editingFormRemoveItem($data);}" type="button" title="Удалить">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>

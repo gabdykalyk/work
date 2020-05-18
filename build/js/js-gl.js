@@ -96,6 +96,25 @@ $.widget("custom.hatNavbarContentsSearchField", $.ui.autocomplete, {
     }
 });
 
+function getScrollbarWidth() {
+    let div = document.createElement('div');
+
+    div.style.overflowY = 'scroll';
+    div.style.width = '50px';
+    div.style.height = '50px';
+
+    document.body.append(div);
+    const scrollWidth = div.offsetWidth - div.clientWidth;
+
+    div.remove();
+
+    return scrollWidth;
+}
+
+function initHatScaffold(element) {
+    $(element).find('.hat-scaffold__bottom-sheet-content').css('margin-right', getScrollbarWidth());
+}
+
 class HatNavbar {
     constructor(element) {
         this._isCollapsed = false;
