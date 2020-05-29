@@ -582,8 +582,31 @@
 												<option value="2">Специальность #2</option>
 												<option value="3">Специальность #3</option>
 											</select>
-										</div>
-										<div class="col-md-4 col-md-4 col-sm-6 form-group empllist-diagram__filters-form-filter empllist-diagram__filters-form-filter--dense-hidden">
+                                        </div>
+
+                                        <div class="col-md-8 col-sm-12 col-md-push-4 form-group empllist-diagram__filters-form-filter empllist-diagram__filters-form-filter--dense-hidden">
+                                            <label>Продолжительность работы, месяцев</label>
+                                            <div class="row" class="duration-range range">
+                                                <div class="col col-xs-6">
+                                                    <div class="range__slider-wrapper">
+                                                        <div id="duration-range-slider" data-min="1" data-max="99" class="range__slider"></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col col-xs-6">
+                                                    <div class="duration-range-value range__values">
+                                                        <input type="text" name="duration[min]"
+                                                        id="duration-range-min" class="form-control range__value"
+                                                        maxlength="2" value="1">
+                                                        <span class="range__values-separator"></span>
+                                                        <input type="text" name="duration[max]"
+                                                        id="duration-range-max" class="form-control range__value"
+                                                        maxlength="2" value="36">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+										<div class="col-md-4 col-md-pull-8 col-sm-6 form-group empllist-diagram__filters-form-filter empllist-diagram__filters-form-filter--dense-hidden">
 											<label for="age">Возраст</label>
 											<select class="form-control js-select" name="age[]" id="age" multiple="multiple">
 												<option value="1">младше 21</option>
@@ -599,7 +622,8 @@
 												</div>
 												<div class="age__amount"><span class="js-remoteness-min"></span> - <span class="js-remoteness-max"></span> лет</div>
 											</div>-->
-										</div>
+                                        </div>
+
 										<div class="col-md-8 col-sm-6 empllist-diagram__filters-form-actions">
 											<div class="empllist-diagram__filters-form-actions-content">
 												<button class="btn btn-link empllist-diagram__filters-form-expand-button" type="button">
@@ -1097,7 +1121,70 @@
 				}
 			});
 
-			/*var remotenessAmountMin = $('.js-remoteness-min');
+            var durationRangeSlider = document.getElementById('duration-range-slider');
+            var durationRangeMinInput = document.getElementById('duration-range-min');
+            var durationRangeMaxInput = document.getElementById('duration-range-max');
+
+            $.fn.inputFilter = function(inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    }
+                });
+            };
+
+            $(durationRangeMinInput).inputFilter(function(value) {
+                return /^\d*[.,]?\d*$/.test(value) && value >= 0;
+            });
+
+            $(durationRangeMaxInput).inputFilter(function(value) {
+                return /^\d*[.,]?\d*$/.test(value) && value >= 0;
+            });
+
+            if (durationRangeSlider) {
+                noUiSlider.create(durationRangeSlider, {
+                    start: [
+                      parseInt(durationRangeMinInput.value, 10),
+                      parseInt(durationRangeMaxInput.value, 10),
+                    ],
+                    range: {
+                        'min': parseInt(durationRangeSlider.dataset.min, 10),
+                        'max': parseInt(durationRangeSlider.dataset.max, 10)
+                    },
+                    connect: true,
+                    step: 1
+                });
+                durationRangeSlider.noUiSlider.on('update', function(values, handle) {
+					var value = parseInt(values[handle], 10);
+					if (handle === 0) {
+                        durationRangeMinInput.value = value;
+					}
+					if (handle === 1) {
+                        durationRangeMaxInput.value = value;
+					}
+                });
+                durationRangeMinInput.addEventListener('change', function() {
+                    durationRangeSlider.noUiSlider.setHandle(
+                      0,
+                      parseInt(durationRangeMinInput.value, 10),
+                      true
+                    );
+                });
+                durationRangeMaxInput.addEventListener('change', function() {
+                    durationRangeSlider.noUiSlider.setHandle(
+                      1,
+                      parseInt(durationRangeMaxInput.value, 10),
+                      true
+                    );
+                });
+            }
+
+            /*var remotenessAmountMin = $('.js-remoteness-min');
 			var remotenessAmountMax = $('.js-remoteness-max');
 			var remotenessSlider = document.getElementById('jsRemotenessSlider');
 			if (remotenessSlider) {
