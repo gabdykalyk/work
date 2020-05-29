@@ -782,9 +782,18 @@ mark {
 
     &__board-item-footer {
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
+        justify-content: space-between;
         position: relative;
         margin: 12px 0 0;
+
+        &-section {
+            display: flex;
+            align-items: center;
+            position: relative;
+            margin-bottom: 4px;
+        }
     }
 
     &__board-item-avatar {
@@ -837,10 +846,10 @@ mark {
     }
 
     &__board-item-status {
-        position: absolute;
-        right: 0;
-        bottom: 8px;
-        text-align: right;
+        margin-left: 5px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
     }
 
     &__board-item-status[data-current-status="new"] &__inline-status--new,
@@ -849,8 +858,32 @@ mark {
         display: block;
     }
 
+    &__board-item-source[data-source="manual"] &__source--manual,
+    &__board-item-source[data-source="external"] &__source--external,
+    &__board-item-source[data-source="site"] &__source--site,
+    &__board-item-source[data-source="hh"] &__source--hh {
+        display: block;
+    }
+
+    &__source {
+        display: none;
+        margin-left: 6px;
+
+        i {
+            font-size: 14px;
+        }
+
+        &--hh {
+            &:before {
+                content: '';
+                .hh-icon();
+            }
+        }
+    }
+
     &__inline-status {
         display: none;
+        margin-left: 6px;
 
         &--new {
             text-transform: uppercase;
