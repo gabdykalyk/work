@@ -23,6 +23,9 @@
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
+
+	<!-- Scrollbar -->
+	<link href="js/scrollbar/jquery.mCustomScrollbar.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -389,1521 +392,672 @@
 			<div class="hat-scaffold__body-content">
 				<div class="hat-scaffold__content-wrapper">
 					<div class="worksheet">
-						<div class="hat-scaffold__head">
-							<h1>
-								Изменение анкеты Администратор
-							</h1>
-						</div>
-						<form class="form-respons" action="" method="post">
-							<div class="row">
-								<div class="col-md-5 col-sm-12 form-group">
-									<label for="worksheet-name">Название анкеты</label>
-									<input class="form-control" type="text" name="worksheet-name" id="worksheet-name" />
-								</div>
-								<div class="col-md-7 col-sm-12 form-group">
-									<label for="post">Должности</label>
-									<select class="form-control js-select2 select2-hidden-accessible" name="post[]" id="post"
-										multiple="" tabindex="-1" aria-hidden="true">
-										<option value="1">Оператор</option>
-										<option value="2">Водитель</option>
-										<option value="3">Технический сотрудник</option>
-										<option value="3">Администратор филиала</option>
-									</select>
-								</div>
+						<!-- ko template: { afterRender: function () {afterRender();} } -->
+							<div class="hat-scaffold__head">
+								<h1>
+									Изменение анкеты Администратор
+								</h1>
 							</div>
-							<ul class="nav nav-tabs worksheet__tabs">
-								<li class="active"><a href="#first" aria-controls="home" role="tab" data-toggle="tab">Этап 1</a></li>
-								<li><a href="#second" aria-controls="home" role="tab" data-toggle="tab">Этап 2</a></li>
-								<li><a href="#additional" aria-controls="home" role="tab" data-toggle="tab">Дополнительные поля</a></li>
-							</ul>
-							<!-- Tab panes -->
-							<div class="tab-content">
-								<div role="tabpanel" class="tab-pane active" id="first">
-									<div class="worksheet__tab-pane-content">
-										<div class="worksheet__alert">
-											Заполните сначала настройки для анкеты сотрудника — они автоматически продублируются для анкеты кандидата
+							<form class="form-respons" action="" method="post">
+								<div class="row">
+									<div class="col-md-5 col-sm-12 form-group">
+										<label for="worksheet-name">Название анкеты</label>
+										<input class="form-control" type="text" name="worksheet-name" id="worksheet-name" />
+									</div>
+									<div class="col-md-7 col-sm-12 form-group">
+										<label for="post">Должности</label>
+										<select class="form-control js-select2 select2-hidden-accessible" name="post[]" id="post"
+											multiple="" tabindex="-1" aria-hidden="true">
+											<option value="1">Оператор</option>
+											<option value="2">Водитель</option>
+											<option value="3">Технический сотрудник</option>
+											<option value="3">Администратор филиала</option>
+										</select>
+									</div>
+								</div>
+								<ul class="nav nav-tabs worksheet__tabs">
+									<li class="active"><a href="#first" aria-controls="home" role="tab" data-toggle="tab">Этап 1</a></li>
+									<li><a href="#second" aria-controls="home" role="tab" data-toggle="tab">Этап 2</a></li>
+									<li><a href="#additional" aria-controls="home" role="tab" data-toggle="tab">Дополнительные поля</a></li>
+								</ul>
+								<!-- Tab panes -->
+								<div class="tab-content">
+									<div role="tabpanel" class="tab-pane active" id="first">
+										<div class="worksheet__tab-pane-content">
+											<div class="worksheet__alert">
+												Заполните сначала настройки для анкеты сотрудника — они автоматически продублируются для анкеты кандидата
+											</div>
+
+											<table class="table table-hover worksheet__table">
+												<thead>
+													<tr>
+														<th rowspan="2">Поле</th>
+														<th class="worksheet__table-employee-head-cell" colspan="2">
+															Анкета сотрудника
+															<div class="worksheet__table-employee-head-cell-divider"></div>
+														</th>
+														<th class="worksheet__table-candidate-head-cell" colspan="2">
+															Анкета кандидата
+															<div class="worksheet__table-candidate-head-cell-divider"></div>
+														</th>
+														<th class="worksheet__table-directory-head-cell" colspan="2">
+															Справочник
+															<div class="worksheet__table-directory-head-cell-divider"></div>
+														</th>
+														<th class="worksheet__table-actions-head-cell" colspan="2" rowspan="2"></th>
+													</tr>
+													<tr>
+														<th class="worksheet__table-employee-visible-head-cell">Показывать</th>
+														<th class="worksheet__table-employee-required-head-cell">
+															<div class="hidden-xs hidden-sm">Обязательное</div>
+															<div class="visible-xs visible-sm">Обязат.</div>
+														</th>
+														<th class="worksheet__table-candidate-visible-head-cell">Показывать</th>
+														<th class="worksheet__table-candidate-required-head-cell">
+															<div class="hidden-xs hidden-sm">Обязательное</div>
+															<div class="visible-xs visible-sm">Обязат.</div>
+														</th>
+														<th class="worksheet__table-directory-custom-head-cell">Вводить произв. значения</th>
+														<th class="worksheet__table-directory-autofill-head-cell">
+															<div class="hidden-xs hidden-sm">Автонаполнение</div>
+															<div class="visible-xs visible-sm">Автонап-е</div>
+														</th>
+													</tr>
+												</thead>
+												<tbody>
+													<!-- ko foreach: firstStepFields -->
+														<!-- ko template: {name: 'field', data: $data} --><!-- /ko -->
+													<!-- /ko -->
+												</tbody>
+											</table>
 										</div>
-
-										<table class="table table-hover worksheet__table">
-										<thead>
-											<tr>
-												<th rowspan="2">Поле</th>
-												<th class="worksheet__table-employee-head-cell" colspan="2">
-													Анкета сотрудника
-													<div class="worksheet__table-employee-head-cell-divider"></div>
-												</th>
-												<th class="worksheet__table-candidate-head-cell" colspan="2">
-													Анкета кандидата
-													<div class="worksheet__table-candidate-head-cell-divider"></div>
-												</th>
-											</tr>
-											<tr>
-												<th class="worksheet__table-employee-visible-head-cell">Показывать</th>
-												<th class="worksheet__table-employee-required-head-cell">Обязательное</th>
-												<th class="worksheet__table-candidate-visible-head-cell">Показывать</th>
-												<th class="worksheet__table-candidate-required-head-cell">Обязательное</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td>
-													ФИО
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Фотография
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Пол
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Документы
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Дата рождения
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Номер телефона для связи
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Email
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Гражданство
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Фактический адрес проживания
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Адрес регистрации по паспорту
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Паспортные данные
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Ближайшая станция метро
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Опыт работы в сфере
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Место последней работы
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Продолжительность работы
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Занимаемая должность
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													СНИЛС
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													ИНН
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Напишите три положительных и три отрицательных своих качества
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Как узнали о вакансии
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Телефон человека, который может дать рекомендацию
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Кем бы хотели стать, Желаемая должность
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-											<tr>
-												<td>
-													Напишите, почему именно Вас мы должны принять на работу
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-												<td>
-													<div class="checkbox-nice">
-														<label>
-															<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-															<span class="fa fa-check"></span>
-														</label>
-													</div>
-												</td>
-											</tr>
-										</tbody>
-									</table>
 									</div>
-								</div>
-								<div role="tabpanel" class="tab-pane" id="second">
-									<div class="worksheet__tab-pane-content">
-										<div class="worksheet__alert">
-											Заполните сначала настройки для анкеты сотрудника — они автоматически продублируются для анкеты кандидата
+									<div role="tabpanel" class="tab-pane" id="second">
+										<div class="worksheet__tab-pane-content">
+											<div class="worksheet__alert">
+												Заполните сначала настройки для анкеты сотрудника — они автоматически продублируются для анкеты кандидата
+											</div>
+
+											<table class="table table-hover worksheet__table">
+												<thead>
+													<tr>
+														<th rowspan="2">Поле</th>
+														<th class="worksheet__table-employee-head-cell" colspan="2">
+															Анкета сотрудника
+															<div class="worksheet__table-employee-head-cell-divider"></div>
+														</th>
+														<th class="worksheet__table-candidate-head-cell" colspan="2">
+															Анкета кандидата
+															<div class="worksheet__table-candidate-head-cell-divider"></div>
+														</th>
+														<th class="worksheet__table-directory-head-cell" colspan="2">
+															Справочник
+															<div class="worksheet__table-directory-head-cell-divider"></div>
+														</th>
+														<th class="worksheet__table-actions-head-cell" colspan="2" rowspan="2"></th>
+													</tr>
+													<tr>
+														<th class="worksheet__table-employee-visible-head-cell">Показывать</th>
+														<th class="worksheet__table-employee-required-head-cell">
+															<div class="hidden-xs hidden-sm">Обязательное</div>
+															<div class="visible-xs visible-sm">Обязат.</div>
+														</th>
+														<th class="worksheet__table-candidate-visible-head-cell">Показывать</th>
+														<th class="worksheet__table-candidate-required-head-cell">
+															<div class="hidden-xs hidden-sm">Обязательное</div>
+															<div class="visible-xs visible-sm">Обязат.</div>
+														</th>
+														<th class="worksheet__table-directory-custom-head-cell">Вводить произв. значения</th>
+														<th class="worksheet__table-directory-autofill-head-cell">
+															<div class="hidden-xs hidden-sm">Автонаполнение</div>
+															<div class="visible-xs visible-sm">Автонап-е</div>
+														</th>
+													</tr>
+												</thead>
+												<tbody>
+													<!-- ko foreach: secondStepFields -->
+														<!-- ko template: {name: 'field', data: $data} --><!-- /ko -->
+													<!-- /ko -->
+												</tbody>
+											</table>
 										</div>
+									</div>
+									<div role="tabpanel" class="tab-pane" id="additional">
+										<div class="worksheet__tab-pane-content">
+											<div class="worksheet__alert">
+												Заполните сначала настройки для анкеты сотрудника — они автоматически продублируются для анкеты кандидата
+											</div>
 
-										<table class="table table-hover worksheet__table">
-											<thead>
-											<tr>
-												<th rowspan="2">Поле</th>
-												<th class="worksheet__table-employee-head-cell" colspan="2">
-													Анкета сотрудника
-													<div class="worksheet__table-employee-head-cell-divider"></div>
-												</th>
-												<th class="worksheet__table-candidate-head-cell" colspan="2">
-													Анкета кондидата
-													<div class="worksheet__table-candidate-head-cell-divider"></div>
-												</th>
-											</tr>
-											<tr>
-												<th class="worksheet__table-employee-visible-head-cell">Показывать</th>
-												<th class="worksheet__table-employee-required-head-cell">Обязательное</th>
-												<th class="worksheet__table-candidate-visible-head-cell">Показывать</th>
-												<th class="worksheet__table-candidate-required-head-cell">Обязательное</th>
-											</tr>
-											</thead>
-											<tbody>
-												<tr>
-													<td>
-														Образование
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
+											<table class="table table-hover worksheet__table worksheet__additional-table">
+												<thead>
+													<tr>
+														<th rowspan="2">Поле</th>
+														<th class="worksheet__table-employee-head-cell" colspan="2">
+															Анкета сотрудника
+															<div class="worksheet__table-employee-head-cell-divider"></div>
+														</th>
+														<th class="worksheet__table-candidate-head-cell" colspan="2">
+															Анкета кандидата
+															<div class="worksheet__table-candidate-head-cell-divider"></div>
+														</th>
+													</tr>
+													<tr>
+														<th class="worksheet__table-employee-visible-head-cell">Показывать</th>
+														<th class="worksheet__table-employee-required-head-cell">Обязательное</th>
+														<th class="worksheet__table-candidate-visible-head-cell">Показывать</th>
+														<th class="worksheet__table-candidate-required-head-cell">Обязательное</th>
+													</tr>
+												</thead>
+												<tbody>
+													<!-- ko foreach: additionalStepFields -->
+														<tr>
+															<td class="worksheet__table-name-cell" data-bind="text: name"></td>
+															<td>
+																<div class="checkbox-nice">
+																	<label>
+																		<input type="checkbox" class="worksheet__table-employee-visible-checkbox" data-bind="checked: employeeVisible">
+																		<span class="fa fa-check"></span>
+																	</label>
+																</div>
+															</td>
+															<td>
+																<div class="checkbox-nice">
+																	<label>
+																		<input type="checkbox" class="worksheet__table-employee-required-checkbox" data-bind="checked: employeeRequired">
+																		<span class="fa fa-check"></span>
+																	</label>
+																</div>
+															</td>
+															<td>
+																<div class="checkbox-nice">
+																	<label>
+																		<input type="checkbox" class="worksheet__table-candidate-visible-checkbox" data-bind="checked: candidateVisible">
+																		<span class="fa fa-check"></span>
+																	</label>
+																</div>
+															</td>
+															<td>
+																<div class="checkbox-nice">
+																	<label>
+																		<input type="checkbox" class="worksheet__table-candidate-required-checkbox" data-bind="checked: candidateRequired">
+																		<span class="fa fa-check"></span>
+																	</label>
+																</div>
+															</td>
+														</tr>
+													<!-- /ko -->
+												</tbody>
+											</table>
+
+											<div class="worksheet__additional-fields-settings">
+												<div class="worksheet__additional-fields-settings-header">Настройка полей</div>
+
+												<table class="table worksheet__additional-fields-settings-table">
+													<thead>
+														<tr>
+															<th>Название поля</th>
+															<th>Тип поля</th>
+															<!-- ko if: $root.viewportSize().width >= 992 -->
+																<th class="worksheet__additional-fields-settings-table-directory-head-cell"></th>
+															<!-- /ko -->
+															<th class="worksheet__additional-fields-settings-table-contract-available-head-cell">Доступно для договора</th>
+															<th class="worksheet__additional-fields-settings-table-action-head-cell">
+																<button class="btn btn-default icon-btn worksheet__additional-fields-settings-table-add-button"
+																		data-bind="
+																			click: function () {$root.addAdditionalField();},
+																			attr: {disabled: !$root.isAdditionalFieldsValid()}
+																			"
+																		type="button" title="Добавить поле">
+																	<i class="far fa-plus"></i>
+																</button>
+															</th>
+														</tr>
+													</thead>
+
+													<tbody>
+														<!-- ko template: {
+															foreach: additionalFields,
+															afterAdd: fadeAfterAddFactory(200),
+															beforeRemove: fadeBeforeRemoveFactory(200)
+														} -->
+															<tr class="worksheet__additional-fields-settings-table-row">
+																<td>
+																	<div class="form-group worksheet__additional-fields-settings-table-name-form-group" data-bind="css: { 'has-error': !name.isValid() }">
+																		<input class="form-control" data-bind="textInput: name">
+																		<!-- ko if: !name.isValid() -->
+																			<span class="help-block" data-bind="text: name.error()"></span>
+																		<!-- /ko -->
+																	</div>
+																</td>
+
+																<td>
+																	<div class="form-group worksheet__additional-fields-settings-table-type-form-group">
+																		<select class="form-control" data-bind="value: type, select2">
+																			<option value="0">Текстовый</option>
+																			<option value="1">Число</option>
+																			<option value="2">Логический</option>
+																			<option value="3">Файл</option>
+																			<option value="4">Список</option>
+																		</select>
+																	</div>
+																</td>
+
+																<!-- ko if: $root.viewportSize().width >= 992 -->
+																	<td data-bind="attr: {rowspan: type() === '4' ? 2 : 1}">
+																		<!-- ko template: {name: 'directory'} --><!-- /ko -->
+																	</td>
+																<!-- /ko -->
+
+																<td class="worksheet__additional-fields-settings-table-contract-available-cell">
+																	<div class="checkbox-nice">
+																		<label>
+																			<input type="checkbox" class="worksheet__additional-fields-settings-table-contract-available-checkbox" data-bind="checked: contractAvailable">
+																			<span class="fa fa-check"></span>
+																		</label>
+																	</div>
+																</td>
+
+																<td class="worksheet__additional-fields-settings-table-action-cell">
+																	<button class="btn btn-default icon-btn worksheet__additional-fields-settings-table-delete-button"
+																			data-bind="click: function () {$root.deleteAdditionalField($data);}"
+																			type="button" title="Убрать поле">
+																		<i class="far fa-minus"></i>
+																	</button>
+																</td>
+															</tr>
+
+															<!-- ko template: {
+																foreach: templateIf(type() === '4', $data),
+																afterAdd: fadeAfterAddFactory(200),
+																beforeRemove: fadeBeforeRemoveFactory(200)
+															} -->
+																<tr class="worksheet__additional-fields-settings-table-row worksheet__additional-fields-settings-table-additional-row">
+																	<td colspan="2">
+																		<div class="worksheet__additional-fields-settings-table-additional-row-cell-content">
+																			<div class="checkbox-nice">
+																				<label>
+																					<input type="checkbox" data-bind="checked: directoryCustom">
+																					<span class="fa fa-check"></span>
+																					Можно вводить произвольные значения
+																				</label>
+																			</div>
+
+																			<div class="checkbox-nice worksheet__additional-fields-settings-table-autofill-checkbox">
+																				<label>
+																					<input type="checkbox" data-bind="checked: directoryAutofill">
+																					<span class="fa fa-check"></span>
+																					Автозаполнение
+																				</label>
+																			</div>
+																		</div>
+																	</td>
+																</tr>
+															<!-- /ko -->
+
+															<!-- ko if: $root.viewportSize().width < 992 -->
+																<tr class="worksheet__additional-fields-settings-table-row worksheet__additional-fields-settings-table-additional-row">
+																	<td colspan="4">
+																		<!-- ko template: {name: 'directory'} --><!-- /ko -->
+																	</td>
+																</tr>
+															<!-- /ko -->
+														<!-- /ko -->
+													</tbody>
+
+													<!-- ko template: {
+														foreach: templateIf(additionalFields().length > 0, $data),
+														afterAdd: fadeAfterAddFactory(200),
+														beforeRemove: fadeBeforeRemoveFactory(200)
+													} -->
+														<tfoot>
+															<tr>
+																<th></th>
+																<th></th>
+																<!-- ko if: $root.viewportSize().width >= 992 -->
+																	<th></th>
+																<!-- /ko -->
+																<th></th>
+																<th>
+																	<button class="btn btn-default icon-btn worksheet__additional-fields-settings-table-add-button"
+																			data-bind="
+																				click: function () {$root.addAdditionalField();},
+																				attr: {disabled: !$root.isAdditionalFieldsValid()}
+																			"
+																			type="button" title="Добавить поле">
+																		<i class="far fa-plus"></i>
+																	</button>
+																</th>
+															</tr>
+														</tfoot>
+													<!-- /ko -->
+												</table>
+
+												<template id="directory">
+													<!-- ko template: {
+														foreach: templateIf(type() === '4', $data),
+														afterAdd: fadeAfterAddFactory(200),
+														beforeRemove: fadeBeforeRemoveFactory(200)
+													} -->
+														<div class="worksheet__additional-fields-settings-table-directory">
+															<!-- ko template: {
+																foreach: templateIf(directory().length === 0, $data),
+																afterAdd: fadeAfterAddFactory(200, 300),
+																beforeRemove: fadeBeforeRemoveFactory(200)
+															} -->
+																<a class="btn btn-link worksheet__additional-fields-settings-table-directory-add-button" data-bind="click: function () {$root.openEditAdditionalFieldDirectoryModal($data);}">Добавить значение</a>
+															<!-- /ko -->
+
+															<!-- ko template: {
+																foreach: templateIf(directory().length > 0, $data),
+																afterAdd: fadeAfterAddFactory(200, 300),
+																beforeRemove: fadeBeforeRemoveFactory(200)
+															} -->
+																<div>
+																	<!-- ko text: $root.formatDirectory(directory()) --><!-- /ko -->
+																	<a class="btn btn-link" data-bind="click: function () {$root.openEditAdditionalFieldDirectoryModal($data);}">Редактировать</a>
+																</div>
+															<!-- /ko -->
 														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Владение иностранными языками
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Владение программами
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Наличие автомобиля
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Семейное положение
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Дети
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Наличие трудовой книжки
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Наличие медицинской книжки
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Желаемая ЗП
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Вредные привычки
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Как часто употребляете алкоголь
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Когда бы Вы смогли приступить к работе
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Желаемый график работы
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Последние места работы
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-												<tr>
-													<td>
-														Есть ли у Вас знакомые/родственники, работающие/работавшие в Хатимаки?
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-employee-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-visible-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-													<td>
-														<div class="checkbox-nice">
-															<label>
-																<input type="checkbox" class="worksheet__table-candidate-required-checkbox">
-																<span class="fa fa-check"></span>
-															</label>
-														</div>
-													</td>
-												</tr>
-											</tbody>
-										</table>
+													<!-- /ko -->
+												</template>
+											</div>
+										</div>
 									</div>
 								</div>
-								<div role="tabpanel" class="tab-pane" id="additional">
-									<div class="worksheet__tab-pane-content">
-										Дополнительные поля
-									</div>
-								</div>
-							</div>
 
-							<div class="form-group worksheet__btns">
-								<button type="reset" class="btn btn-default">Сбросить изменения</button>
-								<button type="submit" class="btn btn-primary">Сохранить</button>
-							</div>
-						</form>
+								<div class="form-group worksheet__btns">
+									<button type="reset" class="btn btn-default">Сбросить изменения</button>
+									<button type="submit" class="btn btn-primary">Сохранить</button>
+								</div>
+							</form>
+							<!-- ko component: { name: 'modal-container', params: { opens: modalOpens } } --><!-- /ko -->
+						<!-- /ko -->
 					</div>
-
-			</div>
+				</div>
 			</div>
 		</div>
 	</div>
+
+	<template id="field">
+		<tr>
+			<td class="worksheet__table-name-cell" data-bind="text: name"></td>
+			<td>
+				<div class="checkbox-nice">
+					<label>
+						<input type="checkbox" class="worksheet__table-employee-visible-checkbox" data-bind="checked: employeeVisible">
+						<span class="fa fa-check"></span>
+					</label>
+				</div>
+			</td>
+			<td>
+				<div class="checkbox-nice">
+					<label>
+						<input type="checkbox" class="worksheet__table-employee-required-checkbox" data-bind="checked: employeeRequired">
+						<span class="fa fa-check"></span>
+					</label>
+				</div>
+			</td>
+			<td>
+				<div class="checkbox-nice">
+					<label>
+						<input type="checkbox" class="worksheet__table-candidate-visible-checkbox" data-bind="checked: candidateVisible">
+						<span class="fa fa-check"></span>
+					</label>
+				</div>
+			</td>
+			<td>
+				<div class="checkbox-nice">
+					<label>
+						<input type="checkbox" class="worksheet__table-candidate-required-checkbox" data-bind="checked: candidateRequired">
+						<span class="fa fa-check"></span>
+					</label>
+				</div>
+			</td>
+			<td>
+				<!-- ko if: isDirectory -->
+					<div class="checkbox-nice">
+						<label>
+							<input type="checkbox" class="worksheet__table-directory-custom-checkbox" data-bind="checked: directoryCustom">
+							<span class="fa fa-check"></span>
+						</label>
+					</div>
+				<!-- /ko -->
+			</td>
+			<td>
+				<!-- ko if: isDirectory -->
+					<div class="checkbox-nice">
+						<label>
+							<input type="checkbox" class="worksheet__table-directory-autofill-checkbox" data-bind="checked: directoryAutofill">
+							<span class="fa fa-check"></span>
+						</label>
+					</div>
+				<!-- /ko -->
+			</td>
+			<td>
+				<!-- ko if: isDirectory -->
+					<button class="btn btn-default icon-btn worksheet__table-actions-button"
+							data-bind="click: function () {$root.openEditDirectoryModal($data);}"
+							type="button" title="Редактировать">
+						<i class="far fa-pencil"></i>
+					</button>
+				<!-- /ko -->
+			</td>
+		</tr>
+
+		<!-- ko template: {
+			foreach: templateIf(employeeVisible() || candidateVisible(), $data),
+			afterAdd: fadeAfterAddFactory(200),
+			beforeRemove: fadeBeforeRemoveFactory(200)
+		} -->
+			<!-- ko foreach: subfields -->
+				<tr class="worksheet__table-subfield-row">
+					<td class="worksheet__table-name-cell" data-bind="text: name"></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>
+						<!-- ko if: isDirectory -->
+							<div class="checkbox-nice">
+								<label>
+									<input type="checkbox" class="worksheet__table-directory-custom-checkbox" data-bind="checked: directoryCustom">
+									<span class="fa fa-check"></span>
+								</label>
+							</div>
+						<!-- /ko -->
+					</td>
+					<td>
+						<!-- ko if: isDirectory -->
+							<div class="checkbox-nice">
+								<label>
+									<input type="checkbox" class="worksheet__table-directory-autofill-checkbox" data-bind="checked: directoryAutofill">
+									<span class="fa fa-check"></span>
+								</label>
+							</div>
+						<!-- /ko -->
+					</td>
+					<td>
+						<!-- ko if: isDirectory -->
+							<button class="btn btn-default icon-btn worksheet__table-actions-button"
+									data-bind="click: function () {$root.openEditDirectoryModal($data);}"
+									type="button" title="Редактировать">
+								<i class="far fa-pencil"></i>
+							</button>
+						<!-- /ko -->
+					</td>
+				</tr>
+			<!-- /ko -->
+		<!-- /ko -->
+	</template>
+
+	<script type="text/html" id="edit-directory-modal-content-template">
+		<div data-bind="component: { name: 'edit-directory-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function (result) { close(result); } } }" role="document"></div>
+	</script>
+
+	<template id="edit-directory-modal-dialog-template">
+		<!-- ko template: { afterRender: function () {afterRender();} } -->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close" data-bind="click: cancel">
+						<span aria-hidden="true">&times;</span>
+					</button>
+
+					<h4 class="modal-title" data-bind="text: name"></h4>
+				</div>
+
+				<!-- ko template: {
+					foreach: templateIf(!$component.isAdding(), $data),
+					afterAdd: slideAfterAddFactory(200, 200),
+					beforeRemove: slideBeforeRemoveFactory(200)
+				} -->
+					<div class="worksheet__edit-directory-modal-dialog-edit-form">
+						<div class="modal-body">
+							<div class="form-group search-global search-global--empty worksheet__edit-directory-modal-dialog-search">
+								<input class="form-control" data-bind="textInput: searchTerm" placeholder="Поиск">
+
+								<button class="btn btn-default search-global__search-clear-button"
+										type="button" title="Очистить">
+									<i class="far fa-times"></i>
+								</button>
+							</div>
+
+							<div data-bind="scrollbar">
+								<table class="table worksheet__edit-directory-modal-dialog-table">
+									<tbody>
+										<!-- ko template: {
+											foreach: filteredDirectoryItems,
+											afterAdd: fadeAfterAddFactory(200),
+											beforeRemove: fadeBeforeRemoveFactory(200)
+										} -->
+											<tr>
+												<td>
+													<!-- ko template: {
+														foreach: templateIf($component.editingDirectoryItem() !== $data, $data),
+														afterAdd: fadeAfterAddFactory(200, 300),
+														beforeRemove: fadeBeforeRemoveFactory(200)
+													} -->
+														<div class="worksheet__edit-directory-modal-dialog-table-value" data-bind="text: value">
+														</div>
+													<!-- /ko -->
+
+													<!-- ko template: {
+														foreach: templateIf($component.editingDirectoryItem() === $data, $data),
+														afterAdd: fadeAfterAddFactory(200, 300),
+														beforeRemove: fadeBeforeRemoveFactory(200)
+													} -->
+														<div class="form-group worksheet__edit-directory-modal-dialog-table-edit-form-group" data-bind="css: { 'has-error': !$component.editingDirectoryItemFormModel.isValid() }">
+															<input class="form-control worksheet__edit-directory-modal-dialog-table-edit-control"
+																   data-bind="textInput: $component.editingDirectoryItemFormModel">
+															<!-- ko if: !$component.editingDirectoryItemFormModel.isValid() -->
+																<span class="help-block" data-bind="text: $component.editingDirectoryItemFormModel.error()"></span>
+															<!-- /ko -->
+														</div>
+													<!-- /ko -->
+												</td>
+												<td class="worksheet__edit-directory-modal-dialog-table-actions-cell">
+													<div class="worksheet__edit-directory-modal-dialog-table-actions-cell-content">
+														<!-- ko template: {
+															foreach: templateIf($component.editingDirectoryItem() !== $data, $data),
+															afterAdd: fadeAfterAddFactory(200, 300),
+															beforeRemove: fadeBeforeRemoveFactory(200)
+														} -->
+															<button class="btn btn-default icon-btn worksheet__edit-directory-modal-dialog-table-actions-cell-button"
+																	data-bind="click: function () {$component.edit($data);}"
+																	type="button" title="Редактировать">
+																<i class="far fa-pencil"></i>
+															</button>
+
+															<button class="btn btn-default icon-btn worksheet__edit-directory-modal-dialog-table-actions-cell-button worksheet__edit-directory-modal-dialog-table-delete-button"
+																	data-bind="click: function () {$component.delete($data);}"
+																	type="button" title="Удалить">
+																<i class="far fa-trash"></i>
+															</button>
+														<!-- /ko -->
+
+														<!-- ko template: {
+															foreach: templateIf($component.editingDirectoryItem() === $data, $data),
+															afterAdd: fadeAfterAddFactory(200, 300),
+															beforeRemove: fadeBeforeRemoveFactory(200)
+														} -->
+															<button class="btn btn-default icon-btn worksheet__edit-directory-modal-dialog-table-actions-cell-button worksheet__edit-directory-modal-dialog-table-apply-button"
+																	data-bind="
+																		click: function () {$component.applyEditing();},
+																		attr: {disabled: !$component.editingDirectoryItemFormModel.isValid()}
+																	"
+																	type="button" title="Применить">
+																<i class="far fa-check"></i>
+															</button>
+
+															<button class="btn btn-default icon-btn worksheet__edit-directory-modal-dialog-table-actions-cell-button"
+																	data-bind="click: function () {$component.cancelEditing();}"
+																	type="button" title="Отменить">
+																<i class="far fa-times"></i>
+															</button>
+														<!-- /ko -->
+													</div>
+												</td>
+											</tr>
+										<!-- /ko -->
+									</tbody>
+								</table>
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<div class="worksheet__edit-directory-modal-dialog-actions">
+								<button type="submit" class="btn btn-success worksheet__edit-directory-modal-dialog-action" data-bind="click: add">Добавить значения</button>
+								<div class="spacer"></div>
+								<button type="submit" class="btn btn-default worksheet__edit-directory-modal-dialog-action" data-bind="click: cancel">Сбросить изменения</button>
+								<button type="submit" class="btn btn-primary worksheet__edit-directory-modal-dialog-action" data-bind="click: submit">Сохранить</button>
+							</div>
+						</div>
+					</div>
+				<!-- /ko -->
+
+				<!-- ko template: {
+					foreach: templateIf($component.isAdding(), $data),
+					afterAdd: slideAfterAddFactory(200, 200),
+					beforeRemove: slideBeforeRemoveFactory(200)
+				} -->
+					<div class="worksheet__edit-directory-modal-dialog-add-form">
+						<div class="modal-body">
+							<div class="worksheet__edit-directory-modal-dialog-add-form-description">Введите варианты списка по одному в строке</div>
+
+							<div class="form-group worksheet__edit-directory-modal-dialog-add-form-group" data-bind="css: { 'has-error': $component.isAddingFormSubmitted() && (!$component.addingFormModel.isValid() || $component.addingFormUniqueError() !== null || $component.addingFormDuplicatedError() !== null) }">
+								<textarea class="form-control" data-bind="textInput: $component.addingFormModel, autosize"></textarea>
+								<!-- ko if: $component.isAddingFormSubmitted() -->
+									<!-- ko if: !$component.addingFormModel.isValid() -->
+										<span class="help-block" data-bind="text: $component.addingFormModel.error()"></span>
+									<!-- /ko -->
+
+									<!-- ko if: $component.addingFormUniqueError() !== null -->
+										<span class="help-block" data-bind="text: $component.addingFormUniqueError()"></span>
+									<!-- /ko -->
+
+									<!-- ko if: $component.addingFormDuplicatedError() !== null -->
+										<span class="help-block" data-bind="text: $component.addingFormDuplicatedError()"></span>
+									<!-- /ko -->
+								<!-- /ko -->
+							</div>
+						</div>
+
+						<div class="modal-footer">
+							<div class="worksheet__edit-directory-modal-dialog-actions">
+								<button type="submit" class="btn btn-default worksheet__edit-directory-modal-dialog-action" data-bind="click: cancelAdding">Отменить</button>
+								<button type="submit" class="btn btn-success worksheet__edit-directory-modal-dialog-action"
+										data-bind="
+											click: submitAdding,
+											attr: {disabled: $component.isAddingFormSubmitted() && (!$component.addingFormModel.isValid() || $component.addingFormUniqueError() !== null || $component.addingFormDuplicatedError() !== null)}
+										">
+									Добавить
+								</button>
+							</div>
+						</div>
+					</div>
+				<!-- /ko -->
+			</div>
+		<!-- /ko -->
+	</template>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -1941,55 +1095,822 @@
 <script type="text/javascript" src="js/js-gl.js"></script>
 
 
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js" integrity="sha256-VeNaFBVDhoX3H+gJ37DpT/nTuZTdjYro9yBruHjVmoQ=" crossorigin="anonymous"></script>
+
+<!--<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js"></script>-->
+<script type="text/javascript" src="https://knockoutjs.com/downloads/knockout-3.5.0.debug.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/knockout.validation@2.0.4/dist/knockout.validation.min.js"></script>
+
+<script type="text/javascript" src="js/js-knockout.js"></script>
+
+
+	<script>
+    ko.bindingHandlers.modalContainerModalWrapper = {
+        init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+            const options = $.extend(
+                {
+                    closeOnBackdropClick: true,
+                    closeOnEscape: true
+                },
+                allBindings()['modalContainerModalWrapperOptions']
+            );
+
+            const close = allBindings()['modalContainerModalWrapperClose'];
+
+            const $element = $(element);
+            const $modal = $element.find('.modal');
+
+            $modal.appendTo('body');
+
+            $modal.modal({
+                backdrop: false,
+                keyboard: false,
+                focus: true
+            });
+
+            if ('modalClass' in options) {
+                $modal.addClass(options.modalClass);
+            }
+
+            if (options.closeOnEscape) {
+                $modal.keyup(event => {
+                    if (event.keyCode === 27) {
+                        close.call(viewModel);
+                    }
+                });
+            }
+
+            if (options.closeOnBackdropClick) {
+                $modal.on('click', event => {
+                    if (event.target === $modal.get()[0]) {
+                        close.call(viewModel);
+                    }
+                });
+            }
+
+            const innerBindingContext = ko.bindingEvent.startPossiblyAsyncContentBinding($modal.get()[0], bindingContext);
+            ko.applyBindings(innerBindingContext, $modal.get()[0]);
+
+            ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+                $modal.modal('hide').remove();
+            });
+        }
+    };
+
+    ko.components.register('modal-container', {
+        viewModel: {
+            createViewModel: function (params) {
+                const viewModel = new (function () {
+                    this.opens = params.opens;
+
+                    this.close = function (open, value) {
+                        this.opens.remove(open);
+
+                        if ('close' in open) {
+                            open.close(value);
+                        }
+                    };
+                });
+
+                viewModel.initializing = ko.observable(true);
+
+                viewModel.onInit = function () {
+                    viewModel.initializing(false);
+                };
+
+                return viewModel;
+            }
+        },
+        template: {element: 'modal-container-template'}
+    });
+</script>
+
+<script type="text/html" id="modal-container-template">
+    <!-- ko template: { afterRender: onInit } -->
+        <!-- ko foreach: opens -->
+            <!-- ko let: { modalElement: ko.observable() } -->
+                <div data-bind="modalContainerModalWrapper, modalContainerModalWrapperOptions: $data.options, modalContainerModalWrapperClose: function (value) { $component.close($data, value); }">
+                    <div class="modal modal-with-base-backdrop" role="dialog" tabindex="1" data-bind="element: modalElement">
+                        <!-- ko template: { name: dialogTemplateName, data: { data: $data.data, modalElement: modalElement(), close: function (value) { $component.close($data, value); } } } -->
+                        <!-- /ko -->
+                    </div>
+                </div>
+            <!-- /ko -->
+        <!-- /ko -->
+    <!-- /ko -->
+</script>
+
+
+	<!-- scrollbar http://manos.malihu.gr/jquery-custom-content-scroller/ -->
+	<script src="js/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+
+	<script src="https://cdn.jsdelivr.net/npm/jquery-autosize@1.18.18/jquery.autosize.js"></script>
+
 	<script type="text/javascript">
 		$(function () {
 			initHatNavbar(document);
 
-			$('.js-select2').select2({
-				width: '100%'
-			});
-
-			$('.js-checkbox').on('click', function () {
-				let cur = $(this).is(':checked'),
-					req = $(this).closest('tr').find('td:last-child input[type="checkbox"]');
-				if (cur === false) {
-					req.attr('disabled','disabled');
-				} else {
-					req.removeAttr('disabled');
+			ko.bindingHandlers.autosize = {
+				init: function(element) {
+					$(element).autosize();
 				}
+			};
+
+			ko.bindingHandlers.scrollbar = {
+				init: function(element) {
+					$(element).addClass('worksheet__scrollbar').mCustomScrollbar({
+						axis: 'y',
+						theme: 'dark'
+					});
+				}
+			};
+
+			ko.components.register('edit-directory-modal-dialog', {
+				viewModel: {
+					createViewModel: function (params, componentInfo) {
+						const $element = $(componentInfo.element);
+
+						return new (function () {
+							this.initializing = ko.observable(true);
+
+							this.name = params.data.name;
+
+							this.createDirectoryItem = function(directoryItem) {
+								return {value: ko.observable(directoryItem)};
+							};
+
+							this.directory = ko.observableArray(
+								params.data.directory.map(directoryItem => this.createDirectoryItem(directoryItem))
+							);
+
+							this.searchTerm = ko.observable('');
+
+							this.editingDirectoryItem = ko.observable(null);
+							this.editingDirectoryItemFormModel = ko.observable(null).extend({
+								required: {
+									message: 'Обязательное поле'
+								}
+							});
+
+							this.isAdding = ko.observable(false);
+							this.addingFormModel = ko.observable(null).extend({
+								required: {
+									message: 'Обязательное поле'
+								}
+							});
+							this.isAddingFormSubmitted = ko.observable(false);
+							this.addingFormUniqueError = ko.pureComputed(() => {
+								const values = this.addingFormModel().split('\n');
+								const directoryValues = this.directory().map(item => item.value());
+
+								const usedValues = values.filter(value => directoryValues.includes(value));
+
+								if (usedValues.length > 0) {
+									return 'Значения: ' + usedValues.map(v => `"${v}"`).join(', ') + ' — есть в справочнике';
+								} else {
+									return null;
+								}
+							});
+							this.addingFormDuplicatedError = ko.pureComputed(() => {
+								const values = this.addingFormModel().split('\n');
+								const uniqueValues = new Set();
+								const duplicatedValues = new Set();
+
+								values.forEach(value => {
+									if (uniqueValues.has(value)) {
+										duplicatedValues.add(value);
+									} else {
+										uniqueValues.add(value);
+									}
+								})
+
+								if (duplicatedValues.size > 0) {
+									return 'Значения: ' + [...duplicatedValues].map(v => `"${v}"`).join(', ') + ' — повторяются несколько раз';
+								} else {
+									return null;
+								}
+							});
+
+							this.filteredDirectoryItems = ko.pureComputed(() => {
+								const searchTerm = this.searchTerm().toLowerCase();
+								return this.directory().filter(
+									directoryItem => directoryItem.value().toLowerCase().includes(searchTerm)
+								);
+							});
+
+							this.applyEditing = function () {
+								this.editingDirectoryItem().value(this.editingDirectoryItemFormModel());
+								this.editingDirectoryItem(null);
+							};
+
+							this.cancelEditing = function () {
+								this.editingDirectoryItem(null);
+							};
+
+							this.edit = function (directoryItem) {
+								this.editingDirectoryItem(directoryItem);
+								this.editingDirectoryItemFormModel(directoryItem.value());
+							};
+
+							this.add = function () {
+								this.addingFormModel('');
+								this.isAdding(true);
+								this.isAddingFormSubmitted(false);
+							};
+
+							this.submitAdding = function () {
+								this.isAddingFormSubmitted(true);
+
+								if (this.addingFormModel.isValid() && this.addingFormUniqueError() === null && this.addingFormDuplicatedError() === null) {
+									const values = this.addingFormModel().split('\n');
+									values.forEach(value => {
+										this.directory.push(this.createDirectoryItem(value));
+									});
+									this.isAddingFormSubmitted(false);
+									this.isAdding(false);
+								}
+							};
+
+							this.cancelAdding = function () {
+								this.isAdding(false);
+							};
+
+							this.delete = function (directoryItem) {
+								this.directory.remove(directoryItem);
+							};
+
+							this.cancel = function () {
+								if ('cancel' in params) {
+									params.cancel();
+								}
+							};
+
+							this.submit = function () {
+								if ('submit' in params) {
+									params.submit(this.directory().map(item => item.value()));
+								}
+							};
+
+							this.afterRender = function () {
+								$element.removeClass('worksheet__edit-directory-modal-dialog--initializing');
+
+								initSearchGlobal($element.find('.worksheet__edit-directory-modal-dialog-search').get(0));
+
+								this.initializing(false);
+							};
+
+							(() => {
+								$element.addClass('modal-dialog modal-dialog-centered');
+								$element.addClass('worksheet__edit-directory-modal-dialog');
+								$element.addClass('worksheet__edit-directory-modal-dialog--initializing');
+							})();
+						})();
+					}
+				},
+				template: { element: 'edit-directory-modal-dialog-template' }
 			});
 
-			$('.worksheet__table tbody tr').each((index, rowElement) => {
-				const $row = $(rowElement);
-				const $employeeVisibleCheckbox = $row.find('.worksheet__table-employee-visible-checkbox');
-				const $employeeRequiredCheckbox = $row.find('.worksheet__table-employee-required-checkbox');
-				const $candidateVisibleCheckbox = $row.find('.worksheet__table-candidate-visible-checkbox');
-				const $candidateRequiredCheckbox = $row.find('.worksheet__table-candidate-required-checkbox');
+			const ViewModel = function(firstStepFields, secondStepFields, additionalStepFields, additionalFields) {
+				this.modalOpens = ko.observableArray([]);
 
-				$employeeVisibleCheckbox.on('change', event => {
-					const checked = $(event.target).is(':checked');
+				this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
 
-					if (checked) {
-						$candidateVisibleCheckbox.prop('checked', true);
-					} else {
-						$employeeRequiredCheckbox.prop('checked', false);
-						$candidateVisibleCheckbox.prop('checked', false);
-						$candidateRequiredCheckbox.prop('checked', false);
-					}
+                this.firstStepFields = firstStepFields.map(field => ({
+					...field,
+					employeeVisible: ko.observable(field.employeeVisible),
+					employeeRequired: ko.observable(field.employeeRequired),
+					candidateVisible: ko.observable(field.candidateVisible),
+					candidateRequired: ko.observable(field.candidateRequired),
+					directoryCustom: field.isDirectory ? ko.observable(field.directoryCustom) : null,
+					directoryAutofill: field.isDirectory ? ko.observable(field.directoryAutofill) : null,
+					subfields: field.subfields.map(subfield => ({
+						...subfield,
+						directoryCustom: ko.observable(field.directoryCustom),
+						directoryAutofill: ko.observable(field.directoryAutofill),
+					}))
+                }));
+
+				this.secondStepFields = secondStepFields.map(field => ({
+					...field,
+					employeeVisible: ko.observable(field.employeeVisible),
+					employeeRequired: ko.observable(field.employeeRequired),
+					candidateVisible: ko.observable(field.candidateVisible),
+					candidateRequired: ko.observable(field.candidateRequired),
+					directoryCustom: field.isDirectory ? ko.observable(field.directoryCustom) : null,
+					directoryAutofill: field.isDirectory ? ko.observable(field.directoryAutofill) : null,
+					subfields: field.subfields.map(subfield => ({
+						...subfield,
+						directoryCustom: ko.observable(field.directoryCustom),
+						directoryAutofill: ko.observable(field.directoryAutofill),
+					}))
+				}));
+
+				this.additionalStepFields = additionalStepFields.map(field => ({
+					...field,
+					employeeVisible: ko.observable(field.employeeVisible),
+					employeeRequired: ko.observable(field.employeeRequired),
+					candidateVisible: ko.observable(field.candidateVisible),
+					candidateRequired: ko.observable(field.candidateRequired),
+				}));
+
+				this.createAdditionalField = function (field) {
+					return {
+						name: ko.observable(field.name).extend({
+							required: {
+								message: 'Обязательное поле'
+							}
+						}),
+						type: ko.observable(field.type),
+						contractAvailable: ko.observable(field.contractAvailable),
+						directory: ko.observable(field.directory),
+						directoryCustom: ko.observable(field.directoryCustom),
+						directoryAutofill: ko.observable(field.directoryAutofill)
+					};
+				};
+
+				this.additionalFields = ko.observableArray(additionalFields.map(field => this.createAdditionalField(field)));
+
+				this.addAdditionalField = function () {
+					this.additionalFields.push(this.createAdditionalField({
+						name: '',
+						type: '0',
+						contractAvailable: false,
+						directory: [],
+						directoryCustom: false,
+						directoryAutofill: false
+					}));
+				};
+
+				this.deleteAdditionalField = function (field) {
+					this.additionalFields.remove(field);
+				};
+
+				this.isAdditionalFieldsValid = ko.pureComputed(() => {
+					return this.additionalFields().every(field => field.name.isValid());
 				});
 
-				$employeeRequiredCheckbox.on('change', event => {
-					const checked = $(event.target).is(':checked');
+				this.formatDirectory = function (directory) {
+					return directory.slice(0, 10).map(item => item.toLowerCase()).join(', ').toUpperCase();
+				};
 
-					if (checked) {
-						$employeeVisibleCheckbox.prop('checked', true);
-						$candidateVisibleCheckbox.prop('checked', true);
-						$candidateRequiredCheckbox.prop('checked', true);
-					} else {
-						$candidateRequiredCheckbox.prop('checked', false);
+                this.afterRender = function () {
+					$(window).resize(() => {
+						console.log(123);
+						this.viewportSize({width: $(window).width(), height: $(window).height()});
+					});
+
+					$('.worksheet__table tbody tr').each((index, rowElement) => {
+						const $row = $(rowElement);
+						const $employeeVisibleCheckbox = $row.find('.worksheet__table-employee-visible-checkbox');
+						const $employeeRequiredCheckbox = $row.find('.worksheet__table-employee-required-checkbox');
+						const $candidateVisibleCheckbox = $row.find('.worksheet__table-candidate-visible-checkbox');
+						const $candidateRequiredCheckbox = $row.find('.worksheet__table-candidate-required-checkbox');
+
+						$employeeVisibleCheckbox.on('click', event => {
+							const checked = $(event.target).is(':checked');
+
+							if (checked) {
+								$candidateVisibleCheckbox.prop('checked', false).trigger('click');
+							} else {
+								$employeeRequiredCheckbox.prop('checked', true).trigger('click');
+								$candidateVisibleCheckbox.prop('checked', true).trigger('click');
+								$candidateRequiredCheckbox.prop('checked', true).trigger('click');
+							}
+						});
+
+						$employeeRequiredCheckbox.on('click', event => {
+							const checked = $(event.target).is(':checked');
+
+							if (checked) {
+								$employeeVisibleCheckbox.prop('checked', false).trigger('click');
+								$candidateVisibleCheckbox.prop('checked', false).trigger('click');
+								$candidateRequiredCheckbox.prop('checked', false).trigger('click');
+							} else {
+								$candidateRequiredCheckbox.prop('checked', true).trigger('click');
+							}
+						});
+					});
+
+					$('.js-select2').select2({
+						width: '100%'
+					});
+				};
+
+				this.openEditDirectoryModal = function (field) {
+					this.modalOpens.push({
+						dialogTemplateName: 'edit-directory-modal-content-template',
+						data: {name: field.name, directory: field.directory},
+						options: {
+							modalClass: 'modal-global fade center'
+						},
+						close: result => {
+							if (result !== undefined) {
+								field.directory = result;
+							}
+						}
+					});
+				};
+
+				this.openEditAdditionalFieldDirectoryModal = function (field) {
+					this.modalOpens.push({
+						dialogTemplateName: 'edit-directory-modal-content-template',
+						data: {name: field.name, directory: field.directory()},
+						options: {
+							modalClass: 'modal-global fade center'
+						},
+						close: result => {
+							if (result !== undefined) {
+								field.directory(result);
+							}
+						}
+					});
+				};
+            };
+
+            const viewModel = new ViewModel(
+                [
+					{
+						name: 'ФИО',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Фотография',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Пол',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Дата рождения',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Социальные сети',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Номер телефона для связи',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Email',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Гражданство',
+						isDirectory: true,
+						directory: ['Российская Федерация', 'Австрия'],
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: false,
+						directoryAutofill: false,
+						subfields: []
+					},
+					{
+						name: 'Фактический адрес проживания',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Адрес регистрации по паспорту',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Ближайшая станция метро',
+						isDirectory: true,
+						directory: [],
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: false,
+						directoryAutofill: false,
+						subfields: []
+					},
+					{
+						name: 'Опыт работы в сфере',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Напишите три положительных и три отрицательных своих качества',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Как узнали о вакансии',
+						isDirectory: true,
+						directory: [],
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: false,
+						directoryAutofill: false,
+						subfields: []
+					},
+					{
+						name: 'Кем бы хотели стать, желаемая должность',
+						isDirectory: true,
+						directory: [],
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: false,
+						directoryAutofill: false,
+						subfields: []
+					},
+					{
+						name: 'Напишите, почему именно Вас мы должны принять на работу',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+                ],
+				[
+					{
+						name: 'Образование',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: [
+							{
+								name: 'Специальность',
+								isDirectory: true,
+								directory: [],
+								directoryCustom: false,
+								directoryAutofill: false
+							}
+						]
+					},
+					{
+						name: 'Владение иностранными языками',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: [
+							{
+								name: 'Иностранные языки',
+								isDirectory: true,
+								directory: [],
+								directoryCustom: false,
+								directoryAutofill: false,
+							},
+							{
+								name: 'Уровень владения',
+								isDirectory: true,
+								directory: [],
+								directoryCustom: false,
+								directoryAutofill: false,
+							},
+						]
+					},
+					{
+						name: 'Владение программами',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: [
+							{
+								name: 'Программа',
+								isDirectory: true,
+								directory: [],
+								directoryCustom: false,
+								directoryAutofill: false,
+							},
+							{
+								name: 'Уровень владения',
+								isDirectory: true,
+								directory: [],
+								directoryCustom: false,
+								directoryAutofill: false,
+							},
+						]
+					},
+					{
+						name: 'Наличие автомобиля',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Семейное положение',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Вредные привычки',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Желаемый график',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: null,
+						directoryAutofill: null,
+						subfields: []
+					},
+					{
+						name: 'Последние места работы',
+						isDirectory: true,
+						directory: [],
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						subfields: [
+							{
+								name: 'Должность',
+								isDirectory: true,
+								directory: [],
+								directoryCustom: false,
+								directoryAutofill: false,
+							},
+							{
+								name: 'Причина увольнения',
+								isDirectory: true,
+								directory: [],
+								directoryCustom: false,
+								directoryAutofill: false,
+							},
+						]
 					}
-				});
-			});
+				],
+				[
+					{
+						name: 'Документы',
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false
+					},
+					{
+						name: 'Паспортные данные',
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false
+					},
+					{
+						name: 'СНИЛС',
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false
+					},
+					{
+						name: 'ИНН',
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false
+					}
+				],
+				[]
+            );
+
+            const $content = $('.worksheet');
+
+            ko.applyBindings(
+                viewModel,
+                $content.get()[0]
+            );
 		});
 	</script>
 </body>
