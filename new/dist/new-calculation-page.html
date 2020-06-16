@@ -2647,7 +2647,7 @@
     <!-- Сотрудники -->
     <td class="calculation-summary__cell calculation-summary__cell--count">
       <div class="calculation-summary__cell-content"
-           data-bind="text: ko.isObservable(position.employees) ? position.employees().length : position.employees"></div>
+           data-bind="text: position.employees().length"></div>
     </td>
 
     <!-- ФОТ, % в категории -->
@@ -2705,7 +2705,7 @@
     <!-- Сотрудники -->
     <td class="calculation-summary__cell calculation-summary__cell--count">
       <div class="calculation-summary__cell-content"
-           data-bind="text: total.employees"></div>
+           data-bind="text: total().employees.length"></div>
     </td>
 
     <!-- ФОТ, % в категории -->
@@ -2735,7 +2735,7 @@
     <!-- Опоздания -->
     <td class="calculation-summary__cell calculation-summary__cell--lateness">
       <div class="calculation-summary__cell-content">
-        <!-- ko template: { name: 'lateness-template', data: {lateness: total.lateness} } -->
+        <!-- ko template: { name: 'lateness-template', data: {lateness: total().lateness} } -->
         <!-- /ko -->
       </div>
     </td>
@@ -2746,10 +2746,10 @@
 <script type="text/html"
         id="lateness-template">
 <div class="lateness">
-  <div class="lateness__cell"></div>
-  <div class="lateness__cell"></div>
-  <div class="lateness__cell"></div>
-  <div class="lateness__cell"></div>
+  <div class="lateness__cell lateness__cell--light" data-bind="text: lateness.light"></div>
+  <div class="lateness__cell lateness__cell--medium" data-bind="text: lateness.medium"></div>
+  <div class="lateness__cell lateness__cell--hard" data-bind="text: lateness.hard"></div>
+  <div class="lateness__cell lateness__cell--total" data-bind="text: lateness.total"></div>
 </div>
 </script>
 
@@ -2967,7 +2967,7 @@
 
               <td class="calculation-summary__cell calculation-summary__cell--count">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: table.driversData.employees"></div>
+                     data-bind="text: table.driversData.employees.length"></div>
               </td>
 
               <td class="calculation-summary__cell calculation-summary__cell--count  calculation-summary__cell--total">
@@ -3118,46 +3118,37 @@
             return positions().filter(p => p.visible());
           });
 
-          const driversData = {
-            id: 'drivers',
-            name: 'Водители',
-            levels: [1, 2],
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkloadType: 'Время без дела',
-            additionalWorkloadValue: '52%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: 3
-          };
+          const driversData = model.driversData();
 
           /* TODO */
           const total = ko.pureComputed(() => {
-            return positions().reduce((acc, p) => {
-              return {
-                name: '',
-                workload: (acc.workload || 0) + p.workload,
-                workloadType: '',
-                units: '',
-                additionalWorkload: '',
-                fotCategory: 100,
-                fotRevenue: 100,
-                performanceStandart: -100,
-                lateness: {
-                  green: 0,
-                  yellow: 0,
-                  red: 0
-                },
-                employees: (acc.employees || 0) + p.employees().length
-              }
-            }, {})
+            const result = {
+              workload: 0,
+              workloadType: '',
+              units: '',
+              additionalWorkload: '',
+              fotCategory: 100,
+              fotRevenue: 100,
+              performanceStandart: -100,
+              lateness: {
+                light: 0,
+                medium: 0,
+                hard: 0,
+                total: 0,
+              },
+              employees: []
+            };
+
+            positions().forEach(p => {
+              result.workload += p.workload;
+              result.employees = [...result.employees, ...p.employees()];
+              result.lateness.light += p.lateness.light || 0;
+              result.lateness.medium += p.lateness.medium || 0;
+              result.lateness.hard += p.lateness.hard || 0;
+              result.lateness.total += p.lateness.total || 0;
+            });
+
+            return result;
           });
 
           const columns = [
@@ -3480,12 +3471,13 @@
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary') -->
-  <td class="positions-table__cell positions-table__cell--salary positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--salary positions-table__cell--empty">
+  </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary-bulk') -->
   <td class="positions-table__cell positions-table__cell--salary-bulk">
-    <div class="positions-table__cell-content" data-bind="total.salaryBulk"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.salaryBulk"></div>
   </td>
   <!-- /ko -->
 
@@ -3494,23 +3486,33 @@
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('normalization-ratio') -->
-  <td class="positions-table__cell positions-table__cell--normalization-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--normalization-ratio">
+    <div class="positions-table__cell-content" data-bind="text: total.normalizationRatio"></div>
+  </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart">
+    <div class="positions-table__cell-content" data-bind="text: total.revenueStandart"></div>
+  </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-ratio') -->
-  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-ratio">
+    <div class="positions-table__cell-content" data-bind="text: total.bonusRatio"></div>
+  </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
-  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+  <td class="positions-table__cell positions-table__cell--corrected-time">
+    <div class="positions-table__cell-content" data-bind="text: total.correctedTime"></div>
+  </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-exceed') -->
-  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-exceed">
+    <div class="positions-table__cell-content" data-bind="text: total.bonusExceed"></div>
+  </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('depremation') -->
@@ -3525,8 +3527,12 @@
   <td class="positions-table__cell positions-table__cell--fine positions-table__cell--empty"></td>
   <!-- /ko -->
 
-  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
+    <div class="positions-table__cell-content" data-bind="text: total.total"></div>
+  </td>
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
+    <div class="positions-table__cell-content" data-bind="text: total.toPayment"></div>
+  </td>
 </tr>
 
 </script>
@@ -3574,8 +3580,8 @@
       </div><!-- .calculation-tab__settings-group -->
       <div class="calculation-tab__settings-group">
         <!-- Столбцы -->
-        <button
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns" data-bind="click: setColumns">
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns"
+                data-bind="click: setColumns">
           Настроить столбцы
         </button>
 
@@ -3598,7 +3604,6 @@
       <!-- Fixed section -->
       <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
       <table data-bind="hrmTable"
-
              class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section">
         <thead>
           <tr class="positions-table__row positions-table__head-row">
@@ -3630,7 +3635,8 @@
           } -->
           <tr class="positions-table__row">
             <td class="positions-table__cell">
-              <div class="positions-table__cell-content"  data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
+              <div class="positions-table__cell-content"
+                   data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
 
                 <!-- Данные сотрудника -->
                 <div
@@ -3669,8 +3675,9 @@
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
           } -->
           <tr class="positions-table__row">
-            <td class="positions-table__cell" >
-              <div class="positions-table__cell-content" data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
+            <td class="positions-table__cell">
+              <div class="positions-table__cell-content"
+                   data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
 
                 <!-- Данные сотрудника -->
                 <div
@@ -3710,10 +3717,10 @@
           <colgroup>
             <col class="positions-table__col positions-table__col--name">
             <!-- ko foreach: table.columns -->
-              <!-- ko if: $data.visible -->
-              <col class="positions-table__col"
+            <!-- ko if: $data.visible -->
+            <col class="positions-table__col"
                  data-bind="class: 'position-table__col--' + id">
-              <!-- /ko -->
+            <!-- /ko -->
             <!-- /ko -->
             <col class="positions-table__col positions-table__col--total">
             <col class="positions-table__col positions-table__col--payment">
@@ -4165,6 +4172,8 @@
     const PositionsModel = function () {
       const positions = ko.observableArray([]);
 
+      const driversData = ko.observable();
+
       /**
       * Returns position with specified id
       * @param {string|number} id
@@ -4182,6 +4191,11 @@
         positions(positionsList.map(positionData => {
           return PositionModel(positionData)
         }))
+      }
+
+
+      function setDriversData(driversData) {
+        this.driversData(PositionModel(driversData));
       }
 
       /**
@@ -4378,11 +4392,32 @@
           employees(updated.concat(newEmployees));
         }
 
+        const lateness = ko.pureComputed(() => {
+          const result = {
+            light: 0,
+            medium: 0,
+            hard: 0,
+            total: 0,
+          };
+          this.employees().forEach(employee => {
+            const employeeLateness = employee.lateness;
+            result.light += employeeLateness.light || 0;
+            result.medium += employeeLateness.medium || 0;
+            result.hard += employeeLateness.hard || 0;
+            result.total += result.light + result.medium + result.hard;
+          });
+
+          return result;
+        });
+
+        const totalLateness = ko.pureComputed(() => {
+          return lateness.light + lateness.medium + lateness.hard;
+        })
+
         return {
           id: positionData.id,
           name: positionData.name, // название
           workloadType: positionData.workloadType,
-          type: positionData.type, // production/delivery
           levels: positionData.levels, //
           rate: positionData.rate, // оклад
           units: 3,
@@ -4391,6 +4426,7 @@
           fotCategory: positionData.fotCategory,
           fotRevenue: positionData.fotRevenue,
           employees,
+          lateness,
           addEmployee, // добавить сотрудника
           updateEmployees, // обновить список сотрудников
           allEmployeesLoaded, // загружены сотрудники из всех филиалов
@@ -4402,7 +4438,9 @@
 
       return {
         positions,
+        driversData,
         setPositions,
+        setDriversData,
         getPositionById,
       }
     }
@@ -4440,6 +4478,22 @@
       this.summaryModel = new PositionsModel();
       this.summaryModel.setPositions(defaultPositions);
 
+
+      this.summaryModel.setDriversData({
+        id: 'drivers',
+        name: 'Водители',
+        levels: [1, 2],
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkloadType: 'Время без дела',
+        additionalWorkloadValue: '52%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        employees: []
+      });
+
+
       /** Input data */
       this.inputModel = {
         filial: ko.observable(''),
@@ -4473,7 +4527,6 @@
               name: 'Администратор филиала',
               id: '1',
               levels: [1, 2],
-              type: 'production',
               workloadType: 'Выручка',
               workload: 0,
               units: '₽',
@@ -4482,23 +4535,28 @@
               fotCategory: 0,
               fotRevenue: 0,
               performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
               employees: [
                 {
                   name: 'Администратор филиала #1',
                   id: '11',
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 },
                 {
                   name: 'Администратор филиала #2',
                   id: '12',
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 }
               ]
             },
@@ -4506,7 +4564,6 @@
               name: 'Повар-сушист',
               id: '2',
               levels: [],
-              type: 'production',
               workloadType: 'Выручка',
               workload: 0,
               units: '₽',
@@ -4515,23 +4572,29 @@
               fotCategory: 0,
               fotRevenue: 0,
               performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
+
               employees: [
                 {
                   name: 'Повар-сушист #1',
                   id: '21',
                   level: 0,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 },
                 {
                   name: 'Повар-сушист #2',
                   id: '22',
                   level: 0,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 }
               ]
             },
@@ -4539,32 +4602,36 @@
               name: 'Повар-пиццмейкер',
               id: '3',
               levels: [1, 2, 3],
-              type: 'production',
-              workloadType: 'Выручка',
-              workload: 0,
-              units: '₽',
+              workloadType: 'Пиццы',
+              workload: 30,
+              units: 'шт.',
               additionalWorkloadType: 'Лосось, кг',
               additionalWorkloadValue: 200,
               fotCategory: 0,
               fotRevenue: 0,
               performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
               employees: [
                 {
                   name: 'Повар-пиццмейкер #1',
                   id: '31',
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 },
                 {
                   name: 'Повар-пиццмейкер #2',
                   id: '32',
                   level: 3,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 }
               ]
 
@@ -4573,7 +4640,6 @@
               name: 'Официант',
               id: '4',
               levels: [1, 2],
-              type: 'production',
               workloadType: 'Выручка',
               workload: 0,
               units: '₽',
@@ -4582,23 +4648,29 @@
               fotCategory: 0,
               fotRevenue: 0,
               performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
+
               employees: [
                 {
                   name: 'Официант #1',
                   id: '41',
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 },
                 {
                   name: 'Официант #2',
                   id: '42',
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 }
               ]
             },
@@ -4629,10 +4701,8 @@
       })();
 
       this.productionPositions = ko.pureComputed(() => {
-        return this.summaryModel.positions()
-          .filter(position => position.type === 'production');
+        return this.summaryModel.positions();
       });
-
 
       /** Shift stimulation model (fine/bonus) */
       this.stimulation = (() => {
@@ -4672,8 +4742,6 @@
         };
       })();
 
-
-
       this.isEmployeesCalculated = ko.observable(false);
 
       this.calculateEmployees = function () {
@@ -4694,8 +4762,6 @@
         employee.workingIntervals.push(this.createEmployeeWorkingIntervalModel(''));
       };
 
-
-
       this.onRateInput = function (position) {
         position.employees().forEach(employee => {
           employee.rate(position.rate());
@@ -4704,14 +4770,6 @@
 
       this.onEmployeeRateInput = function (position) {
         position.rate('');
-      };
-
-
-      this.getWorkloadTypeName = function (workloadType) {
-        switch (workloadType) {
-          case 1: return 'Объём товара по всему предприятию';
-          case 2: return 'Объём товара по категориям';
-        }
       };
 
       this.getEmployeeWorkingHours = function (employee) {

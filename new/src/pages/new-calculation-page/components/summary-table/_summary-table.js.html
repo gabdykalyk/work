@@ -28,46 +28,37 @@
             return positions().filter(p => p.visible());
           });
 
-          const driversData = {
-            id: 'drivers',
-            name: 'Водители',
-            levels: [1, 2],
-            workloadType: 'Выручка',
-            workload: 0,
-            units: '₽',
-            additionalWorkloadType: 'Время без дела',
-            additionalWorkloadValue: '52%',
-            fotCategory: 0,
-            fotRevenue: 0,
-            performanceStandart: -100,
-            lateness: {
-              green: 0,
-              yellow: 0,
-              red: 0
-            },
-            employees: 3
-          };
+          const driversData = model.driversData();
 
           /* TODO */
           const total = ko.pureComputed(() => {
-            return positions().reduce((acc, p) => {
-              return {
-                name: '',
-                workload: (acc.workload || 0) + p.workload,
-                workloadType: '',
-                units: '',
-                additionalWorkload: '',
-                fotCategory: 100,
-                fotRevenue: 100,
-                performanceStandart: -100,
-                lateness: {
-                  green: 0,
-                  yellow: 0,
-                  red: 0
-                },
-                employees: (acc.employees || 0) + p.employees().length
-              }
-            }, {})
+            const result = {
+              workload: 0,
+              workloadType: '',
+              units: '',
+              additionalWorkload: '',
+              fotCategory: 100,
+              fotRevenue: 100,
+              performanceStandart: -100,
+              lateness: {
+                light: 0,
+                medium: 0,
+                hard: 0,
+                total: 0,
+              },
+              employees: []
+            };
+
+            positions().forEach(p => {
+              result.workload += p.workload;
+              result.employees = [...result.employees, ...p.employees()];
+              result.lateness.light += p.lateness.light || 0;
+              result.lateness.medium += p.lateness.medium || 0;
+              result.lateness.hard += p.lateness.hard || 0;
+              result.lateness.total += p.lateness.total || 0;
+            });
+
+            return result;
           });
 
           const columns = [

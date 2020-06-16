@@ -2955,15 +2955,15 @@ ko.components.register('hrm-tab-group', {
 
         this.updateWidth = function () {
           this.width($element.width());
-        };
+        }; // this.timer = ko.observable(0);
+        // setInterval(() => {
+        //     this.timer(this.timer() + 1);
+        // }, 1000);
 
-        this.timer = ko.observable(0);
-        setInterval(() => {
-          this.timer(this.timer() + 1);
-        }, 1000);
 
         (() => {
           $(window).on('resize', this.windowResizeHandler);
+          this.windowResizeHandler();
         })();
       };
 
@@ -2978,8 +2978,9 @@ ko.components.register('hrm-tab-group', {
   template: `
         <div class="hrm-tab-group__content-wrapper">
             <div class="hrm-tab-group__content">
+
                 <!-- ko if: items.length > 0 -->
-                    <!-- ko foreach: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth ? items.slice(0, maxFitItem() + 1) : items -->
+                    <!-- ko foreach: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth ? items.slice(0, maxFitItem() + 1) : items -->
                         <div class="hrm-tab-group__item"
                              data-bind="
                                 click: function() {if (!disabled()) {$component.activeItem($index());}},
@@ -2991,8 +2992,8 @@ ko.components.register('hrm-tab-group', {
                              ">
                         </div>
                     <!-- /ko -->
-                    
-                    <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
+
+                    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth -->
                         <!-- ko if: maxFitItem() < items.length - 1 -->
                             <button class="hrm-button hrm-tab-group__more-button"
                                     data-bind="
@@ -3002,7 +3003,7 @@ ko.components.register('hrm-tab-group', {
                                     ">
                                 Еще...
                             </button>
-                            
+
                             <script id="hrm-tab-group-more-button-dropdown-menu-template" type="text/html">
                                 <!-- ko foreach: items.slice(maxFitItem() + 1) -->
                                     <div class="hrm-dropdown-menu__item"
@@ -3013,7 +3014,7 @@ ko.components.register('hrm-tab-group', {
                                          ">
                                     </div>
                                 <!-- /ko -->
-                            </script>   
+                            </script>
                         <!-- /ko -->
                     <!-- /ko -->
                 <!-- /ko -->

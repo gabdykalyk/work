@@ -65,6 +65,8 @@
     const PositionsModel = function () {
       const positions = ko.observableArray([]);
 
+      const driversData = ko.observable();
+
       /**
       * Returns position with specified id
       * @param {string|number} id
@@ -82,6 +84,11 @@
         positions(positionsList.map(positionData => {
           return PositionModel(positionData)
         }))
+      }
+
+
+      function setDriversData(driversData) {
+        this.driversData(PositionModel(driversData));
       }
 
       /**
@@ -278,11 +285,32 @@
           employees(updated.concat(newEmployees));
         }
 
+        const lateness = ko.pureComputed(() => {
+          const result = {
+            light: 0,
+            medium: 0,
+            hard: 0,
+            total: 0,
+          };
+          this.employees().forEach(employee => {
+            const employeeLateness = employee.lateness;
+            result.light += employeeLateness.light || 0;
+            result.medium += employeeLateness.medium || 0;
+            result.hard += employeeLateness.hard || 0;
+            result.total += result.light + result.medium + result.hard;
+          });
+
+          return result;
+        });
+
+        const totalLateness = ko.pureComputed(() => {
+          return lateness.light + lateness.medium + lateness.hard;
+        })
+
         return {
           id: positionData.id,
           name: positionData.name, // название
           workloadType: positionData.workloadType,
-          type: positionData.type, // production/delivery
           levels: positionData.levels, //
           rate: positionData.rate, // оклад
           units: 3,
@@ -291,6 +319,7 @@
           fotCategory: positionData.fotCategory,
           fotRevenue: positionData.fotRevenue,
           employees,
+          lateness,
           addEmployee, // добавить сотрудника
           updateEmployees, // обновить список сотрудников
           allEmployeesLoaded, // загружены сотрудники из всех филиалов
@@ -302,7 +331,9 @@
 
       return {
         positions,
+        driversData,
         setPositions,
+        setDriversData,
         getPositionById,
       }
     }
@@ -340,6 +371,22 @@
       this.summaryModel = new PositionsModel();
       this.summaryModel.setPositions(defaultPositions);
 
+
+      this.summaryModel.setDriversData({
+        id: 'drivers',
+        name: 'Водители',
+        levels: [1, 2],
+        workloadType: 'Выручка',
+        workload: 0,
+        units: '₽',
+        additionalWorkloadType: 'Время без дела',
+        additionalWorkloadValue: '52%',
+        fotCategory: 0,
+        fotRevenue: 0,
+        employees: []
+      });
+
+
       /** Input data */
       this.inputModel = {
         filial: ko.observable(''),
@@ -373,7 +420,6 @@
               name: 'Администратор филиала',
               id: '1',
               levels: [1, 2],
-              type: 'production',
               workloadType: 'Выручка',
               workload: 0,
               units: '₽',
@@ -382,23 +428,28 @@
               fotCategory: 0,
               fotRevenue: 0,
               performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
               employees: [
                 {
                   name: 'Администратор филиала #1',
                   id: '11',
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 },
                 {
                   name: 'Администратор филиала #2',
                   id: '12',
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 }
               ]
             },
@@ -406,7 +457,6 @@
               name: 'Повар-сушист',
               id: '2',
               levels: [],
-              type: 'production',
               workloadType: 'Выручка',
               workload: 0,
               units: '₽',
@@ -415,23 +465,29 @@
               fotCategory: 0,
               fotRevenue: 0,
               performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
+
               employees: [
                 {
                   name: 'Повар-сушист #1',
                   id: '21',
                   level: 0,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 },
                 {
                   name: 'Повар-сушист #2',
                   id: '22',
                   level: 0,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 }
               ]
             },
@@ -439,32 +495,36 @@
               name: 'Повар-пиццмейкер',
               id: '3',
               levels: [1, 2, 3],
-              type: 'production',
-              workloadType: 'Выручка',
-              workload: 0,
-              units: '₽',
+              workloadType: 'Пиццы',
+              workload: 30,
+              units: 'шт.',
               additionalWorkloadType: 'Лосось, кг',
               additionalWorkloadValue: 200,
               fotCategory: 0,
               fotRevenue: 0,
               performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
               employees: [
                 {
                   name: 'Повар-пиццмейкер #1',
                   id: '31',
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 },
                 {
                   name: 'Повар-пиццмейкер #2',
                   id: '32',
                   level: 3,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 }
               ]
 
@@ -473,7 +533,6 @@
               name: 'Официант',
               id: '4',
               levels: [1, 2],
-              type: 'production',
               workloadType: 'Выручка',
               workload: 0,
               units: '₽',
@@ -482,23 +541,29 @@
               fotCategory: 0,
               fotRevenue: 0,
               performanceStandart: -100,
-              lateness: {
-                green: 0,
-                yellow: 0,
-                red: 0
-              },
+
               employees: [
                 {
                   name: 'Официант #1',
                   id: '41',
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 },
                 {
                   name: 'Официант #2',
                   id: '42',
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                 }
               ]
             },
@@ -529,10 +594,8 @@
       })();
 
       this.productionPositions = ko.pureComputed(() => {
-        return this.summaryModel.positions()
-          .filter(position => position.type === 'production');
+        return this.summaryModel.positions();
       });
-
 
       /** Shift stimulation model (fine/bonus) */
       this.stimulation = (() => {
@@ -572,8 +635,6 @@
         };
       })();
 
-
-
       this.isEmployeesCalculated = ko.observable(false);
 
       this.calculateEmployees = function () {
@@ -594,8 +655,6 @@
         employee.workingIntervals.push(this.createEmployeeWorkingIntervalModel(''));
       };
 
-
-
       this.onRateInput = function (position) {
         position.employees().forEach(employee => {
           employee.rate(position.rate());
@@ -604,14 +663,6 @@
 
       this.onEmployeeRateInput = function (position) {
         position.rate('');
-      };
-
-
-      this.getWorkloadTypeName = function (workloadType) {
-        switch (workloadType) {
-          case 1: return 'Объём товара по всему предприятию';
-          case 2: return 'Объём товара по категориям';
-        }
       };
 
       this.getEmployeeWorkingHours = function (employee) {
