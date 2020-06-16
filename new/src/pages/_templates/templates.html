@@ -249,6 +249,40 @@
                         </div>
                     </div>
                     <!-- /ko -->
+
+                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                    <div class="templates__form-field mt-4"
+                         data-bind="
+                            hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+                        ">
+                        <label data-bind="hrmFormFieldLabel: label">Значение</label>
+
+                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                            <input data-bind="
+                                    textInput: $root.formattedDate,
+                                    hrmDatepicker,
+                                    hrmDatepickerConfig: {
+                                        format: 'DD.MM.YYYY'
+                                    },
+                                    hrmFormFieldDatepickerControl: control,
+                                    hrmFormFieldDatepickerControlErrorStateMatcher: $root.formControlErrorStateMatcher
+                                ">
+
+                            <i
+                               class="hrm-form-field__basis-suffix hrm-form-field-icon hrm-form-field-calendar-icon"></i>
+                        </div>
+
+                        <div data-bind="
+                                component: {name: 'hrm-form-field-error'},
+                                hrmSlide,
+                                hrmSlideValue: control() !== null ? control().errorState : false,
+                                hrmSlideDuration: 150
+                            ">
+                            <!-- ko text: $root.formattedDate.error() -->
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- /ko -->
                 </div>
                 <div class="templates__section">
                     <div class="templates__section-title">Поле поиска</div>
