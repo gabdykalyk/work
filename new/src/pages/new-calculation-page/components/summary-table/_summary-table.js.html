@@ -1,4 +1,5 @@
 @@include('./_summary-position-row.html')
+@@include('./_summary-total-row.html')
 @@include('./_summary-table.html')
 
 <script type="text/javascript">
@@ -22,6 +23,29 @@
         createViewModel: function (params, componentInfo) {
           const model = params.model;
           const positions = model.positions;
+
+          const visiblePositions = ko.pureComputed(() => {
+            return positions().filter(p => p.visible());
+          });
+
+          const driversData = {
+            id: 'drivers',
+            name: 'Водители',
+            levels: [1, 2],
+            workloadType: 'Выручка',
+            workload: 0,
+            units: '₽',
+            additionalWorkload: 'Время без дела 0%',
+            fotCategory: 0,
+            fotRevenue: 0,
+            performanceStandart: -100,
+            lateness: {
+              green: 0,
+              yellow: 0,
+              red: 0
+            },
+            employees: 3
+          };
 
           /* TODO */
           const total = ko.pureComputed(() => {
@@ -60,7 +84,8 @@
           return {
             positions,
             total,
-            columns
+            columns,
+            driversData
           };
         }
       },

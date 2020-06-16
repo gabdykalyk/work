@@ -37,23 +37,18 @@
         </thead>
 
         <tbody>
-          <!-- ko foreach: table.positions -->
-          <!-- ko template: {name: 'position-row-template', data: {position: $data}} -->
+          <!-- ko foreach: table.visiblePositions -->
+          <!-- ko template: {name: 'summary-position-row-template', data: {position: $data}} -->
           <!-- /ko -->
           <!-- /ko -->
 
-          <tr class="calculation-summary__row calculation-summary__row--total">
-            <!-- ko foreach: { data: table.columns, as: 'column' } -->
-            <td class="calculation-summary__cell"
-                data-bind="css: {'calculation-summary__cell--empty': !column.hasTotal }">
-              <!-- ko if: column.hasTotal -->
-              <div class="calculation-summary__cell-content"
-                   data-bind="text: column.total">
-              </div>
-              <!-- /ko -->
-            </td>
-            <!-- /ko -->
-          </tr>
+          <!-- ko template: {name: 'summary-position-row-template', data: {position: driversData }} -->
+          <!-- /ko -->
+
+          <!-- ko template: {name: 'summary-total-row-template', data: {total: total}} -->
+          <!-- /ko -->
+
+
 
         </tbody>
       </table>
@@ -93,12 +88,17 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--job">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: name"></div>
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--job">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: driversData.name"></div>
+              </td>
 
               <td class="calculation-summary__cell  calculation-summary__cell--job calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content">Итого</div>
@@ -113,12 +113,17 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--workload-type">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: workloadType"></div>
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--workload-type">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.driversData.workloadType"></div>
+              </td>
 
               <td
                   class="calculation-summary__cell calculation-summary__cell--workload-type  calculation-summary__cell--total">
@@ -134,18 +139,29 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--workload">
                 <div class="position-workload">
 
                   <div class="position-workload__value"
-                       data-bind="text: workload"></div>
+                       data-bind="text: table.workload"></div>
                   <div class="position-workload__units"
-                       data-bind="text: units"></div>
+                       data-bind="text: table.units"></div>
 
                 </div>
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--workload">
+                <div class="position-workload">
+
+                  <div class="position-workload__value"
+                       data-bind="text: table.driversData.workload"></div>
+                  <div class="position-workload__units"
+                       data-bind="text: table.driversData.units"></div>
+
+                </div>
+              </td>
 
               <td
                   class="calculation-summary__cell calculation-summary__cell--workload  calculation-summary__cell--total">
@@ -162,12 +178,17 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--additional-wokload">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: additionalWorkload"></div>
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--additional-wokload">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.driversData.additionalWorkload"></div>
+              </td>
 
               <td
                   class="calculation-summary__cell calculation-summary__cell--additional-wokload  calculation-summary__cell--total">
@@ -183,12 +204,17 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--count">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: employees.length"></div>
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--count">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.driversData.employees"></div>
+              </td>
 
               <td class="calculation-summary__cell calculation-summary__cell--count  calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content"
@@ -204,12 +230,17 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--fot-category">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotCategory"></div>
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--fot-category">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.driversData.fotCategory"></div>
+              </td>
 
               <td
                   class="calculation-summary__cell  calculation-summary__cell--fot-category calculation-summary__cell--total">
@@ -226,12 +257,17 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--fot-revenue">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotRevenue"></div>
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.driversData.fotRevenue"></div>
+              </td>
 
               <td
                   class="calculation-summary__cell calculation-summary__cell--fot-revenue  calculation-summary__cell--total">
@@ -248,12 +284,17 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotRevenue"></div>
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
+                <div class="calculation-summary__cell-content"
+                     data-bind="text: table.driversData.fotRevenue"></div>
+              </td>
 
               <td
                   class="calculation-summary__cell calculation-summary__cell--performance-standart  calculation-summary__cell--total">
@@ -269,12 +310,17 @@
                 </div>
               </th>
 
-              <!-- ko foreach: table.positions -->
+              <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--lateness">
                 <!-- ko template: { name: 'lateness-template', data: {lateness: $data.lateness} } -->
                 <!-- /ko -->
               </td>
               <!-- /ko -->
+
+              <td class="calculation-summary__cell calculation-summary__cell--lateness">
+                <!-- ko template: { name: 'lateness-template', data: {lateness: table.driversData.lateness} } -->
+                <!-- /ko -->
+              </td>
 
               <td class="calculation-summary__cell calculation-summary__cell--lateness   calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content">
