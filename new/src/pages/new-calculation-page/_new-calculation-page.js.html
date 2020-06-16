@@ -42,13 +42,13 @@
           {
             id: 1,
             name: 'Иван Иванов'
-          },{
+          }, {
             id: 2,
             name: 'Петр Петров'
-          },{
+          }, {
             id: 3,
             name: 'Николай Николаев'
-          },{
+          }, {
             id: 4,
             name: 'Сергей Сергеев'
           }
@@ -244,7 +244,7 @@
         * Adds new employee to list
         * @param {Object} employee
         */
-        function addEmployee (employee) {
+        function addEmployee(employee) {
           employees.push(EmployeeModel(employee, positionData, 'visible'));
         }
 
@@ -353,22 +353,161 @@
 
       /** Calculation */
       this.isBuilt = ko.observable(false);
+      this.loading = ko.observable(false);
       /** Get data for calculation */
       this.buildCalculation = () => {
+        this.loading(true);
         const inputData = ko.toJS(this.inputModel);
 
-        /* Получение списка позиций */
-        const positions = [
-          TestPosition('Администратор филиала', 1, { levelCount: 0 }),
-          TestPosition('Повар-сушист', 2),
-          TestPosition('Повар-пиццмейкер', 3),
-          TestPosition('Официант', 4),
-          TestPosition('Водитель', 5, { type: 'delivery' }),
-        ];
+        // Показывать лоадер 3с
+        const loadingDelay = new Promise(resolve => {
+          setTimeout(() => {
+            resolve();
+          }, 3000);
+        });
 
-        /** Обновление представления */
-        this.summaryModel.setPositions(positions);
-        this.isBuilt(true);
+        setTimeout(() => {
+          /* Получение списка позиций */
+          const positions = [
+            {
+              name: 'Администратор филиала',
+              id: '1',
+              levels: [1, 2],
+              type: 'production',
+              workloadType: 'Выручка',
+              workload: 0,
+              units: '₽',
+              additionalWorkload: 'Время без дела 0%',
+              fotCategory: 0,
+              fotRevenue: 0,
+              performanceStandart: -100,
+              lateness: {
+                green: 0,
+                yellow: 0,
+                red: 0
+              },
+              employees: [
+                {
+                  name: 'Администратор филиала #1',
+                  id: '11',
+                  level: 1,
+                  workingIntervals: ['09:00 – 16:00'],
+                },
+                {
+                  name: 'Администратор филиала #2',
+                  id: '12',
+                  level: 2,
+                  workingIntervals: ['09:00 – 16:00'],
+                }
+              ]
+            },
+            {
+              name: 'Повар-сушист',
+              id: '2',
+              levels: [],
+              type: 'production',
+              workloadType: 'Выручка',
+              workload: 0,
+              units: '₽',
+              additionalWorkload: 'Время без дела 0%',
+              fotCategory: 0,
+              fotRevenue: 0,
+              performanceStandart: -100,
+              lateness: {
+                green: 0,
+                yellow: 0,
+                red: 0
+              },
+              employees: [
+                {
+                  name: 'Повар-сушист #1',
+                  id: '21',
+                  level: 0,
+                  workingIntervals: ['09:00 – 16:00'],
+                },
+                {
+                  name: 'Повар-сушист #2',
+                  id: '22',
+                  level: 0,
+                  workingIntervals: ['09:00 – 16:00'],
+                }
+              ]
+            },
+            {
+              name: 'Повар-пиццмейкер',
+              id: '3',
+              levels: [1, 2, 3],
+              type: 'production',
+              workloadType: 'Выручка',
+              workload: 0,
+              units: '₽',
+              additionalWorkload: 'Время без дела 0%',
+              fotCategory: 0,
+              fotRevenue: 0,
+              performanceStandart: -100,
+              lateness: {
+                green: 0,
+                yellow: 0,
+                red: 0
+              },
+              employees: [
+                {
+                  name: 'Повар-пиццмейкер #1',
+                  id: '31',
+                  level: 1,
+                  workingIntervals: ['09:00 – 16:00'],
+                },
+                {
+                  name: 'Повар-пиццмейкер #2',
+                  id: '32',
+                  level: 3,
+                  workingIntervals: ['09:00 – 16:00'],
+                }
+              ]
+
+            },
+            {
+              name: 'Официант',
+              id: '4',
+              levels: [1, 2],
+              type: 'production',
+              workloadType: 'Выручка',
+              workload: 0,
+              units: '₽',
+              additionalWorkload: 'Время без дела 0%',
+              fotCategory: 0,
+              fotRevenue: 0,
+              performanceStandart: -100,
+              lateness: {
+                green: 0,
+                yellow: 0,
+                red: 0
+              },
+              employees: [
+                {
+                  name: 'Официант #1',
+                  id: '41',
+                  level: 1,
+                  workingIntervals: ['09:00 – 16:00'],
+                },
+                {
+                  name: 'Официант #2',
+                  id: '42',
+                  level: 2,
+                  workingIntervals: ['09:00 – 16:00'],
+                }
+              ]
+            },
+          ];
+
+          /** Обновление представления */
+          this.summaryModel.setPositions(positions);
+
+          loadingDelay.then(() => {
+            this.isBuilt(true);
+            this.loading(false);
+          });
+        }, 1000);
       };
 
       /** Tabs: production, delivery, lateness */
@@ -582,49 +721,7 @@
 
 
     /*****/
-    function TestEmployee(name, id, index, levelsCount) {
-      return {
-        name: name + ' #' + index,
-        id: id + '–' + index,
-        level: Math.floor(Math.random() * levelsCount + 1),
-        workingIntervals: ['09:00 – 16:00'],
 
-      }
-    }
-    function TestPosition(name, id, config) {
-      config = config || {};
-
-      let levelCount = 'levelCount' in config ? config.levelCount : Math.floor(Math.random() * 4);
-      if (levelCount === 1) levelCount = 2;
-      const levels = [...Array(levelCount)].map((_, i) => i + 1);
-
-      const employeeCount = 'employeeCount' in config ? config.employeeCount : Math.floor(Math.random() * 4 + 1);
-      const employees = [...Array(employeeCount)].map((_, i) => {
-        return TestEmployee(name, id, i + 1, levelCount);
-
-      })
-
-      return {
-        name: name,
-        id: id,
-        levels: levels,
-        type: config.type || 'production',
-
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkload: 'Время без дела 0%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        performanceStandart: -100,
-        lateness: {
-          green: 0,
-          yellow: 0,
-          red: 0
-        },
-        employees: employees
-      };
-    }
 
     function createModalDialog(id, data, onSave) {
       return {
