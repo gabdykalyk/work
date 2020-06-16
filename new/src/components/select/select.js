@@ -8,6 +8,7 @@ ko.bindingHandlers.hrmSelect = {
         const searchEnabled = allBindings.has('hrmSelectSearchEnabled') ? allBindings.get('hrmSelectSearchEnabled') : false;
         const placeholder = allBindings.has('hrmSelectPlaceholder') ? allBindings.get('hrmSelectPlaceholder') : ' ';
         const allowClear = allBindings.has('hrmSelectAllowClear') ? allBindings.get('hrmSelectAllowClear') : false;
+        const dropdownParent = allBindings.has('hrmSelectDropdownParent') ? allBindings.get('hrmSelectDropdownParent') : $('body');
 
         if (customValuesAllowed && (!isMultiple && !searchEnabled)) {
             throw Error('You have to enable both options "hrmSelectCustomValuesAllowed" and "hrmSelectSearchEnabled"');
@@ -19,6 +20,7 @@ ko.bindingHandlers.hrmSelect = {
             width: '100%',
             dropdownAutoWidth: true,
             dropdownCssClass: 'hrm-select__dropdown',
+            dropdownParent,
             placeholder,
             allowClear,
             templateSelection: state => $('<span>').addClass('hrm-select__rendered-text').text(state.text),

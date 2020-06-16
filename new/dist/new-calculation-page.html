@@ -1959,21 +1959,13 @@
               hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
 
             <option></option>
-            <optgroup label="Безопасность">
-              <option value="0">Возврат в кассу</option>
+            <!-- ko foreach: fines -->
+            <optgroup data-bind="attr: { label: name }">
+              <!-- ko foreach: items -->
+              <option data-bind="value: id, text: name"></option>
+              <!-- /ko -->
             </optgroup>
-            <optgroup label="Дисциплина">
-              <option value="1">За отсутствие объяснительной</option>
-              <option value="2">Халатное отношение к работе</option>
-            </optgroup>
-            <optgroup label="Документы">
-              <option value="3">Налог</option>
-            </optgroup>
-            <optgroup label="Производство">
-              <option value="4">Выкуп готовой продукции</option>
-              <option value="5">Порча инвентаря и оборудования</option>
-              <option value="6">Компенсация за халатность</option>
-            </optgroup>
+            <!-- /ko -->
           </select>
         </div>
 
@@ -2006,21 +1998,13 @@
               hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
 
             <option></option>
-            <optgroup label="Безопасность">
-              <option value="0">Возврат в кассу</option>
+            <!-- ko foreach: bonuses -->
+            <optgroup data-bind="attr: { label: name }">
+              <!-- ko foreach: items -->
+              <option data-bind="value: id, text: name"></option>
+              <!-- /ko -->
             </optgroup>
-            <optgroup label="Дисциплина">
-              <option value="1">За отсутствие объяснительной</option>
-              <option value="2">Халатное отношение к работе</option>
-            </optgroup>
-            <optgroup label="Документы">
-              <option value="3">Налог</option>
-            </optgroup>
-            <optgroup label="Производство">
-              <option value="4">Выкуп готовой продукции</option>
-              <option value="5">Порча инвентаря и оборудования</option>
-              <option value="6">Компенсация за халатность</option>
-            </optgroup>
+            <!-- /ko -->
           </select>
         </div>
 
@@ -2151,17 +2135,6 @@
 
 <script type="text/javascript">
   $(function () {
-    /* Справочник штрафов */
-    const finesTable = {
-      '0': 200,
-      '1': 300,
-      '2': 400,
-      '3': 500,
-      '4': 600,
-      '5': 700,
-      '6': 800,
-    };
-
     ko.components.register('stimulation-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -2177,6 +2150,9 @@
 
           const ViewModel = function () {
             this.isSubmitted = ko.observable(false);
+
+            this.fines = params.data.fines;
+            this.bonuses = params.data.bonuses;
 
             this.formControlErrorStateMatcher = (formControl) => {
               return ko.pureComputed(() => {
@@ -2218,26 +2194,37 @@
 
             this.reset = function () {
               this.formModel.base('');
-              this.formModel.sum(0);
+              this.formModel.sum('');
               this.formModel.author('');
               this.formModel.comment('');
             }
 
             this.formModel.stimulationType.subscribe(() => {
               this.reset();
-            })
+            });
+
+            const getFineById = (fineId) => {
+              for (let i in this.fines) {
+                const items = this.fines[i].items;
+                for (let k in items) {
+                  const fine = items[k];
+                  if (fine.id == fineId) return fine;
+                }
+              }
+            };
 
             this.formModel.base.subscribe((value) => {
               if (this.formModel.stimulationType() !== this.stimulationTypes.FINE) return;
               if (!value) this.formModel.sum(0);
-              this.formModel.sum(finesTable[value] || 0);
-            })
+              const fine = getFineById(value);
+              this.formModel.sum(fine ? fine.sum : 0);
+            });
 
             this.validationObject = ko.validatedObservable({
               base: this.formModel.base,
               author: this.formModel.author,
               sum: this.formModel.sum,
-            })
+            });
 
             this.cancel = function () {
               if ('cancel' in params) {
@@ -4106,6 +4093,72 @@
 </script>
 
   <script type="text/javascript">
+  /* Справочник штрафов */
+  const fines = [
+    {
+      name: 'Группа 1',
+      items: [
+        {
+          id: '1',
+          name: 'Основание штрафа 1',
+          sum: 200
+        },
+        {
+          id: '2',
+          name: 'Основание штрафа 2',
+          sum: 300
+        }
+      ]
+    },
+    {
+      name: 'Группа 2',
+      items: [
+        {
+          id: '3',
+          name: 'Основание штрафа 3',
+          sum: 200
+        },
+        {
+          id: '4',
+          name: 'Основание штрафа 4',
+          sum: 300
+        }
+      ]
+    },
+  ];
+
+  const bonuses = [
+    {
+      name: 'Группа 1',
+      items: [
+        {
+          id: '1',
+          name: 'Основание премии 1',
+          sum: 200
+        },
+        {
+          id: '2',
+          name: 'Основание премии 2',
+          sum: 300
+        }
+      ]
+    },
+    {
+      name: 'Группа 2',
+      items: [
+        {
+          id: '3',
+          name: 'Основание премии 3',
+          sum: 200
+        },
+        {
+          id: '4',
+          name: 'Основание премии 4',
+          sum: 300
+        }
+      ]
+    },
+  ];
   // Справочники
   window.directories = {
     fines: {
@@ -4841,7 +4894,10 @@
         const setStimulation = () => {
           this.utils.openModal(
             'stimulation',
-            null,
+            {
+              fines: fines,
+              bonuses: bonuses
+            },
             (data) => {
               console.log('stimulation saved', data)
             }
