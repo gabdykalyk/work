@@ -222,6 +222,8 @@
           }, 0);
         });
 
+        const lateness = employee.lateness;
+
         return {
           name: employee.name, // имя
           id: employee.id, // идентификатор
@@ -238,6 +240,7 @@
           returnRate: 30, // норматив выручки
           salaryBulk: 7200, // основная часть зп
 
+          lateness: lateness,
 
           bonuses,
           bonusesState,
@@ -315,7 +318,8 @@
             hard: 0,
             total: 0,
           };
-          this.employees().forEach(employee => {
+          employees().forEach(employee => {
+            console.log(employee)
             const employeeLateness = employee.lateness;
             result.light += employeeLateness.light || 0;
             result.medium += employeeLateness.medium || 0;
@@ -326,8 +330,10 @@
           return result;
         });
 
+        console.log('lateness', lateness())
+
         const totalLateness = ko.pureComputed(() => {
-          return lateness.light + lateness.medium + lateness.hard;
+          return lateness.total;
         })
 
         return {
@@ -887,6 +893,12 @@
 
         return h + ':' + m;
       };
+
+      this.afterRenderBuild = function(el) {
+        $(el).hide().fadeIn(200, () => {
+          $(window).resize();
+        })
+      }
 
       this.isSidebarCollapsed = ko.observable(localStorage.getItem(HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY) === 'true');
 

@@ -79,18 +79,10 @@ ko.components.register('hrm-tab-group', {
                     this.width($element.width());
                 };
 
-                // this.timer = ko.observable(0);
-
-                // setInterval(() => {
-                //     this.timer(this.timer() + 1);
-                // }, 1000);
-
                 (() => {
                     $(window).on('resize', this.windowResizeHandler);
                     this.windowResizeHandler();
                 })();
-
-
             };
 
             HrmTabGroupViewModel.prototype.dispose = function() {
@@ -103,7 +95,7 @@ ko.components.register('hrm-tab-group', {
     },
     template: `
         <div class="hrm-tab-group__content-wrapper">
-            <div class="hrm-tab-group__content">
+            <div class="hrm-tab-group__content"">
 
                 <!-- ko if: items.length > 0 -->
                     <!-- ko foreach: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth ? items.slice(0, maxFitItem() + 1) : items -->
