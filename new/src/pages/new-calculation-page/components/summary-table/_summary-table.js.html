@@ -1,17 +1,16 @@
 @@include('./_summary-position-row.html')
+@@include('./_summary-drivers-row.html')
 @@include('./_summary-total-row.html')
 @@include('./_summary-table.html')
 
 <script type="text/javascript">
   $(function () {
-    function Column(id, title, fullTitle, total) {
-
+    function Column(id, title, fullTitle, colspan) {
       return {
         id,
         title,
         fullTitle,
-        hasTotal: !!total,
-        total
+        colspan
       }
     }
 
@@ -30,41 +29,25 @@
 
           const driversData = model.driversData();
 
-          /* TODO */
-          const total = ko.pureComputed(() => {
-            const result = {
-              workload: 0,
-              workloadType: '',
-              units: '',
-              additionalWorkload: '',
-              fotCategory: 100,
-              fotRevenue: 100,
-              performanceStandart: -100,
-              lateness: {
-                light: 0,
-                medium: 0,
-                hard: 0,
-                total: 0,
-              },
-              employees: []
-            };
-
-            positions().forEach(p => {
-              result.workload += p.workload;
-              result.employees = [...result.employees, ...p.employees()];
-              result.lateness.light += p.lateness.light || 0;
-              result.lateness.medium += p.lateness.medium || 0;
-              result.lateness.hard += p.lateness.hard || 0;
-              result.lateness.total += p.lateness.total || 0;
-            });
-
-            return result;
-          });
+          const total = {
+            workload: ko.observable(0),
+            workloadUnits: ko.observable(''),
+            fotCategory: ko.observable(100),
+            fotRevenue: ko.observable(100),
+            performanceStandart: ko.observable(-100),
+            lateness: {
+              light: ko.observable(0),
+              medium: ko.observable(0),
+              hard: ko.observable(0),
+              total: ko.observable(0),
+            },
+            employees: ko.observable(0)
+          };
 
           const columns = [
             Column('job', 'Должность', 'Должность'),
             Column('workload-type', 'Тип нагрузки', 'Тип нагрузки'),
-            Column('workload', 'Нагрузка', 'Нагрузка'),
+            Column('workload', 'Нагрузка', 'Нагрузка', 2),
             Column('additional-workload', 'Доп. нагрузка', 'Дополнительная нагрузка'),
             Column('count', 'Сотр.', 'Сотрудники'),
             Column('fot-category', 'ФОТ, % в категории', 'ФОТ, % в категории'),

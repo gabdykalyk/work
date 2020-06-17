@@ -270,6 +270,198 @@
 
 <script src="assets/js/main.js"></script>
 
+
+  <template id="columns-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Настройка столбцов
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body columns-settings">
+    <div class="columns-settings__search"
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по наименованию' }}">
+    </div>
+
+    <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+    <div class="modal-dialog__scroll">
+      <div class="modal-dialog__scroll-container columns-settings__list">
+        <!-- ko foreach: { data: $component.columns, as: 'column' } -->
+
+        <!-- ko if: column.visible() -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="columns-settings__list-item">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
+            </div>
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+    <div class="modal-dialog__scroll">
+      <div class="modal-dialog__scroll-container columns-settings__list"
+           data-bind="hrmScrollable">
+        <!-- ko foreach: { data: $component.columns, as: 'column' } -->
+
+        <!-- ko if: column.visible() -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="columns-settings__list-item">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
+            </div>
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list columns-settings__action-list">
+    <button class="hrm-button hrm-basic-button  hrm-button--size_large hrm-basic-modal-dialog__action-list-item"
+            data-bind="click: function() {reset();}">
+      Сбросить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-button--size_large  hrm-accent-button hrm-basic-modal-dialog__action-list-item"
+            data-bind="click: function() {submit();}">
+      Применить
+    </button>
+  </div>
+
+</template>
+
+
+<script type="text/javascript">
+    $(function () {
+        function ColumnModel(column) {
+            const checked = ko.observable(column.visible());
+            function apply() {
+                column.visible(checked());
+            }
+            return {
+                id: column.id,
+                name: column.fullTitle,
+                checked,
+                visible: ko.observable(true),
+                apply
+            }
+        }
+
+        ko.components.register('columns-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'hrm-modal-dialog--size_large',
+                        'modal-dialog--columns'
+                    ]);
+
+
+
+
+                    const viewModel = new (function () {
+                        this.columns = params.data.columns.map(ColumnModel);
+
+                        this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+
+                        this.windowResizeHandler = () => {
+                            this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                        };
+
+                        $(window).on('resize', this.windowResizeHandler);
+
+                        /** Поисковый запрос */
+                        this.term = ko.observable('');
+                        /** Скрыть/Показать позиции в списке */
+                        this.term.subscribe(value => {
+                            const formattedTerm = value.toLowerCase();
+
+                            this.columns.forEach(c => {
+                                let isVisible = true;
+                                if (formattedTerm.length >= 1) {
+                                    const formattedName = c.name.toLowerCase();
+                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
+                                    console.log(isVisible)
+                                }
+                                c.visible(isVisible);
+                            })
+                        });
+
+                        /** Сбросить все чекбоксы и поисковый запрос */
+                        this.reset = function () {
+                            this.term('');
+                            this.columns.forEach(c => {
+                                c.checked(false);
+                            });
+                        }
+
+                        /** Закрыть окно без изменений */
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        /** Применить изменения */
+                        this.apply = function () {
+                            this.columns.forEach(c => {
+                                c.apply()
+                            });
+                        }
+
+                        this.submit = function () {
+                            if ('submit' in params) {
+                                this.apply();
+                                params.submit(true);
+                            }
+                        };
+                    });
+
+                    viewModel.dispose = () => {
+                        $(window).off('resize', viewModel.windowResizeHandler);
+                    }
+
+                    return viewModel;
+                }
+            },
+            template: {
+                element: document.getElementById('columns-modal-dialog-template')
+            }
+        });
+    });
+</script>
+
+
   <template id="positions-modal-dialog-template">
 
   <button class="hrm-button hrm-basic-modal-dialog__close-button"
@@ -413,152 +605,6 @@
             },
             template: {
                 element: document.getElementById('positions-modal-dialog-template')
-            }
-        });
-    });
-</script>
-
-  <template id="columns-modal-dialog-template">
-
-  <button class="hrm-button hrm-basic-modal-dialog__close-button"
-          data-bind="click: function() { cancel(); }"
-          aria-label="Close">
-  </button>
-
-  <div class="hrm-basic-modal-dialog__header">
-    <h2 class="hrm-basic-modal-dialog__title">
-      Настройка столбцов
-    </h2>
-  </div>
-
-  <div class="hrm-basic-modal-dialog__body columns-settings">
-    <div class="columns-settings__search"
-         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по наименованию' }}">
-    </div>
-
-    <div class="calculation-modal__scroll">
-      <div class="columns-settings__list">
-        <!-- ko foreach: { data: $component.columns, as: 'column' } -->
-
-        <!-- ko if: column.visible() -->
-
-        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-        <div class="columns-settings__list-item">
-          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-            <div
-                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
-            </div>
-            <label
-                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
-          </div>
-        </div>
-        <!-- /ko -->
-
-        <!-- /ko -->
-        <!-- /ko -->
-      </div>
-    </div>
-
-
-
-  </div>
-
-  <div class="hrm-basic-modal-dialog__action-list columns-settings__action-list">
-    <button class="hrm-button hrm-basic-button  hrm-button--size_large hrm-basic-modal-dialog__action-list-item"
-            data-bind="click: function() {reset();}">
-      Сбросить
-    </button>
-
-    <button class="hrm-button hrm-basic-button hrm-button--size_large  hrm-accent-button hrm-basic-modal-dialog__action-list-item"
-            data-bind="click: function() {submit();}">
-      Применить
-    </button>
-  </div>
-
-</template>
-
-
-<script type="text/javascript">
-    $(function () {
-        function ColumnModel(column) {
-            const checked = ko.observable(column.visible());
-            function apply() {
-                column.visible(checked());
-            }
-            return {
-                id: column.id,
-                name: column.fullTitle,
-                checked,
-                visible: ko.observable(true),
-                apply
-            }
-        }
-
-        ko.components.register('columns-modal-dialog', {
-            viewModel: {
-                createViewModel: function (params, componentInfo) {
-                    const $element = $(componentInfo.element);
-                    $element.addClass([
-                        'modal-dialog',
-                        'modal-dialog-centered',
-                        'hrm-modal-dialog',
-                        'hrm-basic-modal-dialog',
-                        'hrm-modal-dialog--size_large'
-                    ]);
-
-                    return new (function () {
-                        this.columns = params.data.columns.map(ColumnModel);
-
-                        /** Поисковый запрос */
-                        this.term = ko.observable('');
-                        /** Скрыть/Показать позиции в списке */
-                        this.term.subscribe(value => {
-                            const formattedTerm = value.toLowerCase();
-
-                            this.columns.forEach(c => {
-                                let isVisible = true;
-                                if (formattedTerm.length >= 1) {
-                                    const formattedName = c.name.toLowerCase();
-                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
-                                    console.log(isVisible)
-                                }
-                                c.visible(isVisible);
-                            })
-                        });
-
-                        /** Сбросить все чекбоксы и поисковый запрос */
-                        this.reset = function () {
-                            this.term('');
-                            this.columns.forEach(c => {
-                                c.checked(false);
-                            });
-                        }
-
-                        /** Закрыть окно без изменений */
-                        this.cancel = function () {
-                            if ('cancel' in params) {
-                                params.cancel();
-                            }
-                        };
-
-                        /** Применить изменения */
-                        this.apply = function() {
-                            this.columns.forEach(c => {
-                                c.apply()
-                            });
-                        }
-
-                        this.submit = function () {
-                            if ('submit' in params) {
-                                this.apply();
-                                params.submit(true);
-                            }
-                        };
-                    });
-                }
-            },
-            template: {
-                element: document.getElementById('columns-modal-dialog-template')
             }
         });
     });
@@ -2625,23 +2671,119 @@
     </td>
 
     <!-- Нагрузка -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload">
-      <div class="calculation-summary__cell-content">
-        <div class="position-workload">
-          <div class="position-workload__value" data-bind="text: position.workload"></div>
-          <div class="position-workload__units" data-bind="text: position.units"></div>
-        </div>
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value" data-bind="hrmTableEditableCell: editableCell" align="right">
+            <input data-bind="
+                value: position.workload,
+                hrmTableEditableCellInputControl,
+                hrmTableEditableCellInputControlOwner: editableCell
+            ">
       </div>
 
+    </td>
+    <!-- /ko -->
+
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+      <div class="calculation-summary__cell-content" data-bind="text: position.workloadUnits">
+      </div>
     </td>
 
     <!-- Доп. нагрузка -->
     <td class="calculation-summary__cell calculation-summary__cell--additional-workload">
-      <div class="calculation-summary__cell-content"
-           data-bind="text: position.additionalWorkload">
+      <div class="calculation-summary__cell-content">
+        <!-- ko if: position.additionalWorkloadType -->
           <div class="position-additional-workload">
             <div class="position-additional-workload__type" data-bind="text: position.additionalWorkloadType"></div>
-            <div class="position-additional-workload__value" data-bind="text: position.additionalWorkloadValue"></div>
+
+            <div class="position-additional-workload__value" data-bind="text: position.additionalWorkload"></div>
+
+          </div>
+        <!-- /ko -->
+      </div>
+    </td>
+
+    <!-- Сотрудники -->
+    <td class="calculation-summary__cell calculation-summary__cell--count">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.employees().length"></div>
+    </td>
+
+    <!-- ФОТ, % в категории -->
+    <td class="calculation-summary__cell calculation-summary__cell--fot-category">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.fotCategory"></div>
+    </td>
+
+    <!-- ФОТ, % от выручки -->
+    <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" >
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.fotRevenue"></div>
+    </td>
+
+    <!-- Норм. выработки -->
+    <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
+      <div class="calculation-summary__cell-content">
+           <div class="position-performance-standart">
+
+            <div class="position-performance-standart__value" data-bind="text: position.performanceStandart"></div>
+           </div>
+      </div>
+    </td>
+
+    <!-- Опоздания -->
+    <td class="calculation-summary__cell calculation-summary__cell--lateness">
+      <div class="calculation-summary__cell-content">
+        <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness} } -->
+        <!-- /ko -->
+      </div>
+    </td>
+  </tr>
+
+</script>
+
+<script type="text/html"
+        id="summary-drivers-row-template">
+  <tr class="calculation-summary__row">
+    <!-- Должность -->
+    <td class="calculation-summary__cell calculation-summary__cell--job">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.name"></div>
+    </td>
+
+    <!-- Тип нагрузки -->
+    <td class="calculation-summary__cell calculation-summary__cell--workload-type">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.workloadType"></div>
+    </td>
+
+    <!-- Нагрузка -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value" data-bind="hrmTableEditableCell: editableCell" align="right">
+            <input data-bind="
+                value: position.workload,
+                hrmTableEditableCellInputControl,
+                hrmTableEditableCellInputControlOwner: editableCell
+            ">
+      </div>
+
+    </td>
+    <!-- /ko -->
+
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+      <div class="calculation-summary__cell-content" data-bind="text: position.workloadUnits">
+      </div>
+    </td>
+
+
+    <!-- Доп. нагрузка -->
+    <td class="calculation-summary__cell calculation-summary__cell--additional-workload">
+      <div class="calculation-summary__cell-content">
+          <div class="position-additional-workload position-additional-workload--delivery">
+            <div class="position-additional-workload__type">Время без дела:</div>
+            <div class="position-additional-workload__value">
+              <!-- ko text: position.additionalWorkload() + '%' -->
+              <!-- /ko -->
+            </div>
           </div>
       </div>
     </td>
@@ -2666,8 +2808,15 @@
 
     <!-- Норм. выработки -->
     <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
-      <div class="calculation-summary__cell-content"
-           data-bind="text: position.performanceStandart"></div>
+      <div class="calculation-summary__cell-content">
+           <div class="position-performance-standart">
+
+            <div class="position-performance-standart__label" data-bind="text: position.performanceStandartType"></div>
+
+
+            <div class="position-performance-standart__value" data-bind="text: position.performanceStandart"></div>
+           </div>
+      </div>
     </td>
 
     <!-- Опоздания -->
@@ -2691,13 +2840,15 @@
     <!-- Тип нагрузки -->
     <td class="calculation-summary__cell calculation-summary__cell--workload-type calculation-summary__cell--empty"></td>
 
+
     <!-- Нагрузка -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload">
-      <div class="calculation-summary__cell-content">
-        <div class="position-workload">
-          <div class="position-workload__value" data-bind="text: total.workload"></div>
-          <div class="position-workload__units" data-bind="text: total.units"></div>
-        </div>
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value">
+      <div class="calculation-summary__cell-content" data-bind="text: total.workload()">
+      </div>
+    </td>
+
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+      <div class="calculation-summary__cell-content" data-bind="text: total.workloadUnits()">
       </div>
     </td>
 
@@ -2707,7 +2858,7 @@
     <!-- Сотрудники -->
     <td class="calculation-summary__cell calculation-summary__cell--count">
       <div class="calculation-summary__cell-content"
-           data-bind="text: total().employees.length"></div>
+           data-bind="text: total.employees()"></div>
     </td>
 
     <!-- ФОТ, % в категории -->
@@ -2715,7 +2866,7 @@
       data-bind="style: {
         background: '#D0F4E3'
       }">
-      <div class="calculation-summary__cell-content">100</div>
+      <div class="calculation-summary__cell-content" data-bind="text: total.fotCategory()"></div>
     </td>
 
     <!-- ФОТ, % от выручки -->
@@ -2723,7 +2874,7 @@
       data-bind="style: {
         background: '#D0F4E3'
       }">
-      <div class="calculation-summary__cell-content">100</div>
+      <div class="calculation-summary__cell-content" data-bind="text: total.fotRevenue()"></div>
     </td>
 
     <!-- Норм. выработки -->
@@ -2731,13 +2882,13 @@
       data-bind="style: {
         background: '#D0F4E3'
       }">
-      <div class="calculation-summary__cell-content">-100.0</div>
+      <div class="calculation-summary__cell-content" data-bind="text: total.performanceStandart()"></div>
     </td>
 
     <!-- Опоздания -->
     <td class="calculation-summary__cell calculation-summary__cell--lateness">
       <div class="calculation-summary__cell-content">
-        <!-- ko template: { name: 'lateness-template', data: {lateness: total().lateness} } -->
+        <!-- ko template: { name: 'lateness-template', data: {lateness: total.lateness} } -->
         <!-- /ko -->
       </div>
     </td>
@@ -2747,12 +2898,28 @@
 
 <script type="text/html"
         id="lateness-template">
-<div class="lateness">
-  <div class="lateness__cell lateness__cell--light" data-bind="text: lateness.light"></div>
-  <div class="lateness__cell lateness__cell--medium" data-bind="text: lateness.medium"></div>
-  <div class="lateness__cell lateness__cell--hard" data-bind="text: lateness.hard"></div>
-  <div class="lateness__cell lateness__cell--total" data-bind="text: lateness.total"></div>
-</div>
+  <div class="lateness">
+    <div class="lateness__cell lateness__cell--light"
+    data-bind="
+    text: lateness.light > 0 ? lateness.light : '',
+    style: {
+      'background-color': lateness.light > 0 ? '#D0F4E3' : 'transparent',
+    }"></div>
+    <div class="lateness__cell lateness__cell--medium"
+    data-bind="
+    text: lateness.medium > 0 ? lateness.medium : '',
+    style: {
+      'background-color': lateness.medium > 0 ? '#FDFFB3' : 'transparent',
+    }"></div>
+    <div class="lateness__cell lateness__cell--hard"
+    data-bind="
+    text: lateness.hard > 0 ? lateness.hard : '',
+    style: {
+      'background-color': lateness.hard > 0 ? '#FFD3E8' : 'transparent',
+    }"></div>
+    <div class="lateness__cell lateness__cell--total"
+    data-bind="text: lateness.total || '0'"></div>
+  </div>
 </script>
 
 <template id="calculation-page-summary-table-template">
@@ -2772,7 +2939,9 @@
           <tr class="calculation-summary__row">
             <!-- ko foreach: { data: table.columns, as: 'column' } -->
             <th class="calculation-summary__cell calculation-summary__head-cell"
-                data-bind="class: 'calculation-summary__cell--' + column.id">
+                data-bind="class: 'calculation-summary__cell--' + column.id, attr: {
+                  'colspan': column.colspan || 1
+                }">
               <div class="calculation-summary__cell-content">
                 <span data-bind="text: column.title"></span>
                 <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button  calculation-summary__info-icon"
@@ -2789,7 +2958,7 @@
           <!-- /ko -->
           <!-- /ko -->
 
-          <!-- ko template: {name: 'summary-position-row-template', data: {position: driversData }} -->
+          <!-- ko template: {name: 'summary-drivers-row-template', data: {position: driversData }} -->
           <!-- /ko -->
 
           <!-- ko template: {name: 'summary-total-row-template', data: {total: total}} -->
@@ -2836,13 +3005,15 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--job">
+              <td class="calculation-summary__cell calculation-summary__cell--job"
+                  colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: name"></div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--job">
+              <td class="calculation-summary__cell calculation-summary__cell--job"
+                  colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: driversData.name"></div>
               </td>
@@ -2853,33 +3024,33 @@
             </tr>
 
             <tr class="calculation-summary__row calculation-summary__row--workload-type">
-              <th
-                  class="calculation-summary__cell calculation-summary__head-cell calculation-summary__cell--workload-type">
+              <th class="calculation-summary__cell calculation-summary__head-cell calculation-summary__cell--workload-type">
                 <div class="calculation-summary__cell-content">
                   Тип нагрузки
                 </div>
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--workload-type">
+              <td class="calculation-summary__cell calculation-summary__cell--workload-type" colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: workloadType"></div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--workload-type">
+              <td class="calculation-summary__cell calculation-summary__cell--workload-type" colspan="2">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: table.driversData.workloadType"></div>
+                     data-bind="text: table.driversData.workloadType"
+                     ></div>
               </td>
 
               <td
                   class="calculation-summary__cell calculation-summary__cell--workload-type  calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: table.total().workloadType"></div>
+                     data-bind="text: table.total.workloadType"></div>
               </td>
             </tr>
 
-            <tr class="calculation-summary__row calculation-summary__row--workload">
+            <tr class="calculation-summary__row calculation-summary__row--workload-value">
               <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--workload">
                 <div class="calculation-summary__cell-content">
                   Нагрузка
@@ -2887,175 +3058,206 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--workload">
-                <div class="position-workload">
+              <!-- ko let: {editableCell: ko.observable(null)} -->
+              <td class="calculation-summary__cell calculation-summary__cell--workload-value"
+                  data-bind="hrmTableEditableCell: editableCell">
 
-                  <div class="position-workload__value"
-                       data-bind="text: table.workload"></div>
-                  <div class="position-workload__units"
-                       data-bind="text: table.units"></div>
+                <input data-bind="
+                    value: workload,
+                    hrmTableEditableCellInputControl,
+                    hrmTableEditableCellInputControlOwner: editableCell
+                ">
 
-                </div>
+              </td>
+              <!-- /ko -->
+              <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+                <div class="position-workload__units"
+                     data-bind="text: workloadUnits"></div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--workload">
-                <div class="position-workload">
 
-                  <div class="position-workload__value"
-                       data-bind="text: table.driversData.workload"></div>
-                  <div class="position-workload__units"
-                       data-bind="text: table.driversData.units"></div>
-
-                </div>
+              <td class="calculation-summary__cell calculation-summary__cell--workload-value">
+                <div class="position-workload__value"
+                     data-bind="text: table.driversData.workload"></div>
+              </td>
+              <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+                <div class="position-workload__units"
+                     data-bind="text: table.driversData.workloadUnits"></div>
               </td>
 
               <td
-                  class="calculation-summary__cell calculation-summary__cell--workload  calculation-summary__cell--total">
+                  class="calculation-summary__cell calculation-summary__cell--workload-value  calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: table.total().workload"></div>
+                     data-bind="text: table.total.workload() + ' ' + table.total.workloadUnits()">
+                </div>
               </td>
             </tr>
 
+
+
             <tr class="calculation-summary__row calculation-summary__row--additional-workload">
               <th
-                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--additional-wokload">
+                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--additional-workload">
                 <div class="calculation-summary__cell-content">
                   Доп. нагрузка
                 </div>
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--additional-wokload">
-                <div class="calculation-summary__cell-content"
-                     data-bind="text: additionalWorkload">
-                     <div class="position-additional-workload">
-                      <div class="position-additional-workload__type" data-bind="text: position.additionalWorkloadType"></div>
-                      <div class="position-additional-workload__value" data-bind="text: position.additionalWorkloadValue"></div>
-                    </div>
+              <td class="calculation-summary__cell calculation-summary__cell--additional-wokload"
+                  colspan="2">
+                <div class="calculation-summary__cell-content">
+                  <!-- ko if: position.additionalWorkloadType -->
+                  <div class="position-additional-workload">
+                    <div class="position-additional-workload__type"
+                         data-bind="text: position.additionalWorkloadType"></div>
+                    <div class="position-additional-workload__value"
+                         data-bind="text: position.additionalWorkload"></div>
+
                   </div>
+                  <!-- /ko -->
+                </div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--additional-wokload">
+              <td class="calculation-summary__cell calculation-summary__cell--additional-wokload"
+                  colspan="2">
                 <div class="calculation-summary__cell-content">
-                     <div class="position-additional-workload">
-                      <div class="position-additional-workload__type" data-bind="text: table.driversData.additionalWorkloadType"></div>
-                      <div class="position-additional-workload__value" data-bind="text: table.driversData.additionalWorkloadValue"></div>
+                  <div class="position-additional-workload position-additional-workload--delivery">
+                    <div class="position-additional-workload__type">Время без дела:</div>
+                    <div class="position-additional-workload__value">
+                      <!-- ko text: table.driversData.additionalWorkload() + '%' -->
+                      <!-- /ko -->
                     </div>
+                  </div>
                 </div>
               </td>
 
-              <td
-                  class="calculation-summary__cell calculation-summary__cell--additional-wokload  calculation-summary__cell--total">
-                <div class="calculation-summary__cell-content"
-                     data-bind="text: table.total().additionalWorkload"></div>
+              <td class="calculation-summary__cell calculation-summary__cell--additional-wokload  calculation-summary__cell--total">
               </td>
             </tr>
 
             <tr class="calculation-summary__row calculation-summary__row--count">
-              <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--count">
+              <th class="calculation-summary__cell calculation-summary__head-cell calculation-summary__cell--count">
                 <div class="calculation-summary__cell-content">
                   Сотрудники
                 </div>
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--count">
+              <td class="calculation-summary__cell calculation-summary__cell--count"
+                  colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: employees.length"></div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--count">
+              <td class="calculation-summary__cell calculation-summary__cell--count"
+                  colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: table.driversData.employees.length"></div>
               </td>
 
               <td class="calculation-summary__cell calculation-summary__cell--count  calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: table.total().employees.length"></div>
+                     data-bind="text: table.total.employees()"></div>
               </td>
             </tr>
 
             <tr class="calculation-summary__row calculation-summary__row--fot-category">
-              <th
-                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--fot-category">
+              <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--fot-category">
                 <div class="calculation-summary__cell-content">
                   ФОТ, % в категории
                 </div>
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--fot-category">
+              <td class="calculation-summary__cell calculation-summary__cell--fot-category"
+                  colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotCategory"></div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--fot-category">
+              <td class="calculation-summary__cell calculation-summary__cell--fot-category"
+                  colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: table.driversData.fotCategory"></div>
               </td>
 
-              <td
-                  class="calculation-summary__cell  calculation-summary__cell--fot-category calculation-summary__cell--total">
+              <td class="calculation-summary__cell  calculation-summary__cell--fot-category calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: table.total().fotCategory"></div>
+                     data-bind="text: table.total.fotCategory()"></div>
               </td>
             </tr>
 
             <tr class="calculation-summary__row calculation-summary__row--fot-revenue">
-              <th
-                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--fot-revenue">
+              <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--fot-revenue">
                 <div class="calculation-summary__cell-content">
                   ФОТ, % от выручки
                 </div>
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue">
+              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue"
+                  colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotRevenue"></div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue">
+              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue"
+                  colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: table.driversData.fotRevenue"></div>
               </td>
 
-              <td
-                  class="calculation-summary__cell calculation-summary__cell--fot-revenue  calculation-summary__cell--total">
+              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue  calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: table.total().fotRevenue"></div>
+                     data-bind="text: table.total.fotRevenue()"></div>
               </td>
             </tr>
 
             <tr class="calculation-summary__row calculation-summary__row--performance-standart">
-              <th
-                  class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--performance-standart">
+              <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--performance-standart">
                 <div class="calculation-summary__cell-content">
                   Норм. выр-ки, %
                 </div>
               </th>
 
+
+
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
-                <div class="calculation-summary__cell-content"
-                     data-bind="text: fotRevenue"></div>
+              <td class="calculation-summary__cell calculation-summary__cell--performance-standart"
+                  colspan="2">
+                <div class="calculation-summary__cell-content">
+                  <div class="position-performance-standart">
+                    <div class="position-performance-standart__value"
+                         data-bind="text: position.performanceStandart"></div>
+                  </div>
+                </div>
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
-                <div class="calculation-summary__cell-content"
-                     data-bind="text: table.driversData.fotRevenue"></div>
+              <td class="calculation-summary__cell calculation-summary__cell--performance-standart"
+                  colspan="2">
+                <div class="calculation-summary__cell-content">
+                  <div class="position-performance-standart">
+
+                    <div class="position-performance-standart__label"
+                         data-bind="text: table.driversData.performanceStandartType"></div>
+
+
+                    <div class="position-performance-standart__value"
+                         data-bind="text: table.driversData.performanceStandart"></div>
+                  </div>
+                </div>
               </td>
 
-              <td
-                  class="calculation-summary__cell calculation-summary__cell--performance-standart  calculation-summary__cell--total">
+              <td class="calculation-summary__cell calculation-summary__cell--performance-standart  calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: table.total().performanceStandart"></div>
+                     data-bind="text: table.total.performanceStandart()"></div>
               </td>
             </tr>
 
@@ -3067,20 +3269,22 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--lateness">
+              <td class="calculation-summary__cell calculation-summary__cell--lateness"
+                  colspan="2">
                 <!-- ko template: { name: 'lateness-template', data: {lateness: lateness} } -->
                 <!-- /ko -->
               </td>
               <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--lateness">
+              <td class="calculation-summary__cell calculation-summary__cell--lateness"
+                  colspan="2">
                 <!-- ko template: { name: 'lateness-template', data: {lateness: table.driversData.lateness} } -->
                 <!-- /ko -->
               </td>
 
               <td class="calculation-summary__cell calculation-summary__cell--lateness   calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content">
-                  <!-- ko template: { name: 'lateness-template', data: {lateness: table.total().lateness} } -->
+                  <!-- ko template: { name: 'lateness-template', data: {lateness: table.total.lateness} } -->
                   <!-- /ko -->
                 </div>
               </td>
@@ -3096,14 +3300,12 @@
 
 <script type="text/javascript">
   $(function () {
-    function Column(id, title, fullTitle, total) {
-
+    function Column(id, title, fullTitle, colspan) {
       return {
         id,
         title,
         fullTitle,
-        hasTotal: !!total,
-        total
+        colspan
       }
     }
 
@@ -3122,41 +3324,25 @@
 
           const driversData = model.driversData();
 
-          /* TODO */
-          const total = ko.pureComputed(() => {
-            const result = {
-              workload: 0,
-              workloadType: '',
-              units: '',
-              additionalWorkload: '',
-              fotCategory: 100,
-              fotRevenue: 100,
-              performanceStandart: -100,
-              lateness: {
-                light: 0,
-                medium: 0,
-                hard: 0,
-                total: 0,
-              },
-              employees: []
-            };
-
-            positions().forEach(p => {
-              result.workload += p.workload;
-              result.employees = [...result.employees, ...p.employees()];
-              result.lateness.light += p.lateness.light || 0;
-              result.lateness.medium += p.lateness.medium || 0;
-              result.lateness.hard += p.lateness.hard || 0;
-              result.lateness.total += p.lateness.total || 0;
-            });
-
-            return result;
-          });
+          const total = {
+            workload: ko.observable(0),
+            workloadUnits: ko.observable(''),
+            fotCategory: ko.observable(100),
+            fotRevenue: ko.observable(100),
+            performanceStandart: ko.observable(-100),
+            lateness: {
+              light: ko.observable(0),
+              medium: ko.observable(0),
+              hard: ko.observable(0),
+              total: ko.observable(0),
+            },
+            employees: ko.observable(0)
+          };
 
           const columns = [
             Column('job', 'Должность', 'Должность'),
             Column('workload-type', 'Тип нагрузки', 'Тип нагрузки'),
-            Column('workload', 'Нагрузка', 'Нагрузка'),
+            Column('workload', 'Нагрузка', 'Нагрузка', 2),
             Column('additional-workload', 'Доп. нагрузка', 'Дополнительная нагрузка'),
             Column('count', 'Сотр.', 'Сотрудники'),
             Column('fot-category', 'ФОТ, % в категории', 'ФОТ, % в категории'),
@@ -3219,13 +3405,17 @@
     </div>
 
     <div class="employee__actions">
+      <!-- ko if: employee.hasProblems -->
       <button
               class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button employee__action employee__action--documents" data-bind="hrmTooltip, hrmTooltipText: 'Есть проблемы с документами'"></button>
+      <!-- /ko -->
+      <!-- ko if: employee.downRecommended -->
       <button
               class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-down-icon-button employee__action employee__action--down" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется понижение разряда'"></button>
-      <!-- ko if: false -->
+      <!-- /ko -->
+      <!-- ko if: employee.upRecommended -->
       <button
-              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-up-icon-button employee__action employee__action--up" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется повышение разряда'"></button>
+              class="hrm-button hrm-icon-button hrm-icon-button--theme_positive hrm-arrow-up-icon-button employee__action employee__action--up" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется повышение разряда'"></button>
       <!-- /ko -->
 
     </div>
@@ -3300,7 +3490,10 @@
 
   <!-- ko if: table.isColumnVisible('account') -->
     <td class="positions-table__cell positions-table__cell--account">
-      <div class="positions-table__cell-content"></div>
+      <div class="positions-table__cell-content">
+        <!-- ko text: employee.premiumAccount() + '/' + employee.account() -->
+        <!-- /ko -->
+      </div>
     </td>
   <!-- /ko -->
 
@@ -3361,54 +3554,68 @@
 
   <!-- ko if: table.isColumnVisible('compensation') -->
     <td class="positions-table__cell positions-table__cell--compensation">
-      <div class="positions-table__cell-content"></div>
+      <div class="positions-table__cell-content" data-bind="text: employee.compensation"></div>
     </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('workload') -->
   <td class="positions-table__cell positions-table__cell--workload">
-    <div class="positions-table__cell-content"></div>
+    <div class="positions-table__cell-content" data-bind="text: employee.workload"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary') -->
   <td class="positions-table__cell positions-table__cell--salary">
-    <div class="positions-table__cell-content"></div>
+    <div class="positions-table__cell-content" data-bind="text: employee.salary"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary-bulk') -->
   <td class="positions-table__cell positions-table__cell--salary-bulk">
-    <div class="positions-table__cell-content" data-bind="employee.salaryBulk"></div>
+    <div class="positions-table__cell-content" data-bind="text: employee.salaryBulk"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart-hour') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart-hour">
+  <div class="positions-table__cell-content" data-bind="text: employee.revenueStandartPerHour"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('normalization-ratio') -->
-  <td class="positions-table__cell positions-table__cell--normalization-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--normalization-ratio">
+  <div class="positions-table__cell-content" data-bind="text: employee.normalizationRatio"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart">
+  <div class="positions-table__cell-content" data-bind="text: employee.revenueStandart"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-ratio') -->
-  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-ratio">
+  <div class="positions-table__cell-content" data-bind="text: employee.bonusRatio"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
-  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+  <td class="positions-table__cell positions-table__cell--corrected-time">
+  <div class="positions-table__cell-content" data-bind="text: employee.correctedTime"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-exceed') -->
-  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-exceed">
+  <div class="positions-table__cell-content" data-bind="text: employee.bonusExceed"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('depremation') -->
-  <td class="positions-table__cell positions-table__cell--depremation"></td>
+  <td class="positions-table__cell positions-table__cell--depremation">
+  <div class="positions-table__cell-content" data-bind="text: employee.depremation"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('premation') -->
@@ -3429,8 +3636,12 @@
     <!-- /ko -->
   <!-- /ko -->
 
-  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
+    <div class="positions-table__cell-content" data-bind="text: employee.total"></div>
+  </td>
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
+    <div class="positions-table__cell-content" data-bind="text: employee.toPayment"></div>
+  </td>
 </tr>
 
 </script>
@@ -3460,7 +3671,7 @@
 
   <!-- ko if: table.isColumnVisible('work-time') -->
   <td class="positions-table__cell positions-table__cell--work-time">
-    <div class="positions-table__cell-content" data-bind="text: total.workingTime"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.workingTime()"></div>
   </td>
   <!-- /ko -->
 
@@ -3479,7 +3690,7 @@
 
   <!-- ko if: table.isColumnVisible('salary-bulk') -->
   <td class="positions-table__cell positions-table__cell--salary-bulk">
-    <div class="positions-table__cell-content" data-bind="text: total.salaryBulk"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.salaryBulk()"></div>
   </td>
   <!-- /ko -->
 
@@ -3489,31 +3700,31 @@
 
   <!-- ko if: table.isColumnVisible('normalization-ratio') -->
   <td class="positions-table__cell positions-table__cell--normalization-ratio">
-    <div class="positions-table__cell-content" data-bind="text: total.normalizationRatio"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.normalizationRatio()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart') -->
   <td class="positions-table__cell positions-table__cell--revenue-standart">
-    <div class="positions-table__cell-content" data-bind="text: total.revenueStandart"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.revenueStandart()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-ratio') -->
   <td class="positions-table__cell positions-table__cell--bonus-ratio">
-    <div class="positions-table__cell-content" data-bind="text: total.bonusRatio"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.bonusRatio()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
   <td class="positions-table__cell positions-table__cell--corrected-time">
-    <div class="positions-table__cell-content" data-bind="text: total.correctedTime"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.correctedTime()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-exceed') -->
   <td class="positions-table__cell positions-table__cell--bonus-exceed">
-    <div class="positions-table__cell-content" data-bind="text: total.bonusExceed"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.bonusExceed()"></div>
   </td>
   <!-- /ko -->
 
@@ -3530,10 +3741,10 @@
   <!-- /ko -->
 
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
-    <div class="positions-table__cell-content" data-bind="text: total.total"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.total()"></div>
   </td>
   <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
-    <div class="positions-table__cell-content" data-bind="text: total.toPayment"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.toPayment()"></div>
   </td>
 </tr>
 
@@ -3854,14 +4065,12 @@
 
 <script type="text/javascript">
   $(function () {
-    function Column(id, title, fullTitle, total) {
+    function Column(id, title, fullTitle) {
       return {
         id,
         title,
         fullTitle,
         visible: ko.observable(true),
-        total,
-        hasTotal: total !== undefined
       }
     }
 
@@ -3873,7 +4082,7 @@
         createViewModel: function (params, componentInfo) {
           const editableCellErrorStateMatcher = (control) => {
             return ko.pureComputed(() => {
-              return !control.isValid() ? {message: control.error()} : null;
+              return !control.isValid() ? { message: control.error() } : null;
 
             });
           };
@@ -3899,39 +4108,19 @@
             });
           });
 
-          /** Computed total values */
           const total = {
-            workingTime: ko.pureComputed(() => {
-              const minutes = positions().reduce((minutes, position) => {
-                return minutes + position.workingTime();
-              }, 0);
-              return formatDuration(minutes);
-            }),
-            salaryBulk: ko.pureComputed(() => {
-              return 0;
-            }),
-            bonusExceed: ko.pureComputed(() => {
-              return 0;
-            }),
-            normalizationRatio: ko.pureComputed(() => {
-              return 0;
-            }),
-            revenueStandart: ko.pureComputed(() => {
-              return 0;
-            }),
-            bonusRatio: ko.pureComputed(() => {
-              return 0;
-            }),
-            correctedTime: ko.pureComputed(() => {
-              return 0;
-            }),
-            total: ko.pureComputed(() => {
-              return 0;
-            }),
-            toPayment: ko.pureComputed(() => {
-              return 0;
-            }),
-          }
+            workingTime: ko.observable('00:00'),
+            salaryBulk: ko.observable(0),
+            normalizationRatio: ko.observable(0),
+            revenueStandart: ko.observable(0),
+            bonusRatio: ko.observable(0),
+            correctedTime: ko.observable(0),
+            bonusExceed: ko.observable(0),
+            total: ko.observable(0),
+            toPayment: ko.observable(0),
+          };
+
+
 
           /* Table columns */
           const columns = [
@@ -4218,13 +4407,13 @@
       */
       function setPositions(positionsList) {
         positions(positionsList.map(positionData => {
-          return PositionModel(positionData)
+          return new PositionModel(positionData)
         }))
       }
 
 
       function setDriversData(driversData) {
-        this.driversData(PositionModel(driversData));
+        this.driversData(new PositionModel(driversData));
       }
 
       /**
@@ -4274,138 +4463,171 @@
         };
       }
 
-      /**
-      * @param {Object} employee
-      * @param {Object} positionData
-      * @param {boolean} visible
-      */
-      function EmployeeModel(employee, positionData, visible) {
+
+      function EmployeeModel(employee, positionModel, visible) {
+        this.position = positionModel;
+
+        this.name = employee.name;    // имя сотрудника
+        this.id = employee.id;        // идентификатор сотрудника
+        this.level = ko.observable(employee.level);  // разряд
+
+        this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
+        this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
+        this.downRecommended = ko.observable(employee.downRecommended);  // рекомендуется понижение
+
+        // рабочее время
         const defaultIntervals = employee.workingIntervals || [''];
-        const workingIntervals = ko.observableArray(
+        this.workingIntervals = ko.observableArray(
           defaultIntervals.map(i => WorkingIntervalModel(i))
         );
-
         const isWorkingIntervalsValid = ko.pureComputed(() => {
-          return workingIntervals().every(i => i.value.isValid())
+          return this.workingIntervals().every(i => i.value.isValid())
         });
-
-        const workingTime = ko.pureComputed(() => {
+        this.workingTime = ko.pureComputed(() => {
           if (!isWorkingIntervalsValid()) return 0;
 
-          return workingIntervals().reduce((minutes, interval) => {
+          return this.workingIntervals().reduce((minutes, interval) => {
             return minutes + interval.getInterval();
           }, 0);
         });
-
-        /**
-        * Adds empty interval
-        */
-        function addWorkingInterval() {
+        this.addWorkingInterval = () => {
           const model = WorkingIntervalModel('');
-          workingIntervals.push(model);
-        }
+          this.workingIntervals.push(model);
+        };
+        this.removeWorkingInterval = (interval) => {
+          this.workingIntervals.remove(interval);
+        };
 
-        /**
-        * Removes specified interval from list
-        * @param {WorkingIntervalModel} interval
-        */
-        function removeWorkingInterval(interval) {
-          workingIntervals.remove(interval);
-        }
+        this.account = ko.observable(employee.account);             // личный счет
+        this.premiumAccount = ko.observable(employee.account);      // премиальный счет
 
-        const accountOperations = ko.observableArray(employee.accountOperations || []);
-        const accountState = ko.pureComputed(() => {
-          return accountOperations().reduce((sum, operation) => {
+        // операции с ЛС
+        this.accountOperations = ko.observableArray(employee.accountOperations || []);
+        this.accountState = ko.pureComputed(() => {
+          return this.accountOperations().reduce((sum, operation) => {
             const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
             return sum + operationSum;
           }, 0);
         });
 
-        const fines = ko.observableArray(employee.fines || []);
-        const finesState = ko.pureComputed(() => {
-          return fines().reduce((sum, fine) => {
+        // штрафы
+        this.fines = ko.observableArray(employee.fines || []);
+        this.finesState = ko.pureComputed(() => {
+          return this.fines().reduce((sum, fine) => {
             return sum + fine.sum;
           }, 0);
         });
 
-        const bonuses = ko.observableArray(employee.bonuses || []);
-        const bonusesState = ko.pureComputed(() => {
-          return bonuses().reduce((sum, bonus) => {
+        // бонусы
+        this.bonuses = ko.observableArray(employee.bonuses || []);
+        this.bonusesState = ko.pureComputed(() => {
+          return this.bonuses().reduce((sum, bonus) => {
             return sum + bonus.sum;
           }, 0);
         });
 
-        const lateness = employee.lateness;
+        // компенсация
+        this.compensation = ko.observable(employee.compensation || 0);
 
-        return {
-          name: employee.name, // имя
-          id: employee.id, // идентификатор
-          level: employee.level, // разряд
+        this.workload = ko.observable(employee.workload || '');
+        this.workloadUnits = this.position.workloadUnits;
 
-          accountOperations,
-          accountState,
+        this.salary = ko.observable(employee.salary || 0);
+        this.salaryBulk = ko.observable(employee.salaryBulk || 0);
 
-          workingIntervals: workingIntervals, // рабочие интервалы
-          addWorkingInterval,
-          removeWorkingInterval,
-          workingTime,
+        this.revenueStandartUnits = employee.revenueStandartUnits;
+        this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || '');
+        this.revenueStandart = ko.observable(employee.revenueStandart || '');
 
-          returnRate: 30, // норматив выручки
-          salaryBulk: 7200, // основная часть зп
+        this.normalizationRatio = employee.normalizationRatio;
+        this.bonusRatio = employee.bonusRatio;
 
-          lateness: lateness,
+        this.bonusExceed = ko.observable(employee.bonusExceed || 0);
+        this.depremation = ko.observable(employee.depremation || 0);
 
-          bonuses,
-          bonusesState,
+        this.correctedTime = ko.observable(employee.correctedTime || 0);
 
-          fines, // штрафы
-          finesState,
+        // опоздания
+        this.lateness = employee.lateness;
 
-          visible: ko.observable(!!visible), // участвует в расчете
-          loaded: employee.loaded,
-        }
+        this.total = ko.observable(employee.total || 0);
+        this.toPayment = ko.observable(employee.toPayment || 0);
+
+        this.visible = ko.observable(!!visible) // участвует в расчете
+        this.loaded = employee.loaded; // загружен для Все филиалы
       }
 
       /**
       * @param {Object} positionData
       */
       function PositionModel(positionData) {
-        const visible = ko.observable(false);
-        const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, positionData, false)));
+        this.type = positionData.type || 'production';
 
-        const allEmployeesLoaded = ko.observable(false);
+        this.id = positionData.id;
+        this.name = positionData.name;
+        this.levels = positionData.levels; // разряды
 
-        const workingTime = ko.pureComputed(() => {
-          return employees().reduce((minutes, employee) => {
+        // нагрузка
+        this.workloadType = positionData.workloadType;
+        this.workload = ko.observable(positionData.workload);
+        this.workloadUnits = positionData.workloadUnits;
+
+        // доп. нагрузка
+        this.additionalWorkloadType = positionData.additionalWorkloadType;
+        this.additionalWorkload = ko.observable(positionData.additionalWorkload);
+        this.additionalWorkloadUnits = positionData.additionalWorkloadUnits;
+
+        // ФОТ, % в категории
+        this.fotCategory = ko.observable(positionData.fotCategory);
+
+        // ФОТ, % от выручки
+        this.fotRevenue = ko.observable(positionData.fotRevenue);
+
+        this.salary = positionData.salary; // оклад
+        this.salaryBulk = positionData.salaryBulk; // основная часть зарплаты
+
+        this.revenueStandart = positionData.revenueStandart; // Норматив выручки
+        this.revenueStandartPerHour = positionData.revenueStandartPerHour; // Норматив выручки в час
+        this.revenueStandartUnits = positionData.revenueStandartUnits; // Единицы измерения
+
+        // Норм. выработки
+        this.performanceStandart = positionData.performanceStandart;
+        this.performanceStandartType = positionData.performanceStandartType;
+        this.performanceStandartUnits = positionData.performanceStandartUnits;
+
+        this.visible = ko.observable(positionData.visible); // Отображается в таблице
+        this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this, false)));
+
+        this.visibleEmployees = ko.pureComputed(() => {
+          return this.employees().filter(e => e.visible());
+        });
+
+        this.allEmployeesLoaded = ko.observable(false);
+
+        this.workingTime = ko.pureComputed(() => {
+          return this.employees().reduce((minutes, employee) => {
             if (!employee.visible()) return minutes;
             return minutes + employee.workingTime();
           }, 0)
         });
 
-        function findEmployeeById(employeeId) {
-          return employees().find(employee => employee.id === employeeId);
-        }
+        this.findEmployeeById = (employeeId) => {
+          return this.employees().find(employee => employee.id === employeeId);
+        };
 
-        /**
-        * Adds new employee to list
-        * @param {Object} employee
-        */
-        function addEmployee(employee) {
-          employees.push(EmployeeModel(employee, positionData, 'visible'));
-        }
+        this.addEmployee = (employee) => {
+          this.employees.push(new EmployeeModel(employee, this, 'visible'));
+        };
 
-        /**
-        * Updates employees list, set visibility
-        */
-        function updateEmployees(updatedList) {
+        this.updateEmployees = (updatedList) => {
           const updatedIds = updatedList.map(e => e.id);
-          const originalIds = employees().map(e => e.id);
+          const originalIds = this.employees().map(e => e.id);
 
           const notFoundIds = _.difference(originalIds, updatedIds);
           const newEmployeesIds = _.difference(updatedIds, originalIds);
 
           // remove not found-s
-          const updated = employees().filter(e => notFoundIds.indexOf(e.id) === -1);
+          const updated = this.employees().filter(e => notFoundIds.indexOf(e.id) === -1);
 
           // set visibility
           updated.forEach(employee => {
@@ -4416,23 +4638,22 @@
           // add new-s
           const newEmployees = newEmployeesIds.map(id => {
             const employeeData = updatedList.find(e => e.id === id);
-            const employee = EmployeeModel(employeeData, positionData, employeeData.checked);
+            const employee = new EmployeeModel(employeeData, this, employeeData.checked);
             return employee;
           });
 
           // update list
-          employees(updated.concat(newEmployees));
+          this.employees(updated.concat(newEmployees));
         }
 
-        const lateness = ko.pureComputed(() => {
+        this.lateness = ko.pureComputed(() => {
           const result = {
             light: 0,
             medium: 0,
             hard: 0,
             total: 0,
           };
-          employees().forEach(employee => {
-            console.log(employee)
+          this.employees().forEach(employee => {
             const employeeLateness = employee.lateness;
             result.light += employeeLateness.light || 0;
             result.medium += employeeLateness.medium || 0;
@@ -4443,31 +4664,9 @@
           return result;
         });
 
-        console.log('lateness', lateness())
-
-        const totalLateness = ko.pureComputed(() => {
+        this.totalLateness = ko.pureComputed(() => {
           return lateness.total;
-        })
-
-        return {
-          id: positionData.id,
-          name: positionData.name, // название
-          workloadType: positionData.workloadType,
-          levels: positionData.levels, //
-          rate: positionData.rate, // оклад
-          units: 3,
-          workload: 2.2, // нагрузка
-          additionalWorkload: positionData.additionalWorkload,
-          fotCategory: positionData.fotCategory,
-          fotRevenue: positionData.fotRevenue,
-          employees,
-          lateness,
-          addEmployee, // добавить сотрудника
-          updateEmployees, // обновить список сотрудников
-          allEmployeesLoaded, // загружены сотрудники из всех филиалов
-          workingTime, // общее рабочее время всех сотрудников
-          visible, // отображается в таблице
-        };
+        });
       };
 
 
@@ -4515,17 +4714,96 @@
 
 
       this.summaryModel.setDriversData({
-        id: 'drivers',
-        name: 'Водители',
-        levels: [1, 2],
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkloadType: 'Время без дела',
-        additionalWorkloadValue: '52%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        employees: []
+        type: 'delivery',
+        name: 'Водители',                           // название должности
+        id: 'drivers',                              // идентификато позиции
+        levels: [1, 2],                             // разряды
+        workloadType: 'Выручка',                    // тип нагрузки
+        workload: 0,                                // нагрузка (величина)
+        workloadUnits: '₽',                         // единицы измерения нагрузки
+        additionalWorkloadType: '',                 // тип доп. нагрузки
+        additionalWorkload: '52',                   // доп. нагрузка (величина)
+        additionalWorkloadUnits: '',                // единицы измерения доп. нагрузки
+        fotCategory: 0,                             // ФОТ, % в категории
+        fotRevenue: 0,                              // ФОТ, % от выручки
+        performanceStandart: 0,                     // Норм. выработки, %
+        performanceStandartType: 'Цена заказа',
+        performanceStandartUnits: '₽',
+        salary: 30000,                              // Оклад
+        salaryBulk: 7200,                           // основная часть зарплаты
+        revenueStandart: 30,                        // Норматив выручки
+        revenueStandartPerHour: 0,
+        revenueStandartUnits: '₽',
+        employees: [                                // сотрудники
+          {
+            name: 'Водитель #1',                    // имя сотрудника
+            id: 'driver1',                          // идентификатор сотрудника
+            hasProblems: 0,                         // проблемы с документами
+            upRecommended: 0,                       // рекомендуется повышение
+            downRecommended: 0,                     // рекомендуется понижение
+            premiumAccount: 0,                      // премиальный счет
+            account: 100,                           // личный счет
+            accountOperations: [],                  // операции со счетом
+            level: 1,                               // разряд сотрудника
+            workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
+            compensation: 0,                        // компенсация
+            workload: 0,                            // нагрузка
+            workloadUnits: '₽',
+            salary: 3000,                           // зарплата
+            salaryBulk: 2000,                       // основная часть зарплаты
+            revenueStandartUnits: '₽',
+            revenueStandartPerHour: 10000,          // норматив выручки в час
+            revenueStandart: 130000,                // Норматив выручки
+            normalizationRatio: 0.5,                // Коэф. нормализации
+            bonusRatio: 0.5,                        // Коэф. премирования
+            bonusExceed: 100,                       // прем. за превыш. норм
+            bonuses: [],                            // бонусы
+            fines: [],                              // штрафы
+            depremation: 0,                         // депр.
+            correctedTime: '6:00',                  // корр. время
+            total: 7300,                            // всего
+            toPayment: 7300,                        // к выплате
+            lateness: {                             // опоздания сотрудника
+              light: 0,                             // меньше 5 минут
+              medium: 0,                            // 5-10 минут
+              hard: 0                               // больше 10 минут
+            },
+          },
+          {
+            name: 'Водитель #2',
+            id: 'driver2',
+            hasProblems: 0,
+            upRecommended: 0,
+            downRecommended: 0,
+            premiumAccount: 100,
+            account: 0,
+            accountOperations: [],
+            level: 2,
+            workingIntervals: ['09:00 – 16:00'],
+            compensation: 0,
+            workload: 0,
+            workloadUnits: '₽',
+            salary: 3000,
+            salaryBulk: 2000,
+            revenueStandartUnits: '₽',
+            revenueStandartPerHour: 10000,
+            revenueStandart: 130000,
+            normalizationRatio: 0.5,
+            bonusRatio: 0.5,
+            bonusExceed: 100,
+            bonuses: [],
+            fines: [],
+            depremation: 0,
+            correctedTime: '6:00',
+            total: 7300,
+            toPayment: 7300,
+            lateness: {
+              light: 0,
+              medium: 0,
+              hard: 0
+            },
+          }
+        ],
       });
 
 
@@ -4549,7 +4827,7 @@
         const inputData = ko.toJS(this.inputModel);
 
         // Показывать лоадер 3с
-        const delay = 3; // TODO: 3000
+        const delay = 3000
         const loadingDelay = new Promise(resolve => {
           setTimeout(() => {
             resolve();
@@ -4560,41 +4838,95 @@
           /* Получение списка позиций */
           const positions = [
             {
-              name: 'Администратор филиала',
-              id: '1',
-              levels: [1, 2],
-              workloadType: 'Выручка',
-              workload: 0,
-              units: '₽',
-              additionalWorkloadType: 'Время без дела',
-              additionalWorkloadValue: '0%',
-              fotCategory: 0,
-              fotRevenue: 0,
-              performanceStandart: -100,
-              employees: [
+              name: 'Администратор филиала',             // название должности
+              id: '1',                                   // идентификато позиции
+              levels: [1, 2],                            // разряды
+              workloadType: 'Выручка',                   // тип нагрузки
+              workload: 0,                               // нагрузка (величина)
+              workloadUnits: '₽',                        // единицы измерения нагрузки
+              additionalWorkloadType: 'Время без дела',  // тип доп. нагрузки
+              additionalWorkload: '0',                   // доп. нагрузка (величина)
+              additionalWorkloadUnits: '%',              // единицы измерения доп. нагрузки
+              fotCategory: 0,                            // ФОТ, % в категории
+              fotRevenue: 0,                             // ФОТ, % от выручки
+              performanceStandart: 0,                    // Норм. выработки, %
+              performanceStandartType: '',               //
+              salary: 30000,                             // Оклад
+              salaryBulk: 7200,                          // основная часть зарплаты
+              revenueStandart: 30,                       // Норматив выручки
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [                               // сотрудники
                 {
-                  name: 'Администратор филиала #1',
-                  id: '11',
-                  level: 1,
-                  workingIntervals: ['09:00 – 16:00'],
-                  lateness: {
-                    light: 0,
-                    medium: 0,
-                    hard: 0
+                  name: 'Администратор #1 Up',       // имя сотрудника
+                  id: '11',                               // идентификатор сотрудника
+                  hasProblems: 0,                         // проблемы с документами
+                  upRecommended: 1,                       // рекомендуется повышение
+                  downRecommended: 0,                     // рекомендуется понижение
+                  premiumAccount: 100,                    // премиальный счет
+                  account: 0,                             // личный счет
+                  accountOperations: [],                  // операции со счетом
+                  level: 1,                               // разряд сотрудника
+                  workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
+                  compensation: 0,                        // компенсация
+                  workload: 0,                            // нагрузка
+                  workloadUnits: '₽',
+                  salary: 3000,                           // зарплата
+                  salaryBulk: 2000,                       // основная часть зарплаты
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,          // норматив выручки в час
+                  revenueStandart: 130000,                // Норматив выручки
+                  normalizationRatio: 0.5,                // Коэф. нормализации
+                  bonusRatio: 0.5,                        // Коэф. премирования
+                  bonusExceed: 100,                       // прем. за превыш. норм
+                  bonuses: [],                            // бонусы
+                  fines: [],                              // штрафы
+                  depremation: 0,                         // депр.
+                  correctedTime: '6:00',                  // корр. время
+                  total: 7300,                            // всего
+                  toPayment: 7300,                        // к выплате
+                  lateness: {                             // опоздания сотрудника
+                    light: 0,                             // меньше 5 минут
+                    medium: 0,                            // 5-10 минут
+                    hard: 0                               // больше 10 минут
                   },
                 },
                 {
-                  name: 'Администратор филиала #2',
+                  name: 'Администратор #2 Down',
                   id: '12',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 1,
+                  premiumAccount: 100,
+                  account: 0,
+                  accountOperations: [],
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
+              ],
+              visible: 0,
             },
             {
               name: 'Повар-сушист',
@@ -4602,19 +4934,48 @@
               levels: [],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
+              workloadUnits: '₽',
               additionalWorkloadType: 'Лосось, кг',
-              additionalWorkloadValue: 200,
+              additionalWorkload: 200,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
               employees: [
                 {
-                  name: 'Повар-сушист #1',
+                  name: 'Повар-сушист #1 problems',
                   id: '21',
+                  hasProblems: 1,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 0,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -4622,17 +4983,41 @@
                   },
                 },
                 {
-                  name: 'Повар-сушист #2',
+                  name: 'Повар-сушист #2 problems + up',
                   id: '22',
+                  hasProblems: 1,
+                  upRecommended: 1,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 0,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
+              ],
+              visible: 0,
             },
             {
               name: 'Повар-пиццмейкер',
@@ -4640,18 +5025,48 @@
               levels: [1, 2, 3],
               workloadType: 'Пиццы',
               workload: 30,
-              units: 'шт.',
+              workloadUnits: 'шт.',
               additionalWorkloadType: 'Лосось, кг',
-              additionalWorkloadValue: 200,
+              additionalWorkload: 200,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
               employees: [
                 {
-                  name: 'Повар-пиццмейкер #1',
+                  name: 'Повар-пиццмейкер #1 problems + down',
                   id: '31',
+                  hasProblems: 1,
+                  upRecommended: 0,
+                  downRecommended: 1,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -4661,16 +5076,39 @@
                 {
                   name: 'Повар-пиццмейкер #2',
                   id: '32',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 3,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
-
+              ],
+              visible: 0,
             },
             {
               name: 'Официант',
@@ -4678,19 +5116,48 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
               employees: [
                 {
                   name: 'Официант #1',
                   id: '41',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -4700,15 +5167,39 @@
                 {
                   name: 'Официант #2',
                   id: '42',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
+              ],
+              visible: 0,
             },
             {
               name: 'Официант2',
@@ -4716,19 +5207,48 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
               employees: [
                 {
                   name: 'Официант #1',
                   id: '51',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -4738,15 +5258,39 @@
                 {
                   name: 'Официант #2',
                   id: '52',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
+              ],
+              visible: 0,
             },
             {
               name: 'Официант3',
@@ -4754,14 +5298,21 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0,
             },
             {
               name: 'Официант4',
@@ -4770,13 +5321,20 @@
               workloadType: 'Выручка',
               workload: 0,
               units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0,
             },
             {
               name: 'Официант5',
@@ -4784,14 +5342,21 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0,
             },
             {
               name: 'Официант6',
@@ -4799,14 +5364,21 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0,
             },
             {
               name: 'Официант7',
@@ -4814,14 +5386,21 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0
             },
           ];
 
@@ -4832,7 +5411,7 @@
             this.isBuilt(true);
             this.loading(false);
           });
-        }, 1000);
+        }, 10);
       };
 
       /** Tabs: production, delivery, lateness */
@@ -4903,6 +5482,7 @@
       this.recalculateEmployees = function () {
         this.isEmployeesCalculated(false);
 
+        // TODO
         this.formModel().positions().forEach((position, index) => {
           position.employees(positions[index].employees.map(e => this.createEmployeeModel(e)));
         });
@@ -5007,7 +5587,7 @@
         return h + ':' + m;
       };
 
-      this.afterRenderBuild = function(el) {
+      this.afterRenderBuild = function (el) {
         $(el).hide().fadeIn(200, () => {
           $(window).resize();
         })

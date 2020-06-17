@@ -37,13 +37,17 @@
     </div>
 
     <div class="employee__actions">
+      <!-- ko if: employee.hasProblems -->
       <button
               class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button employee__action employee__action--documents" data-bind="hrmTooltip, hrmTooltipText: 'Есть проблемы с документами'"></button>
+      <!-- /ko -->
+      <!-- ko if: employee.downRecommended -->
       <button
               class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-down-icon-button employee__action employee__action--down" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется понижение разряда'"></button>
-      <!-- ko if: false -->
+      <!-- /ko -->
+      <!-- ko if: employee.upRecommended -->
       <button
-              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-arrow-up-icon-button employee__action employee__action--up" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется повышение разряда'"></button>
+              class="hrm-button hrm-icon-button hrm-icon-button--theme_positive hrm-arrow-up-icon-button employee__action employee__action--up" data-bind="hrmTooltip, hrmTooltipText: 'Рекомендуется повышение разряда'"></button>
       <!-- /ko -->
 
     </div>
@@ -118,7 +122,10 @@
 
   <!-- ko if: table.isColumnVisible('account') -->
     <td class="positions-table__cell positions-table__cell--account">
-      <div class="positions-table__cell-content"></div>
+      <div class="positions-table__cell-content">
+        <!-- ko text: employee.premiumAccount() + '/' + employee.account() -->
+        <!-- /ko -->
+      </div>
     </td>
   <!-- /ko -->
 
@@ -179,54 +186,68 @@
 
   <!-- ko if: table.isColumnVisible('compensation') -->
     <td class="positions-table__cell positions-table__cell--compensation">
-      <div class="positions-table__cell-content"></div>
+      <div class="positions-table__cell-content" data-bind="text: employee.compensation"></div>
     </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('workload') -->
   <td class="positions-table__cell positions-table__cell--workload">
-    <div class="positions-table__cell-content"></div>
+    <div class="positions-table__cell-content" data-bind="text: employee.workload"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary') -->
   <td class="positions-table__cell positions-table__cell--salary">
-    <div class="positions-table__cell-content"></div>
+    <div class="positions-table__cell-content" data-bind="text: employee.salary"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary-bulk') -->
   <td class="positions-table__cell positions-table__cell--salary-bulk">
-    <div class="positions-table__cell-content" data-bind="employee.salaryBulk"></div>
+    <div class="positions-table__cell-content" data-bind="text: employee.salaryBulk"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart-hour') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart-hour"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart-hour">
+  <div class="positions-table__cell-content" data-bind="text: employee.revenueStandartPerHour"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('normalization-ratio') -->
-  <td class="positions-table__cell positions-table__cell--normalization-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--normalization-ratio">
+  <div class="positions-table__cell-content" data-bind="text: employee.normalizationRatio"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart">
+  <div class="positions-table__cell-content" data-bind="text: employee.revenueStandart"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-ratio') -->
-  <td class="positions-table__cell positions-table__cell--bonus-ratio"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-ratio">
+  <div class="positions-table__cell-content" data-bind="text: employee.bonusRatio"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
-  <td class="positions-table__cell positions-table__cell--corrected-time"></td>
+  <td class="positions-table__cell positions-table__cell--corrected-time">
+  <div class="positions-table__cell-content" data-bind="text: employee.correctedTime"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-exceed') -->
-  <td class="positions-table__cell positions-table__cell--bonus-exceed"></td>
+  <td class="positions-table__cell positions-table__cell--bonus-exceed">
+  <div class="positions-table__cell-content" data-bind="text: employee.bonusExceed"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('depremation') -->
-  <td class="positions-table__cell positions-table__cell--depremation"></td>
+  <td class="positions-table__cell positions-table__cell--depremation">
+  <div class="positions-table__cell-content" data-bind="text: employee.depremation"></div>
+</td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('premation') -->
@@ -247,8 +268,12 @@
     <!-- /ko -->
   <!-- /ko -->
 
-  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"></td>
-  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"></td>
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
+    <div class="positions-table__cell-content" data-bind="text: employee.total"></div>
+  </td>
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
+    <div class="positions-table__cell-content" data-bind="text: employee.toPayment"></div>
+  </td>
 </tr>
 
 </script>
@@ -278,7 +303,7 @@
 
   <!-- ko if: table.isColumnVisible('work-time') -->
   <td class="positions-table__cell positions-table__cell--work-time">
-    <div class="positions-table__cell-content" data-bind="text: total.workingTime"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.workingTime()"></div>
   </td>
   <!-- /ko -->
 
@@ -297,7 +322,7 @@
 
   <!-- ko if: table.isColumnVisible('salary-bulk') -->
   <td class="positions-table__cell positions-table__cell--salary-bulk">
-    <div class="positions-table__cell-content" data-bind="text: total.salaryBulk"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.salaryBulk()"></div>
   </td>
   <!-- /ko -->
 
@@ -307,31 +332,31 @@
 
   <!-- ko if: table.isColumnVisible('normalization-ratio') -->
   <td class="positions-table__cell positions-table__cell--normalization-ratio">
-    <div class="positions-table__cell-content" data-bind="text: total.normalizationRatio"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.normalizationRatio()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart') -->
   <td class="positions-table__cell positions-table__cell--revenue-standart">
-    <div class="positions-table__cell-content" data-bind="text: total.revenueStandart"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.revenueStandart()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-ratio') -->
   <td class="positions-table__cell positions-table__cell--bonus-ratio">
-    <div class="positions-table__cell-content" data-bind="text: total.bonusRatio"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.bonusRatio()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
   <td class="positions-table__cell positions-table__cell--corrected-time">
-    <div class="positions-table__cell-content" data-bind="text: total.correctedTime"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.correctedTime()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-exceed') -->
   <td class="positions-table__cell positions-table__cell--bonus-exceed">
-    <div class="positions-table__cell-content" data-bind="text: total.bonusExceed"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.bonusExceed()"></div>
   </td>
   <!-- /ko -->
 
@@ -348,10 +373,10 @@
   <!-- /ko -->
 
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
-    <div class="positions-table__cell-content" data-bind="text: total.total"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.total()"></div>
   </td>
   <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
-    <div class="positions-table__cell-content" data-bind="text: total.toPayment"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.toPayment()"></div>
   </td>
 </tr>
 

@@ -16,8 +16,9 @@
          data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по наименованию' }}">
     </div>
 
-    <div class="calculation-modal__scroll">
-      <div class="columns-settings__list">
+    <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+    <div class="modal-dialog__scroll">
+      <div class="modal-dialog__scroll-container columns-settings__list">
         <!-- ko foreach: { data: $component.columns, as: 'column' } -->
 
         <!-- ko if: column.visible() -->
@@ -38,8 +39,33 @@
         <!-- /ko -->
       </div>
     </div>
+    <!-- /ko -->
 
+    <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+    <div class="modal-dialog__scroll">
+      <div class="modal-dialog__scroll-container columns-settings__list"
+           data-bind="hrmScrollable">
+        <!-- ko foreach: { data: $component.columns, as: 'column' } -->
 
+        <!-- ko if: column.visible() -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="columns-settings__list-item">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
+            </div>
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
 
   </div>
 

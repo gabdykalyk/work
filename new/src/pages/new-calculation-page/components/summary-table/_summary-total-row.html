@@ -8,13 +8,15 @@
     <!-- Тип нагрузки -->
     <td class="calculation-summary__cell calculation-summary__cell--workload-type calculation-summary__cell--empty"></td>
 
+
     <!-- Нагрузка -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload">
-      <div class="calculation-summary__cell-content">
-        <div class="position-workload">
-          <div class="position-workload__value" data-bind="text: total.workload"></div>
-          <div class="position-workload__units" data-bind="text: total.units"></div>
-        </div>
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value">
+      <div class="calculation-summary__cell-content" data-bind="text: total.workload()">
+      </div>
+    </td>
+
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+      <div class="calculation-summary__cell-content" data-bind="text: total.workloadUnits()">
       </div>
     </td>
 
@@ -24,7 +26,7 @@
     <!-- Сотрудники -->
     <td class="calculation-summary__cell calculation-summary__cell--count">
       <div class="calculation-summary__cell-content"
-           data-bind="text: total().employees.length"></div>
+           data-bind="text: total.employees()"></div>
     </td>
 
     <!-- ФОТ, % в категории -->
@@ -32,7 +34,7 @@
       data-bind="style: {
         background: '#D0F4E3'
       }">
-      <div class="calculation-summary__cell-content">100</div>
+      <div class="calculation-summary__cell-content" data-bind="text: total.fotCategory()"></div>
     </td>
 
     <!-- ФОТ, % от выручки -->
@@ -40,7 +42,7 @@
       data-bind="style: {
         background: '#D0F4E3'
       }">
-      <div class="calculation-summary__cell-content">100</div>
+      <div class="calculation-summary__cell-content" data-bind="text: total.fotRevenue()"></div>
     </td>
 
     <!-- Норм. выработки -->
@@ -48,13 +50,13 @@
       data-bind="style: {
         background: '#D0F4E3'
       }">
-      <div class="calculation-summary__cell-content">-100.0</div>
+      <div class="calculation-summary__cell-content" data-bind="text: total.performanceStandart()"></div>
     </td>
 
     <!-- Опоздания -->
     <td class="calculation-summary__cell calculation-summary__cell--lateness">
       <div class="calculation-summary__cell-content">
-        <!-- ko template: { name: 'lateness-template', data: {lateness: total().lateness} } -->
+        <!-- ko template: { name: 'lateness-template', data: {lateness: total.lateness} } -->
         <!-- /ko -->
       </div>
     </td>

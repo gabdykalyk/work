@@ -2,14 +2,12 @@
 
 <script type="text/javascript">
   $(function () {
-    function Column(id, title, fullTitle, total) {
+    function Column(id, title, fullTitle) {
       return {
         id,
         title,
         fullTitle,
         visible: ko.observable(true),
-        total,
-        hasTotal: total !== undefined
       }
     }
 
@@ -21,7 +19,7 @@
         createViewModel: function (params, componentInfo) {
           const editableCellErrorStateMatcher = (control) => {
             return ko.pureComputed(() => {
-              return !control.isValid() ? {message: control.error()} : null;
+              return !control.isValid() ? { message: control.error() } : null;
 
             });
           };
@@ -47,39 +45,19 @@
             });
           });
 
-          /** Computed total values */
           const total = {
-            workingTime: ko.pureComputed(() => {
-              const minutes = positions().reduce((minutes, position) => {
-                return minutes + position.workingTime();
-              }, 0);
-              return formatDuration(minutes);
-            }),
-            salaryBulk: ko.pureComputed(() => {
-              return 0;
-            }),
-            bonusExceed: ko.pureComputed(() => {
-              return 0;
-            }),
-            normalizationRatio: ko.pureComputed(() => {
-              return 0;
-            }),
-            revenueStandart: ko.pureComputed(() => {
-              return 0;
-            }),
-            bonusRatio: ko.pureComputed(() => {
-              return 0;
-            }),
-            correctedTime: ko.pureComputed(() => {
-              return 0;
-            }),
-            total: ko.pureComputed(() => {
-              return 0;
-            }),
-            toPayment: ko.pureComputed(() => {
-              return 0;
-            }),
-          }
+            workingTime: ko.observable('00:00'),
+            salaryBulk: ko.observable(0),
+            normalizationRatio: ko.observable(0),
+            revenueStandart: ko.observable(0),
+            bonusRatio: ko.observable(0),
+            correctedTime: ko.observable(0),
+            bonusExceed: ko.observable(0),
+            total: ko.observable(0),
+            toPayment: ko.observable(0),
+          };
+
+
 
           /* Table columns */
           const columns = [

@@ -105,13 +105,13 @@
       */
       function setPositions(positionsList) {
         positions(positionsList.map(positionData => {
-          return PositionModel(positionData)
+          return new PositionModel(positionData)
         }))
       }
 
 
       function setDriversData(driversData) {
-        this.driversData(PositionModel(driversData));
+        this.driversData(new PositionModel(driversData));
       }
 
       /**
@@ -161,138 +161,171 @@
         };
       }
 
-      /**
-      * @param {Object} employee
-      * @param {Object} positionData
-      * @param {boolean} visible
-      */
-      function EmployeeModel(employee, positionData, visible) {
+
+      function EmployeeModel(employee, positionModel, visible) {
+        this.position = positionModel;
+
+        this.name = employee.name;    // имя сотрудника
+        this.id = employee.id;        // идентификатор сотрудника
+        this.level = ko.observable(employee.level);  // разряд
+
+        this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
+        this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
+        this.downRecommended = ko.observable(employee.downRecommended);  // рекомендуется понижение
+
+        // рабочее время
         const defaultIntervals = employee.workingIntervals || [''];
-        const workingIntervals = ko.observableArray(
+        this.workingIntervals = ko.observableArray(
           defaultIntervals.map(i => WorkingIntervalModel(i))
         );
-
         const isWorkingIntervalsValid = ko.pureComputed(() => {
-          return workingIntervals().every(i => i.value.isValid())
+          return this.workingIntervals().every(i => i.value.isValid())
         });
-
-        const workingTime = ko.pureComputed(() => {
+        this.workingTime = ko.pureComputed(() => {
           if (!isWorkingIntervalsValid()) return 0;
 
-          return workingIntervals().reduce((minutes, interval) => {
+          return this.workingIntervals().reduce((minutes, interval) => {
             return minutes + interval.getInterval();
           }, 0);
         });
-
-        /**
-        * Adds empty interval
-        */
-        function addWorkingInterval() {
+        this.addWorkingInterval = () => {
           const model = WorkingIntervalModel('');
-          workingIntervals.push(model);
-        }
+          this.workingIntervals.push(model);
+        };
+        this.removeWorkingInterval = (interval) => {
+          this.workingIntervals.remove(interval);
+        };
 
-        /**
-        * Removes specified interval from list
-        * @param {WorkingIntervalModel} interval
-        */
-        function removeWorkingInterval(interval) {
-          workingIntervals.remove(interval);
-        }
+        this.account = ko.observable(employee.account);             // личный счет
+        this.premiumAccount = ko.observable(employee.account);      // премиальный счет
 
-        const accountOperations = ko.observableArray(employee.accountOperations || []);
-        const accountState = ko.pureComputed(() => {
-          return accountOperations().reduce((sum, operation) => {
+        // операции с ЛС
+        this.accountOperations = ko.observableArray(employee.accountOperations || []);
+        this.accountState = ko.pureComputed(() => {
+          return this.accountOperations().reduce((sum, operation) => {
             const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
             return sum + operationSum;
           }, 0);
         });
 
-        const fines = ko.observableArray(employee.fines || []);
-        const finesState = ko.pureComputed(() => {
-          return fines().reduce((sum, fine) => {
+        // штрафы
+        this.fines = ko.observableArray(employee.fines || []);
+        this.finesState = ko.pureComputed(() => {
+          return this.fines().reduce((sum, fine) => {
             return sum + fine.sum;
           }, 0);
         });
 
-        const bonuses = ko.observableArray(employee.bonuses || []);
-        const bonusesState = ko.pureComputed(() => {
-          return bonuses().reduce((sum, bonus) => {
+        // бонусы
+        this.bonuses = ko.observableArray(employee.bonuses || []);
+        this.bonusesState = ko.pureComputed(() => {
+          return this.bonuses().reduce((sum, bonus) => {
             return sum + bonus.sum;
           }, 0);
         });
 
-        const lateness = employee.lateness;
+        // компенсация
+        this.compensation = ko.observable(employee.compensation || 0);
 
-        return {
-          name: employee.name, // имя
-          id: employee.id, // идентификатор
-          level: employee.level, // разряд
+        this.workload = ko.observable(employee.workload || '');
+        this.workloadUnits = this.position.workloadUnits;
 
-          accountOperations,
-          accountState,
+        this.salary = ko.observable(employee.salary || 0);
+        this.salaryBulk = ko.observable(employee.salaryBulk || 0);
 
-          workingIntervals: workingIntervals, // рабочие интервалы
-          addWorkingInterval,
-          removeWorkingInterval,
-          workingTime,
+        this.revenueStandartUnits = employee.revenueStandartUnits;
+        this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || '');
+        this.revenueStandart = ko.observable(employee.revenueStandart || '');
 
-          returnRate: 30, // норматив выручки
-          salaryBulk: 7200, // основная часть зп
+        this.normalizationRatio = employee.normalizationRatio;
+        this.bonusRatio = employee.bonusRatio;
 
-          lateness: lateness,
+        this.bonusExceed = ko.observable(employee.bonusExceed || 0);
+        this.depremation = ko.observable(employee.depremation || 0);
 
-          bonuses,
-          bonusesState,
+        this.correctedTime = ko.observable(employee.correctedTime || 0);
 
-          fines, // штрафы
-          finesState,
+        // опоздания
+        this.lateness = employee.lateness;
 
-          visible: ko.observable(!!visible), // участвует в расчете
-          loaded: employee.loaded,
-        }
+        this.total = ko.observable(employee.total || 0);
+        this.toPayment = ko.observable(employee.toPayment || 0);
+
+        this.visible = ko.observable(!!visible) // участвует в расчете
+        this.loaded = employee.loaded; // загружен для Все филиалы
       }
 
       /**
       * @param {Object} positionData
       */
       function PositionModel(positionData) {
-        const visible = ko.observable(false);
-        const employees = ko.observableArray(positionData.employees.map((e) => EmployeeModel(e, positionData, false)));
+        this.type = positionData.type || 'production';
 
-        const allEmployeesLoaded = ko.observable(false);
+        this.id = positionData.id;
+        this.name = positionData.name;
+        this.levels = positionData.levels; // разряды
 
-        const workingTime = ko.pureComputed(() => {
-          return employees().reduce((minutes, employee) => {
+        // нагрузка
+        this.workloadType = positionData.workloadType;
+        this.workload = ko.observable(positionData.workload);
+        this.workloadUnits = positionData.workloadUnits;
+
+        // доп. нагрузка
+        this.additionalWorkloadType = positionData.additionalWorkloadType;
+        this.additionalWorkload = ko.observable(positionData.additionalWorkload);
+        this.additionalWorkloadUnits = positionData.additionalWorkloadUnits;
+
+        // ФОТ, % в категории
+        this.fotCategory = ko.observable(positionData.fotCategory);
+
+        // ФОТ, % от выручки
+        this.fotRevenue = ko.observable(positionData.fotRevenue);
+
+        this.salary = positionData.salary; // оклад
+        this.salaryBulk = positionData.salaryBulk; // основная часть зарплаты
+
+        this.revenueStandart = positionData.revenueStandart; // Норматив выручки
+        this.revenueStandartPerHour = positionData.revenueStandartPerHour; // Норматив выручки в час
+        this.revenueStandartUnits = positionData.revenueStandartUnits; // Единицы измерения
+
+        // Норм. выработки
+        this.performanceStandart = positionData.performanceStandart;
+        this.performanceStandartType = positionData.performanceStandartType;
+        this.performanceStandartUnits = positionData.performanceStandartUnits;
+
+        this.visible = ko.observable(positionData.visible); // Отображается в таблице
+        this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this, false)));
+
+        this.visibleEmployees = ko.pureComputed(() => {
+          return this.employees().filter(e => e.visible());
+        });
+
+        this.allEmployeesLoaded = ko.observable(false);
+
+        this.workingTime = ko.pureComputed(() => {
+          return this.employees().reduce((minutes, employee) => {
             if (!employee.visible()) return minutes;
             return minutes + employee.workingTime();
           }, 0)
         });
 
-        function findEmployeeById(employeeId) {
-          return employees().find(employee => employee.id === employeeId);
-        }
+        this.findEmployeeById = (employeeId) => {
+          return this.employees().find(employee => employee.id === employeeId);
+        };
 
-        /**
-        * Adds new employee to list
-        * @param {Object} employee
-        */
-        function addEmployee(employee) {
-          employees.push(EmployeeModel(employee, positionData, 'visible'));
-        }
+        this.addEmployee = (employee) => {
+          this.employees.push(new EmployeeModel(employee, this, 'visible'));
+        };
 
-        /**
-        * Updates employees list, set visibility
-        */
-        function updateEmployees(updatedList) {
+        this.updateEmployees = (updatedList) => {
           const updatedIds = updatedList.map(e => e.id);
-          const originalIds = employees().map(e => e.id);
+          const originalIds = this.employees().map(e => e.id);
 
           const notFoundIds = _.difference(originalIds, updatedIds);
           const newEmployeesIds = _.difference(updatedIds, originalIds);
 
           // remove not found-s
-          const updated = employees().filter(e => notFoundIds.indexOf(e.id) === -1);
+          const updated = this.employees().filter(e => notFoundIds.indexOf(e.id) === -1);
 
           // set visibility
           updated.forEach(employee => {
@@ -303,23 +336,22 @@
           // add new-s
           const newEmployees = newEmployeesIds.map(id => {
             const employeeData = updatedList.find(e => e.id === id);
-            const employee = EmployeeModel(employeeData, positionData, employeeData.checked);
+            const employee = new EmployeeModel(employeeData, this, employeeData.checked);
             return employee;
           });
 
           // update list
-          employees(updated.concat(newEmployees));
+          this.employees(updated.concat(newEmployees));
         }
 
-        const lateness = ko.pureComputed(() => {
+        this.lateness = ko.pureComputed(() => {
           const result = {
             light: 0,
             medium: 0,
             hard: 0,
             total: 0,
           };
-          employees().forEach(employee => {
-            console.log(employee)
+          this.employees().forEach(employee => {
             const employeeLateness = employee.lateness;
             result.light += employeeLateness.light || 0;
             result.medium += employeeLateness.medium || 0;
@@ -330,31 +362,9 @@
           return result;
         });
 
-        console.log('lateness', lateness())
-
-        const totalLateness = ko.pureComputed(() => {
+        this.totalLateness = ko.pureComputed(() => {
           return lateness.total;
-        })
-
-        return {
-          id: positionData.id,
-          name: positionData.name, // название
-          workloadType: positionData.workloadType,
-          levels: positionData.levels, //
-          rate: positionData.rate, // оклад
-          units: 3,
-          workload: 2.2, // нагрузка
-          additionalWorkload: positionData.additionalWorkload,
-          fotCategory: positionData.fotCategory,
-          fotRevenue: positionData.fotRevenue,
-          employees,
-          lateness,
-          addEmployee, // добавить сотрудника
-          updateEmployees, // обновить список сотрудников
-          allEmployeesLoaded, // загружены сотрудники из всех филиалов
-          workingTime, // общее рабочее время всех сотрудников
-          visible, // отображается в таблице
-        };
+        });
       };
 
 
@@ -402,17 +412,96 @@
 
 
       this.summaryModel.setDriversData({
-        id: 'drivers',
-        name: 'Водители',
-        levels: [1, 2],
-        workloadType: 'Выручка',
-        workload: 0,
-        units: '₽',
-        additionalWorkloadType: 'Время без дела',
-        additionalWorkloadValue: '52%',
-        fotCategory: 0,
-        fotRevenue: 0,
-        employees: []
+        type: 'delivery',
+        name: 'Водители',                           // название должности
+        id: 'drivers',                              // идентификато позиции
+        levels: [1, 2],                             // разряды
+        workloadType: 'Выручка',                    // тип нагрузки
+        workload: 0,                                // нагрузка (величина)
+        workloadUnits: '₽',                         // единицы измерения нагрузки
+        additionalWorkloadType: '',                 // тип доп. нагрузки
+        additionalWorkload: '52',                   // доп. нагрузка (величина)
+        additionalWorkloadUnits: '',                // единицы измерения доп. нагрузки
+        fotCategory: 0,                             // ФОТ, % в категории
+        fotRevenue: 0,                              // ФОТ, % от выручки
+        performanceStandart: 0,                     // Норм. выработки, %
+        performanceStandartType: 'Цена заказа',
+        performanceStandartUnits: '₽',
+        salary: 30000,                              // Оклад
+        salaryBulk: 7200,                           // основная часть зарплаты
+        revenueStandart: 30,                        // Норматив выручки
+        revenueStandartPerHour: 0,
+        revenueStandartUnits: '₽',
+        employees: [                                // сотрудники
+          {
+            name: 'Водитель #1',                    // имя сотрудника
+            id: 'driver1',                          // идентификатор сотрудника
+            hasProblems: 0,                         // проблемы с документами
+            upRecommended: 0,                       // рекомендуется повышение
+            downRecommended: 0,                     // рекомендуется понижение
+            premiumAccount: 0,                      // премиальный счет
+            account: 100,                           // личный счет
+            accountOperations: [],                  // операции со счетом
+            level: 1,                               // разряд сотрудника
+            workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
+            compensation: 0,                        // компенсация
+            workload: 0,                            // нагрузка
+            workloadUnits: '₽',
+            salary: 3000,                           // зарплата
+            salaryBulk: 2000,                       // основная часть зарплаты
+            revenueStandartUnits: '₽',
+            revenueStandartPerHour: 10000,          // норматив выручки в час
+            revenueStandart: 130000,                // Норматив выручки
+            normalizationRatio: 0.5,                // Коэф. нормализации
+            bonusRatio: 0.5,                        // Коэф. премирования
+            bonusExceed: 100,                       // прем. за превыш. норм
+            bonuses: [],                            // бонусы
+            fines: [],                              // штрафы
+            depremation: 0,                         // депр.
+            correctedTime: '6:00',                  // корр. время
+            total: 7300,                            // всего
+            toPayment: 7300,                        // к выплате
+            lateness: {                             // опоздания сотрудника
+              light: 0,                             // меньше 5 минут
+              medium: 0,                            // 5-10 минут
+              hard: 0                               // больше 10 минут
+            },
+          },
+          {
+            name: 'Водитель #2',
+            id: 'driver2',
+            hasProblems: 0,
+            upRecommended: 0,
+            downRecommended: 0,
+            premiumAccount: 100,
+            account: 0,
+            accountOperations: [],
+            level: 2,
+            workingIntervals: ['09:00 – 16:00'],
+            compensation: 0,
+            workload: 0,
+            workloadUnits: '₽',
+            salary: 3000,
+            salaryBulk: 2000,
+            revenueStandartUnits: '₽',
+            revenueStandartPerHour: 10000,
+            revenueStandart: 130000,
+            normalizationRatio: 0.5,
+            bonusRatio: 0.5,
+            bonusExceed: 100,
+            bonuses: [],
+            fines: [],
+            depremation: 0,
+            correctedTime: '6:00',
+            total: 7300,
+            toPayment: 7300,
+            lateness: {
+              light: 0,
+              medium: 0,
+              hard: 0
+            },
+          }
+        ],
       });
 
 
@@ -436,7 +525,7 @@
         const inputData = ko.toJS(this.inputModel);
 
         // Показывать лоадер 3с
-        const delay = 3; // TODO: 3000
+        const delay = 3000
         const loadingDelay = new Promise(resolve => {
           setTimeout(() => {
             resolve();
@@ -447,41 +536,95 @@
           /* Получение списка позиций */
           const positions = [
             {
-              name: 'Администратор филиала',
-              id: '1',
-              levels: [1, 2],
-              workloadType: 'Выручка',
-              workload: 0,
-              units: '₽',
-              additionalWorkloadType: 'Время без дела',
-              additionalWorkloadValue: '0%',
-              fotCategory: 0,
-              fotRevenue: 0,
-              performanceStandart: -100,
-              employees: [
+              name: 'Администратор филиала',             // название должности
+              id: '1',                                   // идентификато позиции
+              levels: [1, 2],                            // разряды
+              workloadType: 'Выручка',                   // тип нагрузки
+              workload: 0,                               // нагрузка (величина)
+              workloadUnits: '₽',                        // единицы измерения нагрузки
+              additionalWorkloadType: 'Время без дела',  // тип доп. нагрузки
+              additionalWorkload: '0',                   // доп. нагрузка (величина)
+              additionalWorkloadUnits: '%',              // единицы измерения доп. нагрузки
+              fotCategory: 0,                            // ФОТ, % в категории
+              fotRevenue: 0,                             // ФОТ, % от выручки
+              performanceStandart: 0,                    // Норм. выработки, %
+              performanceStandartType: '',               //
+              salary: 30000,                             // Оклад
+              salaryBulk: 7200,                          // основная часть зарплаты
+              revenueStandart: 30,                       // Норматив выручки
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [                               // сотрудники
                 {
-                  name: 'Администратор филиала #1',
-                  id: '11',
-                  level: 1,
-                  workingIntervals: ['09:00 – 16:00'],
-                  lateness: {
-                    light: 0,
-                    medium: 0,
-                    hard: 0
+                  name: 'Администратор #1 Up',       // имя сотрудника
+                  id: '11',                               // идентификатор сотрудника
+                  hasProblems: 0,                         // проблемы с документами
+                  upRecommended: 1,                       // рекомендуется повышение
+                  downRecommended: 0,                     // рекомендуется понижение
+                  premiumAccount: 100,                    // премиальный счет
+                  account: 0,                             // личный счет
+                  accountOperations: [],                  // операции со счетом
+                  level: 1,                               // разряд сотрудника
+                  workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
+                  compensation: 0,                        // компенсация
+                  workload: 0,                            // нагрузка
+                  workloadUnits: '₽',
+                  salary: 3000,                           // зарплата
+                  salaryBulk: 2000,                       // основная часть зарплаты
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,          // норматив выручки в час
+                  revenueStandart: 130000,                // Норматив выручки
+                  normalizationRatio: 0.5,                // Коэф. нормализации
+                  bonusRatio: 0.5,                        // Коэф. премирования
+                  bonusExceed: 100,                       // прем. за превыш. норм
+                  bonuses: [],                            // бонусы
+                  fines: [],                              // штрафы
+                  depremation: 0,                         // депр.
+                  correctedTime: '6:00',                  // корр. время
+                  total: 7300,                            // всего
+                  toPayment: 7300,                        // к выплате
+                  lateness: {                             // опоздания сотрудника
+                    light: 0,                             // меньше 5 минут
+                    medium: 0,                            // 5-10 минут
+                    hard: 0                               // больше 10 минут
                   },
                 },
                 {
-                  name: 'Администратор филиала #2',
+                  name: 'Администратор #2 Down',
                   id: '12',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 1,
+                  premiumAccount: 100,
+                  account: 0,
+                  accountOperations: [],
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
+              ],
+              visible: 0,
             },
             {
               name: 'Повар-сушист',
@@ -489,19 +632,48 @@
               levels: [],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
+              workloadUnits: '₽',
               additionalWorkloadType: 'Лосось, кг',
-              additionalWorkloadValue: 200,
+              additionalWorkload: 200,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
               employees: [
                 {
-                  name: 'Повар-сушист #1',
+                  name: 'Повар-сушист #1 problems',
                   id: '21',
+                  hasProblems: 1,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 0,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -509,17 +681,41 @@
                   },
                 },
                 {
-                  name: 'Повар-сушист #2',
+                  name: 'Повар-сушист #2 problems + up',
                   id: '22',
+                  hasProblems: 1,
+                  upRecommended: 1,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 0,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
+              ],
+              visible: 0,
             },
             {
               name: 'Повар-пиццмейкер',
@@ -527,18 +723,48 @@
               levels: [1, 2, 3],
               workloadType: 'Пиццы',
               workload: 30,
-              units: 'шт.',
+              workloadUnits: 'шт.',
               additionalWorkloadType: 'Лосось, кг',
-              additionalWorkloadValue: 200,
+              additionalWorkload: 200,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
               employees: [
                 {
-                  name: 'Повар-пиццмейкер #1',
+                  name: 'Повар-пиццмейкер #1 problems + down',
                   id: '31',
+                  hasProblems: 1,
+                  upRecommended: 0,
+                  downRecommended: 1,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -548,16 +774,39 @@
                 {
                   name: 'Повар-пиццмейкер #2',
                   id: '32',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 3,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
-
+              ],
+              visible: 0,
             },
             {
               name: 'Официант',
@@ -565,19 +814,48 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
               employees: [
                 {
                   name: 'Официант #1',
                   id: '41',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -587,15 +865,39 @@
                 {
                   name: 'Официант #2',
                   id: '42',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
+              ],
+              visible: 0,
             },
             {
               name: 'Официант2',
@@ -603,19 +905,48 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
               employees: [
                 {
                   name: 'Официант #1',
                   id: '51',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 1,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -625,15 +956,39 @@
                 {
                   name: 'Официант #2',
                   id: '52',
+                  hasProblems: 0,
+                  upRecommended: 0,
+                  downRecommended: 0,
+                  premiumAccount: 100,
+                  account: 3000,
+                  accountOperations: [],
                   level: 2,
                   workingIntervals: ['09:00 – 16:00'],
+                  compensation: 0,
+                  workload: 0,
+                  workloadUnits: '₽',
+                  salary: 3000,
+                  salaryBulk: 2000,
+                  revenueStandartUnits: '₽',
+                  revenueStandartPerHour: 10000,
+                  revenueStandart: 130000,
+                  normalizationRatio: 0.5,
+                  bonusRatio: 0.5,
+                  bonusExceed: 100,
+                  bonuses: [],
+                  fines: [],
+                  depremation: 0,
+                  correctedTime: '6:00',
+                  total: 7300,
+                  toPayment: 7300,
                   lateness: {
                     light: 0,
                     medium: 0,
                     hard: 0
                   },
                 }
-              ]
+              ],
+              visible: 0,
             },
             {
               name: 'Официант3',
@@ -641,14 +996,21 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0,
             },
             {
               name: 'Официант4',
@@ -657,13 +1019,20 @@
               workloadType: 'Выручка',
               workload: 0,
               units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0,
             },
             {
               name: 'Официант5',
@@ -671,14 +1040,21 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0,
             },
             {
               name: 'Официант6',
@@ -686,14 +1062,21 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0,
             },
             {
               name: 'Официант7',
@@ -701,14 +1084,21 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
-              additionalWorkloadType: 0,
-              additionalWorkloadValue: 0,
+              workloadUnits: '₽',
+              additionalWorkloadType: '',
+              additionalWorkload: 0,
+              additionalWorkloadUnits: '',
               fotCategory: 0,
               fotRevenue: 0,
-              performanceStandart: -100,
-
-              employees: []
+              performanceStandart: 0,
+              performanceStandartType: '',
+              salary: 30000,
+              salaryBulk: 7200,
+              revenueStandart: 30,
+              revenueStandartPerHour: 0,
+              revenueStandartUnits: '₽',
+              employees: [],
+              visible: 0
             },
           ];
 
@@ -719,7 +1109,7 @@
             this.isBuilt(true);
             this.loading(false);
           });
-        }, 1000);
+        }, 10);
       };
 
       /** Tabs: production, delivery, lateness */
@@ -790,6 +1180,7 @@
       this.recalculateEmployees = function () {
         this.isEmployeesCalculated(false);
 
+        // TODO
         this.formModel().positions().forEach((position, index) => {
           position.employees(positions[index].employees.map(e => this.createEmployeeModel(e)));
         });
@@ -894,7 +1285,7 @@
         return h + ':' + m;
       };
 
-      this.afterRenderBuild = function(el) {
+      this.afterRenderBuild = function (el) {
         $(el).hide().fadeIn(200, () => {
           $(window).resize();
         })

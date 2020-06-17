@@ -25,11 +25,23 @@
                         'modal-dialog-centered',
                         'hrm-modal-dialog',
                         'hrm-basic-modal-dialog',
-                        'hrm-modal-dialog--size_large'
+                        'hrm-modal-dialog--size_large',
+                        'modal-dialog--columns'
                     ]);
 
-                    return new (function () {
+
+
+
+                    const viewModel = new (function () {
                         this.columns = params.data.columns.map(ColumnModel);
+
+                        this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+
+                        this.windowResizeHandler = () => {
+                            this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                        };
+
+                        $(window).on('resize', this.windowResizeHandler);
 
                         /** Поисковый запрос */
                         this.term = ko.observable('');
@@ -64,7 +76,7 @@
                         };
 
                         /** Применить изменения */
-                        this.apply = function() {
+                        this.apply = function () {
                             this.columns.forEach(c => {
                                 c.apply()
                             });
@@ -77,6 +89,12 @@
                             }
                         };
                     });
+
+                    viewModel.dispose = () => {
+                        $(window).off('resize', viewModel.windowResizeHandler);
+                    }
+
+                    return viewModel;
                 }
             },
             template: {
