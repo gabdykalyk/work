@@ -444,7 +444,7 @@
 															Справочник
 															<div class="worksheet__table-directory-head-cell-divider"></div>
 														</th>
-														<th class="worksheet__table-actions-head-cell" colspan="2" rowspan="2"></th>
+														<th class="worksheet__table-actions-head-cell" rowspan="2"></th>
 													</tr>
 													<tr>
 														<th class="worksheet__table-employee-visible-head-cell">Показывать</th>
@@ -494,7 +494,7 @@
 															Справочник
 															<div class="worksheet__table-directory-head-cell-divider"></div>
 														</th>
-														<th class="worksheet__table-actions-head-cell" colspan="2" rowspan="2"></th>
+														<th class="worksheet__table-actions-head-cell" rowspan="2"></th>
 													</tr>
 													<tr>
 														<th class="worksheet__table-employee-visible-head-cell">Показывать</th>
@@ -686,11 +686,13 @@
 																				<label>
 																					<input type="checkbox" data-bind="checked: directoryAutofill">
 																					<span class="fa fa-check"></span>
-																					Автозаполнение
+																					Автонаполнение
 																				</label>
 																			</div>
 																		</div>
 																	</td>
+
+																	<td colspan="2"></td>
 																</tr>
 															<!-- /ko -->
 
@@ -752,9 +754,8 @@
 																afterAdd: fadeAfterAddFactory(200, 300),
 																beforeRemove: fadeBeforeRemoveFactory(200)
 															} -->
-																<div>
-																	<!-- ko text: $root.formatDirectory(directory()) --><!-- /ko -->
-																	<a class="btn btn-link" data-bind="click: function () {$root.openEditAdditionalFieldDirectoryModal($data);}">Редактировать</a>
+																<div><!-- ko text: $root.formatDirectory(directory()) -->
+																	<!-- /ko -->  <a class="btn btn-link worksheet__additional-fields-settings-table-directory-edit-button" data-bind="click: function () {$root.openEditAdditionalFieldDirectoryModal($data);}">Редактировать</a>
 																</div>
 															<!-- /ko -->
 														</div>
@@ -1235,6 +1236,7 @@
 							this.initializing = ko.observable(true);
 
 							this.name = params.data.name;
+							this.mode = 'mode' in params.data ? params.data.mode : 'DEFAULT';
 
 							this.createDirectoryItem = function(directoryItem) {
 								return {value: ko.observable(directoryItem)};
@@ -1253,7 +1255,7 @@
 								}
 							});
 
-							this.isAdding = ko.observable(false);
+							this.isAdding = ko.observable(this.mode === 'CREATE_ONLY');
 							this.addingFormModel = ko.observable(null).extend({
 								required: {
 									message: 'Обязательное поле'
@@ -1261,7 +1263,7 @@
 							});
 							this.isAddingFormSubmitted = ko.observable(false);
 							this.addingFormUniqueError = ko.pureComputed(() => {
-								const values = this.addingFormModel().split('\n');
+								const values = this.addingFormModel().split('\n').filter(value => value !== '');
 								const directoryValues = this.directory().map(item => item.value());
 
 								const usedValues = values.filter(value => directoryValues.includes(value));
@@ -1273,7 +1275,7 @@
 								}
 							});
 							this.addingFormDuplicatedError = ko.pureComputed(() => {
-								const values = this.addingFormModel().split('\n');
+								const values = this.addingFormModel().split('\n').filter(value => value !== '');
 								const uniqueValues = new Set();
 								const duplicatedValues = new Set();
 
@@ -1323,17 +1325,26 @@
 								this.isAddingFormSubmitted(true);
 
 								if (this.addingFormModel.isValid() && this.addingFormUniqueError() === null && this.addingFormDuplicatedError() === null) {
-									const values = this.addingFormModel().split('\n');
+									const values = this.addingFormModel().split('\n').filter(value => value !== '');
 									values.forEach(value => {
 										this.directory.push(this.createDirectoryItem(value));
 									});
 									this.isAddingFormSubmitted(false);
-									this.isAdding(false);
+
+									if (this.mode === 'DEFAULT') {
+										this.isAdding(false);
+									} else if (this.mode === 'CREATE_ONLY') {
+										this.submit();
+									}
 								}
 							};
 
 							this.cancelAdding = function () {
-								this.isAdding(false);
+								if (this.mode === 'DEFAULT') {
+									this.isAdding(false);
+								} else if (this.mode === 'CREATE_ONLY') {
+									this.cancel();
+								}
 							};
 
 							this.delete = function (directoryItem) {
@@ -1451,7 +1462,7 @@
 				});
 
 				this.formatDirectory = function (directory) {
-					return directory.slice(0, 10).map(item => item.toLowerCase()).join(', ').toUpperCase();
+					return directory.slice(0, 10).map(item => item.toLowerCase()).join(', ').toUpperCase() + (directory.length > 10 ? '…' : '');
 				};
 
                 this.afterRender = function () {
@@ -1515,7 +1526,7 @@
 				this.openEditAdditionalFieldDirectoryModal = function (field) {
 					this.modalOpens.push({
 						dialogTemplateName: 'edit-directory-modal-content-template',
-						data: {name: field.name, directory: field.directory()},
+						data: {name: field.name, directory: field.directory(), mode: 'CREATE_ONLY'},
 						options: {
 							modalClass: 'modal-global fade center'
 						},
@@ -1812,48 +1823,48 @@
 					},
 					{
 						name: 'Семейное положение',
-						isDirectory: false,
-						directory: null,
-						employeeVisible: false,
-						employeeRequired: false,
-						candidateVisible: false,
-						candidateRequired: false,
-						directoryCustom: null,
-						directoryAutofill: null,
-						subfields: []
-					},
-					{
-						name: 'Вредные привычки',
-						isDirectory: false,
-						directory: null,
-						employeeVisible: false,
-						employeeRequired: false,
-						candidateVisible: false,
-						candidateRequired: false,
-						directoryCustom: null,
-						directoryAutofill: null,
-						subfields: []
-					},
-					{
-						name: 'Желаемый график',
-						isDirectory: false,
-						directory: null,
-						employeeVisible: false,
-						employeeRequired: false,
-						candidateVisible: false,
-						candidateRequired: false,
-						directoryCustom: null,
-						directoryAutofill: null,
-						subfields: []
-					},
-					{
-						name: 'Последние места работы',
 						isDirectory: true,
 						directory: [],
 						employeeVisible: false,
 						employeeRequired: false,
 						candidateVisible: false,
 						candidateRequired: false,
+						directoryCustom: false,
+						directoryAutofill: false,
+						subfields: []
+					},
+					{
+						name: 'Вредные привычки',
+						isDirectory: true,
+						directory: [],
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: false,
+						directoryAutofill: false,
+						subfields: []
+					},
+					{
+						name: 'Желаемый график',
+						isDirectory: true,
+						directory: [],
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: false,
+						candidateRequired: false,
+						directoryCustom: false,
+						directoryAutofill: false,
+						subfields: []
+					},
+					{
+						name: 'Последние места работы',
+						isDirectory: false,
+						directory: null,
+						employeeVisible: false,
+						employeeRequired: false,
+						candidateVisible: null,
+						candidateRequired: null,
 						subfields: [
 							{
 								name: 'Должность',
