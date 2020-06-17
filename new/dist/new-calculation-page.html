@@ -517,7 +517,7 @@
 
                             this.columns.forEach(c => {
                                 let isVisible = true;
-                                if (formattedTerm.length >= 2) {
+                                if (formattedTerm.length >= 1) {
                                     const formattedName = c.name.toLowerCase();
                                     isVisible = formattedName.indexOf(formattedTerm) !== -1;
                                     console.log(isVisible)
@@ -1106,6 +1106,8 @@
             this.fines = ko.observableArray(defaultFines.map((fineData) => {
                 return Fine(fineData, this.fineBases);
             }));
+
+            if (!this.fines().length) this.fines.push(Fine(null, this.fineBases));
 
             this.addFine = () => {
               this.fines.push(Fine(null, this.fineBases))
