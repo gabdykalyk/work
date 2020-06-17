@@ -18,7 +18,7 @@
         }
       });
       base.subscribe(baseId => {
-        const baseData = fineBases().find(group => {
+        const baseData = fineBases.find(group => {
           return group.items.find(item => item.id === baseId);
         });
         if (baseData) sum(baseData.sum);
@@ -51,8 +51,10 @@
           ]);
 
           const employee = params.data.employee;
+          const finesList = params.data.fines;
+          const authorsList = params.data.authors;
 
-          const ViewModel = function (defaultFines) {
+          const ViewModel = function (defaultFines, finesList, authorsList) {
             this.isSubmitted = ko.observable(false);
 
             this.formControlErrorStateMatcher = (formControl) => {
@@ -61,15 +63,15 @@
               });
             };
 
-            this.fineBases = window.directories.fines.get();
-            this.authors = window.directories.authors.get();
+            this.fineBases = finesList;
+            this.authors = authorsList;
 
             this.fines = ko.observableArray(defaultFines.map((fineData) => {
                 return Fine(fineData, this.fineBases);
             }));
 
             this.addFine = () => {
-              this.fines.push(Fine())
+              this.fines.push(Fine(null, this.fineBases))
             };
 
             this.removeFine = (fine) => {
@@ -106,7 +108,7 @@
             };
           }
 
-          return new ViewModel(employee.fines());
+          return new ViewModel(employee.fines(), finesList, authorsList);
         }
       },
       template: {

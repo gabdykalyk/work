@@ -1,128 +1,85 @@
 <script type="text/javascript">
-  /* Справочник штрафов */
-  const fines = [
-    {
-      name: 'Группа 1',
-      items: [
-        {
-          id: '1',
-          name: 'Основание штрафа 1',
-          sum: 200
-        },
-        {
-          id: '2',
-          name: 'Основание штрафа 2',
-          sum: 300
-        }
-      ]
-    },
-    {
-      name: 'Группа 2',
-      items: [
-        {
-          id: '3',
-          name: 'Основание штрафа 3',
-          sum: 200
-        },
-        {
-          id: '4',
-          name: 'Основание штрафа 4',
-          sum: 300
-        }
-      ]
-    },
-  ];
-
-  const bonuses = [
-    {
-      name: 'Группа 1',
-      items: [
-        {
-          id: '1',
-          name: 'Основание премии 1',
-          sum: 200
-        },
-        {
-          id: '2',
-          name: 'Основание премии 2',
-          sum: 300
-        }
-      ]
-    },
-    {
-      name: 'Группа 2',
-      items: [
-        {
-          id: '3',
-          name: 'Основание премии 3',
-          sum: 200
-        },
-        {
-          id: '4',
-          name: 'Основание премии 4',
-          sum: 300
-        }
-      ]
-    },
-  ];
   // Справочники
   window.directories = {
-    fines: {
-      get: () => {
-        const directory = ko.observable([
+    fines: [
+      {
+        name: 'Группа 1',
+        items: [
           {
-            name: 'Безопасность',
-            items: [
-              { id: 1, name: 'Возврат в кассу', sum: 200 }
-            ],
+            id: '1',
+            name: 'Основание штрафа 1',
+            sum: 200
           },
           {
-            name: 'Дисциплина',
-            items: [
-              { id: 2, name: 'За отсутствие объяснительной', sum: 250 },
-              { id: 3, name: 'Халатное отношение к работе', sum: 300 },
-            ]
-          },
-          {
-            name: 'Документы',
-            items: [
-              { id: 4, name: 'Налог', sum: 350 }
-            ],
-          },
-          {
-            name: 'Производство',
-            items: [
-              { id: 5, name: 'Выкуп готовой продукции', sum: 400 },
-              { id: 6, name: 'Порча инвентаря и оборудования', sum: 450 },
-              { id: 7, name: 'Компенсация за халатность', sum: 500 },
-            ],
-          },
-        ]);
-
-        return directory;
-      }
-    },
-    authors: {
-      get: () => {
-        const directory = ko.observable([
-          {
-            id: 1,
-            name: 'Иван Иванов'
-          }, {
-            id: 2,
-            name: 'Петр Петров'
-          }, {
-            id: 3,
-            name: 'Николай Николаев'
-          }, {
-            id: 4,
-            name: 'Сергей Сергеев'
+            id: '2',
+            name: 'Основание штрафа 2',
+            sum: 300
           }
-        ]);
-
-        return directory;
+        ]
+      },
+      {
+        name: 'Группа 2',
+        items: [
+          {
+            id: '3',
+            name: 'Основание штрафа 3',
+            sum: 200
+          },
+          {
+            id: '4',
+            name: 'Основание штрафа 4',
+            sum: 300
+          }
+        ]
+      },
+    ],
+    bonuses: [
+      {
+        name: 'Группа 1',
+        items: [
+          {
+            id: '1',
+            name: 'Основание премии 1',
+            sum: 200
+          },
+          {
+            id: '2',
+            name: 'Основание премии 2',
+            sum: 300
+          }
+        ]
+      },
+      {
+        name: 'Группа 2',
+        items: [
+          {
+            id: '3',
+            name: 'Основание премии 3',
+            sum: 200
+          },
+          {
+            id: '4',
+            name: 'Основание премии 4',
+            sum: 300
+          }
+        ]
+      },
+    ],
+    authors: [
+      {
+        id: 1,
+        name: 'Иван Иванов'
+      }, {
+        id: 2,
+        name: 'Петр Петров'
+      }, {
+        id: 3,
+        name: 'Николай Николаев'
+      }, {
+        id: 4,
+        name: 'Сергей Сергеев'
       }
-    }
+    ],
   };
 
   $(function () {
@@ -802,8 +759,8 @@
           this.utils.openModal(
             'stimulation',
             {
-              fines: fines,
-              bonuses: bonuses
+              fines: window.directories.fines,
+              bonuses: window.directories.bonuses
             },
             (data) => {
               console.log('stimulation saved', data)
