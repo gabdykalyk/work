@@ -215,6 +215,9 @@ ko.bindingHandlers.hrmAutoResize = {
   init: function (element) {
     const autoResizeInstance = $(element).addClass('hrm-auto-resize').autoResize();
     $(element).data('resizeInstance', autoResizeInstance);
+    $(element).on('reset', () => {
+      $(element).height('');
+    });
   },
 };
 

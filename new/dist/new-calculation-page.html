@@ -602,9 +602,10 @@
       <div class="account-operation__sum-value"
            data-bind="hrmFormField, hrmFormFieldControlRef: control">
         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <input type="number"
+          <input type="text" placeholder="0"
                  data-bind="
               textInput: sum,
+              hrmMask, hrmMaskPattern: 'decimal',
               hrmFormFieldInputControl: control,
               hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
           ">
@@ -733,7 +734,7 @@
           message: 'Обязательное поле'
         }
       });
-      this.sum = ko.observable(parseFloat(operationData.sum) || 0).extend({
+      this.sum = ko.observable(parseFloat(operationData.sum) || '').extend({
         required: {
           message: 'Обязательное поле'
         },
@@ -780,6 +781,7 @@
             };
 
             this.operations = ko.observableArray(operations.map(o => new AccountOperation(o)));
+            if (!this.operations().length) this.operations.push(new AccountOperation());
 
             this.total = ko.pureComputed(() => {
               return this.operations().reduce((sum, operation) => {
@@ -4569,10 +4571,11 @@
         const inputData = ko.toJS(this.inputModel);
 
         // Показывать лоадер 3с
+        const delay = 3; // TODO: 3000
         const loadingDelay = new Promise(resolve => {
           setTimeout(() => {
             resolve();
-          }, 3000);
+          }, delay);
         });
 
         setTimeout(() => {
@@ -5047,10 +5050,17 @@
     const defaultPositions = [];
     const viewModel = new ViewModel(defaultPositions);
 
+
+
     ko.applyBindings(
       viewModel,
       $page.get()[0]
     );
+
+    // TODO: test
+    setTimeout(() => {
+      viewModel.buildCalculation()
+    }, 500)
 
 
     /*****/

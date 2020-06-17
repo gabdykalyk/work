@@ -10,7 +10,7 @@
           message: 'Обязательное поле'
         }
       });
-      this.sum = ko.observable(parseFloat(operationData.sum) || 0).extend({
+      this.sum = ko.observable(parseFloat(operationData.sum) || '').extend({
         required: {
           message: 'Обязательное поле'
         },
@@ -57,6 +57,7 @@
             };
 
             this.operations = ko.observableArray(operations.map(o => new AccountOperation(o)));
+            if (!this.operations().length) this.operations.push(new AccountOperation());
 
             this.total = ko.pureComputed(() => {
               return this.operations().reduce((sum, operation) => {
