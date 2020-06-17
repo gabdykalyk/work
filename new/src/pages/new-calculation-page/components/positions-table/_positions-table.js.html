@@ -2,11 +2,12 @@
 
 <script type="text/javascript">
   $(function () {
-    function Column(id, title, fullTitle) {
+    function Column(id, title, fullTitle, colored) {
       return {
         id,
         title,
         fullTitle,
+        colored,
         visible: ko.observable(true),
       }
     }
@@ -58,7 +59,6 @@
           };
 
 
-
           /* Table columns */
           const columns = [
             Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
@@ -79,7 +79,20 @@
             Column('depremation', 'Депр., ₽', 'Депремирование'),
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
+
+            Column('total', 'Всего начислено, ₽', 'Всего начислено, ₽', true),
+            Column('payment', 'К выплате, ₽', 'К выплате, ₽', true)
           ];
+          const defaultColumnsState = localStorage.getItem('calculation-page-employees-columns');
+          if (defaultColumnsState) {
+            const state = JSON.parse(defaultColumnsState);
+            columns.forEach(column => {
+              if (column.id in state && state[column.id] === 0) {
+                column.visible(false);
+              }
+            })
+          };
+
           const activeColumns = ko.pureComputed(() => {
             return columns.filter(c => c.visible()).length;
           });
@@ -99,7 +112,15 @@
 
           /** Sets columns visibility */
           function setColumns() {
-            params.utils.openModal('columns', { columns: columns })
+            params.utils.openModal('columns', { columns: columns }, () => {
+              const state = columns.reduce((acc, column) => {
+                return {
+                  ...acc,
+                  [column.id]: column.visible() ? 1 : 0
+                }
+              }, {});
+              localStorage.setItem('calculation-page-employees-columns', JSON.stringify(state));
+            });
           }
 
 

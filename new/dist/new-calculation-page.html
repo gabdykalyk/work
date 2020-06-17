@@ -289,35 +289,10 @@
          data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по наименованию' }}">
     </div>
 
-    <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-    <div class="modal-dialog__scroll">
-      <div class="modal-dialog__scroll-container columns-settings__list">
-        <!-- ko foreach: { data: $component.columns, as: 'column' } -->
 
-        <!-- ko if: column.visible() -->
-
-        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-        <div class="columns-settings__list-item">
-          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
-            <div
-                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
-            </div>
-            <label
-                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
-          </div>
-        </div>
-        <!-- /ko -->
-
-        <!-- /ko -->
-        <!-- /ko -->
-      </div>
-    </div>
-    <!-- /ko -->
-
-    <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
-    <div class="modal-dialog__scroll">
+    <div class="modal-dialog__scroll" data-bind="hrmScrollable">
       <div class="modal-dialog__scroll-container columns-settings__list"
-           data-bind="hrmScrollable">
+           >
         <!-- ko foreach: { data: $component.columns, as: 'column' } -->
 
         <!-- ko if: column.visible() -->
@@ -338,7 +313,7 @@
         <!-- /ko -->
       </div>
     </div>
-    <!-- /ko -->
+
 
   </div>
 
@@ -362,6 +337,7 @@
         function ColumnModel(column) {
             const checked = ko.observable(column.visible());
             function apply() {
+                console.log('apply', column, checked())
                 column.visible(checked());
             }
             return {
@@ -385,8 +361,6 @@
                         'hrm-modal-dialog--size_large',
                         'modal-dialog--columns'
                     ]);
-
-
 
 
                     const viewModel = new (function () {
@@ -3636,12 +3610,17 @@
     <!-- /ko -->
   <!-- /ko -->
 
+  <!-- ko if: table.isColumnVisible('total') -->
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
     <div class="positions-table__cell-content" data-bind="text: employee.total"></div>
   </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('payment') -->
   <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
     <div class="positions-table__cell-content" data-bind="text: employee.toPayment"></div>
   </td>
+  <!-- /ko -->
 </tr>
 
 </script>
@@ -3740,12 +3719,17 @@
   <td class="positions-table__cell positions-table__cell--fine positions-table__cell--empty"></td>
   <!-- /ko -->
 
+  <!-- ko if: table.isColumnVisible('total') -->
   <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
     <div class="positions-table__cell-content" data-bind="text: total.total()"></div>
   </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('payment') -->
   <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
     <div class="positions-table__cell-content" data-bind="text: total.toPayment()"></div>
   </td>
+  <!-- /ko -->
 </tr>
 
 </script>
@@ -3935,8 +3919,6 @@
                  data-bind="class: 'position-table__col--' + id">
             <!-- /ko -->
             <!-- /ko -->
-            <col class="positions-table__col positions-table__col--total">
-            <col class="positions-table__col positions-table__col--payment">
           </colgroup>
 
           <thead>
@@ -3948,7 +3930,9 @@
               <!-- ko foreach: table.columns -->
               <!-- ko if: $data.visible -->
               <th class="positions-table__cell positions-table__head-cell"
-                  data-bind="class: 'positions-table__cell--' + id">
+                  data-bind="class: 'positions-table__cell--' + id, css: {
+                    'positions-table__cell--colored': colored
+                  }">
                 <div class="positions-table__cell-content">
                   <span data-bind="text: title"></span>
                   <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
@@ -3957,24 +3941,6 @@
               </th>
               <!-- /ko -->
               <!-- /ko -->
-
-              <th
-                  class="positions-table__cell positions-table__head-cell positions-table__cell--total positions-table__cell--colored">
-                <div class="positions-table__cell-content">
-                  <span>Всего начислено, ₽</span>
-                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
-                          data-bind="hrmTooltip, hrmTooltipText: 'Всего начислено'"></button>
-                </div>
-              </th>
-
-              <th
-                  class="positions-table__cell positions-table__head-cell positions-table__cell--payment positions-table__cell--colored">
-                <div class="positions-table__cell-content">
-                  <span>К выплате, ₽</span>
-                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
-                          data-bind="hrmTooltip, hrmTooltipText: 'К выплате'"></button>
-                </div>
-              </th>
             </tr>
           </thead>
 
@@ -3999,7 +3965,7 @@
             <!-- ko template: {
               foreach: hrmTemplateIf($data.visible(), $data),
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
-          } -->
+            } -->
 
             <!-- ko template: {
               name: 'employee-row-template',
@@ -4065,11 +4031,12 @@
 
 <script type="text/javascript">
   $(function () {
-    function Column(id, title, fullTitle) {
+    function Column(id, title, fullTitle, colored) {
       return {
         id,
         title,
         fullTitle,
+        colored,
         visible: ko.observable(true),
       }
     }
@@ -4121,7 +4088,6 @@
           };
 
 
-
           /* Table columns */
           const columns = [
             Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
@@ -4142,7 +4108,20 @@
             Column('depremation', 'Депр., ₽', 'Депремирование'),
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
+
+            Column('total', 'Всего начислено, ₽', 'Всего начислено, ₽', true),
+            Column('payment', 'К выплате, ₽', 'К выплате, ₽', true)
           ];
+          const defaultColumnsState = localStorage.getItem('calculation-page-employees-columns');
+          if (defaultColumnsState) {
+            const state = JSON.parse(defaultColumnsState);
+            columns.forEach(column => {
+              if (column.id in state && state[column.id] === 0) {
+                column.visible(false);
+              }
+            })
+          };
+
           const activeColumns = ko.pureComputed(() => {
             return columns.filter(c => c.visible()).length;
           });
@@ -4162,7 +4141,15 @@
 
           /** Sets columns visibility */
           function setColumns() {
-            params.utils.openModal('columns', { columns: columns })
+            params.utils.openModal('columns', { columns: columns }, () => {
+              const state = columns.reduce((acc, column) => {
+                return {
+                  ...acc,
+                  [column.id]: column.visible() ? 1 : 0
+                }
+              }, {});
+              localStorage.setItem('calculation-page-employees-columns', JSON.stringify(state));
+            });
           }
 
 

@@ -184,8 +184,6 @@
                  data-bind="class: 'position-table__col--' + id">
             <!-- /ko -->
             <!-- /ko -->
-            <col class="positions-table__col positions-table__col--total">
-            <col class="positions-table__col positions-table__col--payment">
           </colgroup>
 
           <thead>
@@ -197,7 +195,9 @@
               <!-- ko foreach: table.columns -->
               <!-- ko if: $data.visible -->
               <th class="positions-table__cell positions-table__head-cell"
-                  data-bind="class: 'positions-table__cell--' + id">
+                  data-bind="class: 'positions-table__cell--' + id, css: {
+                    'positions-table__cell--colored': colored
+                  }">
                 <div class="positions-table__cell-content">
                   <span data-bind="text: title"></span>
                   <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
@@ -206,24 +206,6 @@
               </th>
               <!-- /ko -->
               <!-- /ko -->
-
-              <th
-                  class="positions-table__cell positions-table__head-cell positions-table__cell--total positions-table__cell--colored">
-                <div class="positions-table__cell-content">
-                  <span>Всего начислено, ₽</span>
-                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
-                          data-bind="hrmTooltip, hrmTooltipText: 'Всего начислено'"></button>
-                </div>
-              </th>
-
-              <th
-                  class="positions-table__cell positions-table__head-cell positions-table__cell--payment positions-table__cell--colored">
-                <div class="positions-table__cell-content">
-                  <span>К выплате, ₽</span>
-                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
-                          data-bind="hrmTooltip, hrmTooltipText: 'К выплате'"></button>
-                </div>
-              </th>
             </tr>
           </thead>
 
@@ -248,7 +230,7 @@
             <!-- ko template: {
               foreach: hrmTemplateIf($data.visible(), $data),
               beforeRemove: hrmFadeBeforeRemoveFactory(500)
-          } -->
+            } -->
 
             <!-- ko template: {
               name: 'employee-row-template',
