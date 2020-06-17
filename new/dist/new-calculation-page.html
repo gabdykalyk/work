@@ -453,7 +453,7 @@
          data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по должности' }}">
     </div>
 
-    <div class="calculation-modal__scroll">
+    <div class="modal-dialog__scroll">
       <div class="positions-settings__list"
            data-bind="hrmScrollable">
         <!-- ko foreach: { data: $component.positions, as: 'position' } -->
@@ -499,7 +499,8 @@
 <script type="text/javascript">
     $(function () {
         function PositionModel(positionData) {
-            const checked =  ko.observable(positionData.visible());
+            const checked =  ko.observable(!!positionData.visible());
+            console.log(checked())
             function apply() {
                 positionData.visible(checked());
             }
@@ -694,15 +695,18 @@
 
   <div class="hrm-basic-modal-dialog__body account-operations-form">
 
-    <div class="account-operations-form__list">
-      <!-- ko template: {
-        name: 'account-operation-template',
-        foreach: $component.operations,
-        afterAdd: hrmFadeAfterAddFactory(200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-      } -->
-      <!-- /ko -->
+    <div class="modal-dialog__scroll">
+      <div class="account-operations-form__list" data-bind="hrmScrollable">
+        <!-- ko template: {
+          name: 'account-operation-template',
+          foreach: $component.operations,
+          afterAdd: hrmFadeAfterAddFactory(200),
+          beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <!-- /ko -->
+      </div>
     </div>
+
 
 
     <div class="account-operations-form__actions">
@@ -788,7 +792,8 @@
             'modal-dialog',
             'modal-dialog-centered',
             'hrm-modal-dialog',
-            'hrm-basic-modal-dialog'
+            'hrm-basic-modal-dialog',
+            'modal-dialog--account-operations'
           ]);
 
           const ViewModel = function (operations) {
@@ -1009,8 +1014,8 @@
   </div>
 
   <div class="hrm-basic-modal-dialog__body fine-form">
-    <div class="calculation-modal__scroll">
-      <div class="calculation-modal__scroll-list"
+    <div class="modal-dialog__scroll">
+      <div class="fine-form__scroll-list"
            data-bind="hrmScrollable">
         <!-- ko template: {
           name: 'fine-block-template',
@@ -1582,7 +1587,7 @@
   </div>
   <!-- /ko -->
 
-  <div class="employees-form__tab calculation-modal__scroll">
+  <div class="employees-form__tab modal-dialog__scroll">
   <!-- Отображение сотрудников -->
   <!-- ko template: {
         foreach: hrmTemplateIf(!loadingBranches(), $data),
@@ -2080,10 +2085,9 @@
             hrmFormFieldSelectControl: control,
             hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
             <option></option>
-            <option value="0">Иван Иванов</option>
-            <option value="1">Петр Петров</option>
-            <option value="2">Николай Николаев</option>
-            <option value="3">Дмитрий Дмитриев</option>
+            <!-- ko foreach: $component.authors -->
+            <option data-bind="value: id, text: name"></option>
+            <!-- /ko -->
           </select>
         </div>
 
@@ -2193,6 +2197,7 @@
 
             this.fines = params.data.fines;
             this.bonuses = params.data.bonuses;
+            this.authors = params.data.authors;
 
             this.formControlErrorStateMatcher = (formControl) => {
               return ko.pureComputed(() => {
@@ -5451,7 +5456,8 @@
             'stimulation',
             {
               fines: window.directories.fines,
-              bonuses: window.directories.bonuses
+              bonuses: window.directories.bonuses,
+              authors: window.directories.authors
             },
             (data) => {
               console.log('stimulation saved', data)
