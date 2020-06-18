@@ -746,7 +746,7 @@
 																afterAdd: fadeAfterAddFactory(200, 300),
 																beforeRemove: fadeBeforeRemoveFactory(200)
 															} -->
-																<a class="btn btn-link worksheet__additional-fields-settings-table-directory-add-button" data-bind="click: function () {$root.openEditAdditionalFieldDirectoryModal($data);}">Добавить значение</a>
+																<a class="btn btn-link worksheet__additional-fields-settings-table-directory-add-button" data-bind="click: function () {$root.openAddAdditionalFieldDirectoryModal($data);}">Добавить значение</a>
 															<!-- /ko -->
 
 															<!-- ko template: {
@@ -1523,10 +1523,25 @@
 					});
 				};
 
-				this.openEditAdditionalFieldDirectoryModal = function (field) {
+				this.openAddAdditionalFieldDirectoryModal = function (field) {
 					this.modalOpens.push({
 						dialogTemplateName: 'edit-directory-modal-content-template',
 						data: {name: field.name, directory: field.directory(), mode: 'CREATE_ONLY'},
+						options: {
+							modalClass: 'modal-global fade center'
+						},
+						close: result => {
+							if (result !== undefined) {
+								field.directory(result);
+							}
+						}
+					});
+				};
+
+				this.openEditAdditionalFieldDirectoryModal = function (field) {
+					this.modalOpens.push({
+						dialogTemplateName: 'edit-directory-modal-content-template',
+						data: {name: field.name, directory: field.directory()},
 						options: {
 							modalClass: 'modal-global fade center'
 						},
