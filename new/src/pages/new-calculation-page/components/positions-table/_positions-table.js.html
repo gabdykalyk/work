@@ -72,10 +72,10 @@
             Column('salary-bulk', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
             Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
             Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования'),
-            Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки'),
+            Column('revenue-standart', 'Норм. выр-ки', 'Норматив выручки'),
             Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования'),
             Column('corrected-time', 'Корр. время', 'Корректированное время'),
-            Column('bonus-exceed', 'Прем. за превыш. норм., ₽', 'Премия за превышение норматива'),
+            Column('bonus-exceed', 'Премия за прев. норм., ₽', 'Премия за превышение норматива'),
             Column('depremation', 'Депр., ₽', 'Депремирование'),
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
@@ -113,15 +113,57 @@
           /** Sets columns visibility */
           function setColumns() {
             params.utils.openModal('columns', { columns: columns }, () => {
-              const state = columns.reduce((acc, column) => {
-                return {
-                  ...acc,
-                  [column.id]: column.visible() ? 1 : 0
-                }
-              }, {});
-              localStorage.setItem('calculation-page-employees-columns', JSON.stringify(state));
+              saveColumnsState();
             });
           }
+
+          function setColumnsState(set) {
+            columns.forEach(c => {
+              const isVisible = set ? set.includes(c.id) : true;
+              c.visible(isVisible);
+            });
+            saveColumnsState();
+          }
+
+          function saveColumnsState() {
+            const state = columns.reduce((acc, column) => {
+              return {
+                ...acc,
+                [column.id]: column.visible() ? 1 : 0
+              }
+            }, {});
+            localStorage.setItem('calculation-page-employees-columns', JSON.stringify(state));
+          }
+
+
+
+          const columnSets = [
+            ['account', 'account-operations', 'level', 'interval', 'compensation', 'salary-bulk', 'bonus-exceed', 'depremation', 'premation', 'fine', 'payment'],
+            ['payment']
+          ];
+          const columnSetsIndex = ko.observable(-1);
+          const blockMoreInfo = ko.pureComputed(() => {
+            return !columns.some(c => !c.visible());
+          });
+          const blockLessInfo = ko.pureComputed(() => {
+            return !columns
+              .filter(c => !columnSets[1].includes(c.id))
+              .some(c => c.visible());
+          });
+
+          const moreInfo = () => {
+            const hasInvisibleColumns = columns.filter(c => columnSets[0].includes(c.id))
+            .some(c => !c.visible());
+            if (hasInvisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState();
+          };
+
+          const lessInfo = () => {
+            const hasVisibleColumns = columns.filter(c => !columnSets[0].includes(c.id))
+                .some(c => c.visible());
+            if (hasVisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState(columnSets[1]);
+          };
 
 
           function updatePositionEmployees(positionData) {
@@ -139,7 +181,7 @@
                 const position = model.getPositionById(data.position);
                 position.addEmployee({
                   name: data.name,
-                  level: data.level
+                  level: data.level,
                 });
               });
           };
@@ -234,6 +276,11 @@
             columnCount,
             isColumnVisible,
             setColumns,
+
+            moreInfo,
+            blockMoreInfo,
+            lessInfo,
+            blockLessInfo,
 
             setPositions,
             positions,

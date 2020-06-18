@@ -165,16 +165,17 @@
       function EmployeeModel(employee, positionModel, visible) {
         this.position = positionModel;
 
-        this.name = employee.name;    // имя сотрудника
-        this.id = employee.id;        // идентификатор сотрудника
+        this.name = employee.name;                   // имя сотрудника
+        this.id = employee.id;                       // идентификатор сотрудника
         this.level = ko.observable(employee.level);  // разряд
+        this.link = employee.link;                   // ссылка на личное дело
 
         this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
         this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
         this.downRecommended = ko.observable(employee.downRecommended);  // рекомендуется понижение
 
         // рабочее время
-        const defaultIntervals = employee.workingIntervals || [''];
+        const defaultIntervals = employee.workingIntervals || ['11:00 – 23:00'];
         this.workingIntervals = ko.observableArray(
           defaultIntervals.map(i => WorkingIntervalModel(i))
         );
@@ -196,8 +197,8 @@
           this.workingIntervals.remove(interval);
         };
 
-        this.account = ko.observable(employee.account);             // личный счет
-        this.premiumAccount = ko.observable(employee.account);      // премиальный счет
+        this.account = ko.observable(employee.account || 0);             // личный счет
+        this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
 
         // операции с ЛС
         this.accountOperations = ko.observableArray(employee.accountOperations || []);
@@ -225,28 +226,39 @@
         });
 
         // компенсация
-        this.compensation = ko.observable(employee.compensation || 0);
+        this.compensation = ko.observable(employee.compensation || '');
 
         this.workload = ko.observable(employee.workload || '');
         this.workloadUnits = this.position.workloadUnits;
 
-        this.salary = ko.observable(employee.salary || 0);
-        this.salaryBulk = ko.observable(employee.salaryBulk || 0);
+        this.salary = ko.observable(employee.salary || this.positionSalary);
+        this.salaryBulk = ko.observable(employee.salaryBulk || this.positionSalaryBulk);
 
-        this.revenueStandartUnits = employee.revenueStandartUnits;
-        this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || '');
-        this.revenueStandart = ko.observable(employee.revenueStandart || '');
+        this.revenueStandartUnits = employee.revenueStandartUnits || this.position.revenueStandartUnits;
+        this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || this.position.revenueStandartUnits);
+        this.revenueStandart = ko.observable(employee.revenueStandart || this.position.revenueStandart);
 
-        this.normalizationRatio = employee.normalizationRatio;
-        this.bonusRatio = employee.bonusRatio;
+        this.normalizationRatio = employee.normalizationRatio || this.position.normalizationRatio;
+        this.bonusRatio = employee.bonusRatio || this.position.bonusRatio;
 
-        this.bonusExceed = ko.observable(employee.bonusExceed || 0);
-        this.depremation = ko.observable(employee.depremation || 0);
+        this.bonusExceed = ko.observable(employee.bonusExceed || '');
+        this.depremation = ko.observable(employee.depremation || '');
 
-        this.correctedTime = ko.observable(employee.correctedTime || 0);
+        this.correctedTime = ko.observable(employee.correctedTime || this.position.correctedTime);
 
         // опоздания
-        this.lateness = employee.lateness;
+        this.lateness = {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        };
+        if (employee.lateness) {
+          this.lateness.light(employee.lateness.light);
+          this.lateness.medium(employee.lateness.medium);
+          this.lateness.hard(employee.lateness.hard);
+          this.lateness.total(employee.lateness.light + employee.lateness.medium + employee.lateness.hard);
+        }
 
         this.total = ko.observable(employee.total || 0);
         this.toPayment = ko.observable(employee.toPayment || 0);
@@ -353,9 +365,9 @@
           };
           this.employees().forEach(employee => {
             const employeeLateness = employee.lateness;
-            result.light += employeeLateness.light || 0;
-            result.medium += employeeLateness.medium || 0;
-            result.hard += employeeLateness.hard || 0;
+            result.light += employeeLateness.light() || 0;
+            result.medium += employeeLateness.medium() || 0;
+            result.hard += employeeLateness.hard() || 0;
             result.total += result.light + result.medium + result.hard;
           });
 
@@ -436,6 +448,7 @@
           {
             name: 'Водитель #1',                    // имя сотрудника
             id: 'driver1',                          // идентификатор сотрудника
+            link: '#',                              // ссылка на личное дело
             hasProblems: 0,                         // проблемы с документами
             upRecommended: 0,                       // рекомендуется повышение
             downRecommended: 0,                     // рекомендуется понижение
@@ -470,6 +483,7 @@
           {
             name: 'Водитель #2',
             id: 'driver2',
+            link: '#',
             hasProblems: 0,
             upRecommended: 0,
             downRecommended: 0,
@@ -556,8 +570,9 @@
               revenueStandartUnits: '₽',
               employees: [                               // сотрудники
                 {
-                  name: 'Администратор #1 Up',       // имя сотрудника
+                  name: 'Администратор #1 Up',            // имя сотрудника
                   id: '11',                               // идентификатор сотрудника
+                  link: '#',                              // ссылка на личное дело
                   hasProblems: 0,                         // проблемы с документами
                   upRecommended: 1,                       // рекомендуется повышение
                   downRecommended: 0,                     // рекомендуется понижение
@@ -592,6 +607,7 @@
                 {
                   name: 'Администратор #2 Down',
                   id: '12',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 1,
@@ -649,6 +665,7 @@
                 {
                   name: 'Повар-сушист #1 problems',
                   id: '21',
+                  link: '#',
                   hasProblems: 1,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -683,6 +700,7 @@
                 {
                   name: 'Повар-сушист #2 problems + up',
                   id: '22',
+                  link: '#',
                   hasProblems: 1,
                   upRecommended: 1,
                   downRecommended: 0,
@@ -740,6 +758,7 @@
                 {
                   name: 'Повар-пиццмейкер #1 problems + down',
                   id: '31',
+                  link: '#',
                   hasProblems: 1,
                   upRecommended: 0,
                   downRecommended: 1,
@@ -774,6 +793,7 @@
                 {
                   name: 'Повар-пиццмейкер #2',
                   id: '32',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -831,6 +851,7 @@
                 {
                   name: 'Официант #1',
                   id: '41',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -865,6 +886,7 @@
                 {
                   name: 'Официант #2',
                   id: '42',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -922,6 +944,7 @@
                 {
                   name: 'Официант #1',
                   id: '51',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -956,6 +979,7 @@
                 {
                   name: 'Официант #2',
                   id: '52',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,

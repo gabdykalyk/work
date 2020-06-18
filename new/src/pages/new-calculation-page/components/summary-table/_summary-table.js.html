@@ -23,8 +23,11 @@
           const model = params.model;
           const positions = model.positions;
 
-          const visiblePositions = ko.pureComputed(() => {
-            return positions().filter(p => p.visible());
+          const visiblePositions = ko.computed(() => {
+            return positions().filter(p => {
+              if (p.visible()) return true;
+              if (p.visibleEmployees().length > 0) return true;
+            });
           });
 
           const driversData = model.driversData();
@@ -58,6 +61,7 @@
 
           return {
             positions,
+            visiblePositions,
             total,
             columns,
             driversData

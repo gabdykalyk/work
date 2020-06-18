@@ -33,6 +33,7 @@ visible|boolean|observable|Отображается в таблице
 -|-|-|-
 id|string|статическое|Идентификатор
 name|string|статическое|Имя
+link|string|статическое|Ссылка на личное дело
 hasProblems|bool|статическое|Проблемы с документами
 upRecommended|bool|observable|Рекомендуется повышение
 downRecommended|bool|observable|Рекомендуется понижение

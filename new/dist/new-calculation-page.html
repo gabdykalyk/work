@@ -2690,7 +2690,7 @@
     <!-- Сотрудники -->
     <td class="calculation-summary__cell calculation-summary__cell--count">
       <div class="calculation-summary__cell-content"
-           data-bind="text: position.employees().length"></div>
+           data-bind="text: position.visibleEmployees().length"></div>
     </td>
 
     <!-- ФОТ, % в категории -->
@@ -3134,7 +3134,7 @@
               <td class="calculation-summary__cell calculation-summary__cell--count"
                   colspan="2">
                 <div class="calculation-summary__cell-content"
-                     data-bind="text: employees.length"></div>
+                     data-bind="text: visibleEmployees().length"></div>
               </td>
               <!-- /ko -->
 
@@ -3303,8 +3303,11 @@
           const model = params.model;
           const positions = model.positions;
 
-          const visiblePositions = ko.pureComputed(() => {
-            return positions().filter(p => p.visible());
+          const visiblePositions = ko.computed(() => {
+            return positions().filter(p => {
+              if (p.visible()) return true;
+              if (p.visibleEmployees().length > 0) return true;
+            });
           });
 
           const driversData = model.driversData();
@@ -3338,6 +3341,7 @@
 
           return {
             positions,
+            visiblePositions,
             total,
             columns,
             driversData
@@ -3381,9 +3385,14 @@
     </div>
 
     <div class="employee__info">
+      <!-- ko if: employee.link -->
       <a class="employee__name"
         href="#"
         data-bind="text: employee.name"></a>
+      <!-- /ko -->
+      <!-- ko ifnot: employee.link -->
+      <span class="employee__name" data-bind="text: employee.name"></span>
+      <!-- /ko -->
       <!-- ko if: positionName -->
         <div class="employee__position" data-bind="text: positionName"></div>
       <!-- /ko -->
@@ -3795,13 +3804,15 @@
 
         <!-- Меньше информации -->
         <button
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon  calculation-tab__settings-button calculation-tab__settings-less-info">
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon  calculation-tab__settings-button calculation-tab__settings-less-info"
+                data-bind="click: lessInfo, disable: blockLessInfo">
           Меньше информации
         </button>
 
         <!-- Больше информации -->
         <button
-                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon hrm-button-with-icon--hide_tablet  calculation-tab__settings-button calculation-tab__settings-more-info">
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon hrm-button-with-icon--hide_tablet  calculation-tab__settings-button calculation-tab__settings-more-info"
+                data-bind="click: moreInfo, disable: blockMoreInfo">
           Больше информации
         </button>
       </div><!-- .calculation-tab__settings-group -->
@@ -4112,10 +4123,10 @@
             Column('salary-bulk', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
             Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
             Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования'),
-            Column('revenue-standart', 'Норм. выр-ки/ч', 'Норматив выручки'),
+            Column('revenue-standart', 'Норм. выр-ки', 'Норматив выручки'),
             Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования'),
             Column('corrected-time', 'Корр. время', 'Корректированное время'),
-            Column('bonus-exceed', 'Прем. за превыш. норм., ₽', 'Премия за превышение норматива'),
+            Column('bonus-exceed', 'Премия за прев. норм., ₽', 'Премия за превышение норматива'),
             Column('depremation', 'Депр., ₽', 'Депремирование'),
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
@@ -4153,15 +4164,57 @@
           /** Sets columns visibility */
           function setColumns() {
             params.utils.openModal('columns', { columns: columns }, () => {
-              const state = columns.reduce((acc, column) => {
-                return {
-                  ...acc,
-                  [column.id]: column.visible() ? 1 : 0
-                }
-              }, {});
-              localStorage.setItem('calculation-page-employees-columns', JSON.stringify(state));
+              saveColumnsState();
             });
           }
+
+          function setColumnsState(set) {
+            columns.forEach(c => {
+              const isVisible = set ? set.includes(c.id) : true;
+              c.visible(isVisible);
+            });
+            saveColumnsState();
+          }
+
+          function saveColumnsState() {
+            const state = columns.reduce((acc, column) => {
+              return {
+                ...acc,
+                [column.id]: column.visible() ? 1 : 0
+              }
+            }, {});
+            localStorage.setItem('calculation-page-employees-columns', JSON.stringify(state));
+          }
+
+
+
+          const columnSets = [
+            ['account', 'account-operations', 'level', 'interval', 'compensation', 'salary-bulk', 'bonus-exceed', 'depremation', 'premation', 'fine', 'payment'],
+            ['payment']
+          ];
+          const columnSetsIndex = ko.observable(-1);
+          const blockMoreInfo = ko.pureComputed(() => {
+            return !columns.some(c => !c.visible());
+          });
+          const blockLessInfo = ko.pureComputed(() => {
+            return !columns
+              .filter(c => !columnSets[1].includes(c.id))
+              .some(c => c.visible());
+          });
+
+          const moreInfo = () => {
+            const hasInvisibleColumns = columns.filter(c => columnSets[0].includes(c.id))
+            .some(c => !c.visible());
+            if (hasInvisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState();
+          };
+
+          const lessInfo = () => {
+            const hasVisibleColumns = columns.filter(c => !columnSets[0].includes(c.id))
+                .some(c => c.visible());
+            if (hasVisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState(columnSets[1]);
+          };
 
 
           function updatePositionEmployees(positionData) {
@@ -4179,7 +4232,7 @@
                 const position = model.getPositionById(data.position);
                 position.addEmployee({
                   name: data.name,
-                  level: data.level
+                  level: data.level,
                 });
               });
           };
@@ -4274,6 +4327,11 @@
             columnCount,
             isColumnVisible,
             setColumns,
+
+            moreInfo,
+            blockMoreInfo,
+            lessInfo,
+            blockLessInfo,
 
             setPositions,
             positions,
@@ -4465,16 +4523,17 @@
       function EmployeeModel(employee, positionModel, visible) {
         this.position = positionModel;
 
-        this.name = employee.name;    // имя сотрудника
-        this.id = employee.id;        // идентификатор сотрудника
+        this.name = employee.name;                   // имя сотрудника
+        this.id = employee.id;                       // идентификатор сотрудника
         this.level = ko.observable(employee.level);  // разряд
+        this.link = employee.link;                   // ссылка на личное дело
 
         this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
         this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
         this.downRecommended = ko.observable(employee.downRecommended);  // рекомендуется понижение
 
         // рабочее время
-        const defaultIntervals = employee.workingIntervals || [''];
+        const defaultIntervals = employee.workingIntervals || ['11:00 – 23:00'];
         this.workingIntervals = ko.observableArray(
           defaultIntervals.map(i => WorkingIntervalModel(i))
         );
@@ -4496,8 +4555,8 @@
           this.workingIntervals.remove(interval);
         };
 
-        this.account = ko.observable(employee.account);             // личный счет
-        this.premiumAccount = ko.observable(employee.account);      // премиальный счет
+        this.account = ko.observable(employee.account || 0);             // личный счет
+        this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
 
         // операции с ЛС
         this.accountOperations = ko.observableArray(employee.accountOperations || []);
@@ -4525,28 +4584,39 @@
         });
 
         // компенсация
-        this.compensation = ko.observable(employee.compensation || 0);
+        this.compensation = ko.observable(employee.compensation || '');
 
         this.workload = ko.observable(employee.workload || '');
         this.workloadUnits = this.position.workloadUnits;
 
-        this.salary = ko.observable(employee.salary || 0);
-        this.salaryBulk = ko.observable(employee.salaryBulk || 0);
+        this.salary = ko.observable(employee.salary || this.positionSalary);
+        this.salaryBulk = ko.observable(employee.salaryBulk || this.positionSalaryBulk);
 
-        this.revenueStandartUnits = employee.revenueStandartUnits;
-        this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || '');
-        this.revenueStandart = ko.observable(employee.revenueStandart || '');
+        this.revenueStandartUnits = employee.revenueStandartUnits || this.position.revenueStandartUnits;
+        this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || this.position.revenueStandartUnits);
+        this.revenueStandart = ko.observable(employee.revenueStandart || this.position.revenueStandart);
 
-        this.normalizationRatio = employee.normalizationRatio;
-        this.bonusRatio = employee.bonusRatio;
+        this.normalizationRatio = employee.normalizationRatio || this.position.normalizationRatio;
+        this.bonusRatio = employee.bonusRatio || this.position.bonusRatio;
 
-        this.bonusExceed = ko.observable(employee.bonusExceed || 0);
-        this.depremation = ko.observable(employee.depremation || 0);
+        this.bonusExceed = ko.observable(employee.bonusExceed || '');
+        this.depremation = ko.observable(employee.depremation || '');
 
-        this.correctedTime = ko.observable(employee.correctedTime || 0);
+        this.correctedTime = ko.observable(employee.correctedTime || this.position.correctedTime);
 
         // опоздания
-        this.lateness = employee.lateness;
+        this.lateness = {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        };
+        if (employee.lateness) {
+          this.lateness.light(employee.lateness.light);
+          this.lateness.medium(employee.lateness.medium);
+          this.lateness.hard(employee.lateness.hard);
+          this.lateness.total(employee.lateness.light + employee.lateness.medium + employee.lateness.hard);
+        }
 
         this.total = ko.observable(employee.total || 0);
         this.toPayment = ko.observable(employee.toPayment || 0);
@@ -4653,9 +4723,9 @@
           };
           this.employees().forEach(employee => {
             const employeeLateness = employee.lateness;
-            result.light += employeeLateness.light || 0;
-            result.medium += employeeLateness.medium || 0;
-            result.hard += employeeLateness.hard || 0;
+            result.light += employeeLateness.light() || 0;
+            result.medium += employeeLateness.medium() || 0;
+            result.hard += employeeLateness.hard() || 0;
             result.total += result.light + result.medium + result.hard;
           });
 
@@ -4736,6 +4806,7 @@
           {
             name: 'Водитель #1',                    // имя сотрудника
             id: 'driver1',                          // идентификатор сотрудника
+            link: '#',                              // ссылка на личное дело
             hasProblems: 0,                         // проблемы с документами
             upRecommended: 0,                       // рекомендуется повышение
             downRecommended: 0,                     // рекомендуется понижение
@@ -4770,6 +4841,7 @@
           {
             name: 'Водитель #2',
             id: 'driver2',
+            link: '#',
             hasProblems: 0,
             upRecommended: 0,
             downRecommended: 0,
@@ -4856,8 +4928,9 @@
               revenueStandartUnits: '₽',
               employees: [                               // сотрудники
                 {
-                  name: 'Администратор #1 Up',       // имя сотрудника
+                  name: 'Администратор #1 Up',            // имя сотрудника
                   id: '11',                               // идентификатор сотрудника
+                  link: '#',                              // ссылка на личное дело
                   hasProblems: 0,                         // проблемы с документами
                   upRecommended: 1,                       // рекомендуется повышение
                   downRecommended: 0,                     // рекомендуется понижение
@@ -4892,6 +4965,7 @@
                 {
                   name: 'Администратор #2 Down',
                   id: '12',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 1,
@@ -4949,6 +5023,7 @@
                 {
                   name: 'Повар-сушист #1 problems',
                   id: '21',
+                  link: '#',
                   hasProblems: 1,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -4983,6 +5058,7 @@
                 {
                   name: 'Повар-сушист #2 problems + up',
                   id: '22',
+                  link: '#',
                   hasProblems: 1,
                   upRecommended: 1,
                   downRecommended: 0,
@@ -5040,6 +5116,7 @@
                 {
                   name: 'Повар-пиццмейкер #1 problems + down',
                   id: '31',
+                  link: '#',
                   hasProblems: 1,
                   upRecommended: 0,
                   downRecommended: 1,
@@ -5074,6 +5151,7 @@
                 {
                   name: 'Повар-пиццмейкер #2',
                   id: '32',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -5131,6 +5209,7 @@
                 {
                   name: 'Официант #1',
                   id: '41',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -5165,6 +5244,7 @@
                 {
                   name: 'Официант #2',
                   id: '42',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -5222,6 +5302,7 @@
                 {
                   name: 'Официант #1',
                   id: '51',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
@@ -5256,6 +5337,7 @@
                 {
                   name: 'Официант #2',
                   id: '52',
+                  link: '#',
                   hasProblems: 0,
                   upRecommended: 0,
                   downRecommended: 0,
