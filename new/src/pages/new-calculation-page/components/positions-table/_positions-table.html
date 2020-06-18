@@ -94,10 +94,9 @@
           <!-- Список сотрудников по позиции -->
           <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
 
-          <!-- ko let: { nextEmployee: position.visibleEmployees()[$index() + 1] } -->
+
           <tr class="positions-table__row" data-bind="click: function() { employee.clicked(!employee.clicked()); }, css: {
             'positions-table__row--clicked': employee.clicked,
-            'positions-table__row--next-clicked': nextEmployee ? nextEmployee.clicked() : false,
           }">
             <td class="positions-table__cell">
               <div class="positions-table__cell-content"
@@ -113,7 +112,7 @@
 
             </td>
           </tr>
-          <!-- /ko -->
+
 
           <!-- /ko -->
           <!-- /Список сотрудников по позиции -->
@@ -139,19 +138,9 @@
           <!-- ko ifnot: position.visible -->
           <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
 
-          <!-- ko let: {
-              nextEmployee: position.visibleEmployees()[$index() + 1],
-              nextPosition: table.positions()[positionIndex() + 1],
-            } -->
+
           <tr class="positions-table__row"  data-bind="click: function() { employee.clicked(!employee.clicked()); }, css: {
-            'positions-table__row--clicked': employee.clicked,
-            'positions-table__row--next-clicked': function() {
-              if (nextEmployee) return nextEmployee.clicked();
-              if (nextPosition) {
-                var employee = nextPosition.visibleEmployees()[0];
-                if (employee) return employee.clicked();
-              }
-          }}">
+            'positions-table__row--clicked': employee.clicked,">
             <td class="positions-table__cell">
               <div class="positions-table__cell-content"
                    data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
@@ -165,7 +154,7 @@
               </div>
             </td>
           </tr>
-          <!-- /ko -->
+
 
           <!-- /ko -->
           <!-- /ko -->
@@ -214,7 +203,6 @@
                   data-bind="class: 'positions-table__cell--' + id, css: {
                     'positions-table__cell--colored': colored,
                       'positions-table__cell--clicked': table.getColumnClicked($data.id),
-                      'positions-table__cell--next-clicked': table.getNextColumnClicked($data.id),
                   }, click: function() { $data.clicked(!$data.clicked())}">
                 <div class="positions-table__cell-content">
                   <span data-bind="text: title"></span>
@@ -250,7 +238,7 @@
 
             <!-- ko template: {
               name: 'employee-row-template',
-              data: { employee: employee, position: position, positionName: false, nextEmployee: position.visibleEmployees()[$index() + 1] }
+              data: { employee: employee, position: position, positionName: false
             } -->
             <!-- /ko -->
 
@@ -276,21 +264,18 @@
             <!-- ko ifnot: position.visible -->
             <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
 
-            <!-- ko let: {
-              nextEmployee: position.visibleEmployees()[$index() + 1],
-              nextPosition: table.positions()[positionIndex() + 1],
-            } -->
+
 
 
             <!-- ko template: {
               name: 'employee-row-template',
               data: {
-                employee: employee, position: position, positionName: position.name, nextEmployee: nextEmployee || (nextPosition ? nextPosition.visibleEmployees()[0] : null)
+                employee: employee, position: position, positionName: position.name,
               }
             } -->
             <!-- /ko -->
 
-            <!-- /ko -->
+
 
             <!-- /ko -->
             <!-- /ko -->
