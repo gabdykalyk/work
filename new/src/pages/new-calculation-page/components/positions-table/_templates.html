@@ -31,7 +31,7 @@
       <!-- ko if: employee.link -->
       <a class="employee__name"
         href="#"
-        data-bind="text: employee.name"></a>
+        data-bind="text: employee.name, click: function(_, e) { e.stopPropagation(); }"></a>
       <!-- /ko -->
       <!-- ko ifnot: employee.link -->
       <span class="employee__name" data-bind="text: employee.name"></span>
@@ -112,7 +112,10 @@
 <script id="employee-row-template"
         type="text/html">
 
-<tr class="positions-table__row">
+<tr class="positions-table__row" data-bind="click: function() { employee.clicked(!employee.clicked())}, css: {
+  'positions-table__row--clicked': employee.clicked,
+  'positions-table__row--next-clicked': nextEmployee ? nextEmployee.clicked() : false,
+}">
   <td class="positions-table__cell positions-table__cell--name">
     <div class="positions-table__cell-content">
 
@@ -126,7 +129,10 @@
   </td>
 
   <!-- ko if: table.isColumnVisible('account') -->
-    <td class="positions-table__cell positions-table__cell--account">
+    <td class="positions-table__cell positions-table__cell--account" data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('account'),
+      'positions-table__cell--next-clicked': table.getNextColumnClicked('account'),
+    }">
       <div class="positions-table__cell-content">
         <!-- ko text: employee.premiumAccount() + '/' + employee.account() -->
         <!-- /ko -->
@@ -137,7 +143,13 @@
   <!-- ko if: table.isColumnVisible('account-operations') -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--account-operations"
-        data-bind="click: table.performAccountOperations.bind(table, employee), hrmTableEditableCell: editableCell" align="right">
+        data-bind="click: function(_, e) {
+          e.stopPropagation();
+          table.performAccountOperations(employee);
+        }, hrmTableEditableCell: editableCell, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('account-operations'),
+          'positions-table__cell--next-clicked': table.getNextColumnClicked('account-operations'),
+        }" align="right">
         <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.accountState), hrmColoredSign: employee.accountState"></div>
     </td>
     <!-- /ko -->
@@ -146,7 +158,11 @@
   <!-- ko if: table.isColumnVisible('level') -->
     <!-- ko if: position.levels.length > 0 -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
-    <td data-bind="hrmTableEditableCell: editableCell"
+    <td data-bind="hrmTableEditableCell: editableCell, click: function(_, e) { e.stopPropagation(); },
+    css: {
+      'positions-table__cell--clicked': table.getColumnClicked('level'),
+      'positions-table__cell--next-clicked': table.getNextColumnClicked('level'),
+    }"
         class="positions-table__cell positions-table__cell--level">
       <select data-bind="
                     options: position.levels,
@@ -161,13 +177,19 @@
     <!-- /ko -->
 
     <!-- ko ifnot: position.levels.length > 0 -->
-    <td class="positions-table__cell positions-table__cell--level positions-table__cell--inactive">
+    <td class="positions-table__cell positions-table__cell--level positions-table__cell--inactive"  data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('level'),
+      'positions-table__cell--next-clicked': table.getNextColumnClicked('level'),
+    }">
     </td>
     <!-- /ko -->
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('interval') -->
-    <td class="positions-table__cell positions-table__cell--interval">
+    <td class="positions-table__cell positions-table__cell--interval" data-bind="click: function(_, e) { e.stopPropagation(); }, css: {
+      'positions-table__cell--clicked': table.getColumnClicked('interval'),
+      'positions-table__cell--next-clicked': table.getNextColumnClicked('interval'),
+    }">
       <table class="working-intervals">
         <tbody data-bind="let: {intervalsCount: employee.workingIntervals().length}">
           <!-- ko foreach: employee.workingIntervals() -->
@@ -184,73 +206,109 @@
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('work-time') -->
-    <td class="positions-table__cell positions-table__cell--work-time">
+    <td class="positions-table__cell positions-table__cell--work-time"  data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('work-time'),
+      'positions-table__cell--next-clicked': table.getNextColumnClicked('work-time'),
+    }">
       <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(employee.workingTime())"></div>
     </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('compensation') -->
-    <td class="positions-table__cell positions-table__cell--compensation">
+    <td class="positions-table__cell positions-table__cell--compensation"  data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('compensation'),
+      'positions-table__cell--next-clicked': table.getNextColumnClicked('compensation'),
+    }">
       <div class="positions-table__cell-content" data-bind="text: employee.compensation"></div>
     </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('workload') -->
-  <td class="positions-table__cell positions-table__cell--workload">
+  <td class="positions-table__cell positions-table__cell--workload"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('workload'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('workload'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: employee.workload"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary') -->
-  <td class="positions-table__cell positions-table__cell--salary">
+  <td class="positions-table__cell positions-table__cell--salary"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('salary'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('salary'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: employee.salary"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary-bulk') -->
-  <td class="positions-table__cell positions-table__cell--salary-bulk">
+  <td class="positions-table__cell positions-table__cell--salary-bulk"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('salary-bulk'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('salary-bulk'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: employee.salaryBulk"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart-hour') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart-hour">
+  <td class="positions-table__cell positions-table__cell--revenue-standart-hour"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('revenue-standart-hour'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('revenue-standart-hour'),
+  }">
   <div class="positions-table__cell-content" data-bind="text: employee.revenueStandartPerHour"></div>
 </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('normalization-ratio') -->
-  <td class="positions-table__cell positions-table__cell--normalization-ratio">
+  <td class="positions-table__cell positions-table__cell--normalization-ratio"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('normalization-ratio'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('normalization-ratio'),
+  }">
   <div class="positions-table__cell-content" data-bind="text: employee.normalizationRatio"></div>
 </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart">
+  <td class="positions-table__cell positions-table__cell--revenue-standart"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('revenue-standart'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('revenue-standart'),
+  }">
   <div class="positions-table__cell-content" data-bind="text: employee.revenueStandart"></div>
 </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-ratio') -->
-  <td class="positions-table__cell positions-table__cell--bonus-ratio">
+  <td class="positions-table__cell positions-table__cell--bonus-ratio"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('bonus-ratio'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('bonus-ratio'),
+  }">
   <div class="positions-table__cell-content" data-bind="text: employee.bonusRatio"></div>
 </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
-  <td class="positions-table__cell positions-table__cell--corrected-time">
+  <td class="positions-table__cell positions-table__cell--corrected-time"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('corrected-time'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('corrected-time'),
+  }">
   <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(employee.correctedTime)"></div>
 </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-exceed') -->
-  <td class="positions-table__cell positions-table__cell--bonus-exceed">
+  <td class="positions-table__cell positions-table__cell--bonus-exceed"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('bonus-exceed'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('bonus-exceed'),
+  }">
   <div class="positions-table__cell-content" data-bind="text: employee.bonusExceed"></div>
 </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('depremation') -->
-  <td class="positions-table__cell positions-table__cell--depremation">
+  <td class="positions-table__cell positions-table__cell--depremation"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('depremation'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('depremation'),
+  }">
   <div class="positions-table__cell-content" data-bind="text: employee.depremation"></div>
 </td>
   <!-- /ko -->
@@ -258,8 +316,14 @@
   <!-- ko if: table.isColumnVisible('premation') -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--premation" align="right"
-        data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell, style: {
+        data-bind="click: function(_, e) {
+          e.stopPropagation();
+          table.giveBonus(employee);
+        }, hrmTableEditableCell: editableCell, style: {
           'background-color': employee.bonusesState() > 0 ? '#D0F4E3' : ''
+        }, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('premation'),
+          'positions-table__cell--next-clicked': table.getNextColumnClicked('premation'),
         }">
         <div class="positions-table__cell-content" data-bind="text: employee.bonusesState"></div>
     </td>
@@ -269,9 +333,15 @@
   <!-- ko if: table.isColumnVisible('fine') -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--fine" align="right"
-        data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell,
+        data-bind="click: function(_,e) {
+          e.stopPropagation();
+          table.giveFine(employee);
+        }, hrmTableEditableCell: editableCell,
         style: {
           'background-color': employee.finesState() > 0 ? '#FFD3E8' : ''
+        }, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('fine'),
+          'positions-table__cell--next-clicked': table.getNextColumnClicked('fine'),
         }">
         <div class="positions-table__cell-content" data-bind="text: employee.finesState"></div>
     </td>
@@ -279,13 +349,19 @@
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('total') -->
-  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('total'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('total'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: employee.total"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('payment') -->
-  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('payment'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('payment'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: employee.toPayment"></div>
   </td>
   <!-- /ko -->
@@ -297,104 +373,164 @@
 <script id="total-row-template"
         type="text/html">
 
-<tr class="positions-table__row positions-table__row--highlighted positions-table__total" data-bind="hrmLog">
+<tr class="positions-table__row positions-table__row--highlighted positions-table__total">
   <td class="positions-table__cell positions-table__cell--name positions-table__cell--empty"></td>
 
   <!-- ko if: table.isColumnVisible('account') -->
-  <td class="positions-table__cell positions-table__cell--account positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--account positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('account'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('account'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('account-operations') -->
-  <td class="positions-table__cell positions-table__cell--account-operations positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--account-operations positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('account-operations'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('account-operations'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('level') -->
-  <td class="positions-table__cell positions-table__cell--level positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--level positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('level'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('level'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('interval') -->
-  <td class="positions-table__cell positions-table__cell--interval positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--interval positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('interval'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('interval'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('work-time') -->
-  <td class="positions-table__cell positions-table__cell--work-time">
+  <td class="positions-table__cell positions-table__cell--work-time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('work-time'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('work-time'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(total.workingTime())"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('compensation') -->
-  <td class="positions-table__cell positions-table__cell--compensation positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--compensation positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('compensation'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('compensation'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('workload') -->
-  <td class="positions-table__cell positions-table__cell--workload positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--workload positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('workload'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('workload'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary') -->
-  <td class="positions-table__cell positions-table__cell--salary positions-table__cell--empty">
+  <td class="positions-table__cell positions-table__cell--salary positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('salary'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('salary'),
+  }">
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('salary-bulk') -->
-  <td class="positions-table__cell positions-table__cell--salary-bulk">
+  <td class="positions-table__cell positions-table__cell--salary-bulk" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('salary-bulk'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('salary-bulk'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: total.salaryBulk()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart-hour') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart-hour positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--revenue-standart-hour positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('revenue-standart-hour'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('revenue-standart-hour'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('normalization-ratio') -->
-  <td class="positions-table__cell positions-table__cell--normalization-ratio">
+  <td class="positions-table__cell positions-table__cell--normalization-ratio" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('normalization-ratio'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('total'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: total.normalizationRatio()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('revenue-standart') -->
-  <td class="positions-table__cell positions-table__cell--revenue-standart">
+  <td class="positions-table__cell positions-table__cell--revenue-standart" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('revenue-standart'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('revenue-standart'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: total.revenueStandart()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-ratio') -->
-  <td class="positions-table__cell positions-table__cell--bonus-ratio">
+  <td class="positions-table__cell positions-table__cell--bonus-ratio" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('bonus-ratio'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('bonus-ratio'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: total.bonusRatio()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
-  <td class="positions-table__cell positions-table__cell--corrected-time">
+  <td class="positions-table__cell positions-table__cell--corrected-time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('corrected-time'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('corrected-time'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(total.correctedTime())"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('bonus-exceed') -->
-  <td class="positions-table__cell positions-table__cell--bonus-exceed">
+  <td class="positions-table__cell positions-table__cell--bonus-exceed" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('bonus-exceed'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('bonus-exceed'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: total.bonusExceed()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('depremation') -->
-  <td class="positions-table__cell positions-table__cell--depremation positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--depremation positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('depremation'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('depremation'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('premation') -->
-  <td class="positions-table__cell positions-table__cell--premation positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--premation positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('premation'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('premation'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('fine') -->
-  <td class="positions-table__cell positions-table__cell--fine positions-table__cell--empty"></td>
+  <td class="positions-table__cell positions-table__cell--fine positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('fine'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('fine'),
+  }"></td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('total') -->
-  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored">
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('total'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('total'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: total.total()"></div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('payment') -->
-  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored">
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('payment'),
+    'positions-table__cell--next-clicked': table.getNextColumnClicked('payment'),
+  }">
     <div class="positions-table__cell-content" data-bind="text: total.toPayment()"></div>
   </td>
   <!-- /ko -->

@@ -9,6 +9,7 @@
         fullTitle,
         colored,
         visible: ko.observable(true),
+        clicked: ko.observable(false)
       }
     }
 
@@ -85,6 +86,19 @@
           const columnCount = ko.pureComputed(() => {
             return activeColumns() + 3;
           });
+
+          const getColumnClicked = (columnName) => {
+            const column = columns.find(c => c.id === columnName);
+            if (column) return column.clicked();
+          }
+
+          const getNextColumnClicked = (columnName) => {
+            const index = columns.findIndex(c => c.id === columnName);
+            if (index > -1) {
+              let column = columns[index + 1];
+              if (column) return column.clicked();
+            }
+          }
 
           /** Sets positions visibility */
           function setPositions() {
@@ -264,6 +278,9 @@
           }
 
           return {
+            getColumnClicked,
+            getNextColumnClicked,
+
             onTableRender,
             tableScroll,
 

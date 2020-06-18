@@ -92,12 +92,13 @@
           <!-- /Заголовок позиции -->
 
           <!-- Список сотрудников по позиции -->
-          <!-- ko foreach: { data: position.employees, as: 'employee' } -->
-          <!-- ko template: {
-              foreach: hrmTemplateIf(employee.visible(), $data),
-              beforeRemove: hrmFadeBeforeRemoveFactory(500)
-          } -->
-          <tr class="positions-table__row">
+          <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
+
+          <!-- ko let: { nextEmployee: position.visibleEmployees()[$index() + 1] } -->
+          <tr class="positions-table__row" data-bind="click: function() { employee.clicked(!employee.clicked()); }, css: {
+            'positions-table__row--clicked': employee.clicked,
+            'positions-table__row--next-clicked': nextEmployee ? nextEmployee.clicked() : false,
+          }">
             <td class="positions-table__cell">
               <div class="positions-table__cell-content"
                    data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
@@ -113,6 +114,7 @@
             </td>
           </tr>
           <!-- /ko -->
+
           <!-- /ko -->
           <!-- /Список сотрудников по позиции -->
           <!-- /ko -->
@@ -135,12 +137,21 @@
           <!-- Список сотрудников по остальным позициям -->
           <!-- ko foreach: { data: table.positions, as: 'position' } -->
           <!-- ko ifnot: position.visible -->
-          <!-- ko foreach: { data: position.employees, as: 'employee' } -->
-          <!-- ko template: {
-              foreach: hrmTemplateIf(employee.visible(), $data),
-              beforeRemove: hrmFadeBeforeRemoveFactory(500)
-          } -->
-          <tr class="positions-table__row">
+          <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
+
+          <!-- ko let: {
+              nextEmployee: position.visibleEmployees()[$index() + 1],
+              nextPosition: table.positions()[positionIndex() + 1],
+            } -->
+          <tr class="positions-table__row"  data-bind="click: function() { employee.clicked(!employee.clicked()); }, css: {
+            'positions-table__row--clicked': employee.clicked,
+            'positions-table__row--next-clicked': function() {
+              if (nextEmployee) return nextEmployee.clicked();
+              if (nextPosition) {
+                var employee = nextPosition.visibleEmployees()[0];
+                if (employee) return employee.clicked();
+              }
+          }}">
             <td class="positions-table__cell">
               <div class="positions-table__cell-content"
                    data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
@@ -155,6 +166,7 @@
             </td>
           </tr>
           <!-- /ko -->
+
           <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
@@ -200,8 +212,10 @@
               <!-- ko if: $data.visible -->
               <th class="positions-table__cell positions-table__head-cell"
                   data-bind="class: 'positions-table__cell--' + id, css: {
-                    'positions-table__cell--colored': colored
-                  }">
+                    'positions-table__cell--colored': colored,
+                      'positions-table__cell--clicked': table.getColumnClicked($data.id),
+                      'positions-table__cell--next-clicked': table.getNextColumnClicked($data.id),
+                  }, click: function() { $data.clicked(!$data.clicked())}">
                 <div class="positions-table__cell-content">
                   <span data-bind="text: title"></span>
                   <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
@@ -223,7 +237,7 @@
                   data-bind="attr: {colspan: $parent.columnCount}">
 
                 <div class="positions-table__cell-content">
-                   <!-- ko ifnot: tableScroll -->
+                   <!-- ko ifnot: table.tableScroll -->
                   <div data-bind="template: {name: 'position-header-template', data: position}"></div>
                   <!-- /ko -->
                 </div>
@@ -232,20 +246,14 @@
             <!-- /Название позиции -->
 
             <!-- Список сотрудников по позиции -->
-            <!-- ko foreach: { data: position.employees, as: 'employee' } -->
-            <!-- ko template: {
-              foreach: hrmTemplateIf($data.visible(), $data),
-              beforeRemove: hrmFadeBeforeRemoveFactory(500)
-            } -->
+            <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
 
             <!-- ko template: {
               name: 'employee-row-template',
-              data: { employee: employee, position: position, positionName: false }
+              data: { employee: employee, position: position, positionName: false, nextEmployee: position.visibleEmployees()[$index() + 1] }
             } -->
             <!-- /ko -->
 
-
-            <!-- /ko -->
             <!-- /ko -->
             <!-- Список сотрудников по позиции -->
 
@@ -266,21 +274,24 @@
 
             <!-- ko foreach: { data: table.positions, as: 'position' } -->
             <!-- ko ifnot: position.visible -->
-            <!-- ko foreach: { data: position.employees, as: 'employee' } -->
-            <!-- ko template: {
-              foreach: hrmTemplateIf(employee.visible(), $data),
-              beforeRemove: hrmFadeBeforeRemoveFactory(500)
-          } -->
+            <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
+
+            <!-- ko let: {
+              nextEmployee: position.visibleEmployees()[$index() + 1],
+              nextPosition: table.positions()[positionIndex() + 1],
+            } -->
+
 
             <!-- ko template: {
               name: 'employee-row-template',
               data: {
-                employee: employee, position: position, positionName: position.name
+                employee: employee, position: position, positionName: position.name, nextEmployee: nextEmployee || (nextPosition ? nextPosition.visibleEmployees()[0] : null)
               }
             } -->
             <!-- /ko -->
 
             <!-- /ko -->
+
             <!-- /ko -->
             <!-- /ko -->
             <!-- /ko -->

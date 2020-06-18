@@ -5,6 +5,106 @@
   .positions-table {
     margin-top: 20px;
 
+    &__row {
+      &--clicked {
+        & > td {
+          position: relative;
+
+          &:not(.positions-table__cell--colored) {
+            background: rgba(255, 230, 242, 0.5);
+          }
+
+
+          &:after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            bottom: -1px;
+            pointer-events: none;
+            left: -1px;
+            right: -1px;
+            border-top: 1px solid #ff238d;
+            border-bottom: 1px solid #ff238d;
+          }
+
+          &:first-child {
+            border-left: 1px solid #ff238d;
+          }
+
+          &:last-child {
+            border-right: 1px solid #ff238d;
+          }
+        }
+      }
+    }
+
+    &__row--clicked + .positions-table__row--clicked {
+      td {
+        &:after {
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    &__row--clicked.positions-table__row--next-clicked {
+      td {
+        &:after {
+          border-bottom-color: transparent;
+        }
+      }
+    }
+
+    &__cell {
+      &--clicked {
+
+          position: relative;
+
+          &:not(.positions-table__cell--colored) {
+            background: rgba(255, 230, 242, 0.5);
+          }
+
+          &:before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            bottom: -1px;
+            left: -1px;
+            right: -1px;
+            border-left: 1px solid #ff238d;
+            border-right: 1px solid #ff238d;
+          }
+
+
+      }
+    }
+
+    &__cell--clicked-top {
+      border-top: 1px solid #ff238d!important;
+    }
+
+    &__cell--clicked-bottom {
+      border-top: 1px solid #ff238d!important;
+    }
+
+    &__cell--clicked + .positions-table__cell--clicked {
+
+        &:before {
+          border-left-color: transparent;
+        }
+
+    }
+
+    &__cell--clicked.positions-table__cell--next-clicked {
+
+        &:before {
+          border-right-color: transparent;
+        }
+
+    }
+
+
+
+
     &__fixed-section {
       width: 180px;
       box-shadow: none;
@@ -13,7 +113,7 @@
 
       th,
       td {
-        border-right: none;
+        border-right: none!important;
         .positions-table__cell-content {
           width: 160px;
         }
