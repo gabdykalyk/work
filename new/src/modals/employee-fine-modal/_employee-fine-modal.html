@@ -10,7 +10,7 @@
         </label>
 
         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: base,
+          <select data-bind="descendantsComplete: setBaseValue,
        hrmSelect,
        hrmSelectSearchEnabled: true,
        hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
@@ -22,7 +22,7 @@
             <!-- ko foreach: {data: $component.fineBases, as: 'group'} -->
             <optgroup data-bind="attr: {label: group.name}">
               <!-- ko foreach: { data: group.items, as: 'option' } -->
-              <option data-bind="value: option.id, text: option.name"></option>
+              <option data-bind="value: '' + option.id, text: option.name"></option>
               <!-- /ko -->
 
             </optgroup>
@@ -83,7 +83,7 @@
           <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
 
           <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="value: author,
+            <select data-bind="descendantsComplete: setAuthorValue,
        hrmSelect,
        hrmSelectSearchEnabled: true,
        hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
@@ -91,7 +91,7 @@
        hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
               <option></option>
               <!-- ko foreach: $component.authors -->
-              <option data-bind="value: id, text: name"></option>
+              <option data-bind="value: '' + id, text: name"></option>
               <!-- /ko -->
             </select>
           </div>
@@ -176,8 +176,8 @@
 
       <div class="fine-form__total color--secondary">
         Итого: <span class="fine-form__total-value"
-              data-bind="hrmColoredSign: total">
-          <!-- ko text: $root.utils.formatSign(total) -->
+              data-bind="hrmColoredSign: -1 * total()">
+          <!-- ko text: $root.utils.formatSign(-1 * total()) -->
           <!-- /ko -->
           <i class="far fa-ruble-sign"
              aria-hidden="true"></i>

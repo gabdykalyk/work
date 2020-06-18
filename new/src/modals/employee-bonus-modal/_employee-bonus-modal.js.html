@@ -18,17 +18,34 @@
         }
       });
 
+      const author = ko.observable(defaultData.author).extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+
+      const validationObject = ko.validatedObservable({
+        base,
+        author,
+        sum
+      });
+
       return {
         base,
-        author: ko.observable(defaultData.author).extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        }),
+        author,
         sum,
         comment: ko.observable(defaultData.comment || '').extend({
 
         }),
+        setBaseValue: function(el) {
+          ko.applyBindingsToNode(el, { value: base })
+        },
+        setAuthorValue: function(el) {
+          ko.applyBindingsToNode(el, { value: author })
+        },
+        isValid: () => {
+          return validationObject.isValid();
+        }
       }
     }
 
@@ -90,11 +107,13 @@
 
             /** Применить изменения */
             this.apply = function () {
-              employee.bonuses(this.bonuses());
+              employee.bonuses(ko.toJS(this.bonuses));
             }
 
             this.submit = function () {
               this.isSubmitted(true);
+
+              if (this.bonuses().some(b => !b.isValid())) return;
 
               if ('submit' in params) {
                 this.apply();

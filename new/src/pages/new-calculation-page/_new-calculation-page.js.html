@@ -200,7 +200,7 @@
           this.workingIntervals.remove(interval);
         };
 
-        this.workingIntervals.subscribe(_ => this.root.calculate());
+        this.workingTime.subscribe(_ => this.root.calculate());
 
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
@@ -249,8 +249,8 @@
         this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || this.position.revenueStandartUnits);
         this.revenueStandart = ko.observable(employee.revenueStandart || this.position.revenueStandart);
 
-        this.normalizationRatio = employee.normalizationRatio || this.position.normalizationRatio;
-        this.bonusRatio = employee.bonusRatio || this.position.bonusRatio;
+        this.normalizationRatio = ko.observable(employee.normalizationRatio || this.position.normalizationRatio);
+        this.bonusRatio = ko.observable(employee.bonusRatio || this.position.bonusRatio);
 
         this.bonusExceed = ko.observable(employee.bonusExceed || '');
         this.depremation = ko.observable(employee.depremation || '');
@@ -402,7 +402,7 @@
       };
 
       const productionTotal = {
-        workingTime: ko.observable('00:00'),
+        workingTime: ko.observable(0),
         salaryBulk: ko.observable(0),
         normalizationRatio: ko.observable(0),
         revenueStandart: ko.observable(0),
@@ -521,7 +521,7 @@
             bonuses: [],                            // бонусы
             fines: [],                              // штрафы
             depremation: 0,                         // депр.
-            correctedTime: '6:00',                  // корр. время
+            correctedTime: '0',                  // корр. время
             total: 7300,                            // всего
             toPayment: 7300,                        // к выплате
             lateness: {                             // опоздания сотрудника
@@ -556,7 +556,7 @@
             bonuses: [],
             fines: [],
             depremation: 0,
-            correctedTime: '6:00',
+            correctedTime: '0',
             total: 7300,
             toPayment: 7300,
             lateness: {
@@ -567,6 +567,18 @@
           }
         ],
       });
+
+      this.formatDuration = (minutes) => {
+        console.log('dur', minutes)
+        if (!minutes || minutes <= 0) return '00:00';
+
+        let h = Math.floor(minutes / 60).toString();
+        h = h.length === 1 ? '0' + h : h;
+        let m = (minutes % 60).toString();
+        m = m.length === 1 ? '0' + m : m;
+
+        return h + ':' + m;
+      };
 
 
       /** Input data */
@@ -645,7 +657,7 @@
                   bonuses: [],                            // бонусы
                   fines: [],                              // штрафы
                   depremation: 0,                         // депр.
-                  correctedTime: '6:00',                  // корр. время
+                  correctedTime: '0',                  // корр. время
                   total: 7300,                            // всего
                   toPayment: 7300,                        // к выплате
                   lateness: {                             // опоздания сотрудника
@@ -680,7 +692,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -738,7 +750,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -773,7 +785,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -831,7 +843,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -866,7 +878,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -924,7 +936,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -959,7 +971,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -1017,7 +1029,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -1052,7 +1064,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -1204,8 +1216,15 @@
         return this.summaryModel.positions();
       });
 
+      this.activePositions = ko.pureComputed(() => {
+        return this.summaryModel.positions().filter(p => {
+          if (p.visible()) return true;
+          if (p.visibleEmployees().length) return true;
+        })
+      });
+
       /** Shift stimulation model (fine/bonus) */
-      this.stimulation = (() => {
+      this.stimulation = ((root) => {
         function Stimulation() {
           return {
             base: ko.observable(''),
@@ -1234,17 +1253,41 @@
               authors: window.directories.authors
             },
             (data) => {
-              console.log('stimulation saved', data)
+              let stimulationObject = {
+                base: data.base,
+                comment: data.comment,
+                author: data.author,
+                sum: data.sum
+              };
+              let positions = [];
+              if (data.category === 'production') {
+                positions = root.summaryModel.positions();
+              }
+              positions.forEach(p => {
+                let employees = p.visibleEmployees();
+                employees.forEach(e => {
+                  if (data.stimulationType === 'fine') {
+                    e.fines.push(stimulationObject);
+                  } else if (data.stimulationType === 'bonus') {
+                    e.bonuses.push(stimulationObject);
+                  }
+                })
+              });
             }
           )
         };
 
+        const isBlocked = ko.pureComputed(() => {
+          return !root.activePositions().some(p => p.visibleEmployees().length > 0);
+        });
+
         return {
+          isBlocked,
           fine,
           bonus,
           set: setStimulation
         };
-      })();
+      })(this);
 
       this.isEmployeesCalculated = ko.observable(false);
 
@@ -1376,20 +1419,30 @@
         }));
       })();
 
+      function getRandom(from, to) {
+        return Math.floor(Math.random() * (to - from)) + from;
+      }
+
+      // Перерасчет значений в таблицах
       this.calculate = () => {
         console.log('recalculate');
 
+        /** ДАННЫЕ */
         // Позиции, участвующие в расчете
-        const activePositions = this.summaryModel.positions().filter(p => {
-          if (p.visible()) return true;
-          if (p.visibleEmployees()) return true;
+        const activePositions = this.activePositions();
+        // Водители
+        const drivers = this.summaryModel.driversData();
+
+        /** УСТАНОВКА ДАННЫХ ДЛЯ ВОДИТЕЛЕЙ */
+        // Данные сотрудников
+        drivers.employees().forEach(employee => {
+
         });
+        // Данные всей позиции
 
-        function getRandom(from, to) {
-          return Math.floor(Math.random() * (to - from)) + from;
-        }
-
+        /** УСТАНОВКА ДАННЫХ ДЛЯ ПРОИЗВОДСТВЕННЫХ ПОЗИЦИЙ */
         activePositions.forEach(position => {
+
           // нагрузка из первой таблицы
           const positionWorkload = position.workload();
           // сотрудники, участвующие в расчете
@@ -1407,6 +1460,8 @@
             const revenueStandartPerHour = getRandom(0, 2000);
             const normalizationRatio = getRandom(0, 2000);
             const bonusRatio = getRandom(0, 2000);
+
+            // время в минутах
             const correctedTime = getRandom(0, 2000);
             const bonusExceed = getRandom(0, 2000);
             const depremation = getRandom(0, 2000);
@@ -1440,7 +1495,7 @@
           position.performanceStandart(performanceStandart);
         });
 
-        // Итого первой таблицы
+        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ СВОДНОЙ ТАБЛИЦЫ */
         const workload = getRandom(0, 2000);
         const workloadUnits = getRandom(0, 2000);
         const fotCategory = getRandom(0, 2000);
@@ -1453,13 +1508,24 @@
         this.summaryModel.total.fotRevenue(fotRevenue);
         this.summaryModel.total.performanceStandart(performanceStandart);
 
-        // Итого второй таблицы
-        const workingTime = '77:00';
+        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ПРОИЗВОДСТВО) */
+        // время в минутах
+        const workingTime = activePositions.reduce((acc, p) => {
+          return acc + p.workingTime();
+        }, 0);
+        console.log(workingTime)
+
         const salaryBulk = getRandom(0, 2000);
         const normalizationRatio = getRandom(0, 3);
         const revenueStandart = getRandom(0, 2000);
         const bonusRatio = getRandom(0, 3);
-        const correctedTime = '22:22';
+
+        // время в минутах
+        const correctedTime = activePositions.reduce((acc, p) => {
+          const employees = p.employees().filter(e => e.visible());
+          return employees.reduce((acc, e) => acc + e.correctedTime(), acc);
+        }, 0);
+
         const bonusExceed = getRandom(0, 2000);
         const total = getRandom(0, 34000);
         const toPayment = getRandom(0, 65000);

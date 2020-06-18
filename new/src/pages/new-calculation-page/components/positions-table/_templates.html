@@ -185,7 +185,7 @@
 
   <!-- ko if: table.isColumnVisible('work-time') -->
     <td class="positions-table__cell positions-table__cell--work-time">
-      <div class="positions-table__cell-content" data-bind="text: table.formatDuration(employee.workingTime())"></div>
+      <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(employee.workingTime())"></div>
     </td>
   <!-- /ko -->
 
@@ -239,7 +239,7 @@
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
   <td class="positions-table__cell positions-table__cell--corrected-time">
-  <div class="positions-table__cell-content" data-bind="text: employee.correctedTime"></div>
+  <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(employee.correctedTime)"></div>
 </td>
   <!-- /ko -->
 
@@ -268,7 +268,7 @@
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--fine" align="right"
         data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell">
-        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.finesState), hrmColoredSign: employee.finesState"></div>
+        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(-1 * employee.finesState()), hrmColoredSign: -1 * employee.finesState()"></div>
     </td>
     <!-- /ko -->
   <!-- /ko -->
@@ -313,7 +313,7 @@
 
   <!-- ko if: table.isColumnVisible('work-time') -->
   <td class="positions-table__cell positions-table__cell--work-time">
-    <div class="positions-table__cell-content" data-bind="text: total.workingTime()"></div>
+    <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(total.workingTime())"></div>
   </td>
   <!-- /ko -->
 
@@ -360,7 +360,7 @@
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
   <td class="positions-table__cell positions-table__cell--corrected-time">
-    <div class="positions-table__cell-content" data-bind="text: total.correctedTime()"></div>
+    <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(total.correctedTime())"></div>
   </td>
   <!-- /ko -->
 

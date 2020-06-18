@@ -18,23 +18,52 @@
         }
       });
       base.subscribe(baseId => {
-        const baseData = fineBases.find(group => {
+        let baseData;
+        for (let groupIndex in fineBases) {
+          let group = fineBases[groupIndex];
+          for (let itemIndex in group.items) {
+            let item = group.items[itemIndex];
+            if (item.id === baseId) {
+              baseData = item;
+              break;
+            }
+          }
+          if (baseData) break;
+        }
+
+        fineBases.find(group => {
           return group.items.find(item => item.id === baseId);
         });
         if (baseData) sum(baseData.sum);
         else sum(null);
       });
+      const author = ko.observable(defaultData.author).extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+
+      const validationObject = ko.validatedObservable({
+        base,
+        author,
+        sum
+      });
       return {
         base,
-        author: ko.observable(defaultData.author).extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        }),
+        author,
         sum,
         comment: ko.observable(defaultData.comment || '').extend({
 
         }),
+        setBaseValue: function(el) {
+          ko.applyBindingsToNode(el, { value: base })
+        },
+        setAuthorValue: function(el) {
+          ko.applyBindingsToNode(el, { value: author })
+        },
+        isValid: () => {
+          return validationObject.isValid();
+        }
       }
     }
 
@@ -82,6 +111,9 @@
             }
 
             this.total = ko.pureComputed(() => {
+              console.log('total', this.fines().reduce((sum, fine) => {
+                return sum + fine.sum();
+              }, 0))
               return this.fines().reduce((sum, fine) => {
                 return sum + fine.sum();
               }, 0);
@@ -96,11 +128,13 @@
 
             /** Применить изменения */
             this.apply = function () {
-              employee.fines(this.fines());
+              employee.fines(ko.toJS(this.fines));
             }
 
             this.submit = function () {
               this.isSubmitted(true);
+
+              if (this.fines().some(f => !f.isValid())) return;
 
               if ('submit' in params) {
                 this.apply();

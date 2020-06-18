@@ -868,7 +868,7 @@
         </label>
 
         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: base,
+          <select data-bind="descendantsComplete: setBaseValue,
        hrmSelect,
        hrmSelectSearchEnabled: true,
        hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
@@ -880,7 +880,7 @@
             <!-- ko foreach: {data: $component.fineBases, as: 'group'} -->
             <optgroup data-bind="attr: {label: group.name}">
               <!-- ko foreach: { data: group.items, as: 'option' } -->
-              <option data-bind="value: option.id, text: option.name"></option>
+              <option data-bind="value: '' + option.id, text: option.name"></option>
               <!-- /ko -->
 
             </optgroup>
@@ -941,7 +941,7 @@
           <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
 
           <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="value: author,
+            <select data-bind="descendantsComplete: setAuthorValue,
        hrmSelect,
        hrmSelectSearchEnabled: true,
        hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
@@ -949,7 +949,7 @@
        hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
               <option></option>
               <!-- ko foreach: $component.authors -->
-              <option data-bind="value: id, text: name"></option>
+              <option data-bind="value: '' + id, text: name"></option>
               <!-- /ko -->
             </select>
           </div>
@@ -1034,8 +1034,8 @@
 
       <div class="fine-form__total color--secondary">
         Итого: <span class="fine-form__total-value"
-              data-bind="hrmColoredSign: total">
-          <!-- ko text: $root.utils.formatSign(total) -->
+              data-bind="hrmColoredSign: -1 * total()">
+          <!-- ko text: $root.utils.formatSign(-1 * total()) -->
           <!-- /ko -->
           <i class="far fa-ruble-sign"
              aria-hidden="true"></i>
@@ -1080,23 +1080,52 @@
         }
       });
       base.subscribe(baseId => {
-        const baseData = fineBases.find(group => {
+        let baseData;
+        for (let groupIndex in fineBases) {
+          let group = fineBases[groupIndex];
+          for (let itemIndex in group.items) {
+            let item = group.items[itemIndex];
+            if (item.id === baseId) {
+              baseData = item;
+              break;
+            }
+          }
+          if (baseData) break;
+        }
+
+        fineBases.find(group => {
           return group.items.find(item => item.id === baseId);
         });
         if (baseData) sum(baseData.sum);
         else sum(null);
       });
+      const author = ko.observable(defaultData.author).extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+
+      const validationObject = ko.validatedObservable({
+        base,
+        author,
+        sum
+      });
       return {
         base,
-        author: ko.observable(defaultData.author).extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        }),
+        author,
         sum,
         comment: ko.observable(defaultData.comment || '').extend({
 
         }),
+        setBaseValue: function(el) {
+          ko.applyBindingsToNode(el, { value: base })
+        },
+        setAuthorValue: function(el) {
+          ko.applyBindingsToNode(el, { value: author })
+        },
+        isValid: () => {
+          return validationObject.isValid();
+        }
       }
     }
 
@@ -1144,6 +1173,9 @@
             }
 
             this.total = ko.pureComputed(() => {
+              console.log('total', this.fines().reduce((sum, fine) => {
+                return sum + fine.sum();
+              }, 0))
               return this.fines().reduce((sum, fine) => {
                 return sum + fine.sum();
               }, 0);
@@ -1158,11 +1190,13 @@
 
             /** Применить изменения */
             this.apply = function () {
-              employee.fines(this.fines());
+              employee.fines(ko.toJS(this.fines));
             }
 
             this.submit = function () {
               this.isSubmitted(true);
+
+              if (this.fines().some(f => !f.isValid())) return;
 
               if ('submit' in params) {
                 this.apply();
@@ -1193,7 +1227,7 @@
         </label>
 
         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="value: base,
+          <select data-bind="descendantsComplete: setBaseValue,
        hrmSelect,
        hrmSelectSearchEnabled: true,
        hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
@@ -1265,7 +1299,7 @@
           <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
 
           <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="value: author,
+            <select data-bind="descendantsComplete: setAuthorValue,
        hrmSelect,
        hrmSelectSearchEnabled: true,
        hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
@@ -1404,17 +1438,34 @@
         }
       });
 
+      const author = ko.observable(defaultData.author).extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+
+      const validationObject = ko.validatedObservable({
+        base,
+        author,
+        sum
+      });
+
       return {
         base,
-        author: ko.observable(defaultData.author).extend({
-          required: {
-            message: 'Обязательное поле'
-          }
-        }),
+        author,
         sum,
         comment: ko.observable(defaultData.comment || '').extend({
 
         }),
+        setBaseValue: function(el) {
+          ko.applyBindingsToNode(el, { value: base })
+        },
+        setAuthorValue: function(el) {
+          ko.applyBindingsToNode(el, { value: author })
+        },
+        isValid: () => {
+          return validationObject.isValid();
+        }
       }
     }
 
@@ -1476,11 +1527,13 @@
 
             /** Применить изменения */
             this.apply = function () {
-              employee.bonuses(this.bonuses());
+              employee.bonuses(ko.toJS(this.bonuses));
             }
 
             this.submit = function () {
               this.isSubmitted(true);
+
+              if (this.bonuses().some(b => !b.isValid())) return;
 
               if ('submit' in params) {
                 this.apply();
@@ -3768,7 +3821,7 @@
 
   <!-- ko if: table.isColumnVisible('work-time') -->
     <td class="positions-table__cell positions-table__cell--work-time">
-      <div class="positions-table__cell-content" data-bind="text: table.formatDuration(employee.workingTime())"></div>
+      <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(employee.workingTime())"></div>
     </td>
   <!-- /ko -->
 
@@ -3822,7 +3875,7 @@
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
   <td class="positions-table__cell positions-table__cell--corrected-time">
-  <div class="positions-table__cell-content" data-bind="text: employee.correctedTime"></div>
+  <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(employee.correctedTime)"></div>
 </td>
   <!-- /ko -->
 
@@ -3851,7 +3904,7 @@
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--fine" align="right"
         data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell">
-        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.finesState), hrmColoredSign: employee.finesState"></div>
+        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(-1 * employee.finesState()), hrmColoredSign: -1 * employee.finesState()"></div>
     </td>
     <!-- /ko -->
   <!-- /ko -->
@@ -3896,7 +3949,7 @@
 
   <!-- ko if: table.isColumnVisible('work-time') -->
   <td class="positions-table__cell positions-table__cell--work-time">
-    <div class="positions-table__cell-content" data-bind="text: total.workingTime()"></div>
+    <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(total.workingTime())"></div>
   </td>
   <!-- /ko -->
 
@@ -3943,7 +3996,7 @@
 
   <!-- ko if: table.isColumnVisible('corrected-time') -->
   <td class="positions-table__cell positions-table__cell--corrected-time">
-    <div class="positions-table__cell-content" data-bind="text: total.correctedTime()"></div>
+    <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(total.correctedTime())"></div>
   </td>
   <!-- /ko -->
 
@@ -4002,7 +4055,7 @@
 
         <!-- Штраф/премия -->
         <button class="hrm-button hrm-basic-button hrm-button--size_medium  calculation-tab__settings-button calculation-tab__settings-stimulation"
-                data-bind="click: $root.stimulation.set">
+                data-bind="click: $root.stimulation.set, disable: $root.stimulation.isBlocked">
           Штраф/премия смене
         </button>
         <!-- /ko -->
@@ -4302,16 +4355,7 @@
             });
           };
 
-          function formatDuration(minutes) {
-            if (minutes <= 0) return '00:00';
 
-            let h = Math.floor(minutes / 60).toString();
-            h = h.length === 1 ? '0' + h : h;
-            let m = (minutes % 60).toString();
-            m = m.length === 1 ? '0' + m : m;
-
-            return h + ':' + m;
-          };
 
           const positions = params.positions;
           const model = params.model;
@@ -4537,7 +4581,6 @@
             tabName: params.tabName,
 
             editableCellErrorStateMatcher,
-            formatDuration,
             columns,
             activeColumns,
             columnCount,
@@ -4774,7 +4817,7 @@
           this.workingIntervals.remove(interval);
         };
 
-        this.workingIntervals.subscribe(_ => this.root.calculate());
+        this.workingTime.subscribe(_ => this.root.calculate());
 
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
@@ -4823,8 +4866,8 @@
         this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || this.position.revenueStandartUnits);
         this.revenueStandart = ko.observable(employee.revenueStandart || this.position.revenueStandart);
 
-        this.normalizationRatio = employee.normalizationRatio || this.position.normalizationRatio;
-        this.bonusRatio = employee.bonusRatio || this.position.bonusRatio;
+        this.normalizationRatio = ko.observable(employee.normalizationRatio || this.position.normalizationRatio);
+        this.bonusRatio = ko.observable(employee.bonusRatio || this.position.bonusRatio);
 
         this.bonusExceed = ko.observable(employee.bonusExceed || '');
         this.depremation = ko.observable(employee.depremation || '');
@@ -4976,7 +5019,7 @@
       };
 
       const productionTotal = {
-        workingTime: ko.observable('00:00'),
+        workingTime: ko.observable(0),
         salaryBulk: ko.observable(0),
         normalizationRatio: ko.observable(0),
         revenueStandart: ko.observable(0),
@@ -5095,7 +5138,7 @@
             bonuses: [],                            // бонусы
             fines: [],                              // штрафы
             depremation: 0,                         // депр.
-            correctedTime: '6:00',                  // корр. время
+            correctedTime: '0',                  // корр. время
             total: 7300,                            // всего
             toPayment: 7300,                        // к выплате
             lateness: {                             // опоздания сотрудника
@@ -5130,7 +5173,7 @@
             bonuses: [],
             fines: [],
             depremation: 0,
-            correctedTime: '6:00',
+            correctedTime: '0',
             total: 7300,
             toPayment: 7300,
             lateness: {
@@ -5141,6 +5184,18 @@
           }
         ],
       });
+
+      this.formatDuration = (minutes) => {
+        console.log('dur', minutes)
+        if (!minutes || minutes <= 0) return '00:00';
+
+        let h = Math.floor(minutes / 60).toString();
+        h = h.length === 1 ? '0' + h : h;
+        let m = (minutes % 60).toString();
+        m = m.length === 1 ? '0' + m : m;
+
+        return h + ':' + m;
+      };
 
 
       /** Input data */
@@ -5219,7 +5274,7 @@
                   bonuses: [],                            // бонусы
                   fines: [],                              // штрафы
                   depremation: 0,                         // депр.
-                  correctedTime: '6:00',                  // корр. время
+                  correctedTime: '0',                  // корр. время
                   total: 7300,                            // всего
                   toPayment: 7300,                        // к выплате
                   lateness: {                             // опоздания сотрудника
@@ -5254,7 +5309,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5312,7 +5367,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5347,7 +5402,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5405,7 +5460,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5440,7 +5495,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5498,7 +5553,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5533,7 +5588,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5591,7 +5646,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5626,7 +5681,7 @@
                   bonuses: [],
                   fines: [],
                   depremation: 0,
-                  correctedTime: '6:00',
+                  correctedTime: '0',
                   total: 7300,
                   toPayment: 7300,
                   lateness: {
@@ -5778,8 +5833,15 @@
         return this.summaryModel.positions();
       });
 
+      this.activePositions = ko.pureComputed(() => {
+        return this.summaryModel.positions().filter(p => {
+          if (p.visible()) return true;
+          if (p.visibleEmployees().length) return true;
+        })
+      });
+
       /** Shift stimulation model (fine/bonus) */
-      this.stimulation = (() => {
+      this.stimulation = ((root) => {
         function Stimulation() {
           return {
             base: ko.observable(''),
@@ -5808,17 +5870,41 @@
               authors: window.directories.authors
             },
             (data) => {
-              console.log('stimulation saved', data)
+              let stimulationObject = {
+                base: data.base,
+                comment: data.comment,
+                author: data.author,
+                sum: data.sum
+              };
+              let positions = [];
+              if (data.category === 'production') {
+                positions = root.summaryModel.positions();
+              }
+              positions.forEach(p => {
+                let employees = p.visibleEmployees();
+                employees.forEach(e => {
+                  if (data.stimulationType === 'fine') {
+                    e.fines.push(stimulationObject);
+                  } else if (data.stimulationType === 'bonus') {
+                    e.bonuses.push(stimulationObject);
+                  }
+                })
+              });
             }
           )
         };
 
+        const isBlocked = ko.pureComputed(() => {
+          return !root.activePositions().some(p => p.visibleEmployees().length > 0);
+        });
+
         return {
+          isBlocked,
           fine,
           bonus,
           set: setStimulation
         };
-      })();
+      })(this);
 
       this.isEmployeesCalculated = ko.observable(false);
 
@@ -5950,20 +6036,30 @@
         }));
       })();
 
+      function getRandom(from, to) {
+        return Math.floor(Math.random() * (to - from)) + from;
+      }
+
+      // Перерасчет значений в таблицах
       this.calculate = () => {
         console.log('recalculate');
 
+        /** ДАННЫЕ */
         // Позиции, участвующие в расчете
-        const activePositions = this.summaryModel.positions().filter(p => {
-          if (p.visible()) return true;
-          if (p.visibleEmployees()) return true;
+        const activePositions = this.activePositions();
+        // Водители
+        const drivers = this.summaryModel.driversData();
+
+        /** УСТАНОВКА ДАННЫХ ДЛЯ ВОДИТЕЛЕЙ */
+        // Данные сотрудников
+        drivers.employees().forEach(employee => {
+
         });
+        // Данные всей позиции
 
-        function getRandom(from, to) {
-          return Math.floor(Math.random() * (to - from)) + from;
-        }
-
+        /** УСТАНОВКА ДАННЫХ ДЛЯ ПРОИЗВОДСТВЕННЫХ ПОЗИЦИЙ */
         activePositions.forEach(position => {
+
           // нагрузка из первой таблицы
           const positionWorkload = position.workload();
           // сотрудники, участвующие в расчете
@@ -5981,6 +6077,8 @@
             const revenueStandartPerHour = getRandom(0, 2000);
             const normalizationRatio = getRandom(0, 2000);
             const bonusRatio = getRandom(0, 2000);
+
+            // время в минутах
             const correctedTime = getRandom(0, 2000);
             const bonusExceed = getRandom(0, 2000);
             const depremation = getRandom(0, 2000);
@@ -6014,7 +6112,7 @@
           position.performanceStandart(performanceStandart);
         });
 
-        // Итого первой таблицы
+        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ СВОДНОЙ ТАБЛИЦЫ */
         const workload = getRandom(0, 2000);
         const workloadUnits = getRandom(0, 2000);
         const fotCategory = getRandom(0, 2000);
@@ -6027,13 +6125,24 @@
         this.summaryModel.total.fotRevenue(fotRevenue);
         this.summaryModel.total.performanceStandart(performanceStandart);
 
-        // Итого второй таблицы
-        const workingTime = '77:00';
+        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ПРОИЗВОДСТВО) */
+        // время в минутах
+        const workingTime = activePositions.reduce((acc, p) => {
+          return acc + p.workingTime();
+        }, 0);
+        console.log(workingTime)
+
         const salaryBulk = getRandom(0, 2000);
         const normalizationRatio = getRandom(0, 3);
         const revenueStandart = getRandom(0, 2000);
         const bonusRatio = getRandom(0, 3);
-        const correctedTime = '22:22';
+
+        // время в минутах
+        const correctedTime = activePositions.reduce((acc, p) => {
+          const employees = p.employees().filter(e => e.visible());
+          return employees.reduce((acc, e) => acc + e.correctedTime(), acc);
+        }, 0);
+
         const bonusExceed = getRandom(0, 2000);
         const total = getRandom(0, 34000);
         const toPayment = getRandom(0, 65000);
