@@ -69,8 +69,9 @@
 
             this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
                 this._$contentElement = $(this._contentElement());
+                this._$contentElement.overlayScrollbars({});
                 this._$contentElement.on('scroll', this._contentScrollHandler.bind(this));
-                
+
                 this.check();
             }));
 
@@ -101,7 +102,7 @@
             <div class="hrm-scrollable-wrapper__content"
                  data-bind="hrmElement: _contentElement">
                 <!-- ko template: {nodes: $componentTemplateNodes, data: _childData} --><!-- /ko -->
-                
+
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledVerticalStart() && !options.top.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
@@ -109,7 +110,7 @@
                 } -->
                     <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__top-curtain"></div>
                 <!-- /ko -->
-                
+
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledHorizontalEnd() && !options.right.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
@@ -117,7 +118,7 @@
                 } -->
                     <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__right-curtain"></div>
                 <!-- /ko -->
-                
+
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledVerticalEnd() && !options.bottom.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),
@@ -125,7 +126,7 @@
                 } -->
                     <div class="hrm-scrollable-wrapper__curtain hrm-scrollable-wrapper__bottom-curtain"></div>
                 <!-- /ko -->
-                
+
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledHorizontalStart() && !options.left.disabled, $data),
                     afterAdd: hrmFadeAfterAddFactory(200),

@@ -53,6 +53,7 @@
 
             if (!this._disabled) {
                 if (this._overlayScrollbarsInstance === null) {
+
                     $element.overlayScrollbars(this._overlayScrollbarsOptions);
                     this._overlayScrollbarsInstance = $element.overlayScrollbars();
                 }
