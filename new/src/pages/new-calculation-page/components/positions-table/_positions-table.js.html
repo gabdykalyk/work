@@ -137,6 +137,7 @@
             .some(c => !c.visible());
             if (hasInvisibleColumns) setColumnsState(columnSets[0]);
             else setColumnsState();
+            $(window).resize();
           };
 
           const lessInfo = () => {
@@ -144,6 +145,7 @@
                 .some(c => c.visible());
             if (hasVisibleColumns) setColumnsState(columnSets[0]);
             else setColumnsState(columnSets[1]);
+            $(window).resize();
           };
 
 
@@ -246,7 +248,25 @@
             });
           }
 
+          const tableScroll = ko.observable(false);
+
+          const onTableRender = (el) => {
+            let scrollWrapper = el.querySelector('.os-content');
+            if (!scrollWrapper) return;
+
+            if (scrollWrapper.offsetWidth < scrollWrapper.scrollWidth) {
+              tableScroll(true);
+            }
+
+            params.utils.viewportSize.subscribe(_ => {
+              tableScroll(scrollWrapper.offsetWidth < scrollWrapper.scrollWidth);
+            });
+          }
+
           return {
+            onTableRender,
+            tableScroll,
+
             viewportSize: params.utils.viewportSize,
             tabName: params.tabName,
 

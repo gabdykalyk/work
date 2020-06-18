@@ -66,7 +66,7 @@
     <div class="hrm-table__fixed-section-container positions-table"
          data-bind="let: {table: $data}">
       <!-- Fixed section -->
-      <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.tabletMaxWidth -->
+      <!-- ko if: tableScroll -->
       <table data-bind="hrmTable"
              class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section">
         <thead>
@@ -125,7 +125,9 @@
           <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
             <td class="positions-table__cell positions-table__position-title">
               <div class="positions-table__cell-content">
+
                 <div data-bind="template: {name: 'position-header-template', data: {name: 'Прочее'}}"></div>
+
               </div>
             </td>
           </tr>
@@ -174,7 +176,7 @@
       <!-- /Fixed section -->
 
 
-      <div data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}">
+      <div data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}, descendantsComplete: onTableRender">
         <table data-bind="hrmTable"
                class="positions-table__main-table">
 
@@ -221,7 +223,9 @@
                   data-bind="attr: {colspan: $parent.columnCount}">
 
                 <div class="positions-table__cell-content">
+                   <!-- ko ifnot: tableScroll -->
                   <div data-bind="template: {name: 'position-header-template', data: position}"></div>
+                  <!-- /ko -->
                 </div>
               </td>
             </tr>
