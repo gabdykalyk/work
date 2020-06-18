@@ -2,6 +2,36 @@
 
 <script>
   $(function () {
+    function Bonus(defaultData, bonusBases) {
+      defaultData = defaultData || {};
+      const base = ko.observable(defaultData.base).extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+      const sum = ko.observable(defaultData.sum || 0).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        number: {
+          message: 'Некорректный формат'
+        }
+      });
+
+      return {
+        base,
+        author: ko.observable(defaultData.author).extend({
+          required: {
+            message: 'Обязательное поле'
+          }
+        }),
+        sum,
+        comment: ko.observable(defaultData.comment || '').extend({
+
+        }),
+      }
+    }
+
     ko.components.register('employee-bonus-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -15,7 +45,42 @@
             'modal-dialog--employee-bonus'
           ]);
 
-          const ViewModel = function () {
+          const employee = params.data.employee;
+          const bonusesList = params.data.bonuses;
+          const authorsList = params.data.authors;
+
+          const ViewModel = function (defaultBonuses, bonusesList, authorsList) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.bonusBases = bonusesList;
+            this.authors = authorsList;
+
+            this.bonuses = ko.observableArray(defaultBonuses.map((bonusData) => {
+                return Bonus(bonusData, this.bonusBases);
+            }));
+
+            if (!this.bonuses().length) this.bonuses.push(Bonus(null, this.bonusBases));
+
+            this.addBonus = () => {
+              this.bonuses.push(Bonus(null, this.bonusBases))
+            };
+
+            this.removeBonus = (bonus) => {
+              this.bonuses.remove(bonus);
+            }
+
+            this.total = ko.pureComputed(() => {
+              return this.bonuses().reduce((sum, bonus) => {
+                return sum + bonus.sum();
+              }, 0);
+            })
+
             /** Закрыть окно без изменений */
             this.cancel = function () {
               if ('cancel' in params) {
@@ -25,10 +90,12 @@
 
             /** Применить изменения */
             this.apply = function () {
-
+              employee.bonuses(this.bonuses());
             }
 
             this.submit = function () {
+              this.isSubmitted(true);
+
               if ('submit' in params) {
                 this.apply();
                 params.submit(true);
@@ -36,7 +103,7 @@
             };
           }
 
-          return new ViewModel();
+          return new ViewModel(employee.bonuses(), bonusesList, authorsList);
         }
       },
       template: {

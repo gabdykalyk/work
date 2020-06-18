@@ -85,7 +85,7 @@
   $(function () {
     const $page = $(document.documentElement);
 
-    const PositionsModel = function () {
+    const PositionsModel = function (root) {
       const positions = ko.observableArray([]);
 
       const driversData = ko.observable();
@@ -105,13 +105,13 @@
       */
       function setPositions(positionsList) {
         positions(positionsList.map(positionData => {
-          return new PositionModel(positionData)
+          return new PositionModel(positionData, root)
         }))
       }
 
 
       function setDriversData(driversData) {
-        this.driversData(new PositionModel(driversData));
+        this.driversData(new PositionModel(driversData, root));
       }
 
       /**
@@ -164,11 +164,14 @@
 
       function EmployeeModel(employee, positionModel, visible) {
         this.position = positionModel;
+        this.root = this.position.root;
 
         this.name = employee.name;                   // имя сотрудника
         this.id = employee.id;                       // идентификатор сотрудника
-        this.level = ko.observable(employee.level);  // разряд
         this.link = employee.link;                   // ссылка на личное дело
+
+        this.level = ko.observable(employee.level);  // разряд
+        this.level.subscribe(_ => this.root.calculate());
 
         this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
         this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
@@ -197,6 +200,8 @@
           this.workingIntervals.remove(interval);
         };
 
+        this.workingIntervals.subscribe(_ => this.root.calculate());
+
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
 
@@ -209,6 +214,8 @@
           }, 0);
         });
 
+        this.accountOperations.subscribe(_ => this.root.calculate());
+
         // штрафы
         this.fines = ko.observableArray(employee.fines || []);
         this.finesState = ko.pureComputed(() => {
@@ -217,6 +224,8 @@
           }, 0);
         });
 
+        this.fines.subscribe(_ => this.root.calculate());
+
         // бонусы
         this.bonuses = ko.observableArray(employee.bonuses || []);
         this.bonusesState = ko.pureComputed(() => {
@@ -224,6 +233,8 @@
             return sum + bonus.sum;
           }, 0);
         });
+
+        this.bonuses.subscribe(_ => this.root.calculate());
 
         // компенсация
         this.compensation = ko.observable(employee.compensation || '');
@@ -264,13 +275,17 @@
         this.toPayment = ko.observable(employee.toPayment || 0);
 
         this.visible = ko.observable(!!visible) // участвует в расчете
+        this.visible.subscribe(_ => this.root.calculate());
+
         this.loaded = employee.loaded; // загружен для Все филиалы
       }
 
       /**
       * @param {Object} positionData
       */
-      function PositionModel(positionData) {
+      function PositionModel(positionData, root) {
+        this.root = root;
+
         this.type = positionData.type || 'production';
 
         this.id = positionData.id;
@@ -281,6 +296,10 @@
         this.workloadType = positionData.workloadType;
         this.workload = ko.observable(positionData.workload);
         this.workloadUnits = positionData.workloadUnits;
+
+        this.workload.subscribe(v => {
+          root.calculate();
+        });
 
         // доп. нагрузка
         this.additionalWorkloadType = positionData.additionalWorkloadType;
@@ -301,11 +320,13 @@
         this.revenueStandartUnits = positionData.revenueStandartUnits; // Единицы измерения
 
         // Норм. выработки
-        this.performanceStandart = positionData.performanceStandart;
+        this.performanceStandart = ko.observable(positionData.performanceStandart);
         this.performanceStandartType = positionData.performanceStandartType;
         this.performanceStandartUnits = positionData.performanceStandartUnits;
 
         this.visible = ko.observable(positionData.visible); // Отображается в таблице
+        this.visible.subscribe(_ => this.root.calculate());
+
         this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this, false)));
 
         this.visibleEmployees = ko.pureComputed(() => {
@@ -327,6 +348,7 @@
 
         this.addEmployee = (employee) => {
           this.employees.push(new EmployeeModel(employee, this, 'visible'));
+          this.root.calculate();
         };
 
         this.updateEmployees = (updatedList) => {
@@ -379,6 +401,32 @@
         });
       };
 
+      const productionTotal = {
+        workingTime: ko.observable('00:00'),
+        salaryBulk: ko.observable(0),
+        normalizationRatio: ko.observable(0),
+        revenueStandart: ko.observable(0),
+        bonusRatio: ko.observable(0),
+        correctedTime: ko.observable(0),
+        bonusExceed: ko.observable(0),
+        total: ko.observable(0),
+        toPayment: ko.observable(0),
+      };
+
+      const total = {
+        workload: ko.observable(0),
+        workloadUnits: ko.observable(''),
+        fotCategory: ko.observable(100),
+        fotRevenue: ko.observable(100),
+        performanceStandart: ko.observable(-100),
+        lateness: {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        },
+        employees: ko.observable(0)
+      };
 
       return {
         positions,
@@ -386,6 +434,8 @@
         setPositions,
         setDriversData,
         getPositionById,
+        productionTotal,
+        total
       }
     }
 
@@ -419,7 +469,7 @@
         }
       })();
 
-      this.summaryModel = new PositionsModel();
+      this.summaryModel = new PositionsModel(this);
       this.summaryModel.setPositions(defaultPositions);
 
 
@@ -1325,6 +1375,106 @@
           localStorage.setItem(HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY, collapsed);
         }));
       })();
+
+      this.calculate = () => {
+        console.log('recalculate');
+
+        // Позиции, участвующие в расчете
+        const activePositions = this.summaryModel.positions().filter(p => {
+          if (p.visible()) return true;
+          if (p.visibleEmployees()) return true;
+        });
+
+        function getRandom(from, to) {
+          return Math.floor(Math.random() * (to - from)) + from;
+        }
+
+        activePositions.forEach(position => {
+          // нагрузка из первой таблицы
+          const positionWorkload = position.workload();
+          // сотрудники, участвующие в расчете
+          const visibleEmployees = position.visibleEmployees();
+
+          // Данные сотрудников
+          visibleEmployees.forEach(employee => {
+            const account = getRandom(0, 2000);
+            const premiumAccount = getRandom(0, 2000);
+            const compensation = getRandom(0, 2000);
+            const workload = getRandom(0, 2000);
+            const salary = getRandom(0, 2000);
+            const salaryBulk = getRandom(0, 2000);
+            const revenueStandart = getRandom(0, 2000);
+            const revenueStandartPerHour = getRandom(0, 2000);
+            const normalizationRatio = getRandom(0, 2000);
+            const bonusRatio = getRandom(0, 2000);
+            const correctedTime = getRandom(0, 2000);
+            const bonusExceed = getRandom(0, 2000);
+            const depremation = getRandom(0, 2000);
+            const total = getRandom(0, 2000);
+            const toPayment = getRandom(0, 2000);
+
+            employee.account(account);
+            employee.premiumAccount(premiumAccount);
+            employee.compensation(compensation);
+            employee.workload(workload);
+            employee.salary(salary);
+            employee.salaryBulk(salaryBulk);
+            employee.revenueStandart(revenueStandart);
+            employee.revenueStandartPerHour(revenueStandartPerHour);
+            employee.normalizationRatio(normalizationRatio);
+            employee.bonusRatio(bonusRatio);
+            employee.correctedTime(correctedTime);
+            employee.bonusExceed(bonusExceed);
+            employee.depremation(depremation);
+            employee.total(total);
+            employee.toPayment(toPayment);
+          });
+
+          // данные позиции
+          const fotCategory = getRandom(0, 80);
+          const fotRevenue = getRandom(0, 80);
+          const performanceStandart = getRandom(-80, 0);
+
+          position.fotCategory(fotCategory);
+          position.fotRevenue(fotRevenue);
+          position.performanceStandart(performanceStandart);
+        });
+
+        // Итого первой таблицы
+        const workload = getRandom(0, 2000);
+        const workloadUnits = getRandom(0, 2000);
+        const fotCategory = getRandom(0, 2000);
+        const fotRevenue = getRandom(0, 2000);
+        const performanceStandart = getRandom(0, 2000);
+
+        this.summaryModel.total.workload(workload);
+        this.summaryModel.total.workloadUnits(workloadUnits);
+        this.summaryModel.total.fotCategory(fotCategory);
+        this.summaryModel.total.fotRevenue(fotRevenue);
+        this.summaryModel.total.performanceStandart(performanceStandart);
+
+        // Итого второй таблицы
+        const workingTime = '77:00';
+        const salaryBulk = getRandom(0, 2000);
+        const normalizationRatio = getRandom(0, 3);
+        const revenueStandart = getRandom(0, 2000);
+        const bonusRatio = getRandom(0, 3);
+        const correctedTime = '22:22';
+        const bonusExceed = getRandom(0, 2000);
+        const total = getRandom(0, 34000);
+        const toPayment = getRandom(0, 65000);
+
+        this.summaryModel.productionTotal.workingTime(workingTime);
+        this.summaryModel.productionTotal.salaryBulk(salaryBulk);
+        this.summaryModel.productionTotal.normalizationRatio(normalizationRatio);
+        this.summaryModel.productionTotal.revenueStandart(revenueStandart);
+        this.summaryModel.productionTotal.bonusRatio(bonusRatio);
+        this.summaryModel.productionTotal.correctedTime(correctedTime);
+        this.summaryModel.productionTotal.bonusExceed(bonusExceed);
+        this.summaryModel.productionTotal.total(total);
+        this.summaryModel.productionTotal.toPayment(toPayment);
+
+      }
     };
 
 

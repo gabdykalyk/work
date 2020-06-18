@@ -197,7 +197,7 @@
               } -->
                 <div class="calculation-page__tab">
                   <!-- ko let: {tabName: 'production'} -->
-<div data-bind="component: {name: 'calculation-page-positions-table', params: { tabName: 'production', positions: $root.productionPositions, utils: $root.utils, model: $root.summaryModel }}"></div>
+<div data-bind="component: {name: 'calculation-page-positions-table', params: { tabName: 'production', positions: $root.productionPositions, utils: $root.utils, total: $root.summaryModel.productionTotal, model: $root.summaryModel }}"></div>
 <!-- /ko -->
 
                 </div>
@@ -1156,15 +1156,13 @@
               }
             };
 
-
-
             /** Применить изменения */
             this.apply = function () {
               employee.fines(this.fines());
             }
 
             this.submit = function () {
-              this.submitted(true);
+              this.isSubmitted(true);
 
               if ('submit' in params) {
                 this.apply();
@@ -1183,7 +1181,151 @@
   })
 </script>
 
-  <template id="employee-bonus-modal-dialog-template">
+  <template id="bonus-block-template">
+  <div class="bonus-block">
+    <div class="bonus-block__content">
+      <!-- Base select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="bonus-block__row bonus-block__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание премии
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
+       hrmSelect,
+       hrmSelectSearchEnabled: true,
+       hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+       hrmFormFieldSelectControl: control,
+       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+            <option></option>
+
+            <!-- ko foreach: {data: $component.bonusBases, as: 'group'} -->
+            <optgroup data-bind="attr: {label: group.name}">
+              <!-- ko foreach: { data: group.items, as: 'option' } -->
+              <option data-bind="value: option.id, text: option.name"></option>
+              <!-- /ko -->
+
+            </optgroup>
+            <!-- /ko -->
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+     hrmSlide,
+     hrmSlideValue: control() !== null ? control().errorState : false,
+     hrmSlideDuration: 150">
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Base select -->
+
+      <div class="bonus-block__row">
+        <!-- Sum field -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+        <div class="bonus-block__sum"
+             data-bind="
+      hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+  ">
+          <label data-bind="hrmFormFieldLabel: label">Сумма,
+            <i class="far fa-ruble-sign"></i>
+          </label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="
+              textInput: sum,
+              hrmMask, hrmMaskPattern: 'decimal',
+              hrmFormFieldInputControl: control,
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+          ">
+          </div>
+
+          <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+            <!-- ko text: $parent.sum.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- /Sum field -->
+
+
+        <!-- Author select -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div class="bonus-block__author"
+             data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <select data-bind="value: author,
+       hrmSelect,
+       hrmSelectSearchEnabled: true,
+       hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+       hrmFormFieldSelectControl: control,
+       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+              <option></option>
+              <!-- ko foreach: $component.authors -->
+              <option data-bind="value: id, text: name"></option>
+              <!-- /ko -->
+            </select>
+          </div>
+
+          <div data-bind="component: {name: 'hrm-form-field-error'},
+   hrmSlide,
+   hrmSlideValue: control() !== null ? control().errorState : false,
+   hrmSlideDuration: 150">
+            <!-- ko text: $parent.author.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- /Author select -->
+      </div>
+
+      <!-- Comment field -->
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="bonus-block__row bonus-block__comment"
+           data-bind="
+     hrmFormField, hrmFormFieldControlRef: control
+ ">
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <textarea data-bind="
+             textInput: comment,
+             hrmFormFieldInputControl: control,
+             hrmAutoResize
+         "
+                    placeholder="Комментарий"></textarea>
+        </div>
+
+      </div>
+      <!-- /ko -->
+      <!-- /Comment field -->
+    </div>
+
+    <div class="bonus-block__remove">
+      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
+              data-bind="click: $component.removeBonus"></button>
+      <!-- /ko -->
+
+      <!-- ko ifnot: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
+              data-bind="click: $component.removeBonus">Удалить</button>
+      <!-- /ko -->
+    </div>
+  </div>
+</template>
+
+<template id="employee-bonus-modal-dialog-template">
   <button class="hrm-button hrm-basic-modal-dialog__close-button"
           data-bind="click: function() { cancel(); }"
           aria-label="Close">
@@ -1195,18 +1337,48 @@
     </h2>
   </div>
 
-  <div class="hrm-basic-modal-dialog__body">
+  <div class="hrm-basic-modal-dialog__body bonus-form">
+    <div class="modal-dialog__scroll">
+      <div class="bonus-form__scroll-list"
+           data-bind="hrmScrollable">
+        <!-- ko template: {
+          name: 'bonus-block-template',
+          foreach: bonuses,
+          afterAdd: hrmFadeAfterAddFactory(200),
+          beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <!-- /ko -->
+
+
+      </div>
+    </div>
+    <div class="bonus-form__actions">
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon"
+              data-bind="click: addBonus">Добавить премию</button>
+
+      <div class="bonus-form__total color--secondary">
+        Итого: <span class="bonus-form__total-value"
+              data-bind="hrmColoredSign: total">
+          <!-- ko text: $root.utils.formatSign(total) -->
+          <!-- /ko -->
+          <i class="far fa-ruble-sign"
+             aria-hidden="true"></i>
+        </span>
+      </div>
+
+    </div>
+
   </div>
 
   <div class="hrm-basic-modal-dialog__action-list">
     <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-cancel-button"
+        position-page__speciality-modal-dialog-cancel-button"
             data-bind="click: function() {cancel();}">
       Отменить
     </button>
 
     <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
-         position-page__speciality-modal-dialog-submit-button"
+        position-page__speciality-modal-dialog-submit-button"
             data-bind="click: function() {submit();}">
       Сохранить
     </button>
@@ -1216,6 +1388,36 @@
 
 <script>
   $(function () {
+    function Bonus(defaultData, bonusBases) {
+      defaultData = defaultData || {};
+      const base = ko.observable(defaultData.base).extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+      const sum = ko.observable(defaultData.sum || 0).extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        number: {
+          message: 'Некорректный формат'
+        }
+      });
+
+      return {
+        base,
+        author: ko.observable(defaultData.author).extend({
+          required: {
+            message: 'Обязательное поле'
+          }
+        }),
+        sum,
+        comment: ko.observable(defaultData.comment || '').extend({
+
+        }),
+      }
+    }
+
     ko.components.register('employee-bonus-modal-dialog', {
       viewModel: {
         createViewModel: function (params, componentInfo) {
@@ -1229,7 +1431,42 @@
             'modal-dialog--employee-bonus'
           ]);
 
-          const ViewModel = function () {
+          const employee = params.data.employee;
+          const bonusesList = params.data.bonuses;
+          const authorsList = params.data.authors;
+
+          const ViewModel = function (defaultBonuses, bonusesList, authorsList) {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.bonusBases = bonusesList;
+            this.authors = authorsList;
+
+            this.bonuses = ko.observableArray(defaultBonuses.map((bonusData) => {
+                return Bonus(bonusData, this.bonusBases);
+            }));
+
+            if (!this.bonuses().length) this.bonuses.push(Bonus(null, this.bonusBases));
+
+            this.addBonus = () => {
+              this.bonuses.push(Bonus(null, this.bonusBases))
+            };
+
+            this.removeBonus = (bonus) => {
+              this.bonuses.remove(bonus);
+            }
+
+            this.total = ko.pureComputed(() => {
+              return this.bonuses().reduce((sum, bonus) => {
+                return sum + bonus.sum();
+              }, 0);
+            })
+
             /** Закрыть окно без изменений */
             this.cancel = function () {
               if ('cancel' in params) {
@@ -1239,10 +1476,12 @@
 
             /** Применить изменения */
             this.apply = function () {
-
+              employee.bonuses(this.bonuses());
             }
 
             this.submit = function () {
+              this.isSubmitted(true);
+
               if ('submit' in params) {
                 this.apply();
                 params.submit(true);
@@ -1250,7 +1489,7 @@
             };
           }
 
-          return new ViewModel();
+          return new ViewModel(employee.bonuses(), bonusesList, authorsList);
         }
       },
       template: {
@@ -3312,20 +3551,7 @@
 
           const driversData = model.driversData();
 
-          const total = {
-            workload: ko.observable(0),
-            workloadUnits: ko.observable(''),
-            fotCategory: ko.observable(100),
-            fotRevenue: ko.observable(100),
-            performanceStandart: ko.observable(-100),
-            lateness: {
-              light: ko.observable(0),
-              medium: ko.observable(0),
-              hard: ko.observable(0),
-              total: ko.observable(0),
-            },
-            employees: ko.observable(0)
-          };
+          const total = model.total;
 
           const columns = [
             Column('job', 'Должность', 'Должность'),
@@ -4097,17 +4323,7 @@
             });
           });
 
-          const total = {
-            workingTime: ko.observable('00:00'),
-            salaryBulk: ko.observable(0),
-            normalizationRatio: ko.observable(0),
-            revenueStandart: ko.observable(0),
-            bonusRatio: ko.observable(0),
-            correctedTime: ko.observable(0),
-            bonusExceed: ko.observable(0),
-            total: ko.observable(0),
-            toPayment: ko.observable(0),
-          };
+          const total = params.total;
 
 
           /* Table columns */
@@ -4443,7 +4659,7 @@
   $(function () {
     const $page = $(document.documentElement);
 
-    const PositionsModel = function () {
+    const PositionsModel = function (root) {
       const positions = ko.observableArray([]);
 
       const driversData = ko.observable();
@@ -4463,13 +4679,13 @@
       */
       function setPositions(positionsList) {
         positions(positionsList.map(positionData => {
-          return new PositionModel(positionData)
+          return new PositionModel(positionData, root)
         }))
       }
 
 
       function setDriversData(driversData) {
-        this.driversData(new PositionModel(driversData));
+        this.driversData(new PositionModel(driversData, root));
       }
 
       /**
@@ -4522,11 +4738,14 @@
 
       function EmployeeModel(employee, positionModel, visible) {
         this.position = positionModel;
+        this.root = this.position.root;
 
         this.name = employee.name;                   // имя сотрудника
         this.id = employee.id;                       // идентификатор сотрудника
-        this.level = ko.observable(employee.level);  // разряд
         this.link = employee.link;                   // ссылка на личное дело
+
+        this.level = ko.observable(employee.level);  // разряд
+        this.level.subscribe(_ => this.root.calculate());
 
         this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
         this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
@@ -4555,6 +4774,8 @@
           this.workingIntervals.remove(interval);
         };
 
+        this.workingIntervals.subscribe(_ => this.root.calculate());
+
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
 
@@ -4567,6 +4788,8 @@
           }, 0);
         });
 
+        this.accountOperations.subscribe(_ => this.root.calculate());
+
         // штрафы
         this.fines = ko.observableArray(employee.fines || []);
         this.finesState = ko.pureComputed(() => {
@@ -4575,6 +4798,8 @@
           }, 0);
         });
 
+        this.fines.subscribe(_ => this.root.calculate());
+
         // бонусы
         this.bonuses = ko.observableArray(employee.bonuses || []);
         this.bonusesState = ko.pureComputed(() => {
@@ -4582,6 +4807,8 @@
             return sum + bonus.sum;
           }, 0);
         });
+
+        this.bonuses.subscribe(_ => this.root.calculate());
 
         // компенсация
         this.compensation = ko.observable(employee.compensation || '');
@@ -4622,13 +4849,17 @@
         this.toPayment = ko.observable(employee.toPayment || 0);
 
         this.visible = ko.observable(!!visible) // участвует в расчете
+        this.visible.subscribe(_ => this.root.calculate());
+
         this.loaded = employee.loaded; // загружен для Все филиалы
       }
 
       /**
       * @param {Object} positionData
       */
-      function PositionModel(positionData) {
+      function PositionModel(positionData, root) {
+        this.root = root;
+
         this.type = positionData.type || 'production';
 
         this.id = positionData.id;
@@ -4639,6 +4870,10 @@
         this.workloadType = positionData.workloadType;
         this.workload = ko.observable(positionData.workload);
         this.workloadUnits = positionData.workloadUnits;
+
+        this.workload.subscribe(v => {
+          root.calculate();
+        });
 
         // доп. нагрузка
         this.additionalWorkloadType = positionData.additionalWorkloadType;
@@ -4659,11 +4894,13 @@
         this.revenueStandartUnits = positionData.revenueStandartUnits; // Единицы измерения
 
         // Норм. выработки
-        this.performanceStandart = positionData.performanceStandart;
+        this.performanceStandart = ko.observable(positionData.performanceStandart);
         this.performanceStandartType = positionData.performanceStandartType;
         this.performanceStandartUnits = positionData.performanceStandartUnits;
 
         this.visible = ko.observable(positionData.visible); // Отображается в таблице
+        this.visible.subscribe(_ => this.root.calculate());
+
         this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this, false)));
 
         this.visibleEmployees = ko.pureComputed(() => {
@@ -4685,6 +4922,7 @@
 
         this.addEmployee = (employee) => {
           this.employees.push(new EmployeeModel(employee, this, 'visible'));
+          this.root.calculate();
         };
 
         this.updateEmployees = (updatedList) => {
@@ -4737,6 +4975,32 @@
         });
       };
 
+      const productionTotal = {
+        workingTime: ko.observable('00:00'),
+        salaryBulk: ko.observable(0),
+        normalizationRatio: ko.observable(0),
+        revenueStandart: ko.observable(0),
+        bonusRatio: ko.observable(0),
+        correctedTime: ko.observable(0),
+        bonusExceed: ko.observable(0),
+        total: ko.observable(0),
+        toPayment: ko.observable(0),
+      };
+
+      const total = {
+        workload: ko.observable(0),
+        workloadUnits: ko.observable(''),
+        fotCategory: ko.observable(100),
+        fotRevenue: ko.observable(100),
+        performanceStandart: ko.observable(-100),
+        lateness: {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        },
+        employees: ko.observable(0)
+      };
 
       return {
         positions,
@@ -4744,6 +5008,8 @@
         setPositions,
         setDriversData,
         getPositionById,
+        productionTotal,
+        total
       }
     }
 
@@ -4777,7 +5043,7 @@
         }
       })();
 
-      this.summaryModel = new PositionsModel();
+      this.summaryModel = new PositionsModel(this);
       this.summaryModel.setPositions(defaultPositions);
 
 
@@ -5683,6 +5949,106 @@
           localStorage.setItem(HRM_SIDEBAR_COLLAPSED_LOCAL_STORAGE_KEY, collapsed);
         }));
       })();
+
+      this.calculate = () => {
+        console.log('recalculate');
+
+        // Позиции, участвующие в расчете
+        const activePositions = this.summaryModel.positions().filter(p => {
+          if (p.visible()) return true;
+          if (p.visibleEmployees()) return true;
+        });
+
+        function getRandom(from, to) {
+          return Math.floor(Math.random() * (to - from)) + from;
+        }
+
+        activePositions.forEach(position => {
+          // нагрузка из первой таблицы
+          const positionWorkload = position.workload();
+          // сотрудники, участвующие в расчете
+          const visibleEmployees = position.visibleEmployees();
+
+          // Данные сотрудников
+          visibleEmployees.forEach(employee => {
+            const account = getRandom(0, 2000);
+            const premiumAccount = getRandom(0, 2000);
+            const compensation = getRandom(0, 2000);
+            const workload = getRandom(0, 2000);
+            const salary = getRandom(0, 2000);
+            const salaryBulk = getRandom(0, 2000);
+            const revenueStandart = getRandom(0, 2000);
+            const revenueStandartPerHour = getRandom(0, 2000);
+            const normalizationRatio = getRandom(0, 2000);
+            const bonusRatio = getRandom(0, 2000);
+            const correctedTime = getRandom(0, 2000);
+            const bonusExceed = getRandom(0, 2000);
+            const depremation = getRandom(0, 2000);
+            const total = getRandom(0, 2000);
+            const toPayment = getRandom(0, 2000);
+
+            employee.account(account);
+            employee.premiumAccount(premiumAccount);
+            employee.compensation(compensation);
+            employee.workload(workload);
+            employee.salary(salary);
+            employee.salaryBulk(salaryBulk);
+            employee.revenueStandart(revenueStandart);
+            employee.revenueStandartPerHour(revenueStandartPerHour);
+            employee.normalizationRatio(normalizationRatio);
+            employee.bonusRatio(bonusRatio);
+            employee.correctedTime(correctedTime);
+            employee.bonusExceed(bonusExceed);
+            employee.depremation(depremation);
+            employee.total(total);
+            employee.toPayment(toPayment);
+          });
+
+          // данные позиции
+          const fotCategory = getRandom(0, 80);
+          const fotRevenue = getRandom(0, 80);
+          const performanceStandart = getRandom(-80, 0);
+
+          position.fotCategory(fotCategory);
+          position.fotRevenue(fotRevenue);
+          position.performanceStandart(performanceStandart);
+        });
+
+        // Итого первой таблицы
+        const workload = getRandom(0, 2000);
+        const workloadUnits = getRandom(0, 2000);
+        const fotCategory = getRandom(0, 2000);
+        const fotRevenue = getRandom(0, 2000);
+        const performanceStandart = getRandom(0, 2000);
+
+        this.summaryModel.total.workload(workload);
+        this.summaryModel.total.workloadUnits(workloadUnits);
+        this.summaryModel.total.fotCategory(fotCategory);
+        this.summaryModel.total.fotRevenue(fotRevenue);
+        this.summaryModel.total.performanceStandart(performanceStandart);
+
+        // Итого второй таблицы
+        const workingTime = '77:00';
+        const salaryBulk = getRandom(0, 2000);
+        const normalizationRatio = getRandom(0, 3);
+        const revenueStandart = getRandom(0, 2000);
+        const bonusRatio = getRandom(0, 3);
+        const correctedTime = '22:22';
+        const bonusExceed = getRandom(0, 2000);
+        const total = getRandom(0, 34000);
+        const toPayment = getRandom(0, 65000);
+
+        this.summaryModel.productionTotal.workingTime(workingTime);
+        this.summaryModel.productionTotal.salaryBulk(salaryBulk);
+        this.summaryModel.productionTotal.normalizationRatio(normalizationRatio);
+        this.summaryModel.productionTotal.revenueStandart(revenueStandart);
+        this.summaryModel.productionTotal.bonusRatio(bonusRatio);
+        this.summaryModel.productionTotal.correctedTime(correctedTime);
+        this.summaryModel.productionTotal.bonusExceed(bonusExceed);
+        this.summaryModel.productionTotal.total(total);
+        this.summaryModel.productionTotal.toPayment(toPayment);
+
+      }
     };
 
 
