@@ -2504,7 +2504,7 @@
             }
 
             this.formModel = {
-              category: ko.observable(''),
+              category: ko.observable(params.data.category),
               stimulationType: ko.observable(this.stimulationTypes.FINE),
               base: ko.observable('').extend({
                 required: {
@@ -2986,19 +2986,25 @@
     </td>
 
     <!-- ФОТ, % в категории -->
-    <td class="calculation-summary__cell calculation-summary__cell--fot-category">
+    <td class="calculation-summary__cell calculation-summary__cell--fot-category" data-bind="style: {
+      'background-color': '#FFD3E8'
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotCategory"></div>
     </td>
 
     <!-- ФОТ, % от выручки -->
-    <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" >
+    <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" data-bind="style: {
+      'background-color': '#FFD3E8'
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotRevenue"></div>
     </td>
 
     <!-- Норм. выработки -->
-    <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
+    <td class="calculation-summary__cell calculation-summary__cell--performance-standart"  data-bind="style: {
+      'background-color': '#D0F4E3'
+    }">
       <div class="calculation-summary__cell-content">
            <div class="position-performance-standart">
 
@@ -3053,7 +3059,9 @@
 
 
     <!-- Доп. нагрузка -->
-    <td class="calculation-summary__cell calculation-summary__cell--additional-workload">
+    <td class="calculation-summary__cell calculation-summary__cell--additional-workload" data-bind="style: {
+      'background-color': '#FFD3E8'
+    }">
       <div class="calculation-summary__cell-content">
           <div class="position-additional-workload position-additional-workload--delivery">
             <div class="position-additional-workload__type">Время без дела:</div>
@@ -3072,13 +3080,17 @@
     </td>
 
     <!-- ФОТ, % в категории -->
-    <td class="calculation-summary__cell calculation-summary__cell--fot-category">
+    <td class="calculation-summary__cell calculation-summary__cell--fot-category" data-bind="style: {
+      'background-color': '#FFD3E8'
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotCategory"></div>
     </td>
 
     <!-- ФОТ, % от выручки -->
-    <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" >
+    <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" data-bind="style: {
+      'background-color': '#FFD3E8'
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotRevenue"></div>
     </td>
@@ -3340,6 +3352,7 @@
                   data-bind="hrmTableEditableCell: editableCell">
 
                 <input data-bind="
+                  hrmMask, hrmMaskPattern: 'decimal',
                     value: workload,
                     hrmTableEditableCellInputControl,
                     hrmTableEditableCellInputControlOwner: editableCell
@@ -3382,15 +3395,15 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--additional-wokload"
+              <td class="calculation-summary__cell calculation-summary__cell--additional-workload"
                   colspan="2">
                 <div class="calculation-summary__cell-content">
-                  <!-- ko if: position.additionalWorkloadType -->
+                  <!-- ko if: $data.additionalWorkload -->
                   <div class="position-additional-workload">
                     <div class="position-additional-workload__type"
-                         data-bind="text: position.additionalWorkloadType"></div>
+                         data-bind="text: additionalWorkloadType"></div>
                     <div class="position-additional-workload__value"
-                         data-bind="text: position.additionalWorkload"></div>
+                         data-bind="text: additionalWorkload"></div>
 
                   </div>
                   <!-- /ko -->
@@ -3451,7 +3464,9 @@
 
               <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--fot-category"
-                  colspan="2">
+                  colspan="2" data-bind="style: {
+                    'background-color': '#FFD3E8'
+                  }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotCategory"></div>
               </td>
@@ -3477,7 +3492,9 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue"
+              <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" data-bind="style: {
+                'background-color': '#FFD3E8'
+              }"
                   colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotRevenue"></div>
@@ -3507,11 +3524,13 @@
 
               <!-- ko foreach: table.visiblePositions -->
               <td class="calculation-summary__cell calculation-summary__cell--performance-standart"
-                  colspan="2">
+                  colspan="2" data-bind="style: {
+                    'background-color': '#D0F4E3'
+                  }">
                 <div class="calculation-summary__cell-content">
                   <div class="position-performance-standart">
                     <div class="position-performance-standart__value"
-                         data-bind="text: position.performanceStandart"></div>
+                         data-bind="text: performanceStandart"></div>
                   </div>
                 </div>
               </td>
@@ -3894,8 +3913,10 @@
   <!-- ko if: table.isColumnVisible('premation') -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--premation" align="right"
-        data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell">
-        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.bonusesState), hrmColoredSign: employee.bonusesState"></div>
+        data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell, style: {
+          'background-color': employee.bonusesState() > 0 ? '#D0F4E3' : ''
+        }">
+        <div class="positions-table__cell-content" data-bind="text: employee.bonusesState"></div>
     </td>
     <!-- /ko -->
   <!-- /ko -->
@@ -3903,8 +3924,11 @@
   <!-- ko if: table.isColumnVisible('fine') -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--fine" align="right"
-        data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell">
-        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(-1 * employee.finesState()), hrmColoredSign: -1 * employee.finesState()"></div>
+        data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell,
+        style: {
+          'background-color': employee.finesState() > 0 ? '#FFD3E8' : ''
+        }">
+        <div class="positions-table__cell-content" data-bind="text: employee.finesState"></div>
     </td>
     <!-- /ko -->
   <!-- /ko -->
@@ -5235,8 +5259,8 @@
               workloadType: 'Выручка',                   // тип нагрузки
               workload: 0,                               // нагрузка (величина)
               workloadUnits: '₽',                        // единицы измерения нагрузки
-              additionalWorkloadType: 'Время без дела',  // тип доп. нагрузки
-              additionalWorkload: '0',                   // доп. нагрузка (величина)
+              additionalWorkloadType: '',  // тип доп. нагрузки
+              additionalWorkload: '',                   // доп. нагрузка (величина)
               additionalWorkloadUnits: '%',              // единицы измерения доп. нагрузки
               fotCategory: 0,                            // ФОТ, % в категории
               fotRevenue: 0,                             // ФОТ, % от выручки
@@ -5865,6 +5889,7 @@
           this.utils.openModal(
             'stimulation',
             {
+              category: 'production',
               fines: window.directories.fines,
               bonuses: window.directories.bonuses,
               authors: window.directories.authors

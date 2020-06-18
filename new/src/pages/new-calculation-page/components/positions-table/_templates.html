@@ -258,8 +258,10 @@
   <!-- ko if: table.isColumnVisible('premation') -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--premation" align="right"
-        data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell">
-        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.bonusesState), hrmColoredSign: employee.bonusesState"></div>
+        data-bind="click: table.giveBonus.bind(table, employee), hrmTableEditableCell: editableCell, style: {
+          'background-color': employee.bonusesState() > 0 ? '#D0F4E3' : ''
+        }">
+        <div class="positions-table__cell-content" data-bind="text: employee.bonusesState"></div>
     </td>
     <!-- /ko -->
   <!-- /ko -->
@@ -267,8 +269,11 @@
   <!-- ko if: table.isColumnVisible('fine') -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
     <td class="positions-table__cell positions-table__cell--fine" align="right"
-        data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell">
-        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(-1 * employee.finesState()), hrmColoredSign: -1 * employee.finesState()"></div>
+        data-bind="click: table.giveFine.bind(table, employee), hrmTableEditableCell: editableCell,
+        style: {
+          'background-color': employee.finesState() > 0 ? '#FFD3E8' : ''
+        }">
+        <div class="positions-table__cell-content" data-bind="text: employee.finesState"></div>
     </td>
     <!-- /ko -->
   <!-- /ko -->
