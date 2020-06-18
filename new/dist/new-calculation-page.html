@@ -337,7 +337,6 @@
         function ColumnModel(column) {
             const checked = ko.observable(column.visible());
             function apply() {
-                console.log('apply', column, checked())
                 column.visible(checked());
             }
             return {
@@ -500,7 +499,6 @@
     $(function () {
         function PositionModel(positionData) {
             const checked =  ko.observable(!!positionData.visible());
-            console.log(checked())
             function apply() {
                 positionData.visible(checked());
             }
@@ -666,12 +664,12 @@
 
 
     <div class="account-operation__remove">
-      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
               data-bind="click: $component.removeOperation"></button>
       <!-- /ko -->
 
-      <!-- ko ifnot: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
               data-bind="click: $component.removeOperation">Удалить</button>
       <!-- /ko -->
@@ -716,7 +714,7 @@
       <div class="account-operations-form__total color--secondary">
         Итого: <span class="account-operations-form__total-value"
               data-bind="hrmColoredSign: total">
-          <!-- ko text: $root.utils.formatSign(total) -->
+          <!-- ko text: $component.formatSign(total) -->
           <!-- /ko -->
           <i class="far fa-ruble-sign"
              aria-hidden="true"></i>
@@ -797,6 +795,19 @@
           ]);
 
           const ViewModel = function (operations) {
+            this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+            this.windowResizeHandler = () => {
+              this.viewportSize({ width: $(window).width(), height: $(window).height() });
+            };
+            $(window).on('resize', this.windowResizeHandler);
+
+            this.formatSign = (number) => {
+              const formattedNumber = parseFloat(ko.unwrap(number));
+              if (!formattedNumber) return number;
+              if (formattedNumber > 0) return '+' + formattedNumber;
+              return formattedNumber;
+            };
+
             this.isSubmitted = ko.observable(false);
 
             this.formControlErrorStateMatcher = (formControl) => {
@@ -833,8 +844,8 @@
             /** Применить изменения */
             this.apply = function () {
               employee.accountOperations(this.operations()
-              .map(operation => operation.getData())
-              .filter(operation => operation.sum));
+                .map(operation => operation.getData())
+                .filter(operation => operation.sum));
             }
 
             this.submit = function () {
@@ -843,6 +854,11 @@
                 params.submit(true);
               }
             };
+
+            this.dispose = function () {
+              $(window).off('resize', this.windowResizeHandler);
+            };
+
           }
 
           const employee = params.data.employee;
@@ -988,12 +1004,12 @@
     </div>
 
     <div class="fine-block__remove">
-      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
               data-bind="click: $component.removeFine"></button>
       <!-- /ko -->
 
-      <!-- ko ifnot: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
               data-bind="click: $component.removeFine">Удалить</button>
       <!-- /ko -->
@@ -1035,7 +1051,7 @@
       <div class="fine-form__total color--secondary">
         Итого: <span class="fine-form__total-value"
               data-bind="hrmColoredSign: -1 * total()">
-          <!-- ko text: $root.utils.formatSign(-1 * total()) -->
+          <!-- ko text: $component.formatSign(-1 * total()) -->
           <!-- /ko -->
           <i class="far fa-ruble-sign"
              aria-hidden="true"></i>
@@ -1147,6 +1163,19 @@
           const authorsList = params.data.authors;
 
           const ViewModel = function (defaultFines, finesList, authorsList) {
+            this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+            this.windowResizeHandler = () => {
+              this.viewportSize({ width: $(window).width(), height: $(window).height() });
+            };
+            $(window).on('resize', this.windowResizeHandler);
+
+            this.formatSign = (number) => {
+              const formattedNumber = parseFloat(ko.unwrap(number));
+              if (!formattedNumber) return number;
+              if (formattedNumber > 0) return '+' + formattedNumber;
+              return formattedNumber;
+            };
+
             this.isSubmitted = ko.observable(false);
 
             this.formControlErrorStateMatcher = (formControl) => {
@@ -1202,6 +1231,10 @@
                 this.apply();
                 params.submit(true);
               }
+            };
+
+            this.dispose = function () {
+              $(window).off('resize', this.windowResizeHandler);
             };
           }
 
@@ -1346,12 +1379,12 @@
     </div>
 
     <div class="bonus-block__remove">
-      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
               data-bind="click: $component.removeBonus"></button>
       <!-- /ko -->
 
-      <!-- ko ifnot: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
               data-bind="click: $component.removeBonus">Удалить</button>
       <!-- /ko -->
@@ -1393,7 +1426,7 @@
       <div class="bonus-form__total color--secondary">
         Итого: <span class="bonus-form__total-value"
               data-bind="hrmColoredSign: total">
-          <!-- ko text: $root.utils.formatSign(total) -->
+          <!-- ko text: $component.formatSign(total) -->
           <!-- /ko -->
           <i class="far fa-ruble-sign"
              aria-hidden="true"></i>
@@ -1487,6 +1520,19 @@
           const authorsList = params.data.authors;
 
           const ViewModel = function (defaultBonuses, bonusesList, authorsList) {
+            this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+            this.windowResizeHandler = () => {
+              this.viewportSize({ width: $(window).width(), height: $(window).height() });
+            };
+            $(window).on('resize', this.windowResizeHandler);
+
+            this.formatSign = (number) => {
+              const formattedNumber = parseFloat(ko.unwrap(number));
+              if (!formattedNumber) return number;
+              if (formattedNumber > 0) return '+' + formattedNumber;
+              return formattedNumber;
+            };
+
             this.isSubmitted = ko.observable(false);
 
             this.formControlErrorStateMatcher = (formControl) => {
@@ -1539,6 +1585,10 @@
                 this.apply();
                 params.submit(true);
               }
+            };
+
+            this.dispose = function () {
+              $(window).off('resize', this.windowResizeHandler);
             };
           }
 
@@ -1710,6 +1760,8 @@
                 return this.isSubmitted() && !formControl.isValid();
               });
             };
+
+            console.log(params.data)
 
             this.positions = params.data.positions.map(PositionModal);
             this.levels = ko.observable([]);

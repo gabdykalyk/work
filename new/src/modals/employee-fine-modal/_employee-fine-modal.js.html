@@ -85,6 +85,19 @@
           const authorsList = params.data.authors;
 
           const ViewModel = function (defaultFines, finesList, authorsList) {
+            this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+            this.windowResizeHandler = () => {
+              this.viewportSize({ width: $(window).width(), height: $(window).height() });
+            };
+            $(window).on('resize', this.windowResizeHandler);
+
+            this.formatSign = (number) => {
+              const formattedNumber = parseFloat(ko.unwrap(number));
+              if (!formattedNumber) return number;
+              if (formattedNumber > 0) return '+' + formattedNumber;
+              return formattedNumber;
+            };
+
             this.isSubmitted = ko.observable(false);
 
             this.formControlErrorStateMatcher = (formControl) => {
@@ -140,6 +153,10 @@
                 this.apply();
                 params.submit(true);
               }
+            };
+
+            this.dispose = function () {
+              $(window).off('resize', this.windowResizeHandler);
             };
           }
 

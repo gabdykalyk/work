@@ -2,11 +2,93 @@
     $(function () {
         const $page = $(document.documentElement);
 
+        window.directories = {
+            fines: [
+                {
+                    name: 'Группа 1',
+                    items: [
+                        {
+                            id: '1',
+                            name: 'Основание штрафа 1',
+                            sum: 200
+                        },
+                        {
+                            id: '2',
+                            name: 'Основание штрафа 2',
+                            sum: 300
+                        }
+                    ]
+                },
+                {
+                    name: 'Группа 2',
+                    items: [
+                        {
+                            id: '3',
+                            name: 'Основание штрафа 3',
+                            sum: 200
+                        },
+                        {
+                            id: '4',
+                            name: 'Основание штрафа 4',
+                            sum: 300
+                        }
+                    ]
+                },
+            ],
+            bonuses: [
+                {
+                    name: 'Группа 1',
+                    items: [
+                        {
+                            id: '1',
+                            name: 'Основание премии 1',
+                            sum: 200
+                        },
+                        {
+                            id: '2',
+                            name: 'Основание премии 2',
+                            sum: 300
+                        }
+                    ]
+                },
+                {
+                    name: 'Группа 2',
+                    items: [
+                        {
+                            id: '3',
+                            name: 'Основание премии 3',
+                            sum: 200
+                        },
+                        {
+                            id: '4',
+                            name: 'Основание премии 4',
+                            sum: 300
+                        }
+                    ]
+                },
+            ],
+            authors: [
+                {
+                    id: 1,
+                    name: 'Иван Иванов'
+                }, {
+                    id: 2,
+                    name: 'Петр Петров'
+                }, {
+                    id: 3,
+                    name: 'Николай Николаев'
+                }, {
+                    id: 4,
+                    name: 'Сергей Сергеев'
+                }
+            ],
+        };
+
         const ViewModel = function () {
             this.windowResizeHandler = () => {
-                this.viewportSize({width: $(window).width(), height: $(window).height()});
+                this.viewportSize({ width: $(window).width(), height: $(window).height() });
             };
-            this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
+            this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
 
             this.value = ko.observable('').extend({
                 required: {
@@ -73,8 +155,6 @@
                 }
             });
 
-
-
             this.navigationTabs = [
                 new HrmTabGroupItem('Вкладка #1'),
                 new HrmTabGroupItem('Вкладка #2'),
@@ -93,6 +173,251 @@
                 new HrmTabGroupItem('Вкладка #15'),
             ];
 
+
+            this.modalOpens = ko.observableArray([]);
+
+            this.positions = ko.observableArray([
+                {
+                    id: 1,
+                    name: 'Position 1',
+                    visible: ko.observable(true),
+                    levels: [1, 2, 3]
+                },
+                {
+                    id: 2,
+                    name: 'Position 2',
+                    visible: ko.observable(false),
+                    levels: []
+                },
+                {
+                    id: 2,
+                    name: 'Position 2',
+                    visible: ko.observable(false),
+                    levels: [1, 2]
+                },
+            ]);
+
+            this.openModal = (modalId, mode) => {
+                if (modalId === 'positions') {
+                    this.modalOpens.push({
+                        dialogTemplateName: 'positions-modal-template',
+                        data: {
+                            positions: this.positions
+                        },
+                        close: result => {
+                            console.log(result);
+                        }
+                    });
+                }
+                if (modalId === 'createEmployee') {
+                    this.modalOpens.push({
+                        dialogTemplateName: 'create-employee-modal-template',
+                        data: {
+                            positions: this.positions()
+                        },
+                        close: result => {
+                            console.log(result);
+                        }
+                    });
+                }
+                if (modalId === 'accountOperations') {
+                    this.modalOpens.push({
+                        dialogTemplateName: 'account-operations-modal-template',
+                        data: {
+                            employee: {
+                                accountOperations: ko.observableArray([])
+                            }
+                        },
+                        close: result => {
+                            console.log(result);
+                        }
+                    });
+                }
+                if (modalId === 'employeeFine') {
+                    this.modalOpens.push({
+                        dialogTemplateName: 'employee-fine-modal-template',
+                        data: {
+                            employee: {
+                                fines: ko.observableArray([])
+                            },
+                            fines: window.directories.fines,
+                            authors: window.directories.authors,
+                        },
+                        close: result => {
+                            console.log(result);
+                        }
+                    })
+                }
+                if (modalId === 'employeeBonus') {
+                    this.modalOpens.push({
+                        dialogTemplateName: 'employee-bonus-modal-template',
+                        data: {
+                            employee: {
+                                bonuses: ko.observableArray([])
+                            },
+                            bonuses: window.directories.bonuses,
+                            authors: window.directories.authors,
+                        },
+                        close: result => {
+                            console.log(result);
+                        }
+                    })
+                }
+                if (modalId === 'columns') {
+                    this.modalOpens.push({
+                        dialogTemplateName: 'columns-modal-template',
+                        data: {
+                            columns: [
+                                { id: 1, fullTitle: 'Столбец 1', visible: ko.observable(true) },
+                                { id: 2, fullTitle: 'Столбец 2', visible: ko.observable(false) },
+                                { id: 3, fullTitle: 'Столбец 3', visible: ko.observable(true) },
+                                { id: 4, fullTitle: 'Столбец 4', visible: ko.observable(false) },
+                                { id: 5, fullTitle: 'Столбец 5', visible: ko.observable(true) },
+                                { id: 6, fullTitle: 'Столбец 6', visible: ko.observable(false) },
+                                { id: 7, fullTitle: 'Столбец 7', visible: ko.observable(true) },
+                                { id: 8, fullTitle: 'Столбец 8', visible: ko.observable(false) },
+                                { id: 9, fullTitle: 'Столбец 9', visible: ko.observable(false) },
+                                { id: 10, fullTitle: 'Столбец 10', visible: ko.observable(false) },
+                                { id: 11, fullTitle: 'Столбец 11', visible: ko.observable(false) },
+                                { id: 12, fullTitle: 'Столбец 12', visible: ko.observable(false) },
+                            ]
+                        },
+                        close: result => {
+                            console.log(result);
+                        }
+                    });
+                }
+                if (modalId === 'stimulation') {
+                    this.modalOpens.push({
+                        dialogTemplateName: 'stimulation-modal-template',
+                        data: {
+                            category: 'production',
+                            fines: window.directories.fines,
+                            bonuses: window.directories.bonuses,
+                            authors: window.directories.authors
+                        },
+                        close: result => {
+                            console.log(result)
+                        }
+                    })
+                }
+
+                if (modalId === 'addEmployees') {
+                    if (mode === 'single-position') {
+                        this.modalOpens.push({
+                            dialogTemplateName: 'add-employees-modal-template',
+                            data: {
+                                position: {
+                                    name: 'Position name',
+                                    id: 'positionid',
+                                    visible: ko.observable(true),
+                                    employees: ko.observableArray([
+                                        { id: 1, name: 'Employee 1', visible: ko.observable(true) },
+                                        { id: 2, name: 'Employee 2', visible: ko.observable(false) },
+                                        { id: 3, name: 'Employee 3', visible: ko.observable(false) },
+                                    ]),
+                                    allEmployeesLoaded: ko.observable(false)
+                                },
+                                mode: 'single'
+                            },
+                            close: result => {
+                                console.log(result)
+                            }
+                        });
+                    } else if (mode === 'single-other') {
+                        this.modalOpens.push({
+                            dialogTemplateName: 'add-employees-modal-template',
+                            data: {
+                                positions: [
+                                    {
+                                        name: 'Position 1',
+                                        id: 'position1',
+                                        visible: ko.observable(false),
+                                        employees: ko.observableArray([
+                                            { id: 1, name: 'Employee 1', visible: ko.observable(false) },
+                                            { id: 2, name: 'Employee 2', visible: ko.observable(false) },
+                                            { id: 3, name: 'Employee 3', visible: ko.observable(false) },
+                                        ]),
+                                        allEmployeesLoaded: ko.observable(false)
+                                    },
+                                    {
+                                        name: 'Position 2',
+                                        id: 'position2',
+                                        visible: ko.observable(false),
+                                        employees: ko.observableArray([
+                                            { id: 1, name: 'Employee 1', visible: ko.observable(true) },
+                                            { id: 2, name: 'Employee 2', visible: ko.observable(false) },
+                                            { id: 3, name: 'Employee 3', visible: ko.observable(false) },
+                                        ]),
+                                        allEmployeesLoaded: ko.observable(false)
+                                    },
+                                    {
+                                        name: 'Position 3',
+                                        id: 'position3',
+                                        visible: ko.observable(false),
+                                        employees: ko.observableArray([
+                                            { id: 1, name: 'Employee 1', visible: ko.observable(true) },
+                                            { id: 2, name: 'Employee 2', visible: ko.observable(false) },
+                                            { id: 3, name: 'Employee 3', visible: ko.observable(false) },
+                                        ]),
+                                        allEmployeesLoaded: ko.observable(false)
+                                    }
+                                ],
+                                mode: 'list'
+                            },
+                            close: result => {
+                                console.log(result)
+                            }
+                        });
+                    } else {
+                        this.modalOpens.push({
+                            dialogTemplateName: 'add-employees-modal-template',
+                            data: {
+                                positions: [
+                                    {
+                                        name: 'Position 1',
+                                        id: 'position1',
+                                        visible: ko.observable(true),
+                                        employees: ko.observableArray([
+                                            { id: 1, name: 'Employee 1', visible: ko.observable(true) },
+                                            { id: 2, name: 'Employee 2', visible: ko.observable(false) },
+                                            { id: 3, name: 'Employee 3', visible: ko.observable(false) },
+                                        ]),
+                                        allEmployeesLoaded: ko.observable(false)
+                                    },
+                                    {
+                                        name: 'Position 2',
+                                        id: 'position2',
+                                        visible: ko.observable(false),
+                                        employees: ko.observableArray([
+                                            { id: 4, name: 'Employee 1', visible: ko.observable(true) },
+                                            { id: 5, name: 'Employee 2', visible: ko.observable(false) },
+                                            { id: 6, name: 'Employee 3', visible: ko.observable(false) },
+                                        ]),
+                                        allEmployeesLoaded: ko.observable(false)
+                                    },
+                                    {
+                                        name: 'Position 3',
+                                        id: 'position3',
+                                        visible: ko.observable(false),
+                                        employees: ko.observableArray([
+                                            { id: 7, name: 'Employee 1', visible: ko.observable(true) },
+                                            { id: 8, name: 'Employee 2', visible: ko.observable(false) },
+                                            { id: 9, name: 'Employee 3', visible: ko.observable(false) },
+                                        ]),
+                                        allEmployeesLoaded: ko.observable(false)
+                                    }
+                                ],
+                                mode: 'tabs'
+                            },
+                            close: result => {
+                                console.log(result)
+                            }
+                        });
+                    }
+                }
+            };
+
             this.formControlErrorStateMatcher = function (formControl) {
                 return ko.pureComputed(() => {
                     return !formControl.isValid();
@@ -101,7 +426,7 @@
 
             this.editableCellControlErrorExtractor = function (control) {
                 return ko.pureComputed(() => {
-                    return !control.isValid() ? {message: control.error()} : null;
+                    return !control.isValid() ? { message: control.error() } : null;
                 });
             };
 
@@ -114,7 +439,7 @@
 
         const viewModel = new ViewModel();
 
-        ViewModel.prototype.dispose = function() {
+        ViewModel.prototype.dispose = function () {
             $(window).off('resize', this.windowResizeHandler);
         };
 
