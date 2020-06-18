@@ -2986,22 +2986,38 @@
 
   <script type="text/html"
         id="summary-position-row-template">
-  <tr class="calculation-summary__row">
+
+
+  <tr class="calculation-summary__row"
+  data-bind="hrmLog, click: function() { position.clicked(!position.clicked()); }, css: {
+    'calculation-summary__row--clicked': position.clicked,
+    'calculation-summary__row--next-clicked': nextPosition ? nextPosition.clicked() : false
+  }">
     <!-- Должность -->
-    <td class="calculation-summary__cell calculation-summary__cell--job">
+    <td class="calculation-summary__cell calculation-summary__cell--job" data-bind="hrmLog, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('job'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('job'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.name"></div>
     </td>
 
     <!-- Тип нагрузки -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload-type">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-type" data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload-type'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload-type'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.workloadType"></div>
     </td>
 
     <!-- Нагрузка -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload-value" data-bind="hrmTableEditableCell: editableCell" align="right">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value"
+    data-bind="hrmTableEditableCell: editableCell, click: function(_, e) { e.stopPropagation(); }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload'),
+    }" align="right">
             <input data-bind="
                 value: position.workload,
                 hrmTableEditableCellInputControl,
@@ -3012,13 +3028,19 @@
     </td>
     <!-- /ko -->
 
-    <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload'),
+    }">
       <div class="calculation-summary__cell-content" data-bind="text: position.workloadUnits">
       </div>
     </td>
 
     <!-- Доп. нагрузка -->
-    <td class="calculation-summary__cell calculation-summary__cell--additional-workload">
+    <td class="calculation-summary__cell calculation-summary__cell--additional-workload"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('additional-workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('additional-workload'),
+    }">
       <div class="calculation-summary__cell-content">
         <!-- ko if: position.additionalWorkloadType -->
           <div class="position-additional-workload">
@@ -3032,7 +3054,10 @@
     </td>
 
     <!-- Сотрудники -->
-    <td class="calculation-summary__cell calculation-summary__cell--count">
+    <td class="calculation-summary__cell calculation-summary__cell--count"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('count'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('count'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.visibleEmployees().length"></div>
     </td>
@@ -3040,6 +3065,9 @@
     <!-- ФОТ, % в категории -->
     <td class="calculation-summary__cell calculation-summary__cell--fot-category" data-bind="style: {
       'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-category'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('fot-category'),
     }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotCategory"></div>
@@ -3048,6 +3076,9 @@
     <!-- ФОТ, % от выручки -->
     <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" data-bind="style: {
       'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-revenue'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('fot-revenue'),
     }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotRevenue"></div>
@@ -3056,6 +3087,9 @@
     <!-- Норм. выработки -->
     <td class="calculation-summary__cell calculation-summary__cell--performance-standart"  data-bind="style: {
       'background-color': '#D0F4E3'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('performance-standart'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('performance-standart'),
     }">
       <div class="calculation-summary__cell-content">
            <div class="position-performance-standart">
@@ -3066,7 +3100,10 @@
     </td>
 
     <!-- Опоздания -->
-    <td class="calculation-summary__cell calculation-summary__cell--lateness">
+    <td class="calculation-summary__cell calculation-summary__cell--lateness"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('lateness'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('lateness'),
+    }">
       <div class="calculation-summary__cell-content">
         <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness} } -->
         <!-- /ko -->
@@ -3078,33 +3115,44 @@
 
 <script type="text/html"
         id="summary-drivers-row-template">
-  <tr class="calculation-summary__row">
+
+  <tr class="calculation-summary__row"
+  data-bind="click: function() { position.clicked(!position.clicked()); }, css: {
+    'calculation-summary__row--clicked': position.clicked,
+  }">
     <!-- Должность -->
-    <td class="calculation-summary__cell calculation-summary__cell--job">
+    <td class="calculation-summary__cell calculation-summary__cell--job"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('job'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('job'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.name"></div>
     </td>
 
     <!-- Тип нагрузки -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload-type">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-type"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload-type'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload-type'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.workloadType"></div>
     </td>
 
     <!-- Нагрузка -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload-value" data-bind="hrmTableEditableCell: editableCell" align="right">
-            <input data-bind="
-                value: position.workload,
-                hrmTableEditableCellInputControl,
-                hrmTableEditableCellInputControlOwner: editableCell
-            ">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value" align="right"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload'),
+    }">
+      <div class="calculation-summary__cell-content" data-bind="text: position.workload">
       </div>
-
     </td>
     <!-- /ko -->
 
-    <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload'),
+    }">
       <div class="calculation-summary__cell-content" data-bind="text: position.workloadUnits">
       </div>
     </td>
@@ -3113,6 +3161,9 @@
     <!-- Доп. нагрузка -->
     <td class="calculation-summary__cell calculation-summary__cell--additional-workload" data-bind="style: {
       'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('additional-workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('additional-workload'),
     }">
       <div class="calculation-summary__cell-content">
           <div class="position-additional-workload position-additional-workload--delivery">
@@ -3126,7 +3177,10 @@
     </td>
 
     <!-- Сотрудники -->
-    <td class="calculation-summary__cell calculation-summary__cell--count">
+    <td class="calculation-summary__cell calculation-summary__cell--count"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('count'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('count'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.employees().length"></div>
     </td>
@@ -3134,6 +3188,9 @@
     <!-- ФОТ, % в категории -->
     <td class="calculation-summary__cell calculation-summary__cell--fot-category" data-bind="style: {
       'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-category'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('fot-category'),
     }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotCategory"></div>
@@ -3142,13 +3199,19 @@
     <!-- ФОТ, % от выручки -->
     <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" data-bind="style: {
       'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-revenue'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('fot-revenue'),
     }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotRevenue"></div>
     </td>
 
     <!-- Норм. выработки -->
-    <td class="calculation-summary__cell calculation-summary__cell--performance-standart">
+    <td class="calculation-summary__cell calculation-summary__cell--performance-standart"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('performance-standart'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('performance-standart'),
+    }">
       <div class="calculation-summary__cell-content">
            <div class="position-performance-standart">
 
@@ -3161,14 +3224,16 @@
     </td>
 
     <!-- Опоздания -->
-    <td class="calculation-summary__cell calculation-summary__cell--lateness">
+    <td class="calculation-summary__cell calculation-summary__cell--lateness"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('lateness'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('lateness'),
+    }">
       <div class="calculation-summary__cell-content">
         <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness} } -->
         <!-- /ko -->
       </div>
     </td>
   </tr>
-
 </script>
 
 <script type="text/html"
@@ -3176,28 +3241,52 @@
 
   <tr class="calculation-summary__row calculation-summary__row--total">
     <!-- Должность -->
-    <td class="calculation-summary__cell calculation-summary__cell--job calculation-summary__cell--empty"></td>
+    <td class="calculation-summary__cell calculation-summary__cell--job calculation-summary__cell--empty"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('job'),
+      'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('job'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('job'),
+    }"></td>
 
     <!-- Тип нагрузки -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload-type calculation-summary__cell--empty"></td>
+    <td class="calculation-summary__cell calculation-summary__cell--workload-type calculation-summary__cell--empty"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload-type'),
+      'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('workload-type'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload-type'),
+    }"></td>
 
 
     <!-- Нагрузка -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload-value">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+      'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload'),
+    }">
       <div class="calculation-summary__cell-content" data-bind="text: total.workload()">
       </div>
     </td>
 
-    <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+      'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload'),
+    }">
       <div class="calculation-summary__cell-content" data-bind="text: total.workloadUnits()">
       </div>
     </td>
 
     <!-- Доп. нагрузка -->
-    <td class="calculation-summary__cell calculation-summary__cell--additional-workload calculation-summary__cell--empty"></td>
+    <td class="calculation-summary__cell calculation-summary__cell--additional-workload calculation-summary__cell--empty"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('additional-workload'),
+      'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('additional-workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('additional-workload'),
+    }"></td>
 
     <!-- Сотрудники -->
-    <td class="calculation-summary__cell calculation-summary__cell--count">
+    <td class="calculation-summary__cell calculation-summary__cell--count"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('count'),
+      'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('count'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('count'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: total.employees()"></div>
     </td>
@@ -3206,6 +3295,10 @@
     <td class="calculation-summary__cell calculation-summary__cell--fot-category"
       data-bind="style: {
         background: '#D0F4E3'
+      }, css: {
+        'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-category'),
+        'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('fot-category'),
+        'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('fot-category'),
       }">
       <div class="calculation-summary__cell-content" data-bind="text: total.fotCategory()"></div>
     </td>
@@ -3214,6 +3307,10 @@
     <td class="calculation-summary__cell calculation-summary__cell--fot-revenue"
       data-bind="style: {
         background: '#D0F4E3'
+      }, css: {
+        'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-revenue'),
+        'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('fot-revenue'),
+        'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('fot-revenue'),
       }">
       <div class="calculation-summary__cell-content" data-bind="text: total.fotRevenue()"></div>
     </td>
@@ -3222,12 +3319,20 @@
     <td class="calculation-summary__cell calculation-summary__cell--performance-standart"
       data-bind="style: {
         background: '#D0F4E3'
+      }, css: {
+        'calculation-summary__cell--column-clicked': table.getColumnClicked('performance-standart'),
+        'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('performance-standart'),
+        'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('performance-standart'),
       }">
       <div class="calculation-summary__cell-content" data-bind="text: total.performanceStandart()"></div>
     </td>
 
     <!-- Опоздания -->
-    <td class="calculation-summary__cell calculation-summary__cell--lateness">
+    <td class="calculation-summary__cell calculation-summary__cell--lateness"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('lateness'),
+      'calculation-summary__cell--column-clicked-bottom': table.getColumnClicked('lateness'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('lateness'),
+    }">
       <div class="calculation-summary__cell-content">
         <!-- ko template: { name: 'lateness-template', data: {lateness: total.lateness} } -->
         <!-- /ko -->
@@ -3279,9 +3384,14 @@
         <thead>
           <tr class="calculation-summary__row">
             <!-- ko foreach: { data: table.columns, as: 'column' } -->
+            <!-- ko let: { nextColumn: table.columns[$index() + 1] } -->
             <th class="calculation-summary__cell calculation-summary__head-cell"
                 data-bind="class: 'calculation-summary__cell--' + column.id, attr: {
                   'colspan': column.colspan || 1
+                }, click: function() { column.clicked(!column.clicked()) }, css: {
+                  'calculation-summary__cell--column-clicked': column.clicked,
+                  'calculation-summary__cell--column-clicked-top': column.clicked,
+                  'calculation-summary__cell--next-column-clicked': nextColumn ? nextColumn.clicked() : false,
                 }">
               <div class="calculation-summary__cell-content">
                 <span data-bind="text: column.title"></span>
@@ -3290,13 +3400,16 @@
               </div>
             </th>
             <!-- /ko -->
+            <!-- /ko -->
           </tr>
         </thead>
 
         <tbody>
           <!-- ko foreach: table.visiblePositions -->
-          <!-- ko template: {name: 'summary-position-row-template', data: {position: $data}} -->
+
+          <!-- ko template: {name: 'summary-position-row-template', data: {position: $data, nextPosition: table.visiblePositions()[$index() + 1] || table.driversData }} -->
           <!-- /ko -->
+
           <!-- /ko -->
 
           <!-- ko template: {name: 'summary-drivers-row-template', data: {position: driversData }} -->
@@ -3319,13 +3432,18 @@
              data-bind="hrmTable">
         <tbody>
           <!-- ko foreach: { data: table.columns, as: 'column' } -->
-          <tr class="calculation-form__row">
+
+          <tr class="calculation-form__row" data-bind="click: function() { column.clicked(!column.clicked()); }, css: {
+            'calculation-summary__row--column-clicked': column.clicked,
+            'calculation-summary__row--next-column-clicked': table.getNextColumnClicked(column.id),
+          }">
             <th class="calculation-summary__cell calculation-summary__head-cell"
                 data-bind="class: 'calculation-summary__cell--' + column.id">
               <div class="calculation-summary__cell-content"
                    data-bind="text: column.title"></div>
             </th>
           </tr>
+
           <!-- /ko -->
         </tbody>
       </table>
@@ -3338,7 +3456,10 @@
         <table class=" calculation-summary__table calculation-summary__mobile"
                data-bind="hrmTable">
           <tbody>
-            <tr class="calculation-summary__row calculation-summary__row--job">
+            <tr class="calculation-summary__row calculation-summary__row--job" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('job'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('job')
+            }">
               <th class="calculation-summary__cell calculation-summary__head-cell calculation-summary__cell--job">
                 <div class="calculation-summary__cell-content">
                   Должность
@@ -3346,15 +3467,24 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
               <td class="calculation-summary__cell calculation-summary__cell--job"
-                  colspan="2">
+                  colspan="2" data-bind="css: {
+                    'calculation-summary__cell--clicked': $data.clicked,
+                    'calculation-summary__cell--clicked-top': $data.clicked,
+                    'calculation-summary__cell--next-clicked': nextPosition.clicked()
+                  }, click: function() { $data.clicked(!$data.clicked()); }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: name"></div>
               </td>
               <!-- /ko -->
+              <!-- /ko -->
 
               <td class="calculation-summary__cell calculation-summary__cell--job"
-                  colspan="2">
+                  colspan="2" data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                    'calculation-summary__cell--clicked': table.driversData.clicked,
+                    'calculation-summary__cell--clicked-top': table.driversData.clicked,
+                  }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: driversData.name"></div>
               </td>
@@ -3364,7 +3494,10 @@
               </td>
             </tr>
 
-            <tr class="calculation-summary__row calculation-summary__row--workload-type">
+            <tr class="calculation-summary__row calculation-summary__row--workload-type" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('workload-type'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('workload-type')
+            }">
               <th class="calculation-summary__cell calculation-summary__head-cell calculation-summary__cell--workload-type">
                 <div class="calculation-summary__cell-content">
                   Тип нагрузки
@@ -3372,13 +3505,22 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
-              <td class="calculation-summary__cell calculation-summary__cell--workload-type" colspan="2">
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
+              <td class="calculation-summary__cell calculation-summary__cell--workload-type" colspan="2"
+              data-bind="css: {
+                'calculation-summary__cell--clicked': $data.clicked,
+                'calculation-summary__cell--next-clicked': nextPosition.clicked()
+              }, click: function() { $data.clicked(!$data.clicked()); }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: workloadType"></div>
               </td>
               <!-- /ko -->
+              <!-- /ko -->
 
-              <td class="calculation-summary__cell calculation-summary__cell--workload-type" colspan="2">
+              <td class="calculation-summary__cell calculation-summary__cell--workload-type" colspan="2"
+              data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                'calculation-summary__cell--clicked': table.driversData.clicked,
+              }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: table.driversData.workloadType"
                      ></div>
@@ -3391,7 +3533,10 @@
               </td>
             </tr>
 
-            <tr class="calculation-summary__row calculation-summary__row--workload-value">
+            <tr class="calculation-summary__row calculation-summary__row--workload" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('workload'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('workload')
+            }">
               <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--workload">
                 <div class="calculation-summary__cell-content">
                   Нагрузка
@@ -3399,9 +3544,14 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
               <!-- ko let: {editableCell: ko.observable(null)} -->
+
               <td class="calculation-summary__cell calculation-summary__cell--workload-value"
-                  data-bind="hrmTableEditableCell: editableCell">
+                  data-bind="hrmTableEditableCell: editableCell, css: {
+                    'calculation-summary__cell--clicked': $data.clicked,
+                    'calculation-summary__cell--next-clicked': nextPosition.clicked()
+                  }, click: function(_, e) { e.stopPropagation() }">
 
                 <input data-bind="
                   hrmMask, hrmMaskPattern: 'decimal',
@@ -3412,18 +3562,27 @@
 
               </td>
               <!-- /ko -->
-              <td class="calculation-summary__cell calculation-summary__cell--workload-units">
-                <div class="position-workload__units"
-                     data-bind="text: workloadUnits"></div>
+              <td class="calculation-summary__cell calculation-summary__cell--workload-units"  data-bind="text: workloadUnits, css: {
+                'calculation-summary__cell--clicked': $data.clicked,
+                'calculation-summary__cell--next-clicked': nextPosition.clicked()
+              }, click: function() { $data.clicked(!$data.clicked()); }">
+                <div class="position-workload__units"></div>
               </td>
+              <!-- /ko -->
               <!-- /ko -->
 
 
-              <td class="calculation-summary__cell calculation-summary__cell--workload-value">
+              <td class="calculation-summary__cell calculation-summary__cell--workload-value"
+              data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                'calculation-summary__cell--clicked': table.driversData.clicked,
+              }">
                 <div class="position-workload__value"
                      data-bind="text: table.driversData.workload"></div>
               </td>
-              <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+              <td class="calculation-summary__cell calculation-summary__cell--workload-units"
+              data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                'calculation-summary__cell--clicked': table.driversData.clicked,
+              }">
                 <div class="position-workload__units"
                      data-bind="text: table.driversData.workloadUnits"></div>
               </td>
@@ -3436,9 +3595,10 @@
               </td>
             </tr>
 
-
-
-            <tr class="calculation-summary__row calculation-summary__row--additional-workload">
+            <tr class="calculation-summary__row calculation-summary__row--additional-workload" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('additional-workload'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('additional-workload')
+            }">
               <th
                   class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--additional-workload">
                 <div class="calculation-summary__cell-content">
@@ -3447,8 +3607,12 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
               <td class="calculation-summary__cell calculation-summary__cell--additional-workload"
-                  colspan="2">
+                  colspan="2" data-bind="css: {
+                    'calculation-summary__cell--clicked': $data.clicked,
+                    'calculation-summary__cell--next-clicked': nextPosition.clicked()
+                  }, click: function() { $data.clicked(!$data.clicked()); }">
                 <div class="calculation-summary__cell-content">
                   <!-- ko if: $data.additionalWorkload -->
                   <div class="position-additional-workload">
@@ -3462,9 +3626,12 @@
                 </div>
               </td>
               <!-- /ko -->
+              <!-- /ko -->
 
               <td class="calculation-summary__cell calculation-summary__cell--additional-wokload"
-                  colspan="2">
+                  colspan="2"  data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                    'calculation-summary__cell--clicked': table.driversData.clicked,
+                  }">
                 <div class="calculation-summary__cell-content">
                   <div class="position-additional-workload position-additional-workload--delivery">
                     <div class="position-additional-workload__type">Время без дела:</div>
@@ -3480,7 +3647,10 @@
               </td>
             </tr>
 
-            <tr class="calculation-summary__row calculation-summary__row--count">
+            <tr class="calculation-summary__row calculation-summary__row--count" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('count'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('count')
+            }">
               <th class="calculation-summary__cell calculation-summary__head-cell calculation-summary__cell--count">
                 <div class="calculation-summary__cell-content">
                   Сотрудники
@@ -3488,15 +3658,22 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
               <td class="calculation-summary__cell calculation-summary__cell--count"
-                  colspan="2">
+                  colspan="2" data-bind="css: {
+                    'calculation-summary__cell--clicked': $data.clicked,
+                    'calculation-summary__cell--next-clicked': nextPosition.clicked()
+                  }, click: function() { $data.clicked(!$data.clicked()); }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: visibleEmployees().length"></div>
               </td>
               <!-- /ko -->
+              <!-- /ko -->
 
               <td class="calculation-summary__cell calculation-summary__cell--count"
-                  colspan="2">
+                  colspan="2"  data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                    'calculation-summary__cell--clicked': table.driversData.clicked,
+                  }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: table.driversData.employees.length"></div>
               </td>
@@ -3507,7 +3684,10 @@
               </td>
             </tr>
 
-            <tr class="calculation-summary__row calculation-summary__row--fot-category">
+            <tr class="calculation-summary__row calculation-summary__row--fot-category" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('fot-category'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('fot-category')
+            }">
               <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--fot-category">
                 <div class="calculation-summary__cell-content">
                   ФОТ, % в категории
@@ -3515,17 +3695,24 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
               <td class="calculation-summary__cell calculation-summary__cell--fot-category"
                   colspan="2" data-bind="style: {
                     'background-color': '#FFD3E8'
-                  }">
+                  }, css: {
+                    'calculation-summary__cell--clicked': $data.clicked,
+                    'calculation-summary__cell--next-clicked': nextPosition.clicked()
+                  }, click: function() { $data.clicked(!$data.clicked()); }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotCategory"></div>
               </td>
               <!-- /ko -->
+              <!-- /ko -->
 
               <td class="calculation-summary__cell calculation-summary__cell--fot-category"
-                  colspan="2">
+                  colspan="2" data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                    'calculation-summary__cell--clicked': table.driversData.clicked,
+                  }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: table.driversData.fotCategory"></div>
               </td>
@@ -3536,7 +3723,10 @@
               </td>
             </tr>
 
-            <tr class="calculation-summary__row calculation-summary__row--fot-revenue">
+            <tr class="calculation-summary__row calculation-summary__row--fot-revenue" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('fot-revenue'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('fot-revenue')
+            }">
               <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--fot-revenue">
                 <div class="calculation-summary__cell-content">
                   ФОТ, % от выручки
@@ -3544,17 +3734,24 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
               <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" data-bind="style: {
                 'background-color': '#FFD3E8'
-              }"
+              }, css: {
+                'calculation-summary__cell--clicked': $data.clicked,
+                'calculation-summary__cell--next-clicked': nextPosition.clicked()
+              }, click: function() { $data.clicked(!$data.clicked()); }"
                   colspan="2">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: fotRevenue"></div>
               </td>
               <!-- /ko -->
+              <!-- /ko -->
 
               <td class="calculation-summary__cell calculation-summary__cell--fot-revenue"
-                  colspan="2">
+                  colspan="2" data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                    'calculation-summary__cell--clicked': table.driversData.clicked,
+                  }">
                 <div class="calculation-summary__cell-content"
                      data-bind="text: table.driversData.fotRevenue"></div>
               </td>
@@ -3565,7 +3762,10 @@
               </td>
             </tr>
 
-            <tr class="calculation-summary__row calculation-summary__row--performance-standart">
+            <tr class="calculation-summary__row calculation-summary__row--performance-standart" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('performance-standart'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('performance-standart')
+            }">
               <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--performance-standart">
                 <div class="calculation-summary__cell-content">
                   Норм. выр-ки, %
@@ -3575,10 +3775,14 @@
 
 
               <!-- ko foreach: table.visiblePositions -->
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
               <td class="calculation-summary__cell calculation-summary__cell--performance-standart"
                   colspan="2" data-bind="style: {
                     'background-color': '#D0F4E3'
-                  }">
+                  }, css: {
+                    'calculation-summary__cell--clicked': $data.clicked,
+                    'calculation-summary__cell--next-clicked': nextPosition.clicked()
+                  }, click: function() { $data.clicked(!$data.clicked()); }">
                 <div class="calculation-summary__cell-content">
                   <div class="position-performance-standart">
                     <div class="position-performance-standart__value"
@@ -3587,9 +3791,12 @@
                 </div>
               </td>
               <!-- /ko -->
+              <!-- /ko -->
 
               <td class="calculation-summary__cell calculation-summary__cell--performance-standart"
-                  colspan="2">
+                  colspan="2" data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                    'calculation-summary__cell--clicked': table.driversData.clicked,
+                  }">
                 <div class="calculation-summary__cell-content">
                   <div class="position-performance-standart">
 
@@ -3609,7 +3816,10 @@
               </td>
             </tr>
 
-            <tr class="calculation-summary__row calculation-summary__row--lateness">
+            <tr class="calculation-summary__row calculation-summary__row--lateness" data-bind="css: {
+              'calculation-summary__row--column-clicked': table.getColumnClicked('lateness'),
+              'calculation-summary__row--next-column-clicked': table.getNextColumnClicked('lateness')
+            }">
               <th class="calculation-summary__cell  calculation-summary__head-cell calculation-summary__cell--lateness">
                 <div class="calculation-summary__cell-content">
                   Опоздания
@@ -3617,15 +3827,24 @@
               </th>
 
               <!-- ko foreach: table.visiblePositions -->
+              <!-- ko let: { nextPosition: table.visiblePositions()[$index() + 1] || table.driversData } -->
               <td class="calculation-summary__cell calculation-summary__cell--lateness"
-                  colspan="2">
+                  colspan="2" data-bind="css: {
+                    'calculation-summary__cell--clicked': $data.clicked,
+                    'calculation-summary__cell--clicked-bottom': $data.clicked,
+                    'calculation-summary__cell--next-clicked': nextPosition.clicked()
+                  }, click: function() { $data.clicked(!$data.clicked()); }">
                 <!-- ko template: { name: 'lateness-template', data: {lateness: lateness} } -->
                 <!-- /ko -->
               </td>
               <!-- /ko -->
+              <!-- /ko -->
 
               <td class="calculation-summary__cell calculation-summary__cell--lateness"
-                  colspan="2">
+                  colspan="2" data-bind="click: function() { table.driversData.clicked(!table.driversData.clicked()); }, css: {
+                    'calculation-summary__cell--clicked': table.driversData.clicked,
+                    'calculation-summary__cell--clicked-bottom': table.driversData.clicked,
+                  }">
                 <!-- ko template: { name: 'lateness-template', data: {lateness: table.driversData.lateness} } -->
                 <!-- /ko -->
               </td>
@@ -3653,7 +3872,8 @@
         id,
         title,
         fullTitle,
-        colspan
+        colspan,
+        clicked: ko.observable(false)
       }
     }
 
@@ -3689,7 +3909,23 @@
             Column('lateness', 'Опоздания', 'Опоздания'),
           ];
 
+          const getColumnClicked = (columnId) => {
+            let column = columns.find(c => c.id === columnId);
+            if (!column) return false;
+            return column.clicked();
+          };
+
+          const getNextColumnClicked = (columnId) => {
+            const index = columns.findIndex(c => c.id === columnId);
+            if (index == -1 ) return false;
+            let column = columns[index + 1];
+            if (!column) return false;
+            return column.clicked();Clicked
+          };
+
           return {
+            getColumnClicked,
+            getNextColumnClicked,
             positions,
             visiblePositions,
             total,
@@ -4883,6 +5119,8 @@
         this.position = positionModel;
         this.root = this.position.root;
 
+        this.clicked = ko.observable(false);
+
         this.name = employee.name;                   // имя сотрудника
         this.id = employee.id;                       // идентификатор сотрудника
         this.link = employee.link;                   // ссылка на личное дело
@@ -5002,6 +5240,8 @@
       */
       function PositionModel(positionData, root) {
         this.root = root;
+
+        this.clicked = ko.observable(false);
 
         this.type = positionData.type || 'production';
 

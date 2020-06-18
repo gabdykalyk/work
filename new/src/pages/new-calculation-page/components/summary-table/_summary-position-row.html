@@ -1,21 +1,37 @@
 <script type="text/html"
         id="summary-position-row-template">
-  <tr class="calculation-summary__row">
+
+
+  <tr class="calculation-summary__row"
+  data-bind="hrmLog, click: function() { position.clicked(!position.clicked()); }, css: {
+    'calculation-summary__row--clicked': position.clicked,
+    'calculation-summary__row--next-clicked': nextPosition ? nextPosition.clicked() : false
+  }">
     <!-- Должность -->
-    <td class="calculation-summary__cell calculation-summary__cell--job">
+    <td class="calculation-summary__cell calculation-summary__cell--job" data-bind="hrmLog, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('job'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('job'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.name"></div>
     </td>
 
     <!-- Тип нагрузки -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload-type">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-type" data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload-type'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload-type'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.workloadType"></div>
     </td>
 
     <!-- Нагрузка -->
     <!-- ko let: {editableCell: ko.observable(null)} -->
-    <td class="calculation-summary__cell calculation-summary__cell--workload-value" data-bind="hrmTableEditableCell: editableCell" align="right">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value"
+    data-bind="hrmTableEditableCell: editableCell, click: function(_, e) { e.stopPropagation(); }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload'),
+    }" align="right">
             <input data-bind="
                 value: position.workload,
                 hrmTableEditableCellInputControl,
@@ -26,13 +42,19 @@
     </td>
     <!-- /ko -->
 
-    <td class="calculation-summary__cell calculation-summary__cell--workload-units">
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('workload'),
+    }">
       <div class="calculation-summary__cell-content" data-bind="text: position.workloadUnits">
       </div>
     </td>
 
     <!-- Доп. нагрузка -->
-    <td class="calculation-summary__cell calculation-summary__cell--additional-workload">
+    <td class="calculation-summary__cell calculation-summary__cell--additional-workload"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('additional-workload'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('additional-workload'),
+    }">
       <div class="calculation-summary__cell-content">
         <!-- ko if: position.additionalWorkloadType -->
           <div class="position-additional-workload">
@@ -46,7 +68,10 @@
     </td>
 
     <!-- Сотрудники -->
-    <td class="calculation-summary__cell calculation-summary__cell--count">
+    <td class="calculation-summary__cell calculation-summary__cell--count"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('count'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('count'),
+    }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.visibleEmployees().length"></div>
     </td>
@@ -54,6 +79,9 @@
     <!-- ФОТ, % в категории -->
     <td class="calculation-summary__cell calculation-summary__cell--fot-category" data-bind="style: {
       'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-category'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('fot-category'),
     }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotCategory"></div>
@@ -62,6 +90,9 @@
     <!-- ФОТ, % от выручки -->
     <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" data-bind="style: {
       'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-revenue'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('fot-revenue'),
     }">
       <div class="calculation-summary__cell-content"
            data-bind="text: position.fotRevenue"></div>
@@ -70,6 +101,9 @@
     <!-- Норм. выработки -->
     <td class="calculation-summary__cell calculation-summary__cell--performance-standart"  data-bind="style: {
       'background-color': '#D0F4E3'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('performance-standart'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('performance-standart'),
     }">
       <div class="calculation-summary__cell-content">
            <div class="position-performance-standart">
@@ -80,7 +114,10 @@
     </td>
 
     <!-- Опоздания -->
-    <td class="calculation-summary__cell calculation-summary__cell--lateness">
+    <td class="calculation-summary__cell calculation-summary__cell--lateness"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('lateness'),
+      'calculation-summary__cell--next-column-clicked': table.getNextColumnClicked('lateness'),
+    }">
       <div class="calculation-summary__cell-content">
         <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness} } -->
         <!-- /ko -->

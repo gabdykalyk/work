@@ -2,6 +2,204 @@
   .calculation-summary {
     margin-bottom: 40px;
 
+    /* row--clicked (top, bottom - before) */
+    &__row {
+      &--clicked {
+        td {
+          background: rgba(255, 230, 242, 0.5);
+          position: relative;
+
+          &:before {
+            content: '';
+            position: absolute;
+            left: -1px;
+            right: -1px;
+            top: -1px;
+            bottom: -1px;
+            pointer-events: none;
+            border-top: 1px solid #ff238d;
+            border-bottom: 1px solid #ff238d;
+          }
+
+          &:first-child {
+            border-left: 1px solid #ff238d !important;
+          }
+
+          &:last-child {
+            border-right: 1px solid #ff238d !important;
+          }
+        }
+      }
+    }
+
+    &__row--clicked + .calculation-summary__row--clicked {
+      td {
+        &:before {
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    &__row--clicked.calculation-summary__row--next-clicked {
+      td {
+        &:before {
+          border-bottom-color: transparent;
+        }
+      }
+    }
+    /* end row--clicked */
+
+    /* row--column-clicked (top, bottom - before) */
+    &__row {
+      &--column-clicked {
+        td,th {
+          background: rgba(255, 230, 242, 0.5);
+          position: relative;
+
+          &:before {
+            content: '';
+            position: absolute;
+            left: -1px;
+            right: -1px;
+            top: -1px;
+            bottom: -1px;
+            pointer-events: none;
+            border-top: 1px solid #ff238d;
+            border-bottom: 1px solid #ff238d;
+          }
+
+
+        }
+
+        td {
+          &:first-child {
+            border-left: 1px solid #ff238d !important;
+          }
+
+          &:last-child {
+            border-right: 1px solid #ff238d !important;
+          }
+        }
+      }
+    }
+
+    &__row--column-clicked + .calculation-summary__row--column-clicked {
+      td, th {
+        &:before {
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    &__row--column-clicked.calculation-summary__row--next-column-clicked {
+      td, th {
+        &:before {
+          border-bottom-color: transparent;
+        }
+      }
+    }
+    /* end row--column-clicked */
+
+    /* cell--clicked (left, right - after) */
+    &__cell {
+      &--clicked {
+        background: rgba(255, 230, 242, 0.5);
+        position: relative;
+        &:after {
+          content: '';
+          position: absolute;
+          top: -1px;
+          bottom: -1px;
+          left: -1px;
+          right: -1px;
+          pointer-events: none;
+          border-left: 1px solid #ff238d;
+          border-right: 1px solid #ff238d;
+        }
+      }
+      &--clicked-top {
+        border-top: 1px solid #ff238d;
+      }
+      &--clicked-bottom {
+        border-bottom: 1px solid #ff238d;
+      }
+    }
+
+    &__cell--clicked + .calculation-summary__cell--clicked {
+      &:after {
+        border-left-color: transparent;
+      }
+    }
+
+    &__cell--clicked.calculation-summary__cell--next-clicked {
+      &:after {
+        border-right-color: transparent;
+      }
+    }
+
+    &__cell--workload-units.calculation-summary__cell--clicked {
+      &:after {
+        border-left-color: transparent !important;
+      }
+    }
+
+    &__cell--workload-value.calculation-summary__cell--clicked {
+      &:after {
+        border-right-color: transparent !important;
+      }
+    }
+    /* end cell--clicked */
+
+    /* cell--column-clicked (left, right - after) */
+    &__cell {
+      &--column-clicked {
+        background: rgba(255, 230, 242, 0.5);
+        position: relative;
+        &:after {
+          content: '';
+          position: absolute;
+          top: -1px;
+          bottom: -1px;
+          left: -1px;
+          right: -1px;
+          pointer-events: none;
+          border-left: 1px solid #ff238d;
+          border-right: 1px solid #ff238d;
+        }
+      }
+      &--column-clicked-top {
+        border-top: 1px solid #ff238d;
+      }
+      &--column-clicked-bottom {
+        border-bottom: 1px solid #ff238d !important;
+      }
+    }
+
+    &__cell--column-clicked + .calculation-summary__cell--column-clicked {
+      &:after {
+        border-left-color: transparent;
+      }
+    }
+
+    &__cell--column-clicked.calculation-summary__cell--next-column-clicked {
+      &:after {
+        border-right-color: transparent;
+      }
+    }
+
+    &__cell--workload-units.calculation-summary__cell--column-clicked {
+      &:after {
+        border-left-color: transparent !important;
+      }
+    }
+
+    &__cell--workload-value.calculation-summary__cell--column-clicked {
+      &:after {
+        border-right-color: transparent !important;
+      }
+    }
+    /* end cell--column-clicked */
+
     &__cell {
       &--lateness,
       &--additional-workload {
@@ -15,6 +213,7 @@
       }
 
       &--workload-value {
+        min-width: 100px;
         input {
           width: 100px;
           text-align: right;
@@ -27,12 +226,8 @@
         }
       }
 
-      &--total {
+      &--total:not(.calculation-summary__cell--lateness) {
         background-color: @light-grey-color;
-      }
-
-      &--lateness {
-        background-color: white;
       }
 
       &--empty {
@@ -97,7 +292,6 @@
 
         &--total {
           border-left: 1px solid #dfe4ef;
-          background: white;
         }
       }
     }
