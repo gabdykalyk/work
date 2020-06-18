@@ -5262,7 +5262,9 @@
       });
 
       this.formatDuration = (minutes) => {
-        console.log('dur', minutes)
+        if (!minutes) return '00:00';
+        minutes = ko.unwrap(minutes);
+        minutes = parseInt(minutes);
         if (!minutes || minutes <= 0) return '00:00';
 
         let h = Math.floor(minutes / 60).toString();
@@ -6088,15 +6090,6 @@
         });
       };
 
-      this.formatDuration = function (minutes) {
-        let h = Math.floor(minutes / 60).toString();
-        h = h.length === 1 ? '0' + h : h;
-        let m = (minutes % 60).toString();
-        m = m.length === 1 ? '0' + m : m;
-
-        return h + ':' + m;
-      };
-
       this.afterRenderBuild = function (el) {
         $(el).hide().fadeIn(200, () => {
           $(window).resize();
@@ -6253,11 +6246,6 @@
       viewModel,
       $page.get()[0]
     );
-
-    // TODO: test
-    setTimeout(() => {
-      viewModel.buildCalculation()
-    }, 500)
 
 
     /*****/
