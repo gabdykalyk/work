@@ -1,0 +1,117 @@
+@@include('./_routes-modal.html')
+
+<script type="text/javascript">
+    ko.components.register('routes-modal-dialog', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+                $element.addClass([
+                    'modal-dialog-content',
+                    'modal-dialog-content--initializing'
+                ]);
+
+                return new (function () {
+                    this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+                    this.windowResizeHandler = () => {
+                        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                    };
+                    $(window).on('resize', this.windowResizeHandler);
+
+                    this.initializing = ko.observable(true);
+
+                    this.isSubmitted = ko.observable(true);
+                    this.isLoading = ko.observable(true);
+
+                    this.formControlErrorStateMatcher = function (formControl) {
+                        return ko.pureComputed(() => {
+                            return this.isSubmitted() && !formControl.isValid();
+                        });
+                    };
+
+                    this.employee = params.data.employee;
+
+                    this.routes = ko.observableArray([]);
+
+                    this.loadData = () => {
+                        const id = this.employee.id;
+
+                        setTimeout(() => {
+                            const data = [
+                                {
+                                    addresses: [
+                                        {
+                                            id: 58664,
+                                            address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                        }
+                                    ],
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    addresses: [
+                                        {
+                                            id: 58664,
+                                            address: 'г. Москва, ул. Летчика Грицевца, д. 9',
+                                        },
+                                        {
+                                            id: 58664,
+                                            address: 'МО, г. Московский, мкрн. 1, д.29',
+                                        }
+                                    ],
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 16.9,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    addresses: [
+                                        {
+                                            id: 58664,
+                                            address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                        }
+                                    ],
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                }
+                            ];
+                            this.routes(data);
+
+                            this.isLoading(false);
+
+                        }, 3000);
+                    };
+
+                    this.loadData();
+
+                    this.save = function () {
+                        this.isSubmitted(true);
+
+
+                    };
+
+                    this.cancel = function () {
+                        params.cancel();
+                    };
+
+
+                    this.afterRender = function () {
+                        $element.removeClass('modal-dialog-content--initializing');
+                        this.initializing(false);
+                    }.bind(this);
+
+                    this.dispose = function () {
+                        $(window).off('resize', this.windowResizeHandler);
+                    };
+                });
+            }
+        },
+        template: { element: 'routes-modal-dialog-template' }
+    });
+</script>

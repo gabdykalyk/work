@@ -186,6 +186,34 @@
 
 </script>
 
+<script type="text/html" id="driver-modal-template">
+  <div class="calculation-modal__wrapper">
+      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+          <div class="calculation-modal__wrapper-actions">
+              <button class="hrm-button calculation-modal__wrapper-close"
+                      data-bind="click: function () {close();}">
+              </button>
+          </div>
+      <!-- /ko -->
+
+      <div data-bind="component: { name: 'driver-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function ($data) { close($data); } } }" role="document"></div>
+  </div>
+</script>
+
+<script type="text/html" id="routes-modal-template">
+  <div class="calculation-modal__wrapper">
+      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+          <div class="calculation-modal__wrapper-actions">
+              <button class="hrm-button calculation-modal__wrapper-close"
+                      data-bind="click: function () {close();}">
+              </button>
+          </div>
+      <!-- /ko -->
+
+      <div data-bind="component: { name: 'routes-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function ($data) { close($data); } } }" role="document"></div>
+  </div>
+</script>
+
 
 <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
 
@@ -2644,6 +2672,345 @@
 </script>
 
 
+  <template id="routes-modal-dialog-template">
+  <!-- ko template: { afterRender: afterRender } -->
+  <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+  <button class="hrm-button modal-dialog-content__close"
+          data-bind="click: function() {cancel();}"
+          aria-label="Close">
+  </button>
+  <!-- /ko -->
+
+  <!-- ko if: !isLoading() -->
+  <div class="routes" data-bind="hrmScrollable">
+  <table data-bind="hrmTable"
+         class="routes-table">
+    <thead>
+      <tr>
+        <th class="routes-table__cell routes-table__cell--route">
+          <div class="routes-table__cell-content">
+            Заказ/маршрут
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Заказ/маршрут'"></button>
+          </div>
+        </th>
+        <th class="routes-table__cell routes-table__cell--dates">
+          <div class="routes-table__cell-content">
+            Начало/завершение
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Начало/завершение'"></button>
+          </div>
+        </th>
+        <th class="routes-table__cell routes-table__cell--dist">
+          <div class="routes-table__cell-content">
+            Дистанция, км
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Дистанция, км'"></button>
+          </div>
+        </th>
+        <th class="routes-table__cell routes-table__cell--time">
+          <div class="routes-table__cell-content">
+            Расч./факт. время в пути
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Расч./факт. время в пути'"></button>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: routes -->
+      <tr class="routes-table__route-row">
+        <td colspan="3">
+
+          <!-- ko foreach: addresses -->
+          <div class="routes-table__cell-content routes-table__route">
+            <span class="routes-table__route-id"
+                  data-bind="text: id"></span>
+            <span class="routes-table__route-address"
+                  data-bind="text: address"></span>
+          </div>
+          <!-- /ko -->
+
+        </td>
+      </tr>
+      <tr>
+        <td class="routes-table__cell routes-table__cell--route">
+          <!-- ko foreach: addresses -->
+          <div class="routes-table__cell-content routes-table__route">
+            <span class="routes-table__route-id"
+                  data-bind="text: id"></span>
+            <span class="routes-table__route-address"
+                  data-bind="text: address"></span>
+          </div>
+          <!-- /ko -->
+        </td>
+        <td class="routes-table__cell routes-table__cell--dates">
+          <div class="routes-table__cell-content">
+            <div data-bind="text: startedAt"></div>
+            <div data-bind="text: finishedAt"></div>
+          </div>
+        </td>
+        <td align="right"
+            class="routes-table__cell routes-table__cell--dist">
+          <div class="routes-table__cell-content"
+               data-bind="text: distKm">
+          </div>
+        </td>
+        <td class="routes-table__cell routes-table__cell--time">
+          <div class="routes-table__cell-content">
+            <div data-bind="text: estimatedTime"></div>
+            <div data-bind="text: actualTime"></div>
+          </div>
+        </td>
+      </tr>
+      <!-- /ko -->
+    </tbody>
+  </table>
+</div>
+  <!-- /ko -->
+
+  <!-- ko if: isLoading() -->
+  <div class="loader">
+    <i class="fa fa-spinner fa-pulse loader__indicator">
+    </i>
+  </div>
+  <!-- /ko -->
+  <!-- /ko -->
+</template>
+
+
+<script type="text/javascript">
+    ko.components.register('routes-modal-dialog', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+                $element.addClass([
+                    'modal-dialog-content',
+                    'modal-dialog-content--initializing'
+                ]);
+
+                return new (function () {
+                    this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+                    this.windowResizeHandler = () => {
+                        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                    };
+                    $(window).on('resize', this.windowResizeHandler);
+
+                    this.initializing = ko.observable(true);
+
+                    this.isSubmitted = ko.observable(true);
+                    this.isLoading = ko.observable(true);
+
+                    this.formControlErrorStateMatcher = function (formControl) {
+                        return ko.pureComputed(() => {
+                            return this.isSubmitted() && !formControl.isValid();
+                        });
+                    };
+
+                    this.employee = params.data.employee;
+
+                    this.routes = ko.observableArray([]);
+
+                    this.loadData = () => {
+                        const id = this.employee.id;
+
+                        setTimeout(() => {
+                            const data = [
+                                {
+                                    addresses: [
+                                        {
+                                            id: 58664,
+                                            address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                        }
+                                    ],
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    addresses: [
+                                        {
+                                            id: 58664,
+                                            address: 'г. Москва, ул. Летчика Грицевца, д. 9',
+                                        },
+                                        {
+                                            id: 58664,
+                                            address: 'МО, г. Московский, мкрн. 1, д.29',
+                                        }
+                                    ],
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 16.9,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    addresses: [
+                                        {
+                                            id: 58664,
+                                            address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                        }
+                                    ],
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                }
+                            ];
+                            this.routes(data);
+
+                            this.isLoading(false);
+
+                        }, 3000);
+                    };
+
+                    this.loadData();
+
+                    this.save = function () {
+                        this.isSubmitted(true);
+
+
+                    };
+
+                    this.cancel = function () {
+                        params.cancel();
+                    };
+
+
+                    this.afterRender = function () {
+                        $element.removeClass('modal-dialog-content--initializing');
+                        this.initializing(false);
+                    }.bind(this);
+
+                    this.dispose = function () {
+                        $(window).off('resize', this.windowResizeHandler);
+                    };
+                });
+            }
+        },
+        template: { element: 'routes-modal-dialog-template' }
+    });
+</script>
+
+  <template id="driver-modal-dialog-template">
+  <!-- ko template: { afterRender: afterRender } -->
+  <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+  <button class="hrm-button modal-dialog-content__close"
+          data-bind="click: function() {cancel();}"
+          aria-label="Close">
+  </button>
+  <!-- /ko -->
+
+  <!-- ko if: !isLoading() -->
+  <div class="modal-dialog-content__header">
+    <span class="modal-dialog-content__title">
+      Заказы водителя
+    </span>
+  </div>
+
+
+
+  <div class="modal-dialog-content__actions">
+    <button class="hrm-button hrm-basic-button"
+            data-bind="click: function() {$component.cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button"
+            data-bind="click: function() {$component.save();}">
+      Сохранить
+    </button>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko if: isLoading() -->
+  <div class="loader">
+    <i class="fa fa-spinner fa-pulse loader__indicator">
+    </i>
+  </div>
+  <!-- /ko -->
+  <!-- /ko -->
+</template>
+
+
+<script type="text/javascript">
+    ko.components.register('driver-modal-dialog', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+                $element.addClass([
+                    'modal-dialog-content',
+                    'modal-dialog-content--initializing'
+                ]);
+
+
+
+                return new (function () {
+                    this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+                    this.windowResizeHandler = () => {
+                        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                    };
+                    $(window).on('resize', this.windowResizeHandler);
+
+                    this.initializing = ko.observable(true);
+
+                    this.isSubmitted = ko.observable(true);
+                    this.isLoading = ko.observable(true);
+
+                    this.formControlErrorStateMatcher = function (formControl) {
+                        return ko.pureComputed(() => {
+                            return this.isSubmitted() && !formControl.isValid();
+                        });
+                    };
+
+                    this.employee = params.data.employee;
+                    this.routes = ko.observableArray([]);
+
+                    this.loadData = () => {
+                        const id = this.employee.id;
+
+                        setTimeout(() => {
+
+                            const data = [];
+                            this.routes(data);
+
+                            this.isLoading(false);
+
+                        }, 3000);
+                    };
+
+                    this.loadData();
+
+                    this.save = function () {
+                        this.isSubmitted(true);
+                    };
+
+                    this.cancel = function () {
+                        params.cancel();
+                    };
+
+
+
+
+                    this.afterRender = function () {
+                        $element.removeClass('modal-dialog-content--initializing');
+                        this.initializing(false);
+                    }.bind(this);
+
+                    this.dispose = function () {
+                        $(window).off('resize', this.windowResizeHandler);
+                    };
+                });
+            }
+        },
+        template: { element: 'driver-modal-dialog-template' }
+    });
+</script>
+
+
   <template id="calculation-page-input-form-template">
   <div class="calculation-input-form">
     <div class="calculation-input-form__header">
@@ -5085,7 +5452,7 @@
   <!-- ko if: table.isColumnVisible('orders-count') -->
     <td class="positions-table__cell positions-table__cell--orders-count"  data-bind="css: {
       'positions-table__cell--clicked': table.getColumnClicked('orders-count'),
-    }, click: function(_, e) { e.stopPropagation(); } " align="right">
+    }, click: function(_, e) { e.stopPropagation(); table.openDriverModal(employee); } " align="right">
       <a class="positions-table__cell-content" href="javascript: void(0)" data-bind="text: employee.ordersCount">
 
       </a>
@@ -5111,7 +5478,7 @@
   <!-- ko if: table.isColumnVisible('dist-km') -->
   <td class="positions-table__cell positions-table__cell--dist-km"  data-bind="css: {
     'positions-table__cell--clicked': table.getColumnClicked('dist-km'),
-  }, click: function(_, e) {e.stopPropagation();} " align="right">
+  }, click: function(_, e) {e.stopPropagation(); table.openRoutesModal(employee); } " align="right">
     <a href="javascript: void(0)" data-bind="text: employee.distKm" class="positions-table__cell-content"></a>
   </td>
   <!-- /ko -->
@@ -5827,6 +6194,22 @@
             });
           }
 
+          const openDriverModal = (employee) => {
+            params.utils.openModal('driver', {
+              employee: employee
+            }, () => {
+
+            });
+          }
+
+          const openRoutesModal = (employee) => {
+            params.utils.openModal('routes', {
+              employee: employee
+            }, () => {
+
+            });
+          }
+
           return {
             getColumnClicked,
 
@@ -5855,7 +6238,10 @@
 
             performAccountOperations,
             giveBonus,
-            giveFine
+            giveFine,
+
+            openDriverModal,
+            openRoutesModal,
           };
         }
       },

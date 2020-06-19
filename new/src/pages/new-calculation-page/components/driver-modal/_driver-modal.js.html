@@ -1,0 +1,75 @@
+@@include('./_driver-modal.html')
+
+<script type="text/javascript">
+    ko.components.register('driver-modal-dialog', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+                $element.addClass([
+                    'modal-dialog-content',
+                    'modal-dialog-content--initializing'
+                ]);
+
+
+
+                return new (function () {
+                    this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+                    this.windowResizeHandler = () => {
+                        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                    };
+                    $(window).on('resize', this.windowResizeHandler);
+
+                    this.initializing = ko.observable(true);
+
+                    this.isSubmitted = ko.observable(true);
+                    this.isLoading = ko.observable(true);
+
+                    this.formControlErrorStateMatcher = function (formControl) {
+                        return ko.pureComputed(() => {
+                            return this.isSubmitted() && !formControl.isValid();
+                        });
+                    };
+
+                    this.employee = params.data.employee;
+                    this.routes = ko.observableArray([]);
+
+                    this.loadData = () => {
+                        const id = this.employee.id;
+
+                        setTimeout(() => {
+
+                            const data = [];
+                            this.routes(data);
+
+                            this.isLoading(false);
+
+                        }, 3000);
+                    };
+
+                    this.loadData();
+
+                    this.save = function () {
+                        this.isSubmitted(true);
+                    };
+
+                    this.cancel = function () {
+                        params.cancel();
+                    };
+
+
+
+
+                    this.afterRender = function () {
+                        $element.removeClass('modal-dialog-content--initializing');
+                        this.initializing(false);
+                    }.bind(this);
+
+                    this.dispose = function () {
+                        $(window).off('resize', this.windowResizeHandler);
+                    };
+                });
+            }
+        },
+        template: { element: 'driver-modal-dialog-template' }
+    });
+</script>
