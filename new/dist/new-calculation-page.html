@@ -3204,32 +3204,29 @@
 
     <!-- ko if: !isLoading() -->
       <div class="modal-dialog-content__header">
+        <div>
         <div class="modal-dialog-content__title">
           Заказы водителя
         </div>
 
-        <!-- ko let: {control: ko.observable(null), employeeId: ko.observable(employee().id) } -->
+        <!-- ko let: {control: ko.observable(null) } -->
         <div data-bind="hrmFormField, hrmFormFieldControlRef: control">
 
-          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <div class="driver-name"  data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
             <select data-bind="value: employeeId,
             valueAllowUnset: true,
             options: $component.employees,
             optionsText: 'name',
             optionsValue: 'id',
-            event:{
-              change: function() {
-                console.log('change');
-                $component.changeEmployee(employeeId());
-              }
-            },
             hrmSelect,
             hrmFormFieldSelectControl: control">
             </select>
           </div>
 
         </div>
+
         <!-- /ko -->
+      </div>
       </div>
 
       <div class="driver-orders">
@@ -3430,11 +3427,11 @@
                     ];
                     this.activeTab = ko.observable(0);
 
-                    this.employee = ko.observable(params.data.employee);
-                    this.changeEmployee = (employeeId) => {
+                    this.employeeId = ko.observable(params.data.employee.id);
+                    this.employeeId.subscribe(v => {
                         this.isLoading(true);
-                        this.loadData(employeeId);
-                    }
+                        this.loadData(v);
+                    });
 
                     this.employees = params.data.employees;
 
@@ -3672,7 +3669,7 @@
                         }, 3000);
                     };
 
-                    this.loadData(this.employee().id);
+                    this.loadData(this.employeeId());
 
                     this.save = function () {
                         this.isSubmitted(true);

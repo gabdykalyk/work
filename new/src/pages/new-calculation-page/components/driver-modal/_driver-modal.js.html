@@ -36,11 +36,11 @@
                     ];
                     this.activeTab = ko.observable(0);
 
-                    this.employee = ko.observable(params.data.employee);
-                    this.changeEmployee = (employeeId) => {
+                    this.employeeId = ko.observable(params.data.employee.id);
+                    this.employeeId.subscribe(v => {
                         this.isLoading(true);
-                        this.loadData(employeeId);
-                    }
+                        this.loadData(v);
+                    });
 
                     this.employees = params.data.employees;
 
@@ -278,7 +278,7 @@
                         }, 3000);
                     };
 
-                    this.loadData(this.employee().id);
+                    this.loadData(this.employeeId());
 
                     this.save = function () {
                         this.isSubmitted(true);
