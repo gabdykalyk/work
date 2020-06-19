@@ -209,7 +209,7 @@
                 beforeRemove: hrmFadeBeforeRemoveFactory(200)
               } -->
                 <div class="calculation-page__tab">
-                  delivery
+                  <div data-bind="component: {name: 'calculation-page-delivery-table', params: { tabName: 'delivery', position: $root.summaryModel.driversData, utils: $root.utils, total: $root.summaryModel.deliveryTotal, model: $root.summaryModel }}"></div>
 
                 </div>
               <!-- /ko -->
@@ -3165,7 +3165,7 @@
       'calculation-summary__cell--column-clicked': table.getColumnClicked('count'),
     }">
       <div class="calculation-summary__cell-content"
-           data-bind="text: position.employees().length"></div>
+           data-bind="text: position.visibleEmployees().length"></div>
     </td>
 
     <!-- ФОТ, % в категории -->
@@ -4076,7 +4076,7 @@
     <td class="positions-table__cell positions-table__cell--work-time"  data-bind="css: {
       'positions-table__cell--clicked': table.getColumnClicked('work-time'),
     }">
-      <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(employee.workingTime())"></div>
+      <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(employee.workingTime())"></div>
     </td>
   <!-- /ko -->
 
@@ -4148,7 +4148,7 @@
   <td class="positions-table__cell positions-table__cell--corrected-time"  data-bind="css: {
     'positions-table__cell--clicked': table.getColumnClicked('corrected-time'),
   }">
-  <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(employee.correctedTime)"></div>
+  <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(employee.correctedTime)"></div>
 </td>
   <!-- /ko -->
 
@@ -4255,7 +4255,7 @@
   <td class="positions-table__cell positions-table__cell--work-time" data-bind="css: {
     'positions-table__cell--clicked': table.getColumnClicked('work-time'),
   }">
-    <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(total.workingTime())"></div>
+    <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(total.workingTime())"></div>
   </td>
   <!-- /ko -->
 
@@ -4320,7 +4320,7 @@
   <td class="positions-table__cell positions-table__cell--corrected-time" data-bind="css: {
     'positions-table__cell--clicked': table.getColumnClicked('corrected-time'),
   }">
-    <div class="positions-table__cell-content" data-bind="text: $root.formatDuration(total.correctedTime())"></div>
+    <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(total.correctedTime())"></div>
   </td>
   <!-- /ko -->
 
@@ -4391,7 +4391,7 @@
 
         <!-- Штраф/премия -->
         <button class="hrm-button hrm-basic-button hrm-button--size_medium  calculation-tab__settings-button calculation-tab__settings-stimulation"
-                data-bind="click: $root.stimulation.set, disable: $root.stimulation.isBlocked">
+                data-bind="click: function() { $root.stimulation.set('production'); }, disable: $root.stimulation.isProductionBlocked">
           Штраф/премия смене
         </button>
         <!-- /ko -->
@@ -4406,7 +4406,7 @@
                 data-bind="click: setPositions"></button>
 
         <!-- Штраф/премия -->
-        <button data-bind="click: $root.stimulation.set"
+        <button data-bind="click: function() { $root.stimulation.set('production') }"
                 class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary  calculation-tab__settings-button calculation-tab__settings-stimulation"></button>
         <!-- /ko -->
       </div><!-- .calculation-tab__settings-group -->
@@ -4750,7 +4750,7 @@
             else return false;
           };
           const columnCount = ko.pureComputed(() => {
-            return activeColumns() + 3;
+            return activeColumns() + 1;
           });
 
           const getColumnClicked = (columnName) => {
@@ -4980,6 +4980,892 @@
   })
 </script>
 
+  
+
+<!-- Блок сотрудника в таблице -->
+<script id="delivery-employee-block-template"
+        type="text/html">
+  <div class="employee">
+    <div class="employee__remove">
+      <button data-bind="
+      hrmTooltip,
+      hrmTooltipText: 'Удалить из расчета',,
+      click: table.removeEmployee.bind(table, employee)"
+              class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary positions-table__action employe__remove-button">
+      </button>
+    </div>
+
+    <div class="employee__info">
+      <a class="employee__name"
+        href="#"
+        data-bind="text: employee.name, click: function(_, e) { e.stopPropagation(); }"></a>
+
+    </div>
+
+    <div class="employee__actions">
+      <!-- ko if: employee.hasProblems -->
+      <button
+              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button employee__action employee__action--documents" data-bind="hrmTooltip, hrmTooltipText: 'Есть проблемы с документами'"></button>
+      <!-- /ko -->
+    </div>
+  </div>
+</script>
+
+<!-- Строка сотрудника в таблице -->
+<script id="delivery-employee-row-template"
+        type="text/html">
+
+<tr class="positions-table__row" data-bind="click: function() { employee.clicked(!employee.clicked())}, css: {
+  'positions-table__row--clicked': employee.clicked,
+}">
+  <td class="positions-table__cell positions-table__cell--name">
+    <div class="positions-table__cell-content">
+
+      <!-- Данные сотрудника -->
+      <div
+           data-bind="template: { name: 'delivery-employee-block-template', data: {employee: employee } }">
+      </div>
+      <!-- /Данные сотрудника -->
+
+    </div>
+  </td>
+
+  <!-- ko if: table.isColumnVisible('account') -->
+    <td class="positions-table__cell positions-table__cell--account" data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('account'),
+    }">
+      <div class="positions-table__cell-content">
+        <!-- ko text: employee.premiumAccount() + '/' + employee.account() -->
+        <!-- /ko -->
+      </div>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('account-operations') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--account-operations"
+        data-bind="click: function(_, e) {
+          e.stopPropagation();
+          table.performAccountOperations(employee);
+        }, hrmTableEditableCell: editableCell, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('account-operations'),
+        }" align="right">
+        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.accountState), hrmColoredSign: employee.accountState"></div>
+    </td>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('interval') -->
+    <td class="positions-table__cell positions-table__cell--interval" data-bind="click: function(_, e) { e.stopPropagation(); }, css: {
+      'positions-table__cell--clicked': table.getColumnClicked('interval'),
+    }">
+      <table class="working-intervals">
+        <tbody data-bind="let: {intervalsCount: employee.workingIntervals().length}">
+          <!-- ko foreach: employee.workingIntervals() -->
+          <tr class="working-intervals__row">
+
+              <!-- ko template: { name: 'working-interval-template', data: { interval: $data, canRemove: intervalsCount > 1, canAdd: $index() === intervalsCount - 1 } } -->
+              <!-- /ko -->
+
+          </tr>
+          <!-- /ko -->
+        </tbody>
+      </table>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('work-time') -->
+    <td class="positions-table__cell positions-table__cell--work-time"  data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('work-time'),
+    }">
+      <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(employee.workingTime())"></div>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders-count') -->
+    <td class="positions-table__cell positions-table__cell--orders-count"  data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('orders-count'),
+    }, click: function(_, e) { e.stopPropagation(); } " align="right">
+      <a class="positions-table__cell-content" href="javascript: void(0)" data-bind="text: employee.ordersCount">
+
+      </a>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders-value') -->
+  <td class="positions-table__cell positions-table__cell--orders-value"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders-value'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: employee.ordersValue"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('average-bill') -->
+  <td class="positions-table__cell positions-table__cell--average-bill"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('average-bill'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: employee.averageBill"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('dist-km') -->
+  <td class="positions-table__cell positions-table__cell--dist-km"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('dist-km'),
+  }, click: function(_, e) {e.stopPropagation();} " align="right">
+    <a href="javascript: void(0)" data-bind="text: employee.distKm" class="positions-table__cell-content"></a>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('estimated-time') -->
+  <td class="positions-table__cell positions-table__cell--estimated-time"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('estimated-time'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.estimatedTime"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('actual-time') -->
+  <td class="positions-table__cell positions-table__cell--actual-time"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('actual-time'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.actualTime"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('kpi') -->
+  <td class="positions-table__cell positions-table__cell--kpi"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('kpi'),
+    'highlighted-success': true,
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.kpi"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('time-without-case') -->
+  <td class="positions-table__cell positions-table__cell--time-without-case"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('time-without-case'),
+    'highlighted-danger': true
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.timeWithoutCase"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('time') -->
+  <td class="positions-table__cell positions-table__cell--time"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('time'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(employee.time)"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders') -->
+  <td class="positions-table__cell positions-table__cell--orders"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.orders"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('dist') -->
+  <td class="positions-table__cell positions-table__cell--dist"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('dist'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.dist"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('min-payment') -->
+  <td class="positions-table__cell positions-table__cell--min-payment"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('min-payment'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.minPayment"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('surcharge') -->
+  <td class="positions-table__cell positions-table__cell--surcharge"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('surcharge'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.surcharge"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('late-surcharge') -->
+  <td class="positions-table__cell positions-table__cell--late-surcharge"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('late-surcharge'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.lateSurcharge"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('short-shift-surcharge') -->
+  <td class="positions-table__cell positions-table__cell--short-shift-surcharge"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('short-shift-surcharge'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: employee.shortShiftSurcharge"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('premation') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--premation" align="right"
+        data-bind="click: function(_, e) {
+          e.stopPropagation();
+          table.giveBonus(employee);
+        }, hrmTableEditableCell: editableCell, style: {
+          'background-color': employee.bonusesState() > 0 ? '#D0F4E3' : ''
+        }, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('premation'),
+        }">
+        <div class="positions-table__cell-content" data-bind="text: employee.bonusesState"></div>
+    </td>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('fine') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--fine" align="right"
+        data-bind="click: function(_,e) {
+          e.stopPropagation();
+          table.giveFine(employee);
+        }, hrmTableEditableCell: editableCell,
+        style: {
+          'background-color': employee.finesState() > 0 ? '#FFD3E8' : ''
+        }, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('fine'),
+        }">
+        <div class="positions-table__cell-content" data-bind="text: employee.finesState"></div>
+    </td>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('total') -->
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('total'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: employee.total"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('payment') -->
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('payment'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: employee.toPayment"></div>
+  </td>
+  <!-- /ko -->
+</tr>
+
+</script>
+
+<!-- Строка Итого -->
+<script id="delivery-total-row-template"
+        type="text/html">
+
+<tr class="positions-table__row positions-table__row--highlighted positions-table__total">
+  <td class="positions-table__cell positions-table__cell--name positions-table__cell--empty"></td>
+
+  <!-- ko if: table.isColumnVisible('account') -->
+  <td class="positions-table__cell positions-table__cell--account positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('account'),
+  }"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('account-operations') -->
+  <td class="positions-table__cell positions-table__cell--account-operations positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('account-operations'),
+  }"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('interval') -->
+  <td class="positions-table__cell positions-table__cell--interval positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('interval'),
+  }"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('work-time') -->
+  <td class="positions-table__cell positions-table__cell--work-time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('work-time'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(total.workingTime())"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders-count') -->
+  <td class="positions-table__cell positions-table__cell--orders-count" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders-count'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: total.ordersCount()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders-value') -->
+  <td class="positions-table__cell positions-table__cell--orders-value" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders-value'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: total.ordersValue()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('average-bill') -->
+  <td class="positions-table__cell positions-table__cell--average-bill" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('average-bill'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: total.averageBill()"></div>
+
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('dist-km') -->
+  <td class="positions-table__cell positions-table__cell--dist-km" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('dist-km'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: total.distKm()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('estimated-time') -->
+  <td class="positions-table__cell positions-table__cell--estimated-time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('estimated-time'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: total.estimatedTime()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('actual-time') -->
+  <td class="positions-table__cell positions-table__cell--actual-time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('actual-time'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: total.actualTime()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('kpi') -->
+  <td class="positions-table__cell positions-table__cell--kpi" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('kpi'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: total.kpi()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('time-without-case') -->
+  <td class="positions-table__cell positions-table__cell--time-without-case" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('time-without-case'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: total.timeWithoutCase()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('time') -->
+  <td class="positions-table__cell positions-table__cell--time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('time'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: total.time()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders') -->
+  <td class="positions-table__cell positions-table__cell--orders" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: total.orders()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('dist') -->
+  <td class="positions-table__cell positions-table__cell--dist positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('dist'),
+  }"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('min-payment') -->
+  <td class="positions-table__cell positions-table__cell--min-payment positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('min-payment'),
+  }"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('surcharge') -->
+  <td class="positions-table__cell positions-table__cell--surcharge positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('surcharge'),
+  }"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('late-surcharge') -->
+  <td class="positions-table__cell positions-table__cell--late-surcharge" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('late-surcharge'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: total.lateSurcharge()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('short-shift-surcharge') -->
+  <td class="positions-table__cell positions-table__cell--short-shift-surcharge " data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('short-shift-surcharge'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: total.shortShiftSurcharge()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('premation') -->
+  <td class="positions-table__cell positions-table__cell--premation" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('premation'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: total.bonus()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('fine') -->
+  <td class="positions-table__cell positions-table__cell--fine" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('fine'),
+  }">
+  <div class="positions-table__cell-content" data-bind="text: total.fine()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('total') -->
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('total'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: total.total()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('payment') -->
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('payment'),
+  }">
+    <div class="positions-table__cell-content" data-bind="text: total.toPayment()"></div>
+  </td>
+  <!-- /ko -->
+</tr>
+
+</script>
+
+
+<template id="calculation-page-delivery-table-template">
+  <div class="calculation-tab"
+       data-bind="class: 'calculation-' + tabName">
+
+    <div class="calculation-tab__settings">
+      <div class="calculation-tab__settings-group">
+
+        <!-- Пересчитать маршруты -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_mobile hrm-button-with-icon--theme_secondary hrm-button-with-route-icon  calculation-tab__settings-button calculation-tab__recalculate-routes"
+                data-bind="click: $root.recalculateRoutes">
+          Пересчитать маршруты
+        </button>
+
+        <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+        <!-- Штраф/премия -->
+        <button class="hrm-button hrm-basic-button hrm-button--size_medium  calculation-tab__settings-button calculation-tab__settings-stimulation"
+                data-bind="click: function() { $root.stimulation.set('delivery'); }, disable: $root.stimulation.isDeliveryBlocked">
+          Штраф/премия смене
+        </button>
+        <!-- /ko -->
+
+        <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+        <!-- Штраф/премия -->
+        <button data-bind="click: function() { $root.stimulation.set('delivery'); }"
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary  calculation-tab__settings-button calculation-tab__settings-stimulation"></button>
+        <!-- /ko -->
+
+
+
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+        <div class="holiday-surcharge" data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="value: $root.summaryModel.holidaySurcharge,
+                            hrmMask,
+                            hrmMaskPattern: 'decimal',
+                            hrmFormFieldInputControl: control"
+                   placeholder="Праздничная надбавка">
+          </div>
+
+          <div class="holiday-surcharge__append">%</div>
+        </div>
+        <!-- /ko -->
+
+
+      </div><!-- .calculation-tab__settings-group -->
+      <div class="calculation-tab__settings-group">
+        <!-- Столбцы -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns"
+                data-bind="click: setColumns">
+          Настроить столбцы
+        </button>
+
+        <!-- Меньше информации -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon  calculation-tab__settings-button calculation-tab__settings-less-info"
+                data-bind="click: lessInfo, disable: blockLessInfo">
+          Меньше информации
+        </button>
+
+        <!-- Больше информации -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon hrm-button-with-icon--hide_tablet  calculation-tab__settings-button calculation-tab__settings-more-info"
+                data-bind="click: moreInfo, disable: blockMoreInfo">
+          Больше информации
+        </button>
+      </div><!-- .calculation-tab__settings-group -->
+    </div><!-- .calculation-tab__settings -->
+
+    <div class="hrm-table__fixed-section-container positions-table positions-table--delivery"
+         data-bind="let: {table: $data}">
+      <!-- Fixed section -->
+      <!-- ko if: tableScroll -->
+      <table data-bind="hrmTable"
+             class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section">
+        <thead>
+          <tr class="positions-table__row positions-table__head-row">
+            <th class="positions-table__cell positions-table__head-cell">
+              <div class="positions-table__cell-content">Сотрудник</div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- Список сотрудников по позиции -->
+          <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
+          <tr class="positions-table__row"
+              data-bind="click: function() { employee.clicked(!employee.clicked()); }, css: {
+            'positions-table__row--clicked': employee.clicked,
+          }">
+            <td class="positions-table__cell">
+              <div class="positions-table__cell-content"
+                   data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
+
+                <!-- Данные сотрудника -->
+                <div
+                     data-bind="template: { name: 'delivery-employee-block-template', data: {employee: employee, positionName: false} }">
+                </div>
+                <!-- /Данные сотрудника -->
+
+              </div>
+
+            </td>
+          </tr>
+          <!-- /ko -->
+          <!-- /Список сотрудников по позиции -->
+
+          <!-- Total section -->
+          <tr class="positions-table__row positions-table__row--highlighted positions-table__total">
+            <td class="positions-table__cell">
+              <div class="positions-table__cell-content"></div>
+            </td>
+          </tr>
+          <!-- /Total section -->
+        </tbody>
+      </table>
+      <!-- /ko -->
+      <!-- /Fixed section -->
+
+
+      <div
+           data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}, descendantsComplete: onTableRender">
+        <table data-bind="hrmTable"
+               class="positions-table__main-table">
+
+          <colgroup>
+            <col class="positions-table__col positions-table__col--name">
+            <!-- ko foreach: table.columns -->
+            <!-- ko if: $data.visible -->
+            <col class="positions-table__col"
+                 data-bind="class: 'position-table__col--' + id">
+            <!-- /ko -->
+            <!-- /ko -->
+          </colgroup>
+
+          <thead>
+            <tr class="positions-table__row positions-table__head-row">
+              <th class="positions-table__cell positions-table__head-cell positions-table__cell--name">
+                <div class="positions-table__cell-content">Сотрудник</div>
+              </th>
+
+              <!-- ko foreach: table.columns -->
+              <!-- ko if: $data.visible -->
+              <th class="positions-table__cell positions-table__head-cell"
+                  data-bind="class: 'positions-table__cell--' + id, css: {
+                    'positions-table__cell--colored': colored,
+                      'positions-table__cell--clicked': table.getColumnClicked($data.id),
+                  }, click: function() { $data.clicked(!$data.clicked())}">
+                <div class="positions-table__cell-content">
+                  <span data-bind="text: title"></span>
+                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                          data-bind="hrmTooltip, hrmTooltipText: fullTitle"></button>
+                </div>
+              </th>
+              <!-- /ko -->
+              <!-- /ko -->
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <!-- Список сотрудников по позиции -->
+            <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
+
+            <!-- ko template: {
+              name: 'delivery-employee-row-template',
+              data: { employee: employee, position: position }
+            } -->
+            <!-- /ko -->
+
+            <!-- /ko -->
+            <!-- Список сотрудников по позиции -->
+
+            <!-- Total section -->
+            <!-- ko template: { name: 'delivery-total-row-template', data: { total: table.total } } -->
+            <!-- /ko -->
+            <!-- /Total section -->
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</template>
+
+
+<script type="text/javascript">
+  $(function () {
+    function Column(id, title, fullTitle, colored) {
+      return {
+        id,
+        title,
+        fullTitle,
+        colored,
+        visible: ko.observable(true),
+        clicked: ko.observable(false)
+      }
+    }
+
+    ko.components.register('calculation-page-delivery-table', {
+      viewModel: {
+        /**
+        * @param {ObservableArray} params.positions
+        */
+        createViewModel: function (params, componentInfo) {
+          const editableCellErrorStateMatcher = (control) => {
+            return ko.pureComputed(() => {
+              return !control.isValid() ? { message: control.error() } : null;
+
+            });
+          };
+
+          const position = params.position();
+          const model = params.model;
+          const total = params.total;
+
+
+          /* Table columns */
+          const columns = [
+            Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
+            Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
+            Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
+            Column('work-time', 'Рабочее время', 'Рабочее время'),
+            Column('orders-count', 'Кол-во заказов', 'Кол-во заказов'),
+            Column('orders-value', 'Стоимость заказов, ₽', 'Стоимость заказов'),
+            Column('average-bill', 'Средний чек, ₽', 'Средний чек'),
+            Column('dist-km', 'Расст-е, км', 'Расст-е, км'),
+            Column('estimated-time', 'Расчет. время в пути', 'Расчет. время в пути'),
+            Column('actual-time', 'Факт. время в пути', 'Факт. время в пути'),
+            Column('kpi', 'KPI', 'KPI'),
+            Column('time-without-case', 'Время без дела, %', 'Время без дела, %'),
+            Column('time', 'Время', 'Время'),
+            Column('orders', 'Заказы', 'Заказы'),
+            Column('dist', 'Расст.', 'Расст.'),
+            Column('min-payment', 'Min оплата., ₽', 'Min оплата., ₽'),
+            Column('surcharge', 'Надбавка, ₽', 'Надбавка, ₽'),
+            Column('late-surcharge', 'Надб. за поздний выезд, ₽', 'Надб. за поздний выезд, ₽'),
+            Column('short-shift-surcharge', 'Надб. за короткую смену, ₽', 'Надб. за короткую смену, ₽'),
+            Column('premation', 'Прем., ₽', 'Премирование'),
+            Column('fine', 'Штраф, ₽', 'Штраф'),
+            Column('total', 'Всего начислено, ₽', 'Всего начислено, ₽', true),
+            Column('payment', 'К выплате, ₽', 'К выплате, ₽', true)
+          ];
+          const defaultColumnsState = localStorage.getItem('calculation-page-delivery-columns');
+          if (defaultColumnsState) {
+            const state = JSON.parse(defaultColumnsState);
+            columns.forEach(column => {
+              if (column.id in state && state[column.id] === 0) {
+                column.visible(false);
+              }
+            })
+          };
+
+          const activeColumns = ko.pureComputed(() => {
+            return columns.filter(c => c.visible()).length;
+          });
+          const isColumnVisible = (columnName) => {
+            const column = columns.find(c => c.id === columnName);
+            if (column) return column.visible;
+            else return false;
+          };
+          const columnCount = ko.pureComputed(() => {
+            return activeColumns() + 1;
+          });
+
+          const getColumnClicked = (columnName) => {
+            const column = columns.find(c => c.id === columnName);
+            if (column) return column.clicked;
+          }
+
+          /** Sets columns visibility */
+          function setColumns() {
+            params.utils.openModal('columns', { columns: columns }, () => {
+              saveColumnsState();
+            });
+          }
+
+          function setColumnsState(set) {
+            columns.forEach(c => {
+              const isVisible = set ? set.includes(c.id) : true;
+              c.visible(isVisible);
+            });
+            saveColumnsState();
+          }
+
+          function saveColumnsState() {
+            const state = columns.reduce((acc, column) => {
+              return {
+                ...acc,
+                [column.id]: column.visible() ? 1 : 0
+              }
+            }, {});
+            localStorage.setItem('calculation-page-delivery-columns', JSON.stringify(state));
+          }
+
+          const columnSets = [
+            ['account', 'account-operations', 'interval', 'orders-count', 'orders-value', 'average-bill', 'dist-km', 'actual-time', 'kpi', 'time-without-case', 'premation', 'fine', 'payment'],
+            ['time-without-case', 'payment']
+          ];
+          const columnSetsIndex = ko.observable(-1);
+          const blockMoreInfo = ko.pureComputed(() => {
+            return !columns.some(c => !c.visible());
+          });
+          const blockLessInfo = ko.pureComputed(() => {
+            return !columns
+              .filter(c => !columnSets[1].includes(c.id))
+              .some(c => c.visible());
+          });
+
+          const moreInfo = () => {
+            const hasInvisibleColumns = columns.filter(c => columnSets[0].includes(c.id))
+            .some(c => !c.visible());
+            if (hasInvisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState();
+            $(window).resize();
+          };
+
+          const lessInfo = () => {
+            const hasVisibleColumns = columns.filter(c => !columnSets[0].includes(c.id))
+                .some(c => c.visible());
+            if (hasVisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState(columnSets[1]);
+            $(window).resize();
+          };
+
+
+          /**
+          * Opens Account Operations modal
+          * @param {Object} employee
+          */
+          function performAccountOperations(employee) {
+            params.utils.openModal('account-operations', {
+              employee: employee,
+            });
+          }
+
+          /**
+          * Opens Employee bonus modal
+          * @param {Object} employee
+          */
+          function giveBonus(employee) {
+            params.utils.openModal('employee-bonus', {
+              employee: employee,
+              bonuses: window.directories.bonuses,
+              authors: window.directories.authors,
+            }, (result) => {
+              console.log('after bonus', result)
+            });
+          }
+
+          /**
+          * Opens Employee fine modal
+          * @param {Object} employee
+          */
+          function giveFine(employee) {
+            params.utils.openModal('employee-fine', {
+              employee: employee,
+              fines: window.directories.fines,
+              authors: window.directories.authors,
+            }, (result) => {
+              console.log('after fine', result)
+            });
+          }
+
+          /**
+          * Removes employee from calculation
+          * @param {Object} employee
+          */
+          function removeEmployee(employee) {
+            employee.visible(false);
+          };
+
+          const tableScroll = ko.observable(false);
+
+          const onTableRender = (el) => {
+            let scrollWrapper = el.querySelector('.os-content');
+            if (!scrollWrapper) return;
+
+            if (scrollWrapper.offsetWidth < scrollWrapper.scrollWidth) {
+              tableScroll(true);
+            }
+
+            params.utils.viewportSize.subscribe(_ => {
+              tableScroll(scrollWrapper.offsetWidth < scrollWrapper.scrollWidth);
+            });
+          }
+
+          return {
+            getColumnClicked,
+
+            onTableRender,
+            tableScroll,
+
+            viewportSize: params.utils.viewportSize,
+            tabName: params.tabName,
+
+            editableCellErrorStateMatcher,
+            columns,
+            activeColumns,
+            columnCount,
+            isColumnVisible,
+            setColumns,
+
+            moreInfo,
+            blockMoreInfo,
+            lessInfo,
+            blockLessInfo,
+
+            position,
+            total,
+
+            removeEmployee,
+
+            performAccountOperations,
+            giveBonus,
+            giveFine
+          };
+        }
+      },
+      template: {
+        element: document.getElementById('calculation-page-delivery-table-template')
+      }
+    });
+  })
+</script>
+
   <script type="text/javascript">
   // Справочники
   window.directories = {
@@ -5072,6 +5958,11 @@
 
       const driversData = ko.observable();
 
+      const holidaySurcharge = ko.observable('');
+      holidaySurcharge.subscribe(_ => {
+        root.calculate();
+      });
+
       /**
       * Returns position with specified id
       * @param {string|number} id
@@ -5093,7 +5984,7 @@
 
 
       function setDriversData(driversData) {
-        this.driversData(new PositionModel(driversData, root));
+        this.driversData(new DeliveryPositionModel(driversData, root));
       }
 
       /**
@@ -5144,7 +6035,7 @@
       }
 
 
-      function EmployeeModel(employee, positionModel, visible) {
+      function EmployeeModel(employee, positionModel) {
         this.position = positionModel;
         this.root = this.position.root;
 
@@ -5258,21 +6149,127 @@
         this.total = ko.observable(employee.total || 0);
         this.toPayment = ko.observable(employee.toPayment || 0);
 
-        this.visible = ko.observable(!!visible) // участвует в расчете
+        this.visible = ko.observable(employee.visible) // участвует в расчете
         this.visible.subscribe(_ => this.root.calculate());
 
         this.loaded = employee.loaded; // загружен для Все филиалы
       }
 
-      /**
-      * @param {Object} positionData
-      */
+      function DriverEmployeeModel(employee, positionModel) {
+        this.position = positionModel;
+        this.root = this.position.root;
+
+        this.clicked = ko.observable(false);
+
+        this.name = employee.name;                   // имя сотрудника
+        this.id = employee.id;                       // идентификатор сотрудника
+        this.link = employee.link;                   // ссылка на личное дело
+
+        this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
+
+        // рабочее время
+        const defaultIntervals = employee.workingIntervals || ['11:00 – 23:00'];
+        this.workingIntervals = ko.observableArray(
+          defaultIntervals.map(i => WorkingIntervalModel(i))
+        );
+        const isWorkingIntervalsValid = ko.pureComputed(() => {
+          return this.workingIntervals().every(i => i.value.isValid())
+        });
+        this.workingTime = ko.pureComputed(() => {
+          if (!isWorkingIntervalsValid()) return 0;
+
+          return this.workingIntervals().reduce((minutes, interval) => {
+            return minutes + interval.getInterval();
+          }, 0);
+        });
+        this.addWorkingInterval = () => {
+          const model = WorkingIntervalModel('');
+          this.workingIntervals.push(model);
+        };
+        this.removeWorkingInterval = (interval) => {
+          this.workingIntervals.remove(interval);
+        };
+
+        this.workingTime.subscribe(_ => this.root.calculate());
+
+        this.account = ko.observable(employee.account || 0);             // личный счет
+        this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
+
+        // операции с ЛС
+        this.accountOperations = ko.observableArray(employee.accountOperations || []);
+        this.accountState = ko.pureComputed(() => {
+          return this.accountOperations().reduce((sum, operation) => {
+            const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
+            return sum + operationSum;
+          }, 0);
+        });
+
+        this.accountOperations.subscribe(_ => this.root.calculate());
+
+        this.ordersCount = ko.observable(employee.ordersCount);
+        this.ordersValue = ko.observable(employee.ordersValue);
+        this.averageBill = ko.observable(employee.averageBill);
+        this.distKm = ko.observable(employee.distKm);
+        this.estimatedTime = ko.observable(employee.estimatedTime);
+        this.actualTime = ko.observable(employee.actualTime);
+        this.kpi = ko.observable(employee.kpi);
+        this.timeWithoutCase = ko.observable(employee.timeWithoutCase);
+        this.time = ko.observable(employee.time);
+        this.orders = ko.observable(employee.orders);
+        this.dist = ko.observable(employee.dist);
+        this.minPayment = ko.observable(employee.minPayment);
+        this.surcharge = ko.observable(employee.surcharge);
+        this.lateSurcharge = ko.observable(employee.lateSurcharge);
+        this.shortShirtSurcharge = ko.observable(employee.shortShirtSurcharge);
+
+        // штрафы
+        this.fines = ko.observableArray(employee.fines || []);
+        this.finesState = ko.pureComputed(() => {
+          return this.fines().reduce((sum, fine) => {
+            return sum + fine.sum;
+          }, 0);
+        });
+
+        this.fines.subscribe(_ => this.root.calculate());
+
+        // бонусы
+        this.bonuses = ko.observableArray(employee.bonuses || []);
+        this.bonusesState = ko.pureComputed(() => {
+          return this.bonuses().reduce((sum, bonus) => {
+            return sum + bonus.sum;
+          }, 0);
+        });
+
+        this.bonuses.subscribe(_ => this.root.calculate());
+
+        // опоздания
+        this.lateness = {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        };
+        if (employee.lateness) {
+          this.lateness.light(employee.lateness.light);
+          this.lateness.medium(employee.lateness.medium);
+          this.lateness.hard(employee.lateness.hard);
+          this.lateness.total(employee.lateness.light + employee.lateness.medium + employee.lateness.hard);
+        }
+
+        this.total = ko.observable(employee.total || 0);
+        this.toPayment = ko.observable(employee.toPayment || 0);
+
+        this.visible = ko.observable(employee.visible) // участвует в расчете
+        this.visible.subscribe(_ => this.root.calculate());
+      }
+
+
       function PositionModel(positionData, root) {
         this.root = root;
 
         this.clicked = ko.observable(false);
 
-        this.type = positionData.type || 'production';
+        this.type = 'production';
 
         this.id = positionData.id;
         this.name = positionData.name;
@@ -5313,7 +6310,7 @@
         this.visible = ko.observable(positionData.visible); // Отображается в таблице
         this.visible.subscribe(_ => this.root.calculate());
 
-        this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this, false)));
+        this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this)));
 
         this.visibleEmployees = ko.pureComputed(() => {
           return this.employees().filter(e => e.visible());
@@ -5333,7 +6330,8 @@
         };
 
         this.addEmployee = (employee) => {
-          this.employees.push(new EmployeeModel(employee, this, 'visible'));
+          employee.visible = true;
+          this.employees.push(new EmployeeModel(employee, this));
           this.root.calculate();
         };
 
@@ -5356,7 +6354,8 @@
           // add new-s
           const newEmployees = newEmployeesIds.map(id => {
             const employeeData = updatedList.find(e => e.id === id);
-            const employee = new EmployeeModel(employeeData, this, employeeData.checked);
+            employeeData.visible = employeeData.checked;
+            const employee = new EmployeeModel(employeeData, this);
             return employee;
           });
 
@@ -5395,6 +6394,94 @@
         }
       };
 
+      function DeliveryPositionModel(positionData, root) {
+        this.root = root;
+        this.clicked = ko.observable(false);
+        this.type = 'delivery';
+
+        this.id = positionData.id;
+        this.name = positionData.name;
+
+        this.employees = ko.observableArray(positionData.employees.map((e) => new DriverEmployeeModel(e, this)));
+
+        this.visibleEmployees = ko.pureComputed(() => {
+          return this.employees().filter(e => e.visible());
+        });
+
+        this.workingTime = ko.pureComputed(() => {
+          return this.employees().reduce((minutes, employee) => {
+            if (!employee.visible()) return minutes;
+            return minutes + employee.workingTime();
+          }, 0)
+        });
+
+        this.findEmployeeById = (employeeId) => {
+          return this.employees().find(employee => employee.id === employeeId);
+        };
+
+        this.toggleClicked = () => {
+          if (this.visibleEmployees().some(e => !e.clicked())) {
+            this.visibleEmployees().forEach(e => e.clicked(true));
+          } else {
+            this.visibleEmployees().forEach(e => e.clicked(false));
+          }
+        }
+
+        // нагрузка
+        this.workloadType = positionData.workloadType;
+        this.workload = ko.observable(positionData.workload);
+        this.workloadUnits = positionData.workloadUnits;
+
+        this.workload.subscribe(v => {
+          root.calculate();
+        });
+
+        // доп. нагрузка
+        this.additionalWorkloadType = positionData.additionalWorkloadType;
+        this.additionalWorkload = ko.observable(positionData.additionalWorkload);
+        this.additionalWorkloadUnits = positionData.additionalWorkloadUnits;
+
+        // ФОТ, % в категории
+        this.fotCategory = ko.observable(positionData.fotCategory);
+
+        // ФОТ, % от выручки
+        this.fotRevenue = ko.observable(positionData.fotRevenue);
+
+        this.salary = positionData.salary; // оклад
+        this.salaryBulk = positionData.salaryBulk; // основная часть зарплаты
+
+        this.revenueStandart = positionData.revenueStandart; // Норматив выручки
+        this.revenueStandartPerHour = positionData.revenueStandartPerHour; // Норматив выручки в час
+        this.revenueStandartUnits = positionData.revenueStandartUnits; // Единицы измерения
+
+        // Норм. выработки
+        this.performanceStandart = ko.observable(positionData.performanceStandart);
+        this.performanceStandartType = positionData.performanceStandartType;
+        this.performanceStandartUnits = positionData.performanceStandartUnits;
+
+        this.lateness = ko.pureComputed(() => {
+          const result = {
+            light: 0,
+            medium: 0,
+            hard: 0,
+            total: 0,
+          };
+          this.employees().forEach(employee => {
+            const employeeLateness = employee.lateness;
+            result.light += employeeLateness.light() || 0;
+            result.medium += employeeLateness.medium() || 0;
+            result.hard += employeeLateness.hard() || 0;
+            result.total += result.light + result.medium + result.hard;
+          });
+
+          return result;
+        });
+
+        this.totalLateness = ko.pureComputed(() => {
+          return lateness.total;
+        });
+      };
+
       const productionTotal = {
         workingTime: ko.observable(0),
         salaryBulk: ko.observable(0),
@@ -5403,6 +6490,28 @@
         bonusRatio: ko.observable(0),
         correctedTime: ko.observable(0),
         bonusExceed: ko.observable(0),
+        total: ko.observable(0),
+        toPayment: ko.observable(0),
+      };
+
+      const deliveryTotal = {
+        workingTime: ko.observable(0),
+        ordersCount: ko.observable(0),
+        ordersValue: ko.observable(0),
+        averageBill: ko.observable(0),
+        distKm: ko.observable(0),
+        estimatedTime: ko.observable(0),
+        actualTime: ko.observable(0),
+        kpi: ko.observable(0),
+        timeWithoutCase: ko.observable(0),
+        time: ko.observable(0),
+        orders: ko.observable(0),
+        dist: ko.observable(0),
+        minPayment: ko.observable(0),
+        lateSurcharge: ko.observable(0),
+        shortShiftSurcharge: ko.observable(0),
+        bonus: ko.observable(0),
+        fine: ko.observable(0),
         total: ko.observable(0),
         toPayment: ko.observable(0),
       };
@@ -5423,17 +6532,19 @@
       };
 
       return {
+        holidaySurcharge,
         positions,
         driversData,
         setPositions,
         setDriversData,
         getPositionById,
         productionTotal,
+        deliveryTotal,
         total
       }
     }
 
-    const ViewModel = function (defaultPositions, settings) {
+    const ViewModel = function () {
       /** Initialization */
       (() => {
         this.subscriptions = [];
@@ -5459,125 +6570,26 @@
             return formattedNumber;
           },
 
+          formatTime: (minutes) => {
+            if (!minutes) return '00:00';
+            minutes = ko.unwrap(minutes);
+            minutes = parseInt(minutes);
+            if (!minutes || minutes <= 0) return '00:00';
+
+            let h = Math.floor(minutes / 60).toString();
+            h = h.length === 1 ? '0' + h : h;
+            let m = (minutes % 60).toString();
+            m = m.length === 1 ? '0' + m : m;
+
+            return h + ':' + m;
+          },
+
           viewportSize: viewportSize
         }
       })();
 
       this.summaryModel = new PositionsModel(this);
-      this.summaryModel.setPositions(defaultPositions);
 
-
-      this.summaryModel.setDriversData({
-        type: 'delivery',
-        name: 'Водители',                           // название должности
-        id: 'drivers',                              // идентификато позиции
-        levels: [1, 2],                             // разряды
-        workloadType: 'Выручка',                    // тип нагрузки
-        workload: 0,                                // нагрузка (величина)
-        workloadUnits: '₽',                         // единицы измерения нагрузки
-        additionalWorkloadType: '',                 // тип доп. нагрузки
-        additionalWorkload: '52',                   // доп. нагрузка (величина)
-        additionalWorkloadUnits: '',                // единицы измерения доп. нагрузки
-        fotCategory: 0,                             // ФОТ, % в категории
-        fotRevenue: 0,                              // ФОТ, % от выручки
-        performanceStandart: 0,                     // Норм. выработки, %
-        performanceStandartType: 'Цена заказа',
-        performanceStandartUnits: '₽',
-        salary: 30000,                              // Оклад
-        salaryBulk: 7200,                           // основная часть зарплаты
-        revenueStandart: 30,                        // Норматив выручки
-        revenueStandartPerHour: 0,
-        revenueStandartUnits: '₽',
-        employees: [                                // сотрудники
-          {
-            name: 'Водитель #1',                    // имя сотрудника
-            id: 'driver1',                          // идентификатор сотрудника
-            link: '#',                              // ссылка на личное дело
-            hasProblems: 0,                         // проблемы с документами
-            upRecommended: 0,                       // рекомендуется повышение
-            downRecommended: 0,                     // рекомендуется понижение
-            premiumAccount: 0,                      // премиальный счет
-            account: 100,                           // личный счет
-            accountOperations: [],                  // операции со счетом
-            level: 1,                               // разряд сотрудника
-            workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
-            compensation: 0,                        // компенсация
-            workload: 0,                            // нагрузка
-            workloadUnits: '₽',
-            salary: 3000,                           // зарплата
-            salaryBulk: 2000,                       // основная часть зарплаты
-            revenueStandartUnits: '₽',
-            revenueStandartPerHour: 10000,          // норматив выручки в час
-            revenueStandart: 130000,                // Норматив выручки
-            normalizationRatio: 0.5,                // Коэф. нормализации
-            bonusRatio: 0.5,                        // Коэф. премирования
-            bonusExceed: 100,                       // прем. за превыш. норм
-            bonuses: [],                            // бонусы
-            fines: [],                              // штрафы
-            depremation: 0,                         // депр.
-            correctedTime: '0',                  // корр. время
-            total: 7300,                            // всего
-            toPayment: 7300,                        // к выплате
-            lateness: {                             // опоздания сотрудника
-              light: 0,                             // меньше 5 минут
-              medium: 0,                            // 5-10 минут
-              hard: 0                               // больше 10 минут
-            },
-          },
-          {
-            name: 'Водитель #2',
-            id: 'driver2',
-            link: '#',
-            hasProblems: 0,
-            upRecommended: 0,
-            downRecommended: 0,
-            premiumAccount: 100,
-            account: 0,
-            accountOperations: [],
-            level: 2,
-            workingIntervals: ['09:00 – 16:00'],
-            compensation: 0,
-            workload: 0,
-            workloadUnits: '₽',
-            salary: 3000,
-            salaryBulk: 2000,
-            revenueStandartUnits: '₽',
-            revenueStandartPerHour: 10000,
-            revenueStandart: 130000,
-            normalizationRatio: 0.5,
-            bonusRatio: 0.5,
-            bonusExceed: 100,
-            bonuses: [],
-            fines: [],
-            depremation: 0,
-            correctedTime: '0',
-            total: 7300,
-            toPayment: 7300,
-            lateness: {
-              light: 0,
-              medium: 0,
-              hard: 0
-            },
-          }
-        ],
-      });
-
-      this.formatDuration = (minutes) => {
-        if (!minutes) return '00:00';
-        minutes = ko.unwrap(minutes);
-        minutes = parseInt(minutes);
-        if (!minutes || minutes <= 0) return '00:00';
-
-        let h = Math.floor(minutes / 60).toString();
-        h = h.length === 1 ? '0' + h : h;
-        let m = (minutes % 60).toString();
-        m = m.length === 1 ? '0' + m : m;
-
-        return h + ':' + m;
-      };
-
-
-      /** Input data */
       this.inputModel = {
         filial: ko.observable(''),
         date: ko.observable(moment().format('DD.MM.YYYY')),
@@ -5588,10 +6600,10 @@
         }
       };
 
-      /** Calculation */
       this.isBuilt = ko.observable(false);
       this.loading = ko.observable(false);
-      /** Get data for calculation */
+
+      // Построение расчета
       this.buildCalculation = () => {
         this.loading(true);
         const inputData = ko.toJS(this.inputModel);
@@ -5605,7 +6617,7 @@
         });
 
         setTimeout(() => {
-          /* Получение списка позиций */
+          // Производственные позиции
           const positions = [
             {
               name: 'Администратор филиала',             // название должности
@@ -5661,6 +6673,7 @@
                     medium: 0,                            // 5-10 минут
                     hard: 0                               // больше 10 минут
                   },
+                  visible: false,
                 },
                 {
                   name: 'Администратор #2 Down',
@@ -5696,6 +6709,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -5754,6 +6768,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 },
                 {
                   name: 'Повар-сушист #2 problems + up',
@@ -5789,6 +6804,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -5847,6 +6863,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 },
                 {
                   name: 'Повар-пиццмейкер #2',
@@ -5882,6 +6899,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -5940,6 +6958,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 },
                 {
                   name: 'Официант #2',
@@ -5975,6 +6994,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -6033,6 +7053,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 },
                 {
                   name: 'Официант #2',
@@ -6068,6 +7089,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -6184,14 +7206,115 @@
             },
           ];
 
-          /** Обновление представления */
+          // Обновление производственных позиций
           this.summaryModel.setPositions(positions);
+
+          // Данные водителей
+          const driversData = {
+            type: 'delivery',
+            name: 'Водители',                           // название должности
+            id: 'drivers',                              // идентификато позиции
+            workloadType: 'Выручка',                    // тип нагрузки
+            workload: 0,                                // нагрузка (величина)
+            workloadUnits: '₽',                         // единицы измерения нагрузки
+            additionalWorkloadType: '',                 // тип доп. нагрузки
+            additionalWorkload: '52',                   // доп. нагрузка (величина)
+            additionalWorkloadUnits: '',                // единицы измерения доп. нагрузки
+            fotCategory: 0,                             // ФОТ, % в категории
+            fotRevenue: 0,                              // ФОТ, % от выручки
+            performanceStandart: 0,                     // Норм. выработки, %
+            performanceStandartType: 'Цена заказа',
+            performanceStandartUnits: '₽',
+            salary: 30000,                              // Оклад
+            salaryBulk: 7200,                           // основная часть зарплаты
+            revenueStandart: 30,                        // Норматив выручки
+            revenueStandartPerHour: 0,
+            revenueStandartUnits: '₽',
+            employees: [                                // сотрудники
+              {
+                name: 'Водитель #1',                    // имя сотрудника
+                id: 'driver1',                          // идентификатор сотрудника
+                link: '#',                              // ссылка на личное дело
+                hasProblems: 1,                         // проблемы с документами
+                premiumAccount: 0,                      // премиальный счет
+                account: 100,                           // личный счет
+                accountOperations: [],                  // операции со счетом
+                workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
+                ordersCount: 10,
+                ordersValue: 10,
+                averageBill: 100,
+                distKm: 100,
+                estimatedTime: 10000,
+                actualTime: 10000,
+                kpi: 23,
+                timeWithoutCase: 1000,
+                orders: 45,
+                dist: 234,
+                minPayment: 2345,
+                surcharge: 24,
+                lateSurchage: 3,
+                shortShiftSurcharge: 23,
+                bonuses: [],                            // бонусы
+                fines: [],                              // штрафы
+                total: 7300,                            // всего
+                toPayment: 7300,                        // к выплате
+                lateness: {                             // опоздания сотрудника
+                  light: 0,                             // меньше 5 минут
+                  medium: 0,                            // 5-10 минут
+                  hard: 0                               // больше 10 минут
+                },
+                visible: true,
+              },
+              {
+                name: 'Водитель #2',
+                id: 'driver2',
+                link: '#',
+                hasProblems: 0,
+                premiumAccount: 100,
+                account: 0,
+                accountOperations: [],
+                workingIntervals: ['09:00 – 16:00'],
+                ordersCount: 10,
+                ordersValue: 10,
+                averageBill: 100,
+                distKm: 100,
+                estimatedTime: 10000,
+                actualTime: 10000,
+                kpi: 23,
+                timeWithoutCase: 1000,
+                orders: 45,
+                dist: 234,
+                minPayment: 2345,
+                surcharge: 24,
+                lateSurchage: 3,
+                shortShiftSurcharge: 23,
+                bonuses: [],
+                fines: [],
+                depremation: 0,
+                correctedTime: '0',
+                total: 7300,
+                toPayment: 7300,
+                lateness: {
+                  light: 0,
+                  medium: 0,
+                  hard: 0
+                },
+                visible: true
+              }
+            ],
+          };
+          // Обновить данные водителей
+          this.summaryModel.setDriversData(driversData);
 
           loadingDelay.then(() => {
             this.isBuilt(true);
             this.loading(false);
           });
         }, 10);
+      };
+
+      this.recalculateRoutes = () => {
+        this.buildCalculation();
       };
 
       /** Tabs: production, delivery, lateness */
@@ -6240,11 +7363,11 @@
           delivery: Stimulation()
         };
 
-        const setStimulation = () => {
+        const setStimulation = (category) => {
           this.utils.openModal(
             'stimulation',
             {
-              category: 'production',
+              category: category,
               fines: window.directories.fines,
               bonuses: window.directories.bonuses,
               authors: window.directories.authors
@@ -6259,6 +7382,8 @@
               let positions = [];
               if (data.category === 'production') {
                 positions = root.summaryModel.positions();
+              } else {
+                positions = [root.summaryModel.driversData()];
               }
               positions.forEach(p => {
                 let employees = p.visibleEmployees();
@@ -6274,12 +7399,17 @@
           )
         };
 
-        const isBlocked = ko.pureComputed(() => {
+        const isProductionBlocked = ko.pureComputed(() => {
           return !root.activePositions().some(p => p.visibleEmployees().length > 0);
         });
 
+        const isDeliveryBlocked = ko.pureComputed(() => {
+          return false;
+        });
+
         return {
-          isBlocked,
+          isProductionBlocked,
+          isDeliveryBlocked,
           fine,
           bonus,
           set: setStimulation
@@ -6415,20 +7545,126 @@
       this.calculate = () => {
         console.log('recalculate');
 
-        /** ДАННЫЕ */
-        // Позиции, участвующие в расчете
-        const activePositions = this.activePositions();
-        // Водители
-        const drivers = this.summaryModel.driversData();
 
         /** УСТАНОВКА ДАННЫХ ДЛЯ ВОДИТЕЛЕЙ */
-        // Данные сотрудников
-        drivers.employees().forEach(employee => {
 
+        // Позиция Водители
+        const driversPosition = this.summaryModel.driversData();
+        // Сотрудники, участвующие в расчете
+        const activeDrivers = driversPosition.visibleEmployees();
+        // Праздничная надбавка
+        const holidaySurcharge = this.summaryModel.holidaySurcharge();
+
+        // Обновление данных сотрудников (Водители)
+        activeDrivers.forEach(employee => {
+          const account = getRandom(0, 2000);
+          const premiumAccount = getRandom(0, 2000);
+          const ordersCount = getRandom(0, 2000);
+          const ordersValue = getRandom(0, 2000);
+          const averageBill = getRandom(0, 2000);
+          const distKm = getRandom(0, 2000);
+          const estimatedTime = getRandom(0, 2000);
+          const actualTime = getRandom(0, 2000);
+          const kpi = getRandom(0, 2000);
+          const timeWithoutCase = getRandom(0, 2000);
+          const time = getRandom(0, 2000);
+          const orders = getRandom(0, 2000);
+          const dist = getRandom(0, 2000);
+          const minPayment = getRandom(0, 2000);
+          const surcharge = getRandom(0, 2000);
+          const lateSurcharge = getRandom(0, 2000);
+          const shortShiftSurcharge = getRandom(0, 2000);
+          const total = getRandom(0, 2000);
+          const toPayment = getRandom(0, 2000);
+
+          employee.account(account);
+          employee.premiumAccount(premiumAccount);
+          employee.ordersCount(ordersCount);
+          employee.ordersValue(ordersValue);
+          employee.averageBill(averageBill);
+          employee.distKm(distKm);
+          employee.estimatedTime(estimatedTime);
+          employee.actualTime(actualTime);
+          employee.kpi(kpi);
+          employee.timeWithoutCase(timeWithoutCase);
+          employee.time(time);
+          employee.orders(orders);
+          employee.dist(dist);
+          employee.minPayment(minPayment);
+          employee.surcharge(surcharge);
+          employee.lateSurcharge(lateSurcharge);
+          employee.shortShiftSurcharge(shortShiftSurcharge);
+          employee.total(total);
+          employee.toPayment(toPayment);
         });
-        // Данные всей позиции
+
+        // Обновление данных позиции (Водители)
+        (() => {
+          const fotCategory = getRandom(0, 80);
+          const fotRevenue = getRandom(0, 80);
+          const performanceStandart = getRandom(-80, 0);
+
+          driversPosition.fotCategory(fotCategory);
+          driversPosition.fotRevenue(fotRevenue);
+          driversPosition.performanceStandart(performanceStandart);
+        })();
+
+        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ВОДИТЕЛИ) */
+        (() => {
+          const totalModel = this.summaryModel.deliveryTotal;
+
+          // время в минутах
+          const workingTime = activeDrivers.reduce((acc, p) => {
+            return acc + p.workingTime();
+          }, 0);
+
+          const ordersCount = getRandom(0, 1000);
+          const ordersValue = getRandom(0, 1000);
+          const averageBill = getRandom(0, 1000);
+          const distKm = getRandom(0, 1000);
+          const estimatedTime = getRandom(0, 1000);
+          const actualTime = getRandom(0, 1000);
+          const kpi = getRandom(0, 1000);
+          const timeWithoutCase = getRandom(0, 1000);
+          const time = getRandom(0, 1000);
+          const orders = getRandom(0, 1000);
+          const dist = getRandom(0, 1000);
+          const minPayment = getRandom(0, 1000);
+          const lateSurcharge = getRandom(0, 1000);
+          const shortShiftSurcharge = getRandom(0, 1000);
+          const bonus = getRandom(0, 1000);
+          const fine = getRandom(0, 1000);
+          const total = getRandom(0, 1000);
+          const toPayment = getRandom(0, 1000);
+
+          totalModel.workingTime(workingTime);
+          totalModel.ordersCount(ordersCount);
+          totalModel.ordersValue(ordersValue);
+          totalModel.averageBill(averageBill);
+          totalModel.distKm(distKm);
+          totalModel.estimatedTime(estimatedTime);
+          totalModel.actualTime(actualTime);
+          totalModel.kpi(kpi);
+          totalModel.timeWithoutCase(timeWithoutCase);
+          totalModel.time(time);
+          totalModel.orders(orders);
+          totalModel.dist(dist);
+          totalModel.minPayment(minPayment);
+          totalModel.lateSurcharge(lateSurcharge);
+          totalModel.shortShiftSurcharge(shortShiftSurcharge);
+          totalModel.bonus(bonus);
+          totalModel.fine(fine);
+          totalModel.total(total);
+          totalModel.toPayment(toPayment);
+        })();
+
+
+
 
         /** УСТАНОВКА ДАННЫХ ДЛЯ ПРОИЗВОДСТВЕННЫХ ПОЗИЦИЙ */
+
+        // Позиции, участвующие в расчете
+        const activePositions = this.activePositions();
         activePositions.forEach(position => {
 
           // нагрузка из первой таблицы
@@ -6483,50 +7719,64 @@
           position.performanceStandart(performanceStandart);
         });
 
-        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ СВОДНОЙ ТАБЛИЦЫ */
-        const workload = getRandom(0, 2000);
-        const workloadUnits = getRandom(0, 2000);
-        const fotCategory = getRandom(0, 2000);
-        const fotRevenue = getRandom(0, 2000);
-        const performanceStandart = getRandom(0, 2000);
 
-        this.summaryModel.total.workload(workload);
-        this.summaryModel.total.workloadUnits(workloadUnits);
-        this.summaryModel.total.fotCategory(fotCategory);
-        this.summaryModel.total.fotRevenue(fotRevenue);
-        this.summaryModel.total.performanceStandart(performanceStandart);
 
         /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ПРОИЗВОДСТВО) */
-        // время в минутах
-        const workingTime = activePositions.reduce((acc, p) => {
-          return acc + p.workingTime();
-        }, 0);
-        console.log(workingTime)
+        (() => {
+          const totalModel = this.summaryModel.productionTotal;
 
-        const salaryBulk = getRandom(0, 2000);
-        const normalizationRatio = getRandom(0, 3);
-        const revenueStandart = getRandom(0, 2000);
-        const bonusRatio = getRandom(0, 3);
+          // время в минутах
+          const workingTime = activePositions.reduce((acc, p) => {
+            return acc + p.workingTime();
+          }, 0);
 
-        // время в минутах
-        const correctedTime = activePositions.reduce((acc, p) => {
-          const employees = p.employees().filter(e => e.visible());
-          return employees.reduce((acc, e) => acc + e.correctedTime(), acc);
-        }, 0);
+          const salaryBulk = getRandom(0, 2000);
+          const normalizationRatio = getRandom(0, 3);
+          const revenueStandart = getRandom(0, 2000);
+          const bonusRatio = getRandom(0, 3);
 
-        const bonusExceed = getRandom(0, 2000);
-        const total = getRandom(0, 34000);
-        const toPayment = getRandom(0, 65000);
+          // время в минутах
+          const correctedTime = activePositions.reduce((acc, p) => {
+            const employees = p.employees().filter(e => e.visible());
+            return employees.reduce((acc, e) => acc + e.correctedTime(), acc);
+          }, 0);
 
-        this.summaryModel.productionTotal.workingTime(workingTime);
-        this.summaryModel.productionTotal.salaryBulk(salaryBulk);
-        this.summaryModel.productionTotal.normalizationRatio(normalizationRatio);
-        this.summaryModel.productionTotal.revenueStandart(revenueStandart);
-        this.summaryModel.productionTotal.bonusRatio(bonusRatio);
-        this.summaryModel.productionTotal.correctedTime(correctedTime);
-        this.summaryModel.productionTotal.bonusExceed(bonusExceed);
-        this.summaryModel.productionTotal.total(total);
-        this.summaryModel.productionTotal.toPayment(toPayment);
+          const bonusExceed = getRandom(0, 2000);
+          const total = getRandom(0, 34000);
+          const toPayment = getRandom(0, 65000);
+
+          totalModel.workingTime(workingTime);
+          totalModel.salaryBulk(salaryBulk);
+          totalModel.normalizationRatio(normalizationRatio);
+          totalModel.revenueStandart(revenueStandart);
+          totalModel.bonusRatio(bonusRatio);
+          totalModel.correctedTime(correctedTime);
+          totalModel.bonusExceed(bonusExceed);
+          totalModel.total(total);
+          totalModel.toPayment(toPayment);
+        })();
+
+
+
+
+
+        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ СВОДНОЙ ТАБЛИЦЫ */
+        (() => {
+          const totalModel = this.summaryModel.total;
+
+          const workload = getRandom(0, 2000);
+          const workloadUnits = getRandom(0, 2000);
+          const fotCategory = getRandom(0, 2000);
+          const fotRevenue = getRandom(0, 2000);
+          const performanceStandart = getRandom(0, 2000);
+
+          totalModel.workload(workload);
+          totalModel.workloadUnits(workloadUnits);
+          totalModel.fotCategory(fotCategory);
+          totalModel.fotRevenue(fotRevenue);
+          totalModel.performanceStandart(performanceStandart);
+        })();
+
 
       }
     };
@@ -6538,8 +7788,7 @@
     };
 
     /***** Model activation *******/
-    const defaultPositions = [];
-    const viewModel = new ViewModel(defaultPositions);
+    const viewModel = new ViewModel();
 
 
 

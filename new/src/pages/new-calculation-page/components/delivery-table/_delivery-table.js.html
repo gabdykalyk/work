@@ -1,4 +1,4 @@
-@@include('./_positions-table.html')
+@@include('./_delivery-table.html')
 
 <script type="text/javascript">
   $(function () {
@@ -13,7 +13,7 @@
       }
     }
 
-    ko.components.register('calculation-page-positions-table', {
+    ko.components.register('calculation-page-delivery-table', {
       viewModel: {
         /**
         * @param {ObservableArray} params.positions
@@ -26,18 +26,8 @@
             });
           };
 
-
-
-          const positions = params.positions;
+          const position = params.position();
           const model = params.model;
-
-          /** Invisible positions */
-          const hasOtherSection = ko.pureComputed(() => {
-            return positions().some(position => {
-              return !position.visible();
-            });
-          });
-
           const total = params.total;
 
 
@@ -45,27 +35,29 @@
           const columns = [
             Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
             Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
-            Column('level', 'Разряд', 'Разряд'),
             Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
             Column('work-time', 'Рабочее время', 'Рабочее время'),
-            Column('compensation', 'Компенс.', 'Компенсация'),
-            Column('workload', 'Нагрузка', 'Нагрузка'),
-            Column('salary', 'Оклад, ₽', 'Оклад'),
-            Column('salary-bulk', 'Осн. часть зп, ₽', 'Основная часть зарплаты'),
-            Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
-            Column('normalization-ratio', 'Коэфф. норм.-я', 'Коэффициент. нормирования'),
-            Column('revenue-standart', 'Норм. выр-ки', 'Норматив выручки'),
-            Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования'),
-            Column('corrected-time', 'Корр. время', 'Корректированное время'),
-            Column('bonus-exceed', 'Премия за прев. норм., ₽', 'Премия за превышение норматива'),
-            Column('depremation', 'Депр., ₽', 'Депремирование'),
+            Column('orders-count', 'Кол-во заказов', 'Кол-во заказов'),
+            Column('orders-value', 'Стоимость заказов, ₽', 'Стоимость заказов'),
+            Column('average-bill', 'Средний чек, ₽', 'Средний чек'),
+            Column('dist-km', 'Расст-е, км', 'Расст-е, км'),
+            Column('estimated-time', 'Расчет. время в пути', 'Расчет. время в пути'),
+            Column('actual-time', 'Факт. время в пути', 'Факт. время в пути'),
+            Column('kpi', 'KPI', 'KPI'),
+            Column('time-without-case', 'Время без дела, %', 'Время без дела, %'),
+            Column('time', 'Время', 'Время'),
+            Column('orders', 'Заказы', 'Заказы'),
+            Column('dist', 'Расст.', 'Расст.'),
+            Column('min-payment', 'Min оплата., ₽', 'Min оплата., ₽'),
+            Column('surcharge', 'Надбавка, ₽', 'Надбавка, ₽'),
+            Column('late-surcharge', 'Надб. за поздний выезд, ₽', 'Надб. за поздний выезд, ₽'),
+            Column('short-shift-surcharge', 'Надб. за короткую смену, ₽', 'Надб. за короткую смену, ₽'),
             Column('premation', 'Прем., ₽', 'Премирование'),
             Column('fine', 'Штраф, ₽', 'Штраф'),
-
             Column('total', 'Всего начислено, ₽', 'Всего начислено, ₽', true),
             Column('payment', 'К выплате, ₽', 'К выплате, ₽', true)
           ];
-          const defaultColumnsState = localStorage.getItem('calculation-page-employees-columns');
+          const defaultColumnsState = localStorage.getItem('calculation-page-delivery-columns');
           if (defaultColumnsState) {
             const state = JSON.parse(defaultColumnsState);
             columns.forEach(column => {
@@ -92,12 +84,6 @@
             if (column) return column.clicked;
           }
 
-
-          /** Sets positions visibility */
-          function setPositions() {
-            params.utils.openModal('positions', { positions: positions })
-          }
-
           /** Sets columns visibility */
           function setColumns() {
             params.utils.openModal('columns', { columns: columns }, () => {
@@ -120,14 +106,12 @@
                 [column.id]: column.visible() ? 1 : 0
               }
             }, {});
-            localStorage.setItem('calculation-page-employees-columns', JSON.stringify(state));
+            localStorage.setItem('calculation-page-delivery-columns', JSON.stringify(state));
           }
 
-
-
           const columnSets = [
-            ['account', 'account-operations', 'level', 'interval', 'compensation', 'salary-bulk', 'bonus-exceed', 'depremation', 'premation', 'fine', 'payment'],
-            ['payment']
+            ['account', 'account-operations', 'interval', 'orders-count', 'orders-value', 'average-bill', 'dist-km', 'actual-time', 'kpi', 'time-without-case', 'premation', 'fine', 'payment'],
+            ['time-without-case', 'payment']
           ];
           const columnSetsIndex = ko.observable(-1);
           const blockMoreInfo = ko.pureComputed(() => {
@@ -155,67 +139,6 @@
             $(window).resize();
           };
 
-
-          function updatePositionEmployees(positionData) {
-            const positionModel = model.getPositionById(positionData.id);
-            positionModel.allEmployeesLoaded(positionData.loaded);
-            positionModel.updateEmployees(positionData.employees);
-          }
-
-          /** Creates new employee */
-          function createEmployee() {
-            params.utils.openModal(
-              'create-employee',
-              { positions: positions() },
-              (data) => {
-                const position = model.getPositionById(data.position);
-                position.addEmployee({
-                  name: data.name,
-                  level: data.level,
-                });
-              });
-          };
-
-          /** Adds employees to calculation */
-          function addEmployees() {
-            params.utils.openModal('add-employees', {
-              positions: positions(),
-              mode: 'tabs',
-            }, (updatedList) => {
-              updatedList.forEach(updatePositionEmployees)
-            });
-          };
-
-          /**
-          * Adds employees to calculation (specified position)
-          * @param {Object} position
-          */
-          function addEmployeesInPosition(position) {
-            const originalPosition = model.getPositionById(position.id);
-
-            if (originalPosition) {
-              params.utils.openModal('add-employees',
-                { position: originalPosition, mode: 'single' },
-                (updatedList) => {
-                  updatedList.forEach(updatePositionEmployees)
-                });
-            } else {
-              const invisiblePositions = positions().filter(p => !p.visible());
-              params.utils.openModal('add-employees',
-                { positions: invisiblePositions, mode: 'list' },
-                (updatedList) => {
-                  updatedList.forEach(updatePositionEmployees)
-                });
-            }
-          };
-
-          /**
-          * Removes employee from calculation
-          * @param {Object} employee
-          */
-          function removeEmployee(employee) {
-            employee.visible(false);
-          };
 
           /**
           * Opens Account Operations modal
@@ -255,6 +178,14 @@
             });
           }
 
+          /**
+          * Removes employee from calculation
+          * @param {Object} employee
+          */
+          function removeEmployee(employee) {
+            employee.visible(false);
+          };
+
           const tableScroll = ko.observable(false);
 
           const onTableRender = (el) => {
@@ -291,14 +222,9 @@
             lessInfo,
             blockLessInfo,
 
-            setPositions,
-            positions,
-            hasOtherSection,
+            position,
             total,
 
-            addEmployees,
-            addEmployeesInPosition,
-            createEmployee,
             removeEmployee,
 
             performAccountOperations,
@@ -308,7 +234,7 @@
         }
       },
       template: {
-        element: document.getElementById('calculation-page-positions-table-template')
+        element: document.getElementById('calculation-page-delivery-table-template')
       }
     });
   })

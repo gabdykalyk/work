@@ -90,6 +90,11 @@
 
       const driversData = ko.observable();
 
+      const holidaySurcharge = ko.observable('');
+      holidaySurcharge.subscribe(_ => {
+        root.calculate();
+      });
+
       /**
       * Returns position with specified id
       * @param {string|number} id
@@ -111,7 +116,7 @@
 
 
       function setDriversData(driversData) {
-        this.driversData(new PositionModel(driversData, root));
+        this.driversData(new DeliveryPositionModel(driversData, root));
       }
 
       /**
@@ -162,7 +167,7 @@
       }
 
 
-      function EmployeeModel(employee, positionModel, visible) {
+      function EmployeeModel(employee, positionModel) {
         this.position = positionModel;
         this.root = this.position.root;
 
@@ -276,21 +281,127 @@
         this.total = ko.observable(employee.total || 0);
         this.toPayment = ko.observable(employee.toPayment || 0);
 
-        this.visible = ko.observable(!!visible) // участвует в расчете
+        this.visible = ko.observable(employee.visible) // участвует в расчете
         this.visible.subscribe(_ => this.root.calculate());
 
         this.loaded = employee.loaded; // загружен для Все филиалы
       }
 
-      /**
-      * @param {Object} positionData
-      */
+      function DriverEmployeeModel(employee, positionModel) {
+        this.position = positionModel;
+        this.root = this.position.root;
+
+        this.clicked = ko.observable(false);
+
+        this.name = employee.name;                   // имя сотрудника
+        this.id = employee.id;                       // идентификатор сотрудника
+        this.link = employee.link;                   // ссылка на личное дело
+
+        this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
+
+        // рабочее время
+        const defaultIntervals = employee.workingIntervals || ['11:00 – 23:00'];
+        this.workingIntervals = ko.observableArray(
+          defaultIntervals.map(i => WorkingIntervalModel(i))
+        );
+        const isWorkingIntervalsValid = ko.pureComputed(() => {
+          return this.workingIntervals().every(i => i.value.isValid())
+        });
+        this.workingTime = ko.pureComputed(() => {
+          if (!isWorkingIntervalsValid()) return 0;
+
+          return this.workingIntervals().reduce((minutes, interval) => {
+            return minutes + interval.getInterval();
+          }, 0);
+        });
+        this.addWorkingInterval = () => {
+          const model = WorkingIntervalModel('');
+          this.workingIntervals.push(model);
+        };
+        this.removeWorkingInterval = (interval) => {
+          this.workingIntervals.remove(interval);
+        };
+
+        this.workingTime.subscribe(_ => this.root.calculate());
+
+        this.account = ko.observable(employee.account || 0);             // личный счет
+        this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
+
+        // операции с ЛС
+        this.accountOperations = ko.observableArray(employee.accountOperations || []);
+        this.accountState = ko.pureComputed(() => {
+          return this.accountOperations().reduce((sum, operation) => {
+            const operationSum = operation.type === 'fine' ? operation.sum * -1 : operation.sum;
+            return sum + operationSum;
+          }, 0);
+        });
+
+        this.accountOperations.subscribe(_ => this.root.calculate());
+
+        this.ordersCount = ko.observable(employee.ordersCount);
+        this.ordersValue = ko.observable(employee.ordersValue);
+        this.averageBill = ko.observable(employee.averageBill);
+        this.distKm = ko.observable(employee.distKm);
+        this.estimatedTime = ko.observable(employee.estimatedTime);
+        this.actualTime = ko.observable(employee.actualTime);
+        this.kpi = ko.observable(employee.kpi);
+        this.timeWithoutCase = ko.observable(employee.timeWithoutCase);
+        this.time = ko.observable(employee.time);
+        this.orders = ko.observable(employee.orders);
+        this.dist = ko.observable(employee.dist);
+        this.minPayment = ko.observable(employee.minPayment);
+        this.surcharge = ko.observable(employee.surcharge);
+        this.lateSurcharge = ko.observable(employee.lateSurcharge);
+        this.shortShirtSurcharge = ko.observable(employee.shortShirtSurcharge);
+
+        // штрафы
+        this.fines = ko.observableArray(employee.fines || []);
+        this.finesState = ko.pureComputed(() => {
+          return this.fines().reduce((sum, fine) => {
+            return sum + fine.sum;
+          }, 0);
+        });
+
+        this.fines.subscribe(_ => this.root.calculate());
+
+        // бонусы
+        this.bonuses = ko.observableArray(employee.bonuses || []);
+        this.bonusesState = ko.pureComputed(() => {
+          return this.bonuses().reduce((sum, bonus) => {
+            return sum + bonus.sum;
+          }, 0);
+        });
+
+        this.bonuses.subscribe(_ => this.root.calculate());
+
+        // опоздания
+        this.lateness = {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        };
+        if (employee.lateness) {
+          this.lateness.light(employee.lateness.light);
+          this.lateness.medium(employee.lateness.medium);
+          this.lateness.hard(employee.lateness.hard);
+          this.lateness.total(employee.lateness.light + employee.lateness.medium + employee.lateness.hard);
+        }
+
+        this.total = ko.observable(employee.total || 0);
+        this.toPayment = ko.observable(employee.toPayment || 0);
+
+        this.visible = ko.observable(employee.visible) // участвует в расчете
+        this.visible.subscribe(_ => this.root.calculate());
+      }
+
+
       function PositionModel(positionData, root) {
         this.root = root;
 
         this.clicked = ko.observable(false);
 
-        this.type = positionData.type || 'production';
+        this.type = 'production';
 
         this.id = positionData.id;
         this.name = positionData.name;
@@ -331,7 +442,7 @@
         this.visible = ko.observable(positionData.visible); // Отображается в таблице
         this.visible.subscribe(_ => this.root.calculate());
 
-        this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this, false)));
+        this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this)));
 
         this.visibleEmployees = ko.pureComputed(() => {
           return this.employees().filter(e => e.visible());
@@ -351,7 +462,8 @@
         };
 
         this.addEmployee = (employee) => {
-          this.employees.push(new EmployeeModel(employee, this, 'visible'));
+          employee.visible = true;
+          this.employees.push(new EmployeeModel(employee, this));
           this.root.calculate();
         };
 
@@ -374,7 +486,8 @@
           // add new-s
           const newEmployees = newEmployeesIds.map(id => {
             const employeeData = updatedList.find(e => e.id === id);
-            const employee = new EmployeeModel(employeeData, this, employeeData.checked);
+            employeeData.visible = employeeData.checked;
+            const employee = new EmployeeModel(employeeData, this);
             return employee;
           });
 
@@ -413,6 +526,94 @@
         }
       };
 
+      function DeliveryPositionModel(positionData, root) {
+        this.root = root;
+        this.clicked = ko.observable(false);
+        this.type = 'delivery';
+
+        this.id = positionData.id;
+        this.name = positionData.name;
+
+        this.employees = ko.observableArray(positionData.employees.map((e) => new DriverEmployeeModel(e, this)));
+
+        this.visibleEmployees = ko.pureComputed(() => {
+          return this.employees().filter(e => e.visible());
+        });
+
+        this.workingTime = ko.pureComputed(() => {
+          return this.employees().reduce((minutes, employee) => {
+            if (!employee.visible()) return minutes;
+            return minutes + employee.workingTime();
+          }, 0)
+        });
+
+        this.findEmployeeById = (employeeId) => {
+          return this.employees().find(employee => employee.id === employeeId);
+        };
+
+        this.toggleClicked = () => {
+          if (this.visibleEmployees().some(e => !e.clicked())) {
+            this.visibleEmployees().forEach(e => e.clicked(true));
+          } else {
+            this.visibleEmployees().forEach(e => e.clicked(false));
+          }
+        }
+
+        // нагрузка
+        this.workloadType = positionData.workloadType;
+        this.workload = ko.observable(positionData.workload);
+        this.workloadUnits = positionData.workloadUnits;
+
+        this.workload.subscribe(v => {
+          root.calculate();
+        });
+
+        // доп. нагрузка
+        this.additionalWorkloadType = positionData.additionalWorkloadType;
+        this.additionalWorkload = ko.observable(positionData.additionalWorkload);
+        this.additionalWorkloadUnits = positionData.additionalWorkloadUnits;
+
+        // ФОТ, % в категории
+        this.fotCategory = ko.observable(positionData.fotCategory);
+
+        // ФОТ, % от выручки
+        this.fotRevenue = ko.observable(positionData.fotRevenue);
+
+        this.salary = positionData.salary; // оклад
+        this.salaryBulk = positionData.salaryBulk; // основная часть зарплаты
+
+        this.revenueStandart = positionData.revenueStandart; // Норматив выручки
+        this.revenueStandartPerHour = positionData.revenueStandartPerHour; // Норматив выручки в час
+        this.revenueStandartUnits = positionData.revenueStandartUnits; // Единицы измерения
+
+        // Норм. выработки
+        this.performanceStandart = ko.observable(positionData.performanceStandart);
+        this.performanceStandartType = positionData.performanceStandartType;
+        this.performanceStandartUnits = positionData.performanceStandartUnits;
+
+        this.lateness = ko.pureComputed(() => {
+          const result = {
+            light: 0,
+            medium: 0,
+            hard: 0,
+            total: 0,
+          };
+          this.employees().forEach(employee => {
+            const employeeLateness = employee.lateness;
+            result.light += employeeLateness.light() || 0;
+            result.medium += employeeLateness.medium() || 0;
+            result.hard += employeeLateness.hard() || 0;
+            result.total += result.light + result.medium + result.hard;
+          });
+
+          return result;
+        });
+
+        this.totalLateness = ko.pureComputed(() => {
+          return lateness.total;
+        });
+      };
+
       const productionTotal = {
         workingTime: ko.observable(0),
         salaryBulk: ko.observable(0),
@@ -421,6 +622,28 @@
         bonusRatio: ko.observable(0),
         correctedTime: ko.observable(0),
         bonusExceed: ko.observable(0),
+        total: ko.observable(0),
+        toPayment: ko.observable(0),
+      };
+
+      const deliveryTotal = {
+        workingTime: ko.observable(0),
+        ordersCount: ko.observable(0),
+        ordersValue: ko.observable(0),
+        averageBill: ko.observable(0),
+        distKm: ko.observable(0),
+        estimatedTime: ko.observable(0),
+        actualTime: ko.observable(0),
+        kpi: ko.observable(0),
+        timeWithoutCase: ko.observable(0),
+        time: ko.observable(0),
+        orders: ko.observable(0),
+        dist: ko.observable(0),
+        minPayment: ko.observable(0),
+        lateSurcharge: ko.observable(0),
+        shortShiftSurcharge: ko.observable(0),
+        bonus: ko.observable(0),
+        fine: ko.observable(0),
         total: ko.observable(0),
         toPayment: ko.observable(0),
       };
@@ -441,17 +664,19 @@
       };
 
       return {
+        holidaySurcharge,
         positions,
         driversData,
         setPositions,
         setDriversData,
         getPositionById,
         productionTotal,
+        deliveryTotal,
         total
       }
     }
 
-    const ViewModel = function (defaultPositions, settings) {
+    const ViewModel = function () {
       /** Initialization */
       (() => {
         this.subscriptions = [];
@@ -477,125 +702,26 @@
             return formattedNumber;
           },
 
+          formatTime: (minutes) => {
+            if (!minutes) return '00:00';
+            minutes = ko.unwrap(minutes);
+            minutes = parseInt(minutes);
+            if (!minutes || minutes <= 0) return '00:00';
+
+            let h = Math.floor(minutes / 60).toString();
+            h = h.length === 1 ? '0' + h : h;
+            let m = (minutes % 60).toString();
+            m = m.length === 1 ? '0' + m : m;
+
+            return h + ':' + m;
+          },
+
           viewportSize: viewportSize
         }
       })();
 
       this.summaryModel = new PositionsModel(this);
-      this.summaryModel.setPositions(defaultPositions);
 
-
-      this.summaryModel.setDriversData({
-        type: 'delivery',
-        name: 'Водители',                           // название должности
-        id: 'drivers',                              // идентификато позиции
-        levels: [1, 2],                             // разряды
-        workloadType: 'Выручка',                    // тип нагрузки
-        workload: 0,                                // нагрузка (величина)
-        workloadUnits: '₽',                         // единицы измерения нагрузки
-        additionalWorkloadType: '',                 // тип доп. нагрузки
-        additionalWorkload: '52',                   // доп. нагрузка (величина)
-        additionalWorkloadUnits: '',                // единицы измерения доп. нагрузки
-        fotCategory: 0,                             // ФОТ, % в категории
-        fotRevenue: 0,                              // ФОТ, % от выручки
-        performanceStandart: 0,                     // Норм. выработки, %
-        performanceStandartType: 'Цена заказа',
-        performanceStandartUnits: '₽',
-        salary: 30000,                              // Оклад
-        salaryBulk: 7200,                           // основная часть зарплаты
-        revenueStandart: 30,                        // Норматив выручки
-        revenueStandartPerHour: 0,
-        revenueStandartUnits: '₽',
-        employees: [                                // сотрудники
-          {
-            name: 'Водитель #1',                    // имя сотрудника
-            id: 'driver1',                          // идентификатор сотрудника
-            link: '#',                              // ссылка на личное дело
-            hasProblems: 0,                         // проблемы с документами
-            upRecommended: 0,                       // рекомендуется повышение
-            downRecommended: 0,                     // рекомендуется понижение
-            premiumAccount: 0,                      // премиальный счет
-            account: 100,                           // личный счет
-            accountOperations: [],                  // операции со счетом
-            level: 1,                               // разряд сотрудника
-            workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
-            compensation: 0,                        // компенсация
-            workload: 0,                            // нагрузка
-            workloadUnits: '₽',
-            salary: 3000,                           // зарплата
-            salaryBulk: 2000,                       // основная часть зарплаты
-            revenueStandartUnits: '₽',
-            revenueStandartPerHour: 10000,          // норматив выручки в час
-            revenueStandart: 130000,                // Норматив выручки
-            normalizationRatio: 0.5,                // Коэф. нормализации
-            bonusRatio: 0.5,                        // Коэф. премирования
-            bonusExceed: 100,                       // прем. за превыш. норм
-            bonuses: [],                            // бонусы
-            fines: [],                              // штрафы
-            depremation: 0,                         // депр.
-            correctedTime: '0',                  // корр. время
-            total: 7300,                            // всего
-            toPayment: 7300,                        // к выплате
-            lateness: {                             // опоздания сотрудника
-              light: 0,                             // меньше 5 минут
-              medium: 0,                            // 5-10 минут
-              hard: 0                               // больше 10 минут
-            },
-          },
-          {
-            name: 'Водитель #2',
-            id: 'driver2',
-            link: '#',
-            hasProblems: 0,
-            upRecommended: 0,
-            downRecommended: 0,
-            premiumAccount: 100,
-            account: 0,
-            accountOperations: [],
-            level: 2,
-            workingIntervals: ['09:00 – 16:00'],
-            compensation: 0,
-            workload: 0,
-            workloadUnits: '₽',
-            salary: 3000,
-            salaryBulk: 2000,
-            revenueStandartUnits: '₽',
-            revenueStandartPerHour: 10000,
-            revenueStandart: 130000,
-            normalizationRatio: 0.5,
-            bonusRatio: 0.5,
-            bonusExceed: 100,
-            bonuses: [],
-            fines: [],
-            depremation: 0,
-            correctedTime: '0',
-            total: 7300,
-            toPayment: 7300,
-            lateness: {
-              light: 0,
-              medium: 0,
-              hard: 0
-            },
-          }
-        ],
-      });
-
-      this.formatDuration = (minutes) => {
-        if (!minutes) return '00:00';
-        minutes = ko.unwrap(minutes);
-        minutes = parseInt(minutes);
-        if (!minutes || minutes <= 0) return '00:00';
-
-        let h = Math.floor(minutes / 60).toString();
-        h = h.length === 1 ? '0' + h : h;
-        let m = (minutes % 60).toString();
-        m = m.length === 1 ? '0' + m : m;
-
-        return h + ':' + m;
-      };
-
-
-      /** Input data */
       this.inputModel = {
         filial: ko.observable(''),
         date: ko.observable(moment().format('DD.MM.YYYY')),
@@ -606,10 +732,10 @@
         }
       };
 
-      /** Calculation */
       this.isBuilt = ko.observable(false);
       this.loading = ko.observable(false);
-      /** Get data for calculation */
+
+      // Построение расчета
       this.buildCalculation = () => {
         this.loading(true);
         const inputData = ko.toJS(this.inputModel);
@@ -623,7 +749,7 @@
         });
 
         setTimeout(() => {
-          /* Получение списка позиций */
+          // Производственные позиции
           const positions = [
             {
               name: 'Администратор филиала',             // название должности
@@ -679,6 +805,7 @@
                     medium: 0,                            // 5-10 минут
                     hard: 0                               // больше 10 минут
                   },
+                  visible: false,
                 },
                 {
                   name: 'Администратор #2 Down',
@@ -714,6 +841,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -772,6 +900,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 },
                 {
                   name: 'Повар-сушист #2 problems + up',
@@ -807,6 +936,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -865,6 +995,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 },
                 {
                   name: 'Повар-пиццмейкер #2',
@@ -900,6 +1031,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -958,6 +1090,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 },
                 {
                   name: 'Официант #2',
@@ -993,6 +1126,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -1051,6 +1185,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 },
                 {
                   name: 'Официант #2',
@@ -1086,6 +1221,7 @@
                     medium: 0,
                     hard: 0
                   },
+                  visible: false,
                 }
               ],
               visible: 0,
@@ -1202,14 +1338,115 @@
             },
           ];
 
-          /** Обновление представления */
+          // Обновление производственных позиций
           this.summaryModel.setPositions(positions);
+
+          // Данные водителей
+          const driversData = {
+            type: 'delivery',
+            name: 'Водители',                           // название должности
+            id: 'drivers',                              // идентификато позиции
+            workloadType: 'Выручка',                    // тип нагрузки
+            workload: 0,                                // нагрузка (величина)
+            workloadUnits: '₽',                         // единицы измерения нагрузки
+            additionalWorkloadType: '',                 // тип доп. нагрузки
+            additionalWorkload: '52',                   // доп. нагрузка (величина)
+            additionalWorkloadUnits: '',                // единицы измерения доп. нагрузки
+            fotCategory: 0,                             // ФОТ, % в категории
+            fotRevenue: 0,                              // ФОТ, % от выручки
+            performanceStandart: 0,                     // Норм. выработки, %
+            performanceStandartType: 'Цена заказа',
+            performanceStandartUnits: '₽',
+            salary: 30000,                              // Оклад
+            salaryBulk: 7200,                           // основная часть зарплаты
+            revenueStandart: 30,                        // Норматив выручки
+            revenueStandartPerHour: 0,
+            revenueStandartUnits: '₽',
+            employees: [                                // сотрудники
+              {
+                name: 'Водитель #1',                    // имя сотрудника
+                id: 'driver1',                          // идентификатор сотрудника
+                link: '#',                              // ссылка на личное дело
+                hasProblems: 1,                         // проблемы с документами
+                premiumAccount: 0,                      // премиальный счет
+                account: 100,                           // личный счет
+                accountOperations: [],                  // операции со счетом
+                workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
+                ordersCount: 10,
+                ordersValue: 10,
+                averageBill: 100,
+                distKm: 100,
+                estimatedTime: 10000,
+                actualTime: 10000,
+                kpi: 23,
+                timeWithoutCase: 1000,
+                orders: 45,
+                dist: 234,
+                minPayment: 2345,
+                surcharge: 24,
+                lateSurchage: 3,
+                shortShiftSurcharge: 23,
+                bonuses: [],                            // бонусы
+                fines: [],                              // штрафы
+                total: 7300,                            // всего
+                toPayment: 7300,                        // к выплате
+                lateness: {                             // опоздания сотрудника
+                  light: 0,                             // меньше 5 минут
+                  medium: 0,                            // 5-10 минут
+                  hard: 0                               // больше 10 минут
+                },
+                visible: true,
+              },
+              {
+                name: 'Водитель #2',
+                id: 'driver2',
+                link: '#',
+                hasProblems: 0,
+                premiumAccount: 100,
+                account: 0,
+                accountOperations: [],
+                workingIntervals: ['09:00 – 16:00'],
+                ordersCount: 10,
+                ordersValue: 10,
+                averageBill: 100,
+                distKm: 100,
+                estimatedTime: 10000,
+                actualTime: 10000,
+                kpi: 23,
+                timeWithoutCase: 1000,
+                orders: 45,
+                dist: 234,
+                minPayment: 2345,
+                surcharge: 24,
+                lateSurchage: 3,
+                shortShiftSurcharge: 23,
+                bonuses: [],
+                fines: [],
+                depremation: 0,
+                correctedTime: '0',
+                total: 7300,
+                toPayment: 7300,
+                lateness: {
+                  light: 0,
+                  medium: 0,
+                  hard: 0
+                },
+                visible: true
+              }
+            ],
+          };
+          // Обновить данные водителей
+          this.summaryModel.setDriversData(driversData);
 
           loadingDelay.then(() => {
             this.isBuilt(true);
             this.loading(false);
           });
         }, 10);
+      };
+
+      this.recalculateRoutes = () => {
+        this.buildCalculation();
       };
 
       /** Tabs: production, delivery, lateness */
@@ -1258,11 +1495,11 @@
           delivery: Stimulation()
         };
 
-        const setStimulation = () => {
+        const setStimulation = (category) => {
           this.utils.openModal(
             'stimulation',
             {
-              category: 'production',
+              category: category,
               fines: window.directories.fines,
               bonuses: window.directories.bonuses,
               authors: window.directories.authors
@@ -1277,6 +1514,8 @@
               let positions = [];
               if (data.category === 'production') {
                 positions = root.summaryModel.positions();
+              } else {
+                positions = [root.summaryModel.driversData()];
               }
               positions.forEach(p => {
                 let employees = p.visibleEmployees();
@@ -1292,12 +1531,17 @@
           )
         };
 
-        const isBlocked = ko.pureComputed(() => {
+        const isProductionBlocked = ko.pureComputed(() => {
           return !root.activePositions().some(p => p.visibleEmployees().length > 0);
         });
 
+        const isDeliveryBlocked = ko.pureComputed(() => {
+          return false;
+        });
+
         return {
-          isBlocked,
+          isProductionBlocked,
+          isDeliveryBlocked,
           fine,
           bonus,
           set: setStimulation
@@ -1433,20 +1677,126 @@
       this.calculate = () => {
         console.log('recalculate');
 
-        /** ДАННЫЕ */
-        // Позиции, участвующие в расчете
-        const activePositions = this.activePositions();
-        // Водители
-        const drivers = this.summaryModel.driversData();
 
         /** УСТАНОВКА ДАННЫХ ДЛЯ ВОДИТЕЛЕЙ */
-        // Данные сотрудников
-        drivers.employees().forEach(employee => {
 
+        // Позиция Водители
+        const driversPosition = this.summaryModel.driversData();
+        // Сотрудники, участвующие в расчете
+        const activeDrivers = driversPosition.visibleEmployees();
+        // Праздничная надбавка
+        const holidaySurcharge = this.summaryModel.holidaySurcharge();
+
+        // Обновление данных сотрудников (Водители)
+        activeDrivers.forEach(employee => {
+          const account = getRandom(0, 2000);
+          const premiumAccount = getRandom(0, 2000);
+          const ordersCount = getRandom(0, 2000);
+          const ordersValue = getRandom(0, 2000);
+          const averageBill = getRandom(0, 2000);
+          const distKm = getRandom(0, 2000);
+          const estimatedTime = getRandom(0, 2000);
+          const actualTime = getRandom(0, 2000);
+          const kpi = getRandom(0, 2000);
+          const timeWithoutCase = getRandom(0, 2000);
+          const time = getRandom(0, 2000);
+          const orders = getRandom(0, 2000);
+          const dist = getRandom(0, 2000);
+          const minPayment = getRandom(0, 2000);
+          const surcharge = getRandom(0, 2000);
+          const lateSurcharge = getRandom(0, 2000);
+          const shortShiftSurcharge = getRandom(0, 2000);
+          const total = getRandom(0, 2000);
+          const toPayment = getRandom(0, 2000);
+
+          employee.account(account);
+          employee.premiumAccount(premiumAccount);
+          employee.ordersCount(ordersCount);
+          employee.ordersValue(ordersValue);
+          employee.averageBill(averageBill);
+          employee.distKm(distKm);
+          employee.estimatedTime(estimatedTime);
+          employee.actualTime(actualTime);
+          employee.kpi(kpi);
+          employee.timeWithoutCase(timeWithoutCase);
+          employee.time(time);
+          employee.orders(orders);
+          employee.dist(dist);
+          employee.minPayment(minPayment);
+          employee.surcharge(surcharge);
+          employee.lateSurcharge(lateSurcharge);
+          employee.shortShiftSurcharge(shortShiftSurcharge);
+          employee.total(total);
+          employee.toPayment(toPayment);
         });
-        // Данные всей позиции
+
+        // Обновление данных позиции (Водители)
+        (() => {
+          const fotCategory = getRandom(0, 80);
+          const fotRevenue = getRandom(0, 80);
+          const performanceStandart = getRandom(-80, 0);
+
+          driversPosition.fotCategory(fotCategory);
+          driversPosition.fotRevenue(fotRevenue);
+          driversPosition.performanceStandart(performanceStandart);
+        })();
+
+        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ВОДИТЕЛИ) */
+        (() => {
+          const totalModel = this.summaryModel.deliveryTotal;
+
+          // время в минутах
+          const workingTime = activeDrivers.reduce((acc, p) => {
+            return acc + p.workingTime();
+          }, 0);
+
+          const ordersCount = getRandom(0, 1000);
+          const ordersValue = getRandom(0, 1000);
+          const averageBill = getRandom(0, 1000);
+          const distKm = getRandom(0, 1000);
+          const estimatedTime = getRandom(0, 1000);
+          const actualTime = getRandom(0, 1000);
+          const kpi = getRandom(0, 1000);
+          const timeWithoutCase = getRandom(0, 1000);
+          const time = getRandom(0, 1000);
+          const orders = getRandom(0, 1000);
+          const dist = getRandom(0, 1000);
+          const minPayment = getRandom(0, 1000);
+          const lateSurcharge = getRandom(0, 1000);
+          const shortShiftSurcharge = getRandom(0, 1000);
+          const bonus = getRandom(0, 1000);
+          const fine = getRandom(0, 1000);
+          const total = getRandom(0, 1000);
+          const toPayment = getRandom(0, 1000);
+
+          totalModel.workingTime(workingTime);
+          totalModel.ordersCount(ordersCount);
+          totalModel.ordersValue(ordersValue);
+          totalModel.averageBill(averageBill);
+          totalModel.distKm(distKm);
+          totalModel.estimatedTime(estimatedTime);
+          totalModel.actualTime(actualTime);
+          totalModel.kpi(kpi);
+          totalModel.timeWithoutCase(timeWithoutCase);
+          totalModel.time(time);
+          totalModel.orders(orders);
+          totalModel.dist(dist);
+          totalModel.minPayment(minPayment);
+          totalModel.lateSurcharge(lateSurcharge);
+          totalModel.shortShiftSurcharge(shortShiftSurcharge);
+          totalModel.bonus(bonus);
+          totalModel.fine(fine);
+          totalModel.total(total);
+          totalModel.toPayment(toPayment);
+        })();
+
+
+
 
         /** УСТАНОВКА ДАННЫХ ДЛЯ ПРОИЗВОДСТВЕННЫХ ПОЗИЦИЙ */
+
+        // Позиции, участвующие в расчете
+        const activePositions = this.activePositions();
         activePositions.forEach(position => {
 
           // нагрузка из первой таблицы
@@ -1501,50 +1851,64 @@
           position.performanceStandart(performanceStandart);
         });
 
-        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ СВОДНОЙ ТАБЛИЦЫ */
-        const workload = getRandom(0, 2000);
-        const workloadUnits = getRandom(0, 2000);
-        const fotCategory = getRandom(0, 2000);
-        const fotRevenue = getRandom(0, 2000);
-        const performanceStandart = getRandom(0, 2000);
 
-        this.summaryModel.total.workload(workload);
-        this.summaryModel.total.workloadUnits(workloadUnits);
-        this.summaryModel.total.fotCategory(fotCategory);
-        this.summaryModel.total.fotRevenue(fotRevenue);
-        this.summaryModel.total.performanceStandart(performanceStandart);
 
         /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ПРОИЗВОДСТВО) */
-        // время в минутах
-        const workingTime = activePositions.reduce((acc, p) => {
-          return acc + p.workingTime();
-        }, 0);
-        console.log(workingTime)
+        (() => {
+          const totalModel = this.summaryModel.productionTotal;
 
-        const salaryBulk = getRandom(0, 2000);
-        const normalizationRatio = getRandom(0, 3);
-        const revenueStandart = getRandom(0, 2000);
-        const bonusRatio = getRandom(0, 3);
+          // время в минутах
+          const workingTime = activePositions.reduce((acc, p) => {
+            return acc + p.workingTime();
+          }, 0);
 
-        // время в минутах
-        const correctedTime = activePositions.reduce((acc, p) => {
-          const employees = p.employees().filter(e => e.visible());
-          return employees.reduce((acc, e) => acc + e.correctedTime(), acc);
-        }, 0);
+          const salaryBulk = getRandom(0, 2000);
+          const normalizationRatio = getRandom(0, 3);
+          const revenueStandart = getRandom(0, 2000);
+          const bonusRatio = getRandom(0, 3);
 
-        const bonusExceed = getRandom(0, 2000);
-        const total = getRandom(0, 34000);
-        const toPayment = getRandom(0, 65000);
+          // время в минутах
+          const correctedTime = activePositions.reduce((acc, p) => {
+            const employees = p.employees().filter(e => e.visible());
+            return employees.reduce((acc, e) => acc + e.correctedTime(), acc);
+          }, 0);
 
-        this.summaryModel.productionTotal.workingTime(workingTime);
-        this.summaryModel.productionTotal.salaryBulk(salaryBulk);
-        this.summaryModel.productionTotal.normalizationRatio(normalizationRatio);
-        this.summaryModel.productionTotal.revenueStandart(revenueStandart);
-        this.summaryModel.productionTotal.bonusRatio(bonusRatio);
-        this.summaryModel.productionTotal.correctedTime(correctedTime);
-        this.summaryModel.productionTotal.bonusExceed(bonusExceed);
-        this.summaryModel.productionTotal.total(total);
-        this.summaryModel.productionTotal.toPayment(toPayment);
+          const bonusExceed = getRandom(0, 2000);
+          const total = getRandom(0, 34000);
+          const toPayment = getRandom(0, 65000);
+
+          totalModel.workingTime(workingTime);
+          totalModel.salaryBulk(salaryBulk);
+          totalModel.normalizationRatio(normalizationRatio);
+          totalModel.revenueStandart(revenueStandart);
+          totalModel.bonusRatio(bonusRatio);
+          totalModel.correctedTime(correctedTime);
+          totalModel.bonusExceed(bonusExceed);
+          totalModel.total(total);
+          totalModel.toPayment(toPayment);
+        })();
+
+
+
+
+
+        /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ СВОДНОЙ ТАБЛИЦЫ */
+        (() => {
+          const totalModel = this.summaryModel.total;
+
+          const workload = getRandom(0, 2000);
+          const workloadUnits = getRandom(0, 2000);
+          const fotCategory = getRandom(0, 2000);
+          const fotRevenue = getRandom(0, 2000);
+          const performanceStandart = getRandom(0, 2000);
+
+          totalModel.workload(workload);
+          totalModel.workloadUnits(workloadUnits);
+          totalModel.fotCategory(fotCategory);
+          totalModel.fotRevenue(fotRevenue);
+          totalModel.performanceStandart(performanceStandart);
+        })();
+
 
       }
     };
@@ -1556,8 +1920,7 @@
     };
 
     /***** Model activation *******/
-    const defaultPositions = [];
-    const viewModel = new ViewModel(defaultPositions);
+    const viewModel = new ViewModel();
 
 
 
