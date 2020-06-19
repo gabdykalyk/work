@@ -9,7 +9,7 @@
           message: 'Обязательное поле'
         }
       });
-      const sum = ko.observable(defaultData.sum || 0).extend({
+      const sum = ko.observable(defaultData.sum || '').extend({
         required: {
           message: 'Обязательное поле'
         },
@@ -55,12 +55,7 @@
         comment: ko.observable(defaultData.comment || '').extend({
 
         }),
-        setBaseValue: function(el) {
-          ko.applyBindingsToNode(el, { value: base })
-        },
-        setAuthorValue: function(el) {
-          ko.applyBindingsToNode(el, { value: author })
-        },
+
         isValid: () => {
           return validationObject.isValid();
         }
@@ -124,11 +119,9 @@
             }
 
             this.total = ko.pureComputed(() => {
-              console.log('total', this.fines().reduce((sum, fine) => {
-                return sum + fine.sum();
-              }, 0))
               return this.fines().reduce((sum, fine) => {
-                return sum + fine.sum();
+                let fineSum = parseFloat(fine.sum()) || 0;
+                return sum + fineSum;
               }, 0);
             })
 

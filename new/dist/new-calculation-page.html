@@ -915,12 +915,12 @@
         </label>
 
         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="descendantsComplete: setBaseValue,
-       hrmSelect,
-       hrmSelectSearchEnabled: true,
-       hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
-       hrmFormFieldSelectControl: control,
-       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+          <select data-bind="bindInner, value: base,
+            hrmSelect,
+            hrmSelectSearchEnabled: true,
+            hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+            hrmFormFieldSelectControl: control,
+            hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
 
             <option></option>
 
@@ -935,10 +935,11 @@
           </select>
         </div>
 
+
         <div data-bind="component: {name: 'hrm-form-field-error'},
-     hrmSlide,
-     hrmSlideValue: control() !== null ? control().errorState : false,
-     hrmSlideDuration: 150">
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150">
           <!-- ko text: $parent.base.error() -->
           <!-- /ko -->
         </div>
@@ -950,9 +951,7 @@
         <!-- Sum field -->
         <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
         <div class="fine-block__sum"
-             data-bind="
-      hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-  ">
+             data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
           <label data-bind="hrmFormFieldLabel: label">Сумма,
             <i class="far fa-ruble-sign"></i>
           </label>
@@ -961,18 +960,17 @@
             <input data-bind="
               textInput: sum,
               hrmFormFieldInputControl: control,
-              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
-          "
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)"
                    readonly
                    type="number">
           </div>
 
           <div data-bind="
-          component: {name: 'hrm-form-field-error'},
-          hrmSlide,
-          hrmSlideValue: control() !== null ? control().errorState : false,
-          hrmSlideDuration: 150
-      ">
+              component: {name: 'hrm-form-field-error'},
+              hrmSlide,
+              hrmSlideValue: control() !== null ? control().errorState : false,
+              hrmSlideDuration: 150
+          ">
             <!-- ko text: $parent.sum.error() -->
             <!-- /ko -->
           </div>
@@ -988,12 +986,12 @@
           <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
 
           <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="descendantsComplete: setAuthorValue,
-       hrmSelect,
-       hrmSelectSearchEnabled: true,
-       hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
-       hrmFormFieldSelectControl: control,
-       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+            <select data-bind="bindInner, value: autor,
+              hrmSelect,
+              hrmSelectSearchEnabled: true,
+              hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
               <option></option>
               <!-- ko foreach: $component.authors -->
               <option data-bind="value: '' + id, text: name"></option>
@@ -1002,9 +1000,9 @@
           </div>
 
           <div data-bind="component: {name: 'hrm-form-field-error'},
-   hrmSlide,
-   hrmSlideValue: control() !== null ? control().errorState : false,
-   hrmSlideDuration: 150">
+        hrmSlide,
+        hrmSlideValue: control() !== null ? control().errorState : false,
+        hrmSlideDuration: 150">
             <!-- ko text: $parent.author.error() -->
             <!-- /ko -->
           </div>
@@ -1118,7 +1116,7 @@
           message: 'Обязательное поле'
         }
       });
-      const sum = ko.observable(defaultData.sum || 0).extend({
+      const sum = ko.observable(defaultData.sum || '').extend({
         required: {
           message: 'Обязательное поле'
         },
@@ -1164,12 +1162,7 @@
         comment: ko.observable(defaultData.comment || '').extend({
 
         }),
-        setBaseValue: function(el) {
-          ko.applyBindingsToNode(el, { value: base })
-        },
-        setAuthorValue: function(el) {
-          ko.applyBindingsToNode(el, { value: author })
-        },
+
         isValid: () => {
           return validationObject.isValid();
         }
@@ -1233,11 +1226,9 @@
             }
 
             this.total = ko.pureComputed(() => {
-              console.log('total', this.fines().reduce((sum, fine) => {
-                return sum + fine.sum();
-              }, 0))
               return this.fines().reduce((sum, fine) => {
-                return sum + fine.sum();
+                let fineSum = parseFloat(fine.sum()) || 0;
+                return sum + fineSum;
               }, 0);
             })
 
@@ -1290,13 +1281,16 @@
           Основание премии
         </label>
 
+        <div data-bind="text: base"></div>
+
+
         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="descendantsComplete: setBaseValue,
-       hrmSelect,
-       hrmSelectSearchEnabled: true,
-       hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
-       hrmFormFieldSelectControl: control,
-       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+          <select data-bind="bindInner, value: base,
+            hrmSelect,
+            hrmSelectSearchEnabled: true,
+            hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+            hrmFormFieldSelectControl: control,
+            hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
 
             <option></option>
 
@@ -1363,7 +1357,7 @@
           <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
 
           <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="descendantsComplete: setAuthorValue,
+            <select data-bind="bindInner, value: author,
        hrmSelect,
        hrmSelectSearchEnabled: true,
        hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
@@ -1493,7 +1487,7 @@
           message: 'Обязательное поле'
         }
       });
-      const sum = ko.observable(defaultData.sum || 0).extend({
+      const sum = ko.observable(defaultData.sum || '').extend({
         required: {
           message: 'Обязательное поле'
         },
@@ -1508,6 +1502,10 @@
         }
       });
 
+      const comment = ko.observable(defaultData.comment || '').extend({
+
+      });
+
       const validationObject = ko.validatedObservable({
         base,
         author,
@@ -1518,17 +1516,18 @@
         base,
         author,
         sum,
-        comment: ko.observable(defaultData.comment || '').extend({
+        comment,
 
-        }),
-        setBaseValue: function(el) {
-          ko.applyBindingsToNode(el, { value: base })
-        },
-        setAuthorValue: function(el) {
-          ko.applyBindingsToNode(el, { value: author })
-        },
         isValid: () => {
           return validationObject.isValid();
+        },
+        getData: () => {
+          return {
+            base: base(),
+            author: author(),
+            comment: comment(),
+            sum: parseFloat(sum())
+          }
         }
       }
     }
@@ -1591,7 +1590,8 @@
 
             this.total = ko.pureComputed(() => {
               return this.bonuses().reduce((sum, bonus) => {
-                return sum + bonus.sum();
+                let bonusSum = parseFloat(bonus.sum()) || 0;
+                return sum + bonusSum;
               }, 0);
             })
 
@@ -1604,7 +1604,7 @@
 
             /** Применить изменения */
             this.apply = function () {
-              employee.bonuses(ko.toJS(this.bonuses));
+              employee.bonuses(this.bonuses().map(b => b.getData()));
             }
 
             this.submit = function () {
@@ -2657,7 +2657,15 @@
 
               if (this.validationObject.isValid()) {
                 if ('submit' in params) {
-                  params.submit(ko.toJS(this.formModel));
+
+                  params.submit({
+                    category: this.formModel.category(),
+                    stimulationType: this.formModel.stimulationType(),
+                    base: this.formModel.base(),
+                    author: this.formModel.author(),
+                    comment: this.formModel.comment(),
+                    sum: parseFloat(this.formModel.sum()),
+                  });
                 }
               }
 
@@ -5036,7 +5044,11 @@
 <script id="employee-row-template"
         type="text/html">
 
-<tr class="positions-table__row" data-bind="click: function() { employee.clicked(!employee.clicked())}, css: {
+<tr class="positions-table__row"
+data-bind="click: function() {
+  employee.clicked(!employee.clicked());
+},
+css: {
   'positions-table__row--clicked': employee.clicked,
 }">
   <td class="positions-table__cell positions-table__cell--name">
@@ -5516,7 +5528,11 @@
           <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
 
 
-          <tr class="positions-table__row" data-bind="click: function() { employee.clicked(!employee.clicked()); }, css: {
+          <tr class="positions-table__row"
+          data-bind="click: function() {
+            employee.clicked(!employee.clicked());
+          },
+          css: {
             'positions-table__row--clicked': employee.clicked,
           }">
             <td class="positions-table__cell">
@@ -5560,8 +5576,13 @@
           <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
 
 
-          <tr class="positions-table__row"  data-bind="click: function() { employee.clicked(!employee.clicked()); }, css: {
-            'positions-table__row--clicked': employee.clicked,">
+          <tr class="positions-table__row"
+          data-bind="click: function() {
+            employee.clicked(!employee.clicked());
+          },
+          css: {
+            'positions-table__row--clicked': employee.clicked,
+          }">
             <td class="positions-table__cell">
               <div class="positions-table__cell-content"
                    data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">

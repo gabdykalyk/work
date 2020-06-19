@@ -2730,6 +2730,14 @@ ko.bindingHandlers.hrmSelect = {
     }
   }
 };
+ko.bindingHandlers.bindInner = {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    ko.applyBindingsToDescendants(bindingContext, element);
+    return {
+      controlsDescendantBindings: true
+    };
+  }
+};
 "use strict";
 
 // hrmSwitch

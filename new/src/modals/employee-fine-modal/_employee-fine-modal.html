@@ -10,12 +10,12 @@
         </label>
 
         <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-          <select data-bind="descendantsComplete: setBaseValue,
-       hrmSelect,
-       hrmSelectSearchEnabled: true,
-       hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
-       hrmFormFieldSelectControl: control,
-       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+          <select data-bind="bindInner, value: base,
+            hrmSelect,
+            hrmSelectSearchEnabled: true,
+            hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+            hrmFormFieldSelectControl: control,
+            hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
 
             <option></option>
 
@@ -30,10 +30,11 @@
           </select>
         </div>
 
+
         <div data-bind="component: {name: 'hrm-form-field-error'},
-     hrmSlide,
-     hrmSlideValue: control() !== null ? control().errorState : false,
-     hrmSlideDuration: 150">
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150">
           <!-- ko text: $parent.base.error() -->
           <!-- /ko -->
         </div>
@@ -45,9 +46,7 @@
         <!-- Sum field -->
         <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
         <div class="fine-block__sum"
-             data-bind="
-      hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
-  ">
+             data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
           <label data-bind="hrmFormFieldLabel: label">Сумма,
             <i class="far fa-ruble-sign"></i>
           </label>
@@ -56,18 +55,17 @@
             <input data-bind="
               textInput: sum,
               hrmFormFieldInputControl: control,
-              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
-          "
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)"
                    readonly
                    type="number">
           </div>
 
           <div data-bind="
-          component: {name: 'hrm-form-field-error'},
-          hrmSlide,
-          hrmSlideValue: control() !== null ? control().errorState : false,
-          hrmSlideDuration: 150
-      ">
+              component: {name: 'hrm-form-field-error'},
+              hrmSlide,
+              hrmSlideValue: control() !== null ? control().errorState : false,
+              hrmSlideDuration: 150
+          ">
             <!-- ko text: $parent.sum.error() -->
             <!-- /ko -->
           </div>
@@ -83,12 +81,12 @@
           <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
 
           <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="descendantsComplete: setAuthorValue,
-       hrmSelect,
-       hrmSelectSearchEnabled: true,
-       hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
-       hrmFormFieldSelectControl: control,
-       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+            <select data-bind="bindInner, value: autor,
+              hrmSelect,
+              hrmSelectSearchEnabled: true,
+              hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
               <option></option>
               <!-- ko foreach: $component.authors -->
               <option data-bind="value: '' + id, text: name"></option>
@@ -97,9 +95,9 @@
           </div>
 
           <div data-bind="component: {name: 'hrm-form-field-error'},
-   hrmSlide,
-   hrmSlideValue: control() !== null ? control().errorState : false,
-   hrmSlideDuration: 150">
+        hrmSlide,
+        hrmSlideValue: control() !== null ? control().errorState : false,
+        hrmSlideDuration: 150">
             <!-- ko text: $parent.author.error() -->
             <!-- /ko -->
           </div>

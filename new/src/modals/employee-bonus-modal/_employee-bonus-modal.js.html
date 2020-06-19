@@ -9,7 +9,7 @@
           message: 'Обязательное поле'
         }
       });
-      const sum = ko.observable(defaultData.sum || 0).extend({
+      const sum = ko.observable(defaultData.sum || '').extend({
         required: {
           message: 'Обязательное поле'
         },
@@ -24,6 +24,10 @@
         }
       });
 
+      const comment = ko.observable(defaultData.comment || '').extend({
+
+      });
+
       const validationObject = ko.validatedObservable({
         base,
         author,
@@ -34,17 +38,18 @@
         base,
         author,
         sum,
-        comment: ko.observable(defaultData.comment || '').extend({
+        comment,
 
-        }),
-        setBaseValue: function(el) {
-          ko.applyBindingsToNode(el, { value: base })
-        },
-        setAuthorValue: function(el) {
-          ko.applyBindingsToNode(el, { value: author })
-        },
         isValid: () => {
           return validationObject.isValid();
+        },
+        getData: () => {
+          return {
+            base: base(),
+            author: author(),
+            comment: comment(),
+            sum: parseFloat(sum())
+          }
         }
       }
     }
@@ -107,7 +112,8 @@
 
             this.total = ko.pureComputed(() => {
               return this.bonuses().reduce((sum, bonus) => {
-                return sum + bonus.sum();
+                let bonusSum = parseFloat(bonus.sum()) || 0;
+                return sum + bonusSum;
               }, 0);
             })
 
@@ -120,7 +126,7 @@
 
             /** Применить изменения */
             this.apply = function () {
-              employee.bonuses(ko.toJS(this.bonuses));
+              employee.bonuses(this.bonuses().map(b => b.getData()));
             }
 
             this.submit = function () {
