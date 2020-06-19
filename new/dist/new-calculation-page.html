@@ -220,8 +220,8 @@
 
               <!-- ko template: {
                 foreach: hrmTemplateIf(tabs.activeTab() === 0, $data),
-                afterAdd: hrmFadeAfterAddFactory(200, 200),
-                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                afterAdd: tabs.afterOpen,
+                beforeRemove: hrmFadeBeforeRemoveFactory(200),
               } -->
                 <div class="calculation-page__tab">
                   <!-- ko let: {tabName: 'production'} -->
@@ -233,7 +233,7 @@
 
               <!-- ko template: {
                 foreach: hrmTemplateIf(tabs.activeTab() === 1, $data),
-                afterAdd: hrmFadeAfterAddFactory(200, 200),
+                afterAdd: tabs.afterOpen,
                 beforeRemove: hrmFadeBeforeRemoveFactory(200)
               } -->
                 <div class="calculation-page__tab">
@@ -5972,6 +5972,7 @@
           const tableScroll = ko.observable(false);
 
           const onTableRender = (el) => {
+
             let scrollWrapper = el.querySelector('.os-content');
             if (!scrollWrapper) return;
 
@@ -8396,6 +8397,11 @@
         return {
           tabs,
           activeTab,
+          afterOpen: (el) => {
+            $(el).hide().delay(200).fadeIn(200, function () {
+              $(window).delay(1).resize()
+            })
+          }
         }
       })();
 
