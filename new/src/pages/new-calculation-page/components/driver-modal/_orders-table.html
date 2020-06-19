@@ -78,15 +78,15 @@
         </td>
       </tr>
 
-      <!-- ko if: activeOrder() === order -->
+      <!-- ko template: {
+        foreach: hrmTemplateIf(activeOrder() === order, $data),
+        afterAdd: $component.afterDetailsAdd,
+        beforeRemove: $component.beforeDetailsRemove,
+      } -->
       <tr class="driver-orders-table__order-row">
         <td colspan="4">
-          <!-- ko template: {
-            foreach: hrmTemplateIf(activeOrder() === order, $data),
-            afterAdd: hrmSlideAfterAddFactory(500, 100),
-            beforeRemove: hrmSlideBeforeRemoveFactory(500)
-          } -->
-          <div class="driver-orders-table__order order-block">
+
+          <div class="driver-orders-table__order order-block details-block">
             <div class="order-block__header">
               <h3 class="order-block__title">Состав заказа</h3>
               <div class="order-block__sum">
@@ -212,20 +212,21 @@
 
                   <!-- ko if: true -->
                   <!-- ko let: {control: ko.observable(null), driverValue: ko.observable(order.driverId) } -->
+
                   <div class="order-block__driver"
                        data-bind="hrmFormField, hrmFormFieldControlRef: control">
 
                     <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                      <select data-bind="value: driverValue,
+                      <select data-bind="bindInner, value: driverValue,
                           valueAllowUnset: true,
-                          options: $component.employees,
-                          optionsText: 'name',
-                          optionsValue: 'id',
                           change: function() {
                             $component.changeDriver(driverValue());
                           },
                           hrmSelect,
                           hrmFormFieldSelectControl: control">
+                          <!-- ko foreach: $component.employees -->
+                          <option data-bind="value: id, text: name"></option>
+                          <!-- /ko -->
                       </select>
                     </div>
 
@@ -260,7 +261,7 @@
             </div>
 
           </div>
-          <!-- /ko -->
+
         </td>
       </tr>
       <!-- /ko -->

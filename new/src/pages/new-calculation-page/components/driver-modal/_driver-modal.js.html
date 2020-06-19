@@ -68,7 +68,7 @@
                                     deliveryTime: '1ч 4мин',
                                     sum: 900,
                                     operatorName: 'Булекова Ольга',
-                                    driverId: 1,
+                                    driverId: 'driver2',
                                     driverName: 'Харитонов Алексей',
                                     items: [
                                         {
@@ -113,7 +113,7 @@
                                     deliveryTime: '1ч 4мин',
                                     sum: 900,
                                     operatorName: 'Булекова Ольга',
-                                    driverId: 1,
+                                    driverId: 'driver1',
                                     driverName: 'Харитонов Алексей',
                                     items: [
                                         {
@@ -158,7 +158,7 @@
                                     deliveryTime: '1ч 4мин',
                                     sum: 900,
                                     operatorName: 'Булекова Ольга',
-                                    driverId: 1,
+                                    driverId: 'driver1',
                                     driverName: 'Харитонов Алексей',
                                     items: [
                                         {
@@ -203,7 +203,7 @@
                                     deliveryTime: '1ч 4мин',
                                     sum: 900,
                                     operatorName: 'Булекова Ольга',
-                                    driverId: 1,
+                                    driverId: 'driver2',
                                     driverName: 'Харитонов Алексей',
                                     items: [
                                         {
@@ -295,6 +295,23 @@
                         $element.removeClass('modal-dialog-content--initializing');
                         this.initializing(false);
                     }.bind(this);
+
+                    this.afterDetailsAdd = el => {
+                        let $block = $(el).find('.details-block');
+                        $block.hide();
+                        $(el).fadeIn(0, () => {
+                            $block.slideDown(300);
+                        });
+                    };
+
+                    this.beforeDetailsRemove = el => {
+                        let $block = $(el).find('.details-block');
+                        $block.slideUp(300, () => {
+                            $(el).fadeOut(0, () => {
+                                $(el).remove();
+                            })
+                        })
+                    }
 
                     this.dispose = function () {
                         $(window).off('resize', this.windowResizeHandler);
