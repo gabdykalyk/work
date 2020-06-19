@@ -47,22 +47,24 @@
                     this.orders = ko.observableArray([]);
                     this.routes = ko.observableArray([]);
 
-                    this.totalOrdersSum = ko.observable(0);
-                    this.activeOrder = ko.observable('');
                     this.changeOrderDriver = (driverId) => {
                         const orderId = this.activeOrder().id;
                         console.log('change driver', orderId, driverId);
+                    };
+
+                    this.getOrdersSum = orders => {
+                        return orders.reduce((acc, o) => acc + o.sum, 0);
                     }
 
 
+
                     this.loadData = (id) => {
-
-
                         setTimeout(() => {
 
                             const orders = [
                                 {
                                     id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
                                     deliveryTime: '1ч 4мин',
                                     sum: 900,
                                     operatorName: 'Булекова Ольга',
@@ -107,6 +109,7 @@
                                 },
                                 {
                                     id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
                                     deliveryTime: '1ч 4мин',
                                     sum: 900,
                                     operatorName: 'Булекова Ольга',
@@ -151,6 +154,7 @@
                                 },
                                 {
                                     id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
                                     deliveryTime: '1ч 4мин',
                                     sum: 900,
                                     operatorName: 'Булекова Ольга',
@@ -195,6 +199,7 @@
                                 },
                                 {
                                     id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
                                     deliveryTime: '1ч 4мин',
                                     sum: 900,
                                     operatorName: 'Булекова Ольга',
@@ -240,7 +245,32 @@
                             ];
                             this.orders(orders);
 
-                            const routes = [];
+                            const routes = [
+                                {
+                                    orders: orders.slice(0, 1),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    orders: orders.slice(0, 2),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 16.9,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    orders: orders.slice(0, 1),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                }
+                            ];
                             this.routes(routes);
 
                             this.isLoading(false);

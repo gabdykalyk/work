@@ -1,355 +1,85 @@
+@@include('./_orders-table.html')
+
 <template id="driver-modal-dialog-template">
   <!-- ko template: { afterRender: afterRender } -->
-  <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
-  <button class="hrm-button modal-dialog-content__close"
-          data-bind="click: function() {cancel();}"
-          aria-label="Close">
-  </button>
-  <!-- /ko -->
+    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+    <button class="hrm-button modal-dialog-content__close"
+            data-bind="click: function() {cancel();}"
+            aria-label="Close">
+    </button>
+    <!-- /ko -->
 
-  <!-- ko if: !isLoading() -->
-  <div class="modal-dialog-content__header">
-    <div class="modal-dialog-content__title">
-      Заказы водителя
-    </div>
+    <!-- ko if: !isLoading() -->
+      <div class="modal-dialog-content__header">
+        <div class="modal-dialog-content__title">
+          Заказы водителя
+        </div>
 
-    <!-- ko let: {control: ko.observable(null), employeeId: ko.observable(employee().id) } -->
-    <div data-bind="hrmFormField, hrmFormFieldControlRef: control">
+        <!-- ko let: {control: ko.observable(null), employeeId: ko.observable(employee().id) } -->
+        <div data-bind="hrmFormField, hrmFormFieldControlRef: control">
 
-      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-        <select data-bind="value: employeeId,
-        valueAllowUnset: true,
-        options: $component.employees,
-        optionsText: 'name',
-        optionsValue: 'id',
-        event:{
-          change: function() {
-            console.log('change');
-            $component.changeEmployee(employeeId());
-          }
-        },
-        hrmSelect,
-        hrmFormFieldSelectControl: control">
-        </select>
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <select data-bind="value: employeeId,
+            valueAllowUnset: true,
+            options: $component.employees,
+            optionsText: 'name',
+            optionsValue: 'id',
+            event:{
+              change: function() {
+                console.log('change');
+                $component.changeEmployee(employeeId());
+              }
+            },
+            hrmSelect,
+            hrmFormFieldSelectControl: control">
+            </select>
+          </div>
+
+        </div>
+        <!-- /ko -->
       </div>
 
-    </div>
-    <!-- /ko -->
-  </div>
+      <div class="driver-orders">
+        <div class="driver-orders-tabs"
+            data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
+        </div>
 
-  <div class="driver-orders">
-    <div class="driver-orders-tabs"
-         data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
-    </div>
-
-    <!-- ko template: {
-        foreach: hrmTemplateIf(activeTab() === 0, $data),
-        afterAdd: hrmFadeAfterAddFactory(200, 200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-    } -->
-    <div class="driver-orders__scroll" data-bind="hrmScrollable">
-      <table class="driver-orders-table"
-             data-bind="hrmTable">
-        <thead>
-          <tr>
-            <th class="driver-orders-table__cell driver-orders-table__cell--order">
-              <div class="driver-orders-table__cell-content">
-                № заказа
-                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
-                        data-bind="hrmTooltip, hrmTooltipText: '№ заказа'"></button>
-              </div>
-            </th>
-
-            <th class="driver-orders-table__cell driver-orders-table__cell--time">
-              <div class="driver-orders-table__cell-content">
-                Время доставки
-                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
-                        data-bind="hrmTooltip, hrmTooltipText: 'Время доставки'"></button>
-              </div>
-            </th>
-
-            <th class="driver-orders-table__cell driver-orders-table__cell--sum">
-              <div class="driver-orders-table__cell-content">
-                Сумма заказа, ₽
-                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
-                        data-bind="hrmTooltip, hrmTooltipText: 'Сумма заказа, ₽'"></button>
-              </div>
-            </th>
-
-            <th class="driver-orders-table__cell driver-orders-table__cell--operator">
-              <div class="driver-orders-table__cell-content">
-                Обработал
-                <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
-                        data-bind="hrmTooltip, hrmTooltipText: 'Обработал'"></button>
-              </div>
-            </th>
-
-
-          </tr>
-        </thead>
-
-        <tbody>
-          <!-- ko foreach: { data: orders, as: 'order' } -->
-
-          <tr data-bind="css: {
-            'driver-orders-table__active-row': $component.activeOrder() === order
-          }">
-            <td class="driver-orders-table__cell">
-              <div class="driver-orders-table__cell-content"
-                   data-bind="text: id"></div>
-            </td>
-            <td class="driver-orders-table__cell">
-              <div class="driver-orders-table__cell-content"
-                   data-bind="text: deliveryTime"></div>
-            </td>
-            <td class="driver-orders-table__cell">
-              <div class="driver-orders-table__cell-content"
-                   data-bind="text: sum"></div>
-            </td>
-            <td class="driver-orders-table__cell">
-              <div class="driver-orders-table__cell-content driver-orders-table__operator">
-
-                <div data-bind="text: operatorName"></div>
-                <button class="hrm-button hrm-circle-icon-button hrm-circle-arrow-down-icon-button hrm-circle-icon-button--theme_neutral"
-                        data-bind="click: function() {
-                          if ($component.activeOrder() === order) {
-                            $component.activeOrder(null);
-                          } else {
-                            $component.activeOrder(order);
-                          }
-
-                        }, css: {
-                  'active': $component.activeOrder() === order
-                }">
-                </button>
-              </div>
-            </td>
-          </tr>
-
-          <!-- ko if: $component.activeOrder() === order -->
-          <tr class="driver-orders-table__order-row">
-            <td colspan="4">
-              <!-- ko template: {
-                foreach: hrmTemplateIf($component.activeOrder() === order, $data),
-                afterAdd: hrmSlideAfterAddFactory(500),
-                beforeRemove: hrmSlideBeforeRemoveFactory(500)
-              } -->
-              <div class="driver-orders-table__order order-block">
-                <div class="order-block__header">
-                  <h3 class="order-block__title">Состав заказа</h3>
-                  <div class="order-block__sum">
-                    <!-- ko text: sum + '₽' -->
-                    <!-- /ko -->
-                  </div>
-                </div>
-
-                <table class="order-block__items"
-                data-bind="hrmTable">
-                  <tbody>
-                    <!-- ko foreach: items -->
-                    <tr>
-                      <td>
-                        <!-- ko text: name -->
-                        <!-- /ko -->
-                      </td>
-
-                      <td>
-                        <!-- ko text: count -->
-                        <!-- /ko -->
-                      </td>
-
-                      <td>
-                        <!-- ko text: price -->
-                        <!-- /ko -->
-                      </td>
-                    </tr>
-                    <!-- /ko -->
-                  </tbody>
-                </table>
-
-                <div class="order-block__info">
-
-                  <div class="order-block__processing">
-                    <h3 class="order-block__title">История изменений</h3>
-                    <table class="order-processing-table"
-                    data-bind="hrmTable">
-                      <tr class="order-processing-table__row order-processing-table__row--created"
-                          data-bind="css: {
-                        'order-processing-table__row--warning_light': true
-                      }">
-                        <td>
-                          Создан/открыт
-                        </td>
-                        <td>
-                          <!-- ko text: processing.createdAt -->
-                          <!-- /ko -->
-                        </td>
-                      </tr>
-                      <tr class="order-processing-table__row order-processing-table__row--confirmed"
-                          data-bind="css: {
-                        'order-processing-table__row--warning_medium': true
-                      }">
-                        <td>
-                          Подтвержден
-                        </td>
-                        <td>
-                          <!-- ko text: processing.confirmedAt -->
-                          <!-- /ko -->
-                        </td>
-                      </tr>
-                      <tr class="order-processing-table__row order-processing-table__row--printed"
-                          data-bind="css: {
-                        'order-processing-table__row--warning_hard': true
-                      }">
-                        <td>
-                          Распечатан
-                        </td>
-                        <td>
-                          <!-- ko text: processing.printedAt -->
-                          <!-- /ko -->
-                        </td>
-                      </tr>
-                      <tr class="order-processing-table__row order-processing-table__row--ready">
-                        <td>
-                          Приготовлен
-                        </td>
-                        <td>
-                          <!-- ko text: processing.readyAt -->
-                          <!-- /ko -->
-                        </td>
-                      </tr>
-                      <tr class="order-processing-table__row order-processing-table__row--sended">
-                        <td>
-                          Отправлен
-                        </td>
-                        <td>
-                          <!-- ko text: processing.sendedAt -->
-                          <!-- /ko -->
-                        </td>
-                      </tr>
-                      <tr class="order-processing-table__row order-processing-table__row--paid">
-                        <td>
-                          Оплачен
-                        </td>
-                        <td>
-                          <!-- ko text: processing.paidAt -->
-                          <!-- /ko -->
-                        </td>
-                      </tr>
-                      <tr class="order-processing-table__row order-processing-table__row--delivered">
-                        <td>
-                          Доставлен
-                        </td>
-                        <td>
-                          <!-- ko text: processing.deliveredAt -->
-                          <!-- /ko -->
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-
-                  <div class="order-block__data">
-                    <div class="order-block__data-block">
-                      <h4 class="order-block__title">Оператор</h4>
-                      <div data-bind="text: operatorName"></div>
-                    </div>
-                    <div class="order-block__data-block">
-                      <h4 class="order-block__title">Водитель</h4>
-
-                      <!-- ko if: true -->
-                      <!-- ko let: {control: ko.observable(null), driverValue: ko.observable(order.driverId) } -->
-                      <div class="order-block__driver"
-                           data-bind="hrmFormField, hrmFormFieldControlRef: control">
-
-                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                          <select data-bind="value: driverValue,
-                              valueAllowUnset: true,
-                              options: $component.employees,
-                              optionsText: 'name',
-                              optionsValue: 'id',
-                              change: function() {
-                                $component.changeDriver(driverValue());
-                              },
-                              hrmSelect,
-                              hrmFormFieldSelectControl: control">
-                          </select>
-                        </div>
-
-                      </div>
-                      <!-- /ko -->
-
-                      <!-- /ko -->
-
-                      <!-- ko ifnot: true -->
-                      <div data-bind="text: driverName"></div>
-                      <!-- /ko -->
-                    </div>
-                    <div class="order-block__data-block order-block__delivery">
-                      <h4 class="order-block__title">Доставка</h4>
-
-                      <div class="order-block__delivery-item">
-                        <i class="far fa-clock"></i>
-                        <span data-bind="text: delivery.date"></span>
-                      </div>
-                      <div class="order-block__delivery-item">
-                        <i class="far fa-exclamation-circle"></i>
-                        <span data-bind="text: delivery.time"></span>
-                      </div>
-                      <div class="order-block__delivery-item">
-                        <i class="fal fa-map-marker-alt"></i>
-                        <span data-bind="text: delivery.address"></span>
-                      </div>
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-              <!-- /ko -->
-            </td>
-          </tr>
+        <!-- ko template: {
+            foreach: hrmTemplateIf(activeTab() === 0, $data),
+            afterAdd: hrmFadeAfterAddFactory(200, 200),
+            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <div class="driver-orders__scroll"
+            data-bind="hrmScrollable">
+          <!-- ko template: {
+            name: 'orders-table-template',
+            data: {
+              orders: orders(),
+            }
+          } -->
           <!-- /ko -->
+        </div>
+        <!-- /ko -->
 
-          <!-- /ko -->
-        </tbody>
+        <!-- ko template: {
+            foreach: hrmTemplateIf(activeTab() === 1, $data),
+            afterAdd: hrmFadeAfterAddFactory(200, 200),
+            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <div class="driver-orders__scroll"
+            data-bind="hrmScrollable">
+            @@include('./_routes-tab.html')
+          </div>
+        <!-- /ko -->
 
-        <tfoot>
-          <tr>
-            <td colspan="4">
-              <div class="driver-orders-table__total">
-                <div>
-                  Всего заказов: <b data-bind="text: $component.orders().length"></b>
-                </div>
-                <div>
-                  Сумма заказов: <b data-bind="text: $component.totalOrdersSum"></b>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
+      </div>
+    <!-- /ko -->
+
+    <!-- ko if: isLoading() -->
+    <div class="loader">
+      <i class="fa fa-spinner fa-pulse loader__indicator">
+      </i>
     </div>
     <!-- /ko -->
-
-
-
-    <!-- ko template: {
-        foreach: hrmTemplateIf(activeTab() === 1, $data),
-        afterAdd: hrmFadeAfterAddFactory(200, 200),
-        beforeRemove: hrmFadeBeforeRemoveFactory(200)
-    } -->
-
-    <!-- /ko -->
-  </div>
-
-  <!-- /ko -->
-
-  <!-- ko if: isLoading() -->
-  <div class="loader">
-    <i class="fa fa-spinner fa-pulse loader__indicator">
-    </i>
-  </div>
-  <!-- /ko -->
   <!-- /ko -->
 </template>

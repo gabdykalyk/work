@@ -1,0 +1,116 @@
+<!-- ko let: { activeRoute: ko.observable(null) } -->
+<table class="driver-routes-table"
+        data-bind="hrmTable">
+  <thead>
+    <tr>
+      <th class="driver-routes-table__cell driver-routes-table__cell--order">
+        <div class="driver-routes-table__cell-content">
+          Маршрут
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                  data-bind="hrmTooltip, hrmTooltipText: 'Маршрут'"></button>
+        </div>
+      </th>
+
+      <th class="driver-routes-table__cell driver-routes-table__cell--time">
+        <div class="driver-routes-table__cell-content">
+          Начало/завершение
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                  data-bind="hrmTooltip, hrmTooltipText: 'Начало/завершение'"></button>
+        </div>
+      </th>
+
+      <th class="driver-routes-table__cell driver-routes-table__cell--sum">
+        <div class="driver-routes-table__cell-content">
+          Дистанция, км
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                  data-bind="hrmTooltip, hrmTooltipText: 'Дистанция, км'"></button>
+        </div>
+      </th>
+
+      <th class="driver-routes-table__cell driver-routes-table__cell--operator">
+        <div class="driver-routes-table__cell-content">
+          Расч./факт. время в пути
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                  data-bind="hrmTooltip, hrmTooltipText: 'Расч./факт. время в пути'"></button>
+        </div>
+      </th>
+
+
+    </tr>
+  </thead>
+
+  <tbody>
+    <!-- ko foreach: { data: routes, as: 'route' } -->
+
+    <tr data-bind="css: {
+      'driver-routes-table__active-row': activeRoute() === route
+    }">
+      <td class="driver-routes-table__cell">
+        <div class="driver-routes-table__cell-content">
+            <!-- ko foreach: orders -->
+            <div data-bind="text: address" class="driver-routes-table__order-address"></div>
+            <!-- /ko -->
+        </div>
+      </td>
+      <td class="driver-routes-table__cell">
+        <div class="driver-routes-table__cell-content">
+          <div data-bind="text: startedAt"></div>
+            <div data-bind="text: finishedAt"></div>
+        </div>
+      </td>
+      <td class="driver-routes-table__cell">
+        <div class="driver-routes-table__cell-content"
+        data-bind="text: distKm"></div>
+      </td>
+      <td class="driver-routes-table__cell">
+        <div class="driver-routes-table__cell-content driver-routes-table__time">
+          <div>
+            <div data-bind="text: estimatedTime"></div>
+            <div data-bind="text: actualTime"></div>
+          </div>
+
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-arrow-down-icon-button hrm-circle-icon-button--theme_neutral"
+                  data-bind="click: function() {
+                    if (activeRoute() === route) {
+                      activeRoute(null);
+                    } else {
+                      activeRoute(route);
+                    }
+
+                  }, css: {
+            'active': activeRoute() === route
+          }">
+          </button>
+        </div>
+      </td>
+    </tr>
+
+    <!-- ko if: activeRoute() === route -->
+    <tr class="driver-routes-table__route-row">
+      <td colspan="4">
+        <!-- ko template: {
+          foreach: hrmTemplateIf(activeRoute() === route, $data),
+          afterAdd: hrmSlideAfterAddFactory(500),
+          beforeRemove: hrmSlideBeforeRemoveFactory(500)
+        } -->
+        <div class="driver-routes-table__route route-block">
+
+
+        <!-- ko template: {
+          name: 'orders-table-template',
+          data: {
+            orders: route.orders
+          }
+        } -->
+        <!-- /ko -->
+
+        </div>
+        <!-- /ko -->
+      </td>
+    </tr>
+    <!-- /ko -->
+
+    <!-- /ko -->
+  </tbody>
+</table>
+<!-- /ko -->
