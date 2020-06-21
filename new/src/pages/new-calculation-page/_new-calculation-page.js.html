@@ -674,6 +674,168 @@
         deliveryTotal,
         total
       }
+    };
+
+    const LatenessModel = function (root) {
+      this.root = root;
+
+      function PositionIntervalModel(params) {
+        const lateness = {};
+        this.lateness = {
+          light: ko.observable(lateness.light || 0),
+          medium: ko.observable(lateness.medium || 0),
+          hard: ko.observable(lateness.hard || 0),
+          total: ko.observable(lateness.total || 0),
+        };
+
+        this.korf = ko.observable(0);
+        this.workload = ko.observable(0);
+        this.employees = ko.observable(0);
+
+        params.forEach(p => {
+          this[p.id] = ko.observable(0)
+        });
+      }
+
+      function PositionModel(positionData, intervals, root) {
+        this.root = root;
+
+        this.id = positionData.id;
+        this.name = positionData.name;
+
+        this.total = {
+          lateness: {
+            light: ko.observable(0),
+            medium: ko.observable(0),
+            hard: ko.observable(0),
+            total: ko.observable(0),
+          },
+          korf: ko.observable(0),
+          workload: ko.observable(0),
+          employees: ko.observable(0),
+        };
+
+        this.params = [
+
+        ];
+
+        const params = positionData.params || [];
+        params.forEach(param => {
+          this.params.push(param)
+          this.total[param.id] = ko.observable(0);
+        });
+
+        this.intervals = intervals.map(_ => new PositionIntervalModel(this.params));
+
+        this.openLatenessModal = (intervalIndex, latenessDegree) => {
+          this.root.openModal('employee-details-modal', {
+
+          });
+        };
+      };
+
+      this.intervals = [
+        [null, 12],
+        [12, 13],
+        [13, 14],
+        [14, 15],
+        [15, 16],
+        [16, 17],
+        [17, 18],
+        [18, 19],
+        [19, 20],
+        [20, 21],
+        [21, 22],
+        [22, 23],
+        [23, null],
+      ];
+
+      this.intervalsTotal = this.intervals.map(_ => {
+        return {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        }
+      });
+
+      this.total = {
+        light: ko.observable(0),
+        medium: ko.observalbe(0),
+        hard: ko.observable(0),
+        total: ko.observable(0)
+      };
+
+      this.getIntervalString = (interval) => {
+        if (!interval[0]) return '<' + interval[1];
+        if (!interval[1]) return '>' + interval[0];
+
+        return interval[0] + '-' + interval[1];
+      }
+
+      this.operator = new PositionModel({
+        id: 'operator',
+        name: 'Оператор',
+        params: [
+          { id: 'ordersCount', name: 'Кол-во заказов' },
+        ],
+      }, this.intervals, root);
+
+      this.administrator = new PositionModel({
+        id: 'administrator',
+        name: 'Администратор филиала',
+        params: [
+          { id: 'ordersCount', name: 'Кол-во заказов' }
+        ],
+      }, this.intervals, root);
+
+      this.sushiMaster = new PositionModel({
+        id: 'sushi-master',
+        name: 'Повар-сушист',
+        params: [
+          { id: 'empoloyeesWithNorm', name: 'Сотр. с норм.' },
+          { id: 'revenue', name: 'Выручка' }
+        ],
+      }, this.intervals, root);
+
+      this.pizzaMaster = new PositionModel({
+        id: 'pizza-master',
+        name: 'Повар-пиццемейкер',
+        params: [
+          { id: 'empoloyeesWithNorm', name: 'Сотр. с норм.' },
+          { id: 'pizzaCount', name: 'Кол-во пицц' }
+        ],
+      }, this.intervals, root);
+
+      this.hotShop = new PositionModel({
+        id: 'hot-shop',
+        name: 'Горячий цех',
+        params: [
+          { id: 'ordersCount', name: 'Выручка' }
+        ],
+      }, this.intervals, root);
+
+      this.driver = new PositionModel({
+        id: 'driver',
+        name: 'Водитель',
+        params: [
+          { id: 'ordersCount', name: 'Кол-во заказов' }
+        ],
+      }, this.intervals, root);
+
+      this.positions = [
+        this.operator,
+        this.administrator,
+        this.sushiMaster,
+        this.pizzaMaster,
+        this.hotShop,
+        this.driver
+      ];
+
+      this.filters = {
+        lateness: ko.observable(0),
+        positions: ko.observableArray([]),
+      };
     }
 
     const ViewModel = function () {
@@ -721,6 +883,7 @@
       })();
 
       this.summaryModel = new PositionsModel(this);
+      this.latenessModel = new LatenessModel(this);
 
       this.inputModel = {
         filial: ko.observable(''),

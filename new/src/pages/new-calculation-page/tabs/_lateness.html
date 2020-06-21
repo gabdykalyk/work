@@ -1,1 +1,317 @@
-lateness
+<template id="lateness-params-template">
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '1' -->
+  <th class="lateness-table__position-param">
+    <div>
+      &lt;5
+    </div>
+  </th>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '2' -->
+  <th class="lateness-table__position-param">
+    <div>
+      5-10
+    </div>
+  </th>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '3' -->
+  <th class="lateness-table__position-param">
+    <div>
+      &gt;10
+    </div>
+  </th>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() -->
+  <th class="lateness-table__position-param">
+    <div>
+      Всего
+    </div>
+  </th>
+  <!-- /ko -->
+</template>
+
+<template id="interval-lateness-template">
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '1' -->
+  <td class="lateness-table__cell" data-bind="style: {
+            'background-color': '#B8EFD5'
+          }">
+    <div>
+      <!-- ko text: lateness.light -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '2' -->
+  <td class="lateness-table__cell" data-bind="style: {
+            'background-color': '#FDFFB3;'
+          }">
+    <div>
+      <!-- ko text: lateness.medium -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '3' -->
+  <td class="lateness-table__cell" data-bind="style: {
+            'background-color': '#FFE6F2'
+          }">
+    <div>
+      <!-- ko text: lateness.hard -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.total -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+</template>
+
+<template id="lateness-total-template">
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '1' -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.light -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '2' -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.medium -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '3' -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.hard -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.total -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+</template>
+
+
+<div class="lateness-tab" data-bind="let: { table: latenessModel }">
+
+  <div class="lateness-filters">
+
+  </div>
+
+  <div class="lateness-table" data-bind="using: latenessModel">
+
+
+    <table class="lateness-table__positions"
+      data-bind="htmTable, let: {latenessCellsCount: filters.lateness() ? 1 : 4 }">
+      <thead>
+        <!-- Названия позиций -->
+        <tr>
+          <th class="lateness-table__fixed" rowspan="2">Время</th>
+          <!-- ko foreach: positions -->
+          <th class="lateness-table__position-title" data-bind="attr: {
+            colspan: params.length + latenessCellsCount
+          }">
+            <div>
+              <!-- ko text: $data.name -->
+              <!-- /ko -->
+            </div>
+          </th>
+          <!-- /ko -->
+
+          <th class="lateness-table__position-title" data-bind="attr: {
+            colspan: latenessCellsCount
+          }">Итого</th>
+        </tr>
+        <!-- /Названия позиций -->
+
+        <!-- Параметры позиций -->
+        <tr>
+          <!-- ko foreach: positions -->
+          <th class="lateness-table__position-param">
+            <div>
+              КОРФ
+            </div>
+          </th>
+
+          <th class="lateness-table__position-param">
+            <div>
+              Нагрузка
+            </div>
+          </th>
+
+          <th class="lateness-table__position-param">
+            <div>
+              Сотр.
+            </div>
+          </th>
+
+          <!-- ko foreach: position.params -->
+          <th class="lateness-table__position-param">
+            <div>
+              <!-- ko text: name -->
+              <!-- /ko -->
+            </div>
+          </th>
+          <!-- /ko -->
+
+          <!-- ko template: { name: 'lateness-params-template' } -->
+          <!-- /ko -->
+          <!-- /ko -->
+
+          <!-- Секция ИТОГО, параметры -->
+          <!-- ko template: { name: 'lateness-params-template' } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, параметры -->
+        </tr>
+        <!-- /Параметры позиций -->
+      </thead>
+
+      <tbody>
+        <!-- ko foreach: { data: intervals, as: 'interval' } -->
+        <tr>
+          <td class="lateness-table__fixed">
+            <div>
+              <!-- ko text: $parent.getIntervalString($data) -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+
+          <!-- ko foreach: { data: positions, as: 'position' } -->
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval.korf -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval.workload -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval.employees -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <!-- ko foreach: { data: position.params, as: param } -->
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval[param.id] -->
+              <!-- /ko -->
+            </div>
+          </td>
+          <!-- /ko -->
+
+          <!-- ko template: {
+            name: 'interval-lateness-template',
+            data: {
+              lateness: positionInterval.lateness
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /ko -->
+
+
+          <!-- Секция ИТОГО, значения -->
+          <!-- ko template: {
+            name: 'interval-lateness-template',
+            data: {
+              lateness: table.intervalTotal[intervalIndex].lateness
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, значения -->
+        </tr>
+        <!-- /ko -->
+      </tbody>
+
+      <tfoot>
+        <tr class="lateness-table__total">
+          <td class="lateness-table__fixed"></td>
+
+          <!-- ko foreach: { data: positions, as: 'position' } -->
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.korf -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.workload -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.employees -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <!-- ko foreach: { data: position.params, as: 'param' } -->
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total[param.id] -->
+              <!-- /ko -->
+            </div>
+          </td>
+          <!-- /ko -->
+
+          <!-- ko template: {
+            name: 'lateness-total-template',
+            data: {
+              lateness: position.total.lateness
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /ko -->
+
+          <!-- Секция ИТОГО, итого -->
+          <!-- ko template: {
+            name: 'lateness-total-template',
+            data: {
+              lateness: table.total
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, итого -->
+        </tr>
+      </tfoot>
+    </table>
+
+  </div>
+
+</div>
