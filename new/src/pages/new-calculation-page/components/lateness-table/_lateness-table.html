@@ -23,12 +23,17 @@
 }">
 
     <table class="lateness-table__positions"
-      data-bind="hrmTable, let: {latenessCellsCount: table.filters.lateness() > 0 ? 1 : 4 }">
+      data-bind="hrmTable, let: {
+        latenessCellsCount: table.filters.lateness() > 0 ? 1 : 4,
+        hasTotalBlock: table.visiblePositions().length > 1
+      }">
       <thead>
+
+
         <!-- Названия позиций -->
         <tr>
           <th class="lateness-table__fixed" rowspan="2">Время</th>
-          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <!-- ko foreach: { data: table.visiblePositions, as: 'position' } -->
           <th class="lateness-table__position-title" data-bind="attr: {
             colspan: position.paramsCount + latenessCellsCount
           }">
@@ -39,15 +44,19 @@
           </th>
           <!-- /ko -->
 
+          <!-- ko if: hasTotalBlock -->
           <th class="lateness-table__position-title" data-bind="attr: {
             colspan: latenessCellsCount
           }">Итого</th>
+          <!-- /ko -->
         </tr>
         <!-- /Названия позиций -->
 
+
+
         <!-- Параметры позиций -->
         <tr>
-          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <!-- ko foreach: { data: table.visiblePositions, as: 'position' } -->
           <th class="lateness-table__position-param" data-bind="attr: {'data-position': position.name}">
             <div>
               КОРФ
@@ -80,7 +89,9 @@
           <!-- /ko -->
 
           <!-- Секция ИТОГО, параметры -->
+          <!-- ko if: hasTotalBlock -->
           <!-- ko template: { name: 'lateness-params-template' } -->
+          <!-- /ko -->
           <!-- /ko -->
           <!-- /Секция ИТОГО, параметры -->
         </tr>
@@ -97,7 +108,7 @@
             </div>
           </td>
 
-          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <!-- ko foreach: { data: table.visiblePositions, as: 'position' } -->
           <!-- ko let: {positionInterval: position.intervals[intervalIndex()]} -->
 
           <td class="lateness-table__cell">
@@ -147,6 +158,7 @@
 
 
           <!-- Секция ИТОГО, значения -->
+          <!-- ko if: hasTotalBlock -->
           <!-- ko template: {
             name: 'interval-lateness-template',
             data: {
@@ -155,32 +167,31 @@
             }
           } -->
           <!-- /ko -->
+          <!-- /ko -->
           <!-- /Секция ИТОГО, значения -->
         </tr>
         <!-- /ko -->
-      </tbody>
 
-      <tfoot>
         <tr class="lateness-table__total">
-          <td class="lateness-table__fixed"></td>
+          <td class="lateness-table__fixed lateness-table__highlighted"></td>
 
-          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <!-- ko foreach: { data: table.visiblePositions, as: 'position' } -->
 
-          <td class="lateness-table__cell">
+          <td class="lateness-table__cell lateness-table__highlighted">
             <div>
               <!-- ko text: position.total.korf -->
               <!-- /ko -->
             </div>
           </td>
 
-          <td class="lateness-table__cell">
+          <td class="lateness-table__cell lateness-table__highlighted">
             <div>
               <!-- ko text: position.total.workload -->
               <!-- /ko -->
             </div>
           </td>
 
-          <td class="lateness-table__cell">
+          <td class="lateness-table__cell lateness-table__highlighted">
             <div>
               <!-- ko text: position.total.employees -->
               <!-- /ko -->
@@ -188,7 +199,7 @@
           </td>
 
           <!-- ko foreach: { data: position.params, as: 'param' } -->
-          <td class="lateness-table__cell">
+          <td class="lateness-table__cell lateness-table__highlighted">
             <div>
               <!-- ko text: position.total[param.id] -->
               <!-- /ko -->
@@ -203,9 +214,11 @@
             }
           } -->
           <!-- /ko -->
+
           <!-- /ko -->
 
           <!-- Секция ИТОГО, итого -->
+          <!-- ko if: hasTotalBlock -->
           <!-- ko template: {
             name: 'lateness-total-template',
             data: {
@@ -213,9 +226,11 @@
             }
           } -->
           <!-- /ko -->
+          <!-- /ko -->
           <!-- /Секция ИТОГО, итого -->
         </tr>
-      </tfoot>
+      </tbody>
+
     </table>
   </div>
   <!-- /ko -->

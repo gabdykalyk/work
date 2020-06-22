@@ -1,9 +1,48 @@
-
-
-
-<div class="lateness-tab" data-bind="let: { table: latenessModel }">
+<div class="lateness-tab"
+     data-bind="let: { table: latenessModel }">
 
   <div class="lateness-filters">
+
+    <!-- ko let: {control: ko.observable(null)} -->
+    <div class="lateness-filter__positions" data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <select data-bind="
+               selectedOptions: table.filters.positions,
+               hrmSelect,
+               hrmSelectPlaceholder: 'Должности',
+               hrmFormFieldSelectControl: control" multiple>
+          <option></option>
+          <option value="operator">Оператор</option>
+          <option value="administrator">Администратор филиала</option>
+          <option value="sushi-master">Повар-сушист</option>
+          <option value="pizza-master">Повар-пиццемейкер</option>
+          <option value="hot-shop">Горячий цех</option>
+          <option value="driver">Водитель</option>
+        </select>
+      </div>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko let: {control: ko.observable(null)} -->
+    <div class="lateness-filter__lateness"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+        <select data-bind="
+               value: table.filters.lateness,
+               hrmSelect, hrmSelectAllowClear: true,
+               hrmFormFieldSelectControl: control,
+               hrmSelectPlaceholder: 'Степень опоздания'">
+          <option></option>
+          <option value="1">Меньше 5 минут</option>
+          <option value="2">5-10 минут</option>
+          <option value="3">Больше 10 минут</option>
+        </select>
+      </div>
+
+    </div>
+    <!-- /ko -->
 
   </div>
 

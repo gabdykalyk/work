@@ -870,6 +870,8 @@
         this.id = positionData.id;
         this.name = positionData.name;
 
+        this.visible = ko.observable(true);
+
         this.total = {
           lateness: {},
           korf: ko.observable(0),
@@ -1005,10 +1007,26 @@
         this.driver
       ];
 
+      this.visiblePositions = ko.pureComputed(() => {
+        return this.positions.filter(p => p.visible());
+      });
+
       this.filters = {
         lateness: ko.observable(null),
         positions: ko.observableArray([]),
       };
+
+      this.filters.positions.subscribe(v => {
+        if (!v.length) {
+          this.positions.forEach(p => p.visible(true));
+          return;
+        }
+
+        this.positions.forEach(p => {
+          if (v.includes(p.id)) p.visible(true);
+          else p.visible(false);
+        })
+      })
 
       this.intervalsTotal = this.intervals.map((_, i) => {
         let positions = this.positions.map(p => p.intervals[i].lateness);
