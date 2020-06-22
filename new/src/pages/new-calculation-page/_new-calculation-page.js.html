@@ -1127,7 +1127,31 @@
       this.isSubmitted = ko.observable(false);
 
       this.showSuccessMessage = ko.observable(false);
-      this.serverError = ko.observable('');
+      this.showErrorMessage = ko.observable(false);
+
+      this.versions = ko.observableArray([]);
+      this.currentVersion = this.versions[0];
+
+      this.inBookmarks = ko.observable(false);
+      this.addToBookmarks = () => {
+        this.inBookmarks(true);
+      };
+      this.removeFromBookmarks = () => {
+        this.inBookmarks(false);
+      };
+
+      this.toExcel = () => {
+
+      };
+      this.toPrint = () => {
+
+      };
+      this.toPhoto = () => {
+
+      };
+      this.newCalculation = () => {
+
+      };
 
       // Построение расчета
       this.buildCalculation = () => {
@@ -2778,21 +2802,32 @@
         this.isSubmitted(true);
 
         if (this.summaryModel.isValid() && this.latenessModel.isValid()) {
-          this.isNew(false);
-
           const data = this.getData();
           // Отправка данных
-
           setTimeout(() => {
-
             // Данные сохранены
             if (!testError) {
+              this.isNew(false);
               // Обновление данных
               this.summaryModel.save();
               console.log('save')
               this.showSuccessMessage(true);
-            } else {
-              this.serverError('Что-то пошло не так');
+              const newVersion = {
+                avatar: '/',
+                name: 'user',
+                time: moment().format('DD.MM.YYYY HH:mm')
+              };
+              this.versions.unshift(newVersion);
+              this.currentVersion(newVersion);
+              setTimeout(() => {
+
+                this.showSuccessMessage(false);
+              }, 3000)
+            } else { // Ошибка сохранения
+              this.showErrorMessage(true);
+              setTimeout(() => {
+                this.showErrorMessage(false);
+              }, 3000)
             }
 
           }, 3000);

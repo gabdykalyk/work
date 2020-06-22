@@ -23,6 +23,64 @@
 </head>
 
 <body>
+  <div style="display: none">
+    <svg>
+      <symbol id="excel-icon">
+        <path d="M8.47538 3.125H10.5823L8.05679 6.85381L10.9062 11H8.71957L6.98437 8.43767L5.24813 11H3.0625L5.91196 6.85381L3.38642 3.125H5.49336L6.98437 5.29456L8.47538 3.125Z"
+              fill="#12C971" />
+        <path d="M1 13V1H13V13H1Z"
+              stroke="#12C971"
+              fill="none"
+              stroke-width="2" />
+      </symbol>
+      <symbol id="print-icon">
+        <path d="M4 5V1H10.0625V5"
+              stroke="#8E9CBB"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none" />
+        <path d="M3.4 11H2.2C1.88174 11 1.57652 10.8595 1.35147 10.6095C1.12643 10.3594 1 10.0203 1 9.66667V6.33333C1 5.97971 1.12643 5.64057 1.35147 5.39052C1.57652 5.14048 1.88174 5 2.2 5H11.8C12.1183 5 12.4235 5.14048 12.6485 5.39052C12.8736 5.64057 13 5.97971 13 6.33333V9.66667C13 10.0203 12.8736 10.3594 12.6485 10.6095C12.4235 10.8595 12.1183 11 11.8 11H10.6"
+              stroke="#8E9CBB"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none" />
+        <path d="M10 9H4V13H10V9Z"
+              stroke="#8E9CBB"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none" />
+      </symbol>
+      <symbol id="picture-icon">
+        <path d="M11.6667 1H2.33333C1.59695 1 1 1.59695 1 2.33333V11.6667C1 12.403 1.59695 13 2.33333 13H11.6667C12.403 13 13 12.403 13 11.6667V2.33333C13 1.59695 12.403 1 11.6667 1Z"
+              stroke="#8E9CBB"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none" />
+        <path d="M5.5 6C6.32843 6 7 5.32843 7 4.5C7 3.67157 6.32843 3 5.5 3C4.67157 3 4 3.67157 4 4.5C4 5.32843 4.67157 6 5.5 6Z"
+              fill="#8E9CBB" />
+        <path d="M13 9.18182L10.1875 6L4 13"
+              stroke="#8E9CBB"
+              stroke-width="2"
+              stroke-linejoin="round"
+              fill="none" />
+        <path d="M6 9.81818L4.4375 8L1 12"
+              stroke="#8E9CBB"
+              stroke-width="2"
+              stroke-linejoin="round"
+              fill="none" />
+      </symbol>
+      <symbol id="calculation-icon">
+        <path d="M4 5H10M4 8H6M4 11H6M8 8H10M8 11H10M3 15H11C12.1046 15 13 14.1046 13 13V3C13 1.89543 12.1046 1 11 1H3C1.89543 1 1 1.89543 1 3V13C1 14.1046 1.89543 15 3 15Z"
+              stroke="#8E9CBB"
+              stroke-width="2"
+              fill="none" />
+      </symbol>
+    </svg>
+  </div>
   <div class="hrm-scaffold">
     <div class="hrm-scaffold__sidebar"
          data-bind="component: {name: 'hrm-main-sidebar', params: {collapsed: isSidebarCollapsed}}"></div>
@@ -36,6 +94,40 @@
             <!-- /ko -->
           </span>
           <div class="calculation-page__actions">
+            <!-- ko ifnot: isNew -->
+
+            <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+            <button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
+                    data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'versions-dropdown-template'">
+              <!-- ko if: currentVersion -->
+              <!-- ko text: currentVersion.time() -->
+              <!-- /ko -->
+              <!-- /ko -->
+            </button>
+
+            <button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
+                    data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'actions-dropdown-template'">
+              Действия
+            </button>
+            <!-- /ko -->
+
+            <!-- ko if: inBookmarks -->
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-bookmark-icon-button active"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Удалить раздел из избранного', click: removeFromBookmarks">
+            </button>
+            <!-- /ko -->
+
+            <!-- ko ifnot: inBookmarks -->
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-bookmark-icon-button"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Добавить в избранное', click: addToBookmarks">
+            </button>
+            <!-- /ko -->
+
+
+
+
+            <!-- /ko -->
+
             <a href="#"
                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-arrow-left-icon">
               К списку расчетов
@@ -44,9 +136,28 @@
           </div>
         </div>
 
+        <!-- ko if: !isNew() && $root.utils.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+        <div class="calculation-page__actions">
+          <button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
+                  data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'versions-dropdown-template'">
+            <!-- ko if: currentVersion -->
+            <!-- ko text: currentVersion.time() -->
+            <!-- /ko -->
+            <!-- /ko -->
+          </button>
+
+          <button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
+                  data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'actions-dropdown-template'">
+            Действия
+          </button>
+        </div>
+        <!-- /ko -->
+
         <div class="calculation-form">
           <!-- Input table -->
-          <div data-bind="component: {name: 'calculation-page-input-form', params: { model: $root.inputModel, onSubmit: $root.buildCalculation.bind($root) }}"></div>
+          <div
+               data-bind="component: {name: 'calculation-page-input-form', params: { model: $root.inputModel, onSubmit: $root.buildCalculation.bind($root) }}">
+          </div>
           <!-- /Input table -->
 
           <!-- ko template: {
@@ -67,15 +178,16 @@
           } -->
           <div class="calculation-form__content">
             <!-- Summary table -->
-            <div data-bind="component: {name: 'calculation-page-summary-table', params: { model: $root.summaryModel }}"></div>
+            <div data-bind="component: {name: 'calculation-page-summary-table', params: { model: $root.summaryModel }}">
+            </div>
             <!-- /Summary table -->
 
             <!-- Tabs -->
-              <div class="calculation-page__tabs"
-                  data-bind="component: {name: 'hrm-tab-group', params: {items: tabs.tabs, activeItem: tabs.activeTab }}">
-              </div>
+            <div class="calculation-page__tabs"
+                 data-bind="component: {name: 'hrm-tab-group', params: {items: tabs.tabs, activeItem: tabs.activeTab }}">
+            </div>
 
-              <script type="text/html"
+            <script type="text/html"
         id="positions-modal-template">
 
   <div data-bind="component: {
@@ -233,37 +345,37 @@
 <!-- ko component: {name: 'hrm-modal-container', params: {opens: modalOpens}} --><!-- /ko -->
 
 
-              <!-- ko template: {
+            <!-- ko template: {
                 foreach: hrmTemplateIf(tabs.activeTab() === 0, $data),
                 afterAdd: tabs.afterOpen,
                 beforeRemove: hrmFadeBeforeRemoveFactory(200),
               } -->
-                <div class="calculation-page__tab">
-                  <!-- ko let: {tabName: 'production'} -->
+            <div class="calculation-page__tab">
+              <!-- ko let: {tabName: 'production'} -->
 <div data-bind="component: {name: 'calculation-page-positions-table', params: { tabName: 'production', positions: $root.productionPositions, utils: $root.utils, total: $root.summaryModel.productionTotal, model: $root.summaryModel }}"></div>
 <!-- /ko -->
 
-                </div>
-              <!-- /ko -->
+            </div>
+            <!-- /ko -->
 
-              <!-- ko template: {
+            <!-- ko template: {
                 foreach: hrmTemplateIf(tabs.activeTab() === 1, $data),
                 afterAdd: tabs.afterOpen,
                 beforeRemove: hrmFadeBeforeRemoveFactory(200)
               } -->
-                <div class="calculation-page__tab">
-                  <div data-bind="component: {name: 'calculation-page-delivery-table', params: { tabName: 'delivery', position: $root.summaryModel.driversData, utils: $root.utils, total: $root.summaryModel.deliveryTotal, model: $root.summaryModel }}"></div>
+            <div class="calculation-page__tab">
+              <div data-bind="component: {name: 'calculation-page-delivery-table', params: { tabName: 'delivery', position: $root.summaryModel.driversData, utils: $root.utils, total: $root.summaryModel.deliveryTotal, model: $root.summaryModel }}"></div>
 
-                </div>
-              <!-- /ko -->
+            </div>
+            <!-- /ko -->
 
-              <!-- ko template: {
+            <!-- ko template: {
                 foreach: hrmTemplateIf(tabs.activeTab() === 2, $data),
                 afterAdd: hrmFadeAfterAddFactory(200, 200),
                 beforeRemove: hrmFadeBeforeRemoveFactory(200)
               } -->
-                <div class="calculation-page__tab">
-                  
+            <div class="calculation-page__tab">
+              
 
 
 <div class="lateness-tab" data-bind="let: { table: latenessModel }">
@@ -627,19 +739,57 @@
 </div>
 
 </div>
-                </div>
-              <!-- /ko -->
+            </div>
+            <!-- /ko -->
             <!-- /Tabs -->
 
             <div class="calculation-form__actions">
               <button class="hrm-button hrm-button--size_large hrm-basic-button calculation-form__action"
-              data-bind="click: reset">
+                      data-bind="click: reset">
                 Отменить
               </button>
 
               <button class="hrm-button hrm-button--size_large hrm-basic-button hrm-accent-button calculation-form__action"
-              data-bind="click: $root.submit.bind($root, null)">
+                      data-bind="click: $root.submit.bind($root, null)">
                 Сохранить
+
+                <!-- ko template: {
+                  foreach: hrmTemplateIf(showSuccessMessage(), $data),
+                  afterAdd: hrmFadeAfterAddFactory(200),
+                  beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                <div class="message message--success">
+                  <i class="far fa-check"></i>
+                  Расчет успешно сохранен
+                </div>
+                <!-- /ko -->
+
+                <!-- ko template: {
+                  foreach: hrmTemplateIf(showErrorMessage(), $data),
+                  afterAdd: hrmFadeAfterAddFactory(200),
+                  beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                <div class="message message--error">
+                  <i class="far fa-exclamation-circle"></i>
+                  Произошла ошибка при сохранении
+                </div>
+                <!-- /ko -->
+              </button>
+
+              <button class="hrm-button hrm-button--size_large hrm-basic-button hrm-accent-button calculation-form__action"
+                      data-bind="click: $root.submit.bind($root, true)">
+                Сохранить c ошибкой
+
+                <!-- ko template: {
+                  foreach: hrmTemplateIf(showErrorMessage(), $data),
+                  afterAdd: hrmFadeAfterAddFactory(200),
+                  beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                <div class="message message--error">
+                  <i class="far fa-exclamation-circle"></i>
+                  Произошла ошибка при сохранении
+                </div>
+                <!-- /ko -->
               </button>
             </div>
           </div>
@@ -652,6 +802,67 @@
 
     </div>
   </div>
+
+  <script id="versions-dropdown-template"
+          type="text/html">
+        <!-- ko foreach: $root.versions -->
+  <div class="hrm-dropdown-menu__item"
+       data-bind="click: function() {
+          $root.activeVersion($data);
+        }">
+    <div class="version-preview">
+      <div class="version-preview__userpic">
+        <img data-bind="attr: {src: $data.avatar}"
+             alt="">
+      </div>
+      <div class="version-preview__content">
+        <div class="version-preview__user"
+             data-bind="text: $data.name"></div>
+        <div class="version-preview__time"
+             data-bind="text: $data.time"></div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+  </script>
+
+  <script id="actions-dropdown-template"
+          type="text/html">
+
+        <div class="hrm-dropdown-menu__item" data-bind="click: toExcel">
+          <div class="action-preview">
+            <svg width="14" height="14">
+              <use href="#excel-icon"></use>
+            </svg>
+            Выгрузить в excel
+          </div>
+        </div>
+        <div class="hrm-dropdown-menu__item" data-bind="toPrint">
+          <div class="action-preview">
+            <svg width="14" height="14">
+              <use href="#print-icon"></use>
+            </svg>
+            Распечатать
+          </div>
+        </div>
+        <div class="hrm-dropdown-menu__item" data-bind="toPhoto">
+          <div class="action-preview">
+            <svg width="14" height="14">
+              <use href="#picture-icon"></use>
+            </svg>
+            Для фото
+          </div>
+
+        </div>
+        <div class="hrm-dropdown-menu__item" data-bind="newCalculation">
+          <div class="action-preview">
+            <svg width="14" height="16">
+              <use href="#calculation-icon"></use>
+            </svg>
+            Новый расчет
+          </div>
+        </div>
+  </script>
 
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-debug.js" integrity="sha256-M5ZomNNnrnEB2WjSbnty5GWGqq6UuAAVNnWECisgEis=" crossorigin="anonymous"></script>
@@ -8980,7 +9191,31 @@ css: {
       this.isSubmitted = ko.observable(false);
 
       this.showSuccessMessage = ko.observable(false);
-      this.serverError = ko.observable('');
+      this.showErrorMessage = ko.observable(false);
+
+      this.versions = ko.observableArray([]);
+      this.currentVersion = this.versions[0];
+
+      this.inBookmarks = ko.observable(false);
+      this.addToBookmarks = () => {
+        this.inBookmarks(true);
+      };
+      this.removeFromBookmarks = () => {
+        this.inBookmarks(false);
+      };
+
+      this.toExcel = () => {
+
+      };
+      this.toPrint = () => {
+
+      };
+      this.toPhoto = () => {
+
+      };
+      this.newCalculation = () => {
+
+      };
 
       // Построение расчета
       this.buildCalculation = () => {
@@ -10631,21 +10866,32 @@ css: {
         this.isSubmitted(true);
 
         if (this.summaryModel.isValid() && this.latenessModel.isValid()) {
-          this.isNew(false);
-
           const data = this.getData();
           // Отправка данных
-
           setTimeout(() => {
-
             // Данные сохранены
             if (!testError) {
+              this.isNew(false);
               // Обновление данных
               this.summaryModel.save();
               console.log('save')
               this.showSuccessMessage(true);
-            } else {
-              this.serverError('Что-то пошло не так');
+              const newVersion = {
+                avatar: '/',
+                name: 'user',
+                time: moment().format('DD.MM.YYYY HH:mm')
+              };
+              this.versions.unshift(newVersion);
+              this.currentVersion(newVersion);
+              setTimeout(() => {
+
+                this.showSuccessMessage(false);
+              }, 3000)
+            } else { // Ошибка сохранения
+              this.showErrorMessage(true);
+              setTimeout(() => {
+                this.showErrorMessage(false);
+              }, 3000)
             }
 
           }, 3000);
@@ -10704,6 +10950,7 @@ css: {
     }
   });
 </script>
+
 </body>
 
 </html>
