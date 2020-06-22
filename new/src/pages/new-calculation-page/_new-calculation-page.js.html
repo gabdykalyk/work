@@ -86,43 +86,113 @@
     const $page = $(document.documentElement);
 
     const PositionsModel = function (root) {
-      const positions = ko.observableArray([]);
+      this.root = root;
 
-      const driversData = ko.observable();
+      this._defaultState = {
+        positions: null,
+        drivers: null,
+        holidaySurcharge: '',
+      };
 
-      const holidaySurcharge = ko.observable('');
-      holidaySurcharge.subscribe(_ => {
-        root.calculate('delivery');
+      this.positions = ko.observableArray([]);
+      this.driversData = ko.observable();
+
+      this.holidaySurcharge = ko.observable('');
+      this.holidaySurcharge.subscribe(_ => {
+        this.root.calculate('delivery');
       });
 
-      /**
-      * Returns position with specified id
-      * @param {string|number} id
-      * @returns {Observable}
-      */
-      function getPositionById(id) {
-        return positions().find(position => position.id === id);
-      }
+      this.getPositionById = (id) => {
+        return this.positions().find(position => position.id === id);
+      };
 
-      /**
-      * Creates new positions list from data
-      * @param {Object[]} positionsList
-      */
-      function setPositions(positionsList) {
-        positions(positionsList.map(positionData => {
+      this.setPositions = (positionsList) => {
+        this.positions(positionsList.map(positionData => {
           return new PositionModel(positionData, root)
-        }))
+        }));
+        this._defaultState.positions = positionsList;
       }
 
-
-      function setDriversData(driversData) {
+      this.setDriversData = (driversData) => {
+        console.log('drivers', driversData)
         this.driversData(new DeliveryPositionModel(driversData, root));
+        this._defaultState.drivers = driversData;
       }
 
-      /**
-      * @params {string} interval
-      * @returns {{value: Observable, getInterval: function}}
-      */
+      this.reset = () => {
+        console.log('reset', this._defaultState.positions.employees)
+        this.setPositions(this._defaultState.positions);
+        this.setDriversData(this._defaultState.drivers);
+        this.holidaySurcharge(this._defaultState.holidaySurcharge);
+      };
+
+      this.getData = () => {
+        return {
+          positions: this.positions().map(p => p.getData()),
+          drivers: this.driversData().getData()
+        };
+      };
+
+      this.save = () => {
+        this._defaultState = this.getData();
+        console.log('after save', this._defaultState.positions.employees)
+      };
+
+
+
+      this.productionTotal = {
+        workingTime: ko.observable(0),
+        salaryBulk: ko.observable(0),
+        normalizationRatio: ko.observable(0),
+        revenueStandart: ko.observable(0),
+        bonusRatio: ko.observable(0),
+        correctedTime: ko.observable(0),
+        bonusExceed: ko.observable(0),
+        total: ko.observable(0),
+        toPayment: ko.observable(0),
+      };
+
+      this.deliveryTotal = {
+        workingTime: ko.observable(0),
+        ordersCount: ko.observable(0),
+        ordersValue: ko.observable(0),
+        averageBill: ko.observable(0),
+        distKm: ko.observable(0),
+        estimatedTime: ko.observable(0),
+        actualTime: ko.observable(0),
+        kpi: ko.observable(0),
+        timeWithoutCase: ko.observable(0),
+        time: ko.observable(0),
+        orders: ko.observable(0),
+        dist: ko.observable(0),
+        minPayment: ko.observable(0),
+        lateSurcharge: ko.observable(0),
+        shortShiftSurcharge: ko.observable(0),
+        bonus: ko.observable(0),
+        fine: ko.observable(0),
+        total: ko.observable(0),
+        toPayment: ko.observable(0),
+      };
+
+      this.total = {
+        workload: ko.observable(0),
+        workloadUnits: ko.observable(''),
+        fotCategory: ko.observable(100),
+        fotRevenue: ko.observable(100),
+        performanceStandart: ko.observable(-100),
+        lateness: {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        },
+        employees: ko.observable(0)
+      };
+
+      this.isValid = () => {
+        return true;
+      };
+
       function WorkingIntervalModel(interval) {
         const value = ko.observable(interval).extend({
           required: {
@@ -165,7 +235,6 @@
           getInterval
         };
       }
-
 
       function EmployeeModel(employee, positionModel) {
         this.position = positionModel;
@@ -285,6 +354,45 @@
         this.visible.subscribe(_ => this.root.calculate('production'));
 
         this.loaded = employee.loaded; // загружен для Все филиалы
+
+        this.getData = () => {
+          return {
+            name: this.name,
+            id: this.id,
+            link: this.link,
+            hasProblems: this.hasProblems,
+            upRecommended: this.upRecommended,
+            downRecommended: this.downRecommended,
+            premiumAccount: this.premiumAccount(),
+            account: this.account(),
+            accountOperations: this.accountOperations(),
+            level: this.level(),
+            workingIntervals: this.workingIntervals(),
+            compensation: this.compensation(),
+            workload: this.workload(),
+            workloadUnits: this.workloadUnits,
+            salary: this.salary(),
+            salaryBulk: this.salaryBulk(),
+            revenueStandartUnits: this.revenueStandartUnits,
+            revenueStandartPerHour: this.revenueStandartPerHour(),
+            revenueStandart: this.revenueStandart(),
+            normalizationRatio: this.normalizationRatio(),
+            bonusRatio: this.bonusRatio(),
+            bonusExceed: this.bonusExceed(),
+            bonuses: this.bonuses(),
+            fines: this.fines(),
+            depremation: this.depremation(),
+            correctedTime: this.correctedTime(),
+            total: this.total(),
+            toPayment: this.toPayment(),
+            lateness: {
+              light: this.lateness.light(),
+              medium: this.lateness.medium(),
+              hard: this.lateness.hard()
+            },
+            visible: this.visible() ? 1 : 0
+          }
+        };
       }
 
       function DriverEmployeeModel(employee, positionModel) {
@@ -393,8 +501,44 @@
 
         this.visible = ko.observable(employee.visible) // участвует в расчете
         this.visible.subscribe(_ => this.root.calculate('delivery'));
-      }
 
+        this.getData = () => {
+          return {
+            name: this.name,
+            id: this.id,
+            link: this.link,
+            hasProblems: this.hasProblems,
+            premiumAccount: this.premiumAccount(),
+            account: this.account(),
+            accountOperations: this.accountOperations(),
+            workingIntervals: this.workingIntervals(),
+            ordersCount: this.ordersCount(),
+            ordersValue: this.ordersValue(),
+            averageBill: this.averageBill(),
+            distKm: this.distKm(),
+            estimatedTime: this.estimatedTime(),
+            actualTime: this.actualTime(),
+            kpi: this.kpi(),
+            timeWithoutCase: this.timeWithoutCase(),
+            orders: this.orders(),
+            dist: this.dist(),
+            minPayment: this.minPayment(),
+            surcharge: this.surcharge(),
+            lateSurcharge: this.lateSurcharge(),
+            shortShiftSurcharge: this.shortShiftSurcharge(),
+            bonuses: this.bonuses(),
+            fines: this.fines(),
+            total: this.total(),
+            toPayment: this.toPayment(),
+            lateness: {
+              light: this.lateness.light(),
+              medium: this.lateness.medium(),
+              hard: this.lateness.hard()
+            },
+            visible: this.visible() ? 1 : 0
+          }
+        }
+      }
 
       function PositionModel(positionData, root) {
         this.root = root;
@@ -523,8 +667,33 @@
           } else {
             this.visibleEmployees().forEach(e => e.clicked(false));
           }
-        }
-      };
+        };
+
+        this.getData = () => {
+          return {
+            id: this.id,
+            name: this.name,
+            levels: this.levels,
+            workloadType: this.workloadType,
+            workload: this.workload(),
+            workloadUnits: this.workloadUnits,
+            additionalWorkloadType: this.additionalWorkloadType,
+            additionalWorkload: this.additionalWorkload(),
+            additionalWorkloadUnits: this.additionalWorkloadUnits,
+            fotCategory: this.fotCategory(),
+            fotRevenue: this.fotRevenue(),
+            performanceStandart: this.performanceStandart(),
+            performanceStandartType: this.performanceStandartType,
+            salary: this.salary,
+            salaryBulk: this.salaryBulk,
+            revenueStandart: this.revenueStandart,
+            revenueStandartPerHour: this.revenueStandartPerHour,
+            revenueStandartUnits: this.revenueStandartUnits,
+            employees: this.employees().map(e => e.getData()),
+            visible: this.visible() ? 1 : 0,
+          };
+        };
+      }
 
       function DeliveryPositionModel(positionData, root) {
         this.root = root;
@@ -612,67 +781,30 @@
         this.totalLateness = ko.pureComputed(() => {
           return lateness.total;
         });
-      };
 
-      const productionTotal = {
-        workingTime: ko.observable(0),
-        salaryBulk: ko.observable(0),
-        normalizationRatio: ko.observable(0),
-        revenueStandart: ko.observable(0),
-        bonusRatio: ko.observable(0),
-        correctedTime: ko.observable(0),
-        bonusExceed: ko.observable(0),
-        total: ko.observable(0),
-        toPayment: ko.observable(0),
-      };
-
-      const deliveryTotal = {
-        workingTime: ko.observable(0),
-        ordersCount: ko.observable(0),
-        ordersValue: ko.observable(0),
-        averageBill: ko.observable(0),
-        distKm: ko.observable(0),
-        estimatedTime: ko.observable(0),
-        actualTime: ko.observable(0),
-        kpi: ko.observable(0),
-        timeWithoutCase: ko.observable(0),
-        time: ko.observable(0),
-        orders: ko.observable(0),
-        dist: ko.observable(0),
-        minPayment: ko.observable(0),
-        lateSurcharge: ko.observable(0),
-        shortShiftSurcharge: ko.observable(0),
-        bonus: ko.observable(0),
-        fine: ko.observable(0),
-        total: ko.observable(0),
-        toPayment: ko.observable(0),
-      };
-
-      const total = {
-        workload: ko.observable(0),
-        workloadUnits: ko.observable(''),
-        fotCategory: ko.observable(100),
-        fotRevenue: ko.observable(100),
-        performanceStandart: ko.observable(-100),
-        lateness: {
-          light: ko.observable(0),
-          medium: ko.observable(0),
-          hard: ko.observable(0),
-          total: ko.observable(0),
-        },
-        employees: ko.observable(0)
-      };
-
-      return {
-        holidaySurcharge,
-        positions,
-        driversData,
-        setPositions,
-        setDriversData,
-        getPositionById,
-        productionTotal,
-        deliveryTotal,
-        total
+        this.getData = () => {
+          return {
+            id: this.id,
+            name: this.name,
+            workloadType: this.workloadType,
+            workload: this.workload(),
+            workloadUnits: this.workloadUnits,
+            additionalWorkloadType: this.additionalWorkloadType,
+            additionalWorkload: this.additionalWorkload(),
+            additionalWorkloadUnits: this.additionalWorkloadUnits,
+            fotCategory: this.fotCategory(),
+            fotRevenue: this.fotRevenue(),
+            performanceStandart: this.performanceStandart(),
+            performanceStandartType: this.performanceStandartType,
+            performanceStandart: this.performanceStandartUnits,
+            salary: this.salary,
+            salaryBulk: this.salaryBulk,
+            revenueStandart: this.revenueStandart,
+            revenueStandartPerHour: this.revenueStandartPerHour,
+            revenueStandartUnits: this.revenueStandartUnits,
+            employees: this.employees().map(e => e.getData()),
+          };
+        }
       }
     };
 
@@ -926,6 +1058,10 @@
         this.hotShop.setData(data.hotShop);
         this.driver.setData(data.driver);
       }
+
+      this.isValid = () => {
+        return true;
+      }
     }
 
     const ViewModel = function () {
@@ -985,8 +1121,13 @@
         }
       };
 
+      this.isNew = ko.observable(true);
       this.isBuilt = ko.observable(false);
       this.loading = ko.observable(false);
+      this.isSubmitted = ko.observable(false);
+
+      this.showSuccessMessage = ko.observable(false);
+      this.serverError = ko.observable('');
 
       // Построение расчета
       this.buildCalculation = () => {
@@ -1010,7 +1151,7 @@
               levels: [1, 2],                            // разряды
               workloadType: 'Выручка',                   // тип нагрузки
               workload: 0,                               // нагрузка (величина)
-              workloadUnits: '₽',                        // единицы измерения нагрузки
+              workloadUnits: 2,                        // единицы измерения нагрузки
               additionalWorkloadType: '',  // тип доп. нагрузки
               additionalWorkload: '',                   // доп. нагрузка (величина)
               additionalWorkloadUnits: '%',              // единицы измерения доп. нагрузки
@@ -1022,7 +1163,7 @@
               salaryBulk: 7200,                          // основная часть зарплаты
               revenueStandart: 30,                       // Норматив выручки
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [                               // сотрудники
                 {
                   name: 'Администратор #1 Up',            // имя сотрудника
@@ -1038,10 +1179,10 @@
                   workingIntervals: ['09:00 – 16:00'],    // рабочее время сотрудника
                   compensation: 0,                        // компенсация
                   workload: 0,                            // нагрузка
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,                           // зарплата
                   salaryBulk: 2000,                       // основная часть зарплаты
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,          // норматив выручки в час
                   revenueStandart: 130000,                // Норматив выручки
                   normalizationRatio: 0.5,                // Коэф. нормализации
@@ -1074,10 +1215,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1105,7 +1246,7 @@
               levels: [],
               workloadType: 'Выручка',
               workload: 0,
-              workloadUnits: '₽',
+              workloadUnits: 2,
               additionalWorkloadType: 'Лосось, кг',
               additionalWorkload: 200,
               additionalWorkloadUnits: '',
@@ -1117,7 +1258,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [
                 {
                   name: 'Повар-сушист #1 problems',
@@ -1133,10 +1274,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1169,10 +1310,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1200,7 +1341,7 @@
               levels: [1, 2, 3],
               workloadType: 'Пиццы',
               workload: 30,
-              workloadUnits: 'шт.',
+              workloadUnits: 1,
               additionalWorkloadType: 'Лосось, кг',
               additionalWorkload: 200,
               additionalWorkloadUnits: '',
@@ -1212,7 +1353,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [
                 {
                   name: 'Повар-пиццмейкер #1 problems + down',
@@ -1228,10 +1369,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1264,10 +1405,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1295,7 +1436,7 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              workloadUnits: '₽',
+              workloadUnits: 2,
               additionalWorkloadType: '',
               additionalWorkload: 0,
               additionalWorkloadUnits: '',
@@ -1307,7 +1448,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [
                 {
                   name: 'Официант #1',
@@ -1323,10 +1464,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1359,10 +1500,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1390,7 +1531,7 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              workloadUnits: '₽',
+              workloadUnits: 2,
               additionalWorkloadType: '',
               additionalWorkload: 0,
               additionalWorkloadUnits: '',
@@ -1402,7 +1543,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [
                 {
                   name: 'Официант #1',
@@ -1418,10 +1559,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1454,10 +1595,10 @@
                   workingIntervals: ['09:00 – 16:00'],
                   compensation: 0,
                   workload: 0,
-                  workloadUnits: '₽',
+                  workloadUnits: 2,
                   salary: 3000,
                   salaryBulk: 2000,
-                  revenueStandartUnits: '₽',
+                  revenueStandartUnits: 2,
                   revenueStandartPerHour: 10000,
                   revenueStandart: 130000,
                   normalizationRatio: 0.5,
@@ -1485,7 +1626,7 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              workloadUnits: '₽',
+              workloadUnits: 2,
               additionalWorkloadType: '',
               additionalWorkload: 0,
               additionalWorkloadUnits: '',
@@ -1497,7 +1638,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [],
               visible: 0,
             },
@@ -1507,7 +1648,7 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              units: '₽',
+              units: 2,
               additionalWorkloadType: '',
               additionalWorkload: 0,
               additionalWorkloadUnits: '',
@@ -1519,7 +1660,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [],
               visible: 0,
             },
@@ -1529,7 +1670,7 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              workloadUnits: '₽',
+              workloadUnits: 2,
               additionalWorkloadType: '',
               additionalWorkload: 0,
               additionalWorkloadUnits: '',
@@ -1541,7 +1682,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [],
               visible: 0,
             },
@@ -1551,7 +1692,7 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              workloadUnits: '₽',
+              workloadUnits: 2,
               additionalWorkloadType: '',
               additionalWorkload: 0,
               additionalWorkloadUnits: '',
@@ -1563,7 +1704,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [],
               visible: 0,
             },
@@ -1573,7 +1714,7 @@
               levels: [1, 2],
               workloadType: 'Выручка',
               workload: 0,
-              workloadUnits: '₽',
+              workloadUnits: 2,
               additionalWorkloadType: '',
               additionalWorkload: 0,
               additionalWorkloadUnits: '',
@@ -1585,7 +1726,7 @@
               salaryBulk: 7200,
               revenueStandart: 30,
               revenueStandartPerHour: 0,
-              revenueStandartUnits: '₽',
+              revenueStandartUnits: 2,
               employees: [],
               visible: 0
             },
@@ -1601,7 +1742,7 @@
             id: 'drivers',                              // идентификато позиции
             workloadType: 'Выручка',                    // тип нагрузки
             workload: 0,                                // нагрузка (величина)
-            workloadUnits: '₽',                         // единицы измерения нагрузки
+            workloadUnits: 2,                         // единицы измерения нагрузки
             additionalWorkloadType: '',                 // тип доп. нагрузки
             additionalWorkload: '52',                   // доп. нагрузка (величина)
             additionalWorkloadUnits: '',                // единицы измерения доп. нагрузки
@@ -1609,12 +1750,12 @@
             fotRevenue: 0,                              // ФОТ, % от выручки
             performanceStandart: 0,                     // Норм. выработки, %
             performanceStandartType: 'Цена заказа',
-            performanceStandartUnits: '₽',
+            performanceStandartUnits: 2,
             salary: 30000,                              // Оклад
             salaryBulk: 7200,                           // основная часть зарплаты
             revenueStandart: 30,                        // Норматив выручки
             revenueStandartPerHour: 0,
-            revenueStandartUnits: '₽',
+            revenueStandartUnits: 2,
             employees: [                                // сотрудники
               {
                 name: 'Водитель #1',                    // имя сотрудника
@@ -1637,7 +1778,7 @@
                 dist: 234,
                 minPayment: 2345,
                 surcharge: 24,
-                lateSurchage: 3,
+                lateSurcharge: 3,
                 shortShiftSurcharge: 23,
                 bonuses: [],                            // бонусы
                 fines: [],                              // штрафы
@@ -1671,7 +1812,7 @@
                 dist: 234,
                 minPayment: 2345,
                 surcharge: 24,
-                lateSurchage: 3,
+                lateSurcharge: 3,
                 shortShiftSurcharge: 23,
                 bonuses: [],
                 fines: [],
@@ -2625,6 +2766,52 @@
         })();
 
 
+      };
+
+      this.getData = () => {
+        const positionsData = this.summaryModel.getData();
+        console.log(positionsData);
+        return positionsData;
+      }
+
+      this.submit = (testError) => {
+        this.isSubmitted(true);
+
+        if (this.summaryModel.isValid() && this.latenessModel.isValid()) {
+          this.isNew(false);
+
+          const data = this.getData();
+          // Отправка данных
+
+          setTimeout(() => {
+
+            // Данные сохранены
+            if (!testError) {
+              // Обновление данных
+              this.summaryModel.save();
+              console.log('save')
+              this.showSuccessMessage(true);
+            } else {
+              this.serverError('Что-то пошло не так');
+            }
+
+          }, 3000);
+        }
+      }
+
+      this.blocked = ko.observable(false);
+      this.fadePosition = el => {
+        const duration = this.blocked() ? 0 : 500;
+        $(el).fadeOut(duration, () => {
+          $(el).remove();
+        })
+      }
+
+      this.reset = () => {
+        this.blocked(true);
+        this.summaryModel.reset();
+        this.calculate();
+        this.blocked(false);
       }
     };
 
