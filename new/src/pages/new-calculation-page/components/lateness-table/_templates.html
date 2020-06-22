@@ -35,14 +35,14 @@
 <template id="interval-lateness-template">
   <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '1' -->
   <td class="lateness-table__cell" data-bind="style: {
-            'background-color': lateness.light > 0 ? '#B8EFD5' : ''
+            'background-color': lateness.light() > 0 ? '#B8EFD5' : ''
           }, click: function() {
-            if (lateness.light > 0 && latenessPosition) {
-              table.openLatenessModal(latenessPosition, latenessIntervalIndex)
+            if (lateness.light() > 0 && latenessPosition) {
+              latenessPosition.openLatenessModal(latenessIntervalIndex(), 1)
             }
           }">
     <div>
-      <!-- ko text: lateness.light -->
+      <!-- ko text: lateness.light() > 0 ? lateness.light() : '' -->
       <!-- /ko -->
     </div>
   </td>
@@ -50,10 +50,14 @@
 
   <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '2' -->
   <td class="lateness-table__cell" data-bind="style: {
-            'background-color': lateness.medium > 0 ? '#FDFFB3' : ''
+            'background-color': lateness.medium() > 0 ? '#FDFFB3' : ''
+          }, click: function() {
+            if (lateness.medium() > 0 && latenessPosition) {
+              latenessPosition.openLatenessModal(latenessIntervalIndex(), 2)
+            }
           }">
     <div>
-      <!-- ko text: lateness.medium -->
+      <!-- ko text: lateness.medium() > 0 ? lateness.medium() : '' -->
       <!-- /ko -->
     </div>
   </td>
@@ -61,19 +65,27 @@
 
   <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '3' -->
   <td class="lateness-table__cell" data-bind="style: {
-            'background-color': lateness.hard > 0 ? '#FFE6F2' : ''
+            'background-color': lateness.hard() > 0 ? '#FFE6F2' : ''
+          }, click: function() {
+            if (lateness.hard() > 0 && latenessPosition) {
+              latenessPosition.openLatenessModal(latenessIntervalIndex(), 3)
+            }
           }">
     <div>
-      <!-- ko text: lateness.hard -->
+      <!-- ko text: lateness.hard() > 0 ? lateness.hard() : '' -->
       <!-- /ko -->
     </div>
   </td>
   <!-- /ko -->
 
   <!-- ko if: !table.filters.lateness() -->
-  <td class="lateness-table__cell">
+  <td class="lateness-table__cell" data-bind="click: function() {
+            if (lateness.total() > 0 && latenessPosition) {
+              latenessPosition.openLatenessModal(latenessIntervalIndex())
+            }
+          }">
     <div>
-      <!-- ko text: lateness.total -->
+      <!-- ko text: lateness.total() > 0 ? lateness.total() : '' -->
       <!-- /ko -->
     </div>
   </td>

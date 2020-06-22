@@ -1,12 +1,23 @@
 @@include('./_templates.html')
 
 <div class="lateness-table" data-bind="using: latenessModel">
-    <!-- ko template: {
+  <!-- ko template: {
+    foreach: hrmTemplateIf(!loaded(), $data),
+    afterAdd: hrmFadeAfterAddFactory(200, 200),
+    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+  } -->
+  <div class="loader">
+    <i class="fa fa-spinner fa-pulse loader__indicator">
+    </i>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko template: {
       foreach: hrmTemplateIf(loaded(), $data),
       afterAdd: hrmFadeAfterAddFactory(200)
     } -->
 
-<div data-bind="component: {
+  <div data-bind="component: {
   name: 'hrm-scrollable-wrapper',
   params: { options: {left: {disabled: true}} }
 }">
@@ -207,6 +218,6 @@
       </tfoot>
     </table>
   </div>
-    <!-- /ko -->
+  <!-- /ko -->
 
-  </div>
+</div>

@@ -690,14 +690,24 @@
         this.loaded(false);
       }
 
+      function getIntervalString(interval) {
+        if (!interval[0]) return '<' + interval[1];
+        if (!interval[1]) return '>' + interval[0];
+
+        return interval[0] + '-' + interval[1];
+      }
+
       function PositionIntervalModel(params) {
         const lateness = {};
         this.lateness = {
           light: ko.observable(lateness.light || 0),
           medium: ko.observable(lateness.medium || 0),
           hard: ko.observable(lateness.hard || 0),
-          total: ko.observable(lateness.total || 0),
         };
+
+        this.lateness.total = ko.pureComputed(() => {
+          return this.lateness.light() + this.lateness.medium() + this.lateness.hard();
+        });
 
         this.korf = ko.observable(0);
         this.workload = ko.observable(0);
@@ -706,6 +716,20 @@
         params.forEach(p => {
           this[p.id] = ko.observable(0)
         });
+
+        this.setData = data => {
+          this.korf(data.korf);
+          this.workload(data.workload);
+          this.employees(data.employees);
+
+          params.forEach(p => {
+            this[p.id](data[p.id]);
+          });
+
+          this.lateness.light(data.lateness.light);
+          this.lateness.medium(data.lateness.medium);
+          this.lateness.hard(data.lateness.hard);
+        }
       }
 
       function PositionModel(positionData, intervals, root) {
@@ -715,15 +739,9 @@
         this.name = positionData.name;
 
         this.total = {
-          lateness: {
-            light: ko.observable(0),
-            medium: ko.observable(0),
-            hard: ko.observable(0),
-            total: ko.observable(0),
-          },
+          lateness: {},
           korf: ko.observable(0),
           workload: ko.observable(0),
-          employees: ko.observable(0),
         };
 
         this.params = [
@@ -736,17 +754,46 @@
           this.total[param.id] = ko.observable(0);
         });
 
-        this.paramsCount = this.params.length + 3;
-
         this.intervals = intervals.map(_ => new PositionIntervalModel(this.params));
 
-        this.openLatenessModal = (position, intervalIndex) => {
-          console.log('open', position, intervalIndex)
-          this.root.openModal('employee-details-modal', {
-            title: 'заголовок-позиция',
+        this.paramsCount = this.params.length + 3;
+
+        this.total.lateness.light = ko.pureComputed(() => {
+          return this.intervals.reduce((acc, i) => acc + i.lateness.light(), 0);
+        });
+
+        this.total.lateness.medium = ko.pureComputed(() => {
+          return this.intervals.reduce((acc, i) => acc + i.lateness.medium(), 0);
+        });
+
+        this.total.lateness.hard = ko.pureComputed(() => {
+          return this.intervals.reduce((acc, i) => acc + i.lateness.hard(), 0);
+        });
+
+        this.total.lateness.total = ko.pureComputed(() => {
+          return this.total.lateness.light() + this.total.lateness.medium() + this.total.lateness.hard();
+        });
+
+        this.total.employees = ko.pureComputed(() => {
+          return this.intervals.reduce((acc, i) => acc + i.employees(), 0);
+        });
+
+        this.openLatenessModal = (intervalIndex, latenessDegree) => {
+          console.log('open', latenessDegree, intervalIndex)
+          const interval = intervals[intervalIndex];
+          this.root.utils.openModal('lateness-details', {
+            interval,
+            position: this,
+            title: `Опоздания - ${this.name} - ${getIntervalString(interval)}`,
 
           });
         };
+
+        this.setData = (data) => {
+          data.forEach((interval, index) => {
+            this.intervals[index].setData(interval);
+          });
+        }
       };
 
       this.intervals = [
@@ -765,28 +812,7 @@
         [23, null],
       ];
 
-      this.intervalsTotal = this.intervals.map(_ => {
-        return {
-          light: ko.observable(0),
-          medium: ko.observable(0),
-          hard: ko.observable(0),
-          total: ko.observable(0),
-        }
-      });
-
-      this.total = {
-        light: ko.observable(0),
-        medium: ko.observable(0),
-        hard: ko.observable(0),
-        total: ko.observable(0)
-      };
-
-      this.getIntervalString = (interval) => {
-        if (!interval[0]) return '<' + interval[1];
-        if (!interval[1]) return '>' + interval[0];
-
-        return interval[0] + '-' + interval[1];
-      }
+      this.getIntervalString = getIntervalString;
 
       this.operator = new PositionModel({
         id: 'operator',
@@ -851,6 +877,55 @@
         lateness: ko.observable(null),
         positions: ko.observableArray([]),
       };
+
+      this.intervalsTotal = this.intervals.map((_, i) => {
+        let positions = this.positions.map(p => p.intervals[i].lateness);
+
+        const light = ko.pureComputed(() => {
+          return positions.reduce((acc, p) => acc + p.light(), 0);
+        });
+        const medium = ko.pureComputed(() => {
+          return positions.reduce((acc, p) => acc + p.medium(), 0);
+        });
+        const hard = ko.pureComputed(() => {
+          return positions.reduce((acc, p) => acc + p.hard(), 0);
+        });
+        const total = ko.pureComputed(() => {
+          return light() + medium() + hard();
+        })
+
+        return {
+          light,
+          medium,
+          hard,
+          total
+        };
+      });
+
+      this.total = {
+        light: ko.pureComputed(() => {
+          return this.intervalsTotal.reduce((acc, i) => acc + i.light(), 0);
+        }),
+        medium: ko.pureComputed(() => {
+          return this.intervalsTotal.reduce((acc, i) => acc + i.medium(), 0);
+        }),
+        hard: ko.pureComputed(() => {
+          return this.intervalsTotal.reduce((acc, i) => acc + i.hard(), 0);
+        }),
+      };
+
+      this.total.total = ko.pureComputed(() => {
+        return this.total.light() + this.total.medium() + this.total.hard();
+      });
+
+      this.setData = (data) => {
+        this.operator.setData(data.operator);
+        this.administrator.setData(data.administrator);
+        this.sushiMaster.setData(data.sushiMaster);
+        this.pizzaMaster.setData(data.pizzaMaster);
+        this.hotShop.setData(data.hotShop);
+        this.driver.setData(data.driver);
+      }
     }
 
     const ViewModel = function () {
@@ -1616,10 +1691,263 @@
           // Обновить данные водителей
           this.summaryModel.setDriversData(driversData);
 
+          // Опоздания
+          const lateness = {
+            operator: [
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              }},
+            ],
+            administrator: [
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+            ],
+            sushiMaster: [
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+            ],
+            pizzaMaster: [
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+            ],
+            hotShop: [
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+            ],
+            driver: [
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                light: 1, medium: 2, hard: 3
+              } },
+            ]
+          };
+          this.latenessModel.setData(lateness);
+
           loadingDelay.then(() => {
             this.isBuilt(true);
             this.loading(false);
           });
+
+
         }, 10);
       };
 
