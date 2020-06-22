@@ -913,7 +913,6 @@
         });
 
         this.openLatenessModal = (intervalIndex, latenessDegree) => {
-          console.log('open', latenessDegree, intervalIndex)
           const interval = intervals[intervalIndex];
           this.root.utils.openModal('lateness-details', {
             interval,
@@ -1098,7 +1097,8 @@
         this.utils = {
           openModal: (id, data, onSave) => {
             const modal = createModalDialog(id, data, onSave);
-            this.modalOpens.push(modal)
+
+            this.modalOpens.push(modal);
           },
 
           formatSign: (number) => {
@@ -1169,6 +1169,38 @@
       };
       this.newCalculation = () => {
 
+      };
+
+      this.hasChanges = ko.observable(true);
+      this.checkChanges = () => {
+        return new Promise((resolve) => {
+          if (this.hasChanges()) {
+            this.utils.openModal('confirm', {
+              text: 'Текущий расчёт не сохранён. Данные могут быть потеряны. Произвести новый расчёт?',
+            }, () => {
+              resolve();
+            })
+          } else {
+            resolve();
+          }
+        });
+      }
+
+      this.buildForNow = () => {
+        this.checkChanges()
+          .then(() => {
+            this.loading(true);
+            const delay = 3000
+            const loadingDelay = new Promise(resolve => {
+              setTimeout(() => {
+                resolve();
+              }, delay);
+            });
+            loadingDelay.then(() => {
+              this.hasChanges(false);
+              this.loading(false);
+            });
+          })
       };
 
       // Построение расчета
@@ -1877,256 +1909,413 @@
           // Опоздания
           const lateness = {
             operator: [
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              }},
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
             ],
             administrator: [
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
             ],
             sushiMaster: [
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
             ],
             pizzaMaster: [
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
             ],
             hotShop: [
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
             ],
             driver: [
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
-              { korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                light: 1, medium: 2, hard: 3
-              } },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
+              {
+                korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
+                  light: 1, medium: 2, hard: 3
+                }
+              },
             ]
           };
           this.latenessModel.setData(lateness);
 
           loadingDelay.then(() => {
             this.isBuilt(true);
+            this.hasChanges(false);
             this.loading(false);
           });
 
@@ -2896,6 +3085,7 @@
           modalClass: 'calculation-modal calculation-modal--' + id
         },
         close: result => {
+          console.log('close', result)
           if (result !== undefined && typeof onSave === 'function') {
             onSave(result);
           }
