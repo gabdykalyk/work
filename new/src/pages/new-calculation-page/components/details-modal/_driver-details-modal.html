@@ -1,0 +1,82 @@
+@@include('./_orders-table.html')
+
+<template id="driver-details-modal-dialog-template">
+  <!-- ko template: { afterRender: afterRender } -->
+    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+    <button class="hrm-button modal-dialog-content__close"
+            data-bind="click: function() {cancel();}"
+            aria-label="Close">
+    </button>
+    <!-- /ko -->
+
+    <!-- ko if: !isLoading() -->
+      <div class="modal-dialog-content__header">
+        <div>
+        <div class="modal-dialog-content__title">
+          Заказы водителя
+        </div>
+
+        <!-- ko let: {control: ko.observable(null) } -->
+        <div data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+          <div class="driver-name"  data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <select data-bind="value: employeeId,
+            valueAllowUnset: true,
+            options: $component.employees,
+            optionsText: 'name',
+            optionsValue: 'id',
+            hrmSelect,
+            hrmFormFieldSelectControl: control">
+            </select>
+          </div>
+
+        </div>
+
+        <!-- /ko -->
+      </div>
+      </div>
+
+      <div class="details-modal-orders">
+        <div class="details-modal-orders-tabs"
+            data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
+        </div>
+
+        <!-- ko template: {
+            foreach: hrmTemplateIf(activeTab() === 0, $data),
+            afterAdd: hrmFadeAfterAddFactory(200, 200),
+            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <div class="details-modal-orders__scroll"
+            data-bind="hrmScrollable">
+          <!-- ko template: {
+            name: 'orders-table-template',
+            data: {
+              orders: orders(),
+            }
+          } -->
+          <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+        <!-- ko template: {
+            foreach: hrmTemplateIf(activeTab() === 1, $data),
+            afterAdd: hrmFadeAfterAddFactory(200, 200),
+            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <div class="details-modal-orders__scroll"
+            data-bind="hrmScrollable">
+            @@include('./_routes-tab.html')
+          </div>
+        <!-- /ko -->
+
+      </div>
+    <!-- /ko -->
+
+    <!-- ko if: isLoading() -->
+    <div class="loader">
+      <i class="fa fa-spinner fa-pulse loader__indicator">
+      </i>
+    </div>
+    <!-- /ko -->
+  <!-- /ko -->
+</template>

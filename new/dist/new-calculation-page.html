@@ -186,7 +186,7 @@
 
 </script>
 
-<script type="text/html" id="employee-details-modal-template">
+<script type="text/html" id="driver-details-modal-template">
   <div class="calculation-modal__wrapper">
       <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
           <div class="calculation-modal__wrapper-actions">
@@ -196,7 +196,21 @@
           </div>
       <!-- /ko -->
 
-      <div data-bind="component: { name: 'employee-details-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function ($data) { close($data); } } }" role="document"></div>
+      <div data-bind="component: { name: 'driver-details-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function ($data) { close($data); } } }" role="document"></div>
+  </div>
+</script>
+
+<script type="text/html" id="lateness-details-modal-template">
+  <div class="calculation-modal__wrapper">
+      <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+          <div class="calculation-modal__wrapper-actions">
+              <button class="hrm-button calculation-modal__wrapper-close"
+                      data-bind="click: function () {close();}">
+              </button>
+          </div>
+      <!-- /ko -->
+
+      <div data-bind="component: { name: 'lateness-details-modal-dialog', params: { data, modalElement, cancel: function () { close(); }, submit: function ($data) { close($data); } } }" role="document"></div>
   </div>
 </script>
 
@@ -248,8 +262,347 @@
                 beforeRemove: hrmFadeBeforeRemoveFactory(200)
               } -->
                 <div class="calculation-page__tab">
-                  lateness
+                  
 
+
+<div class="lateness-tab" data-bind="let: { table: latenessModel }">
+
+  <div class="lateness-filters">
+
+  </div>
+
+  <template id="lateness-params-template">
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '1' -->
+  <th class="lateness-table__position-param">
+    <div>
+      &lt;5
+    </div>
+  </th>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '2' -->
+  <th class="lateness-table__position-param">
+    <div>
+      5-10
+    </div>
+  </th>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '3' -->
+  <th class="lateness-table__position-param">
+    <div>
+      &gt;10
+    </div>
+  </th>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() > 0 -->
+  <th class="lateness-table__position-param">
+    <div>
+      Всего
+    </div>
+  </th>
+  <!-- /ko -->
+</template>
+
+<template id="interval-lateness-template">
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '1' -->
+  <td class="lateness-table__cell" data-bind="style: {
+            'background-color': lateness.light > 0 ? '#B8EFD5' : ''
+          }, click: function() {
+            if (lateness.light > 0 && latenessPosition) {
+              table.openLatenessModal(latenessPosition, latenessIntervalIndex)
+            }
+          }">
+    <div>
+      <!-- ko text: lateness.light -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '2' -->
+  <td class="lateness-table__cell" data-bind="style: {
+            'background-color': lateness.medium > 0 ? '#FDFFB3' : ''
+          }">
+    <div>
+      <!-- ko text: lateness.medium -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '3' -->
+  <td class="lateness-table__cell" data-bind="style: {
+            'background-color': lateness.hard > 0 ? '#FFE6F2' : ''
+          }">
+    <div>
+      <!-- ko text: lateness.hard -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.total -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+</template>
+
+<template id="lateness-total-template">
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '1' -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.light -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '2' -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.medium -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() || table.filters.lateness() == '3' -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.hard -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: !table.filters.lateness() > 0 -->
+  <td class="lateness-table__cell">
+    <div>
+      <!-- ko text: lateness.total -->
+      <!-- /ko -->
+    </div>
+  </td>
+  <!-- /ko -->
+</template>
+
+<div class="lateness-table" data-bind="using: latenessModel">
+    <!-- ko template: {
+      foreach: hrmTemplateIf(loaded(), $data),
+      afterAdd: hrmFadeAfterAddFactory(200)
+    } -->
+
+<div data-bind="component: {
+  name: 'hrm-scrollable-wrapper',
+  params: { options: {left: {disabled: true}} }
+}">
+
+    <table class="lateness-table__positions"
+      data-bind="hrmTable, let: {latenessCellsCount: table.filters.lateness() > 0 ? 1 : 4 }">
+      <thead>
+        <!-- Названия позиций -->
+        <tr>
+          <th class="lateness-table__fixed" rowspan="2">Время</th>
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <th class="lateness-table__position-title" data-bind="attr: {
+            colspan: position.paramsCount + latenessCellsCount
+          }">
+            <div>
+              <!-- ko text: position.name -->
+              <!-- /ko -->
+            </div>
+          </th>
+          <!-- /ko -->
+
+          <th class="lateness-table__position-title" data-bind="attr: {
+            colspan: latenessCellsCount
+          }">Итого</th>
+        </tr>
+        <!-- /Названия позиций -->
+
+        <!-- Параметры позиций -->
+        <tr>
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <th class="lateness-table__position-param" data-bind="attr: {'data-position': position.name}">
+            <div>
+              КОРФ
+            </div>
+          </th>
+
+          <th class="lateness-table__position-param">
+            <div>
+              Нагрузка
+            </div>
+          </th>
+
+          <th class="lateness-table__position-param">
+            <div>
+              Сотр.
+            </div>
+          </th>
+
+          <!-- ko foreach: { data: position.params, as: 'param' } -->
+          <th class="lateness-table__position-param">
+            <div>
+              <!-- ko text: name -->
+              <!-- /ko -->
+            </div>
+          </th>
+          <!-- /ko -->
+
+          <!-- ko template: { name: 'lateness-params-template' } -->
+          <!-- /ko -->
+          <!-- /ko -->
+
+          <!-- Секция ИТОГО, параметры -->
+          <!-- ko template: { name: 'lateness-params-template' } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, параметры -->
+        </tr>
+        <!-- /Параметры позиций -->
+      </thead>
+
+      <tbody>
+        <!-- ko foreach: { data: table.intervals, as: 'interval' } -->
+        <tr>
+          <td class="lateness-table__fixed">
+            <div>
+              <!-- ko text: $parent.getIntervalString(interval) -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <!-- ko let: {positionInterval: position.intervals[intervalIndex()]} -->
+
+          <td class="lateness-table__cell">
+            <div>
+
+              <!-- ko text: positionInterval.korf -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval.workload -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval.employees -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <!-- ko foreach: { data: position.params, as: 'param' } -->
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval[param.id] -->
+              <!-- /ko -->
+            </div>
+          </td>
+          <!-- /ko -->
+
+          <!-- ko template: {
+            name: 'interval-lateness-template',
+            data: {
+              lateness: positionInterval.lateness,
+              latenessPosition: position,
+              latenessInterval: interval,
+              latenessIntervalIndex: intervalIndex,
+            }
+          } -->
+          <!-- /ko -->
+
+          <!-- /ko -->
+          <!-- /ko -->
+
+
+          <!-- Секция ИТОГО, значения -->
+          <!-- ko template: {
+            name: 'interval-lateness-template',
+            data: {
+              lateness: table.intervalsTotal[intervalIndex()],
+              latenessPosition: null,
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, значения -->
+        </tr>
+        <!-- /ko -->
+      </tbody>
+
+      <tfoot>
+        <tr class="lateness-table__total">
+          <td class="lateness-table__fixed"></td>
+
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.korf -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.workload -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.employees -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <!-- ko foreach: { data: position.params, as: 'param' } -->
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total[param.id] -->
+              <!-- /ko -->
+            </div>
+          </td>
+          <!-- /ko -->
+
+          <!-- ko template: {
+            name: 'lateness-total-template',
+            data: {
+              lateness: position.total.lateness
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /ko -->
+
+          <!-- Секция ИТОГО, итого -->
+          <!-- ko template: {
+            name: 'lateness-total-template',
+            data: {
+              lateness: table.total
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, итого -->
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+    <!-- /ko -->
+
+  </div>
+
+</div>
                 </div>
               <!-- /ko -->
             <!-- /Tabs -->
@@ -1727,7 +2080,7 @@
               options: $component.levels,
               valueAllowUnset: true,
               hrmSelect,
-              hrmSelectPlaceholder: 'Не выбрано',
+              hrmSelectPlaceholder: 'Не выбрано', 
               hrmFormFieldSelectControl: control">
           </select>
         </div>
@@ -2905,36 +3258,36 @@
 
   <template id="orders-table-template">
   <!-- ko let: { activeOrder: ko.observable(null) } -->
-  <table class="driver-orders-table"
+  <table class="details-modal-orders-table"
          data-bind="hrmTable">
     <thead>
       <tr>
-        <th class="driver-orders-table__cell driver-orders-table__cell--order">
-          <div class="driver-orders-table__cell-content">
+        <th class="details-modal-orders-table__cell details-modal-orders-table__cell--order">
+          <div class="details-modal-orders-table__cell-content">
             № заказа
             <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                     data-bind="hrmTooltip, hrmTooltipText: '№ заказа'"></button>
           </div>
         </th>
 
-        <th class="driver-orders-table__cell driver-orders-table__cell--time">
-          <div class="driver-orders-table__cell-content">
+        <th class="details-modal-orders-table__cell details-modal-orders-table__cell--time">
+          <div class="details-modal-orders-table__cell-content">
             Время доставки
             <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                     data-bind="hrmTooltip, hrmTooltipText: 'Время доставки'"></button>
           </div>
         </th>
 
-        <th class="driver-orders-table__cell driver-orders-table__cell--sum">
-          <div class="driver-orders-table__cell-content">
+        <th class="details-modal-orders-table__cell details-modal-orders-table__cell--sum">
+          <div class="details-modal-orders-table__cell-content">
             Сумма заказа, ₽
             <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                     data-bind="hrmTooltip, hrmTooltipText: 'Сумма заказа, ₽'"></button>
           </div>
         </th>
 
-        <th class="driver-orders-table__cell driver-orders-table__cell--operator">
-          <div class="driver-orders-table__cell-content">
+        <th class="details-modal-orders-table__cell details-modal-orders-table__cell--operator">
+          <div class="details-modal-orders-table__cell-content">
             Обработал
             <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                     data-bind="hrmTooltip, hrmTooltipText: 'Обработал'"></button>
@@ -2949,22 +3302,22 @@
       <!-- ko foreach: { data: orders, as: 'order' } -->
 
       <tr data-bind="css: {
-        'driver-orders-table__active-row': activeOrder() === order
+        'details-modal-orders-table__active-row': activeOrder() === order
       }">
-        <td class="driver-orders-table__cell">
-          <div class="driver-orders-table__cell-content"
+        <td class="details-modal-orders-table__cell">
+          <div class="details-modal-orders-table__cell-content"
                data-bind="text: id"></div>
         </td>
-        <td class="driver-orders-table__cell">
-          <div class="driver-orders-table__cell-content"
+        <td class="details-modal-orders-table__cell">
+          <div class="details-modal-orders-table__cell-content"
                data-bind="text: deliveryTime"></div>
         </td>
-        <td class="driver-orders-table__cell">
-          <div class="driver-orders-table__cell-content"
+        <td class="details-modal-orders-table__cell">
+          <div class="details-modal-orders-table__cell-content"
                data-bind="text: sum"></div>
         </td>
-        <td class="driver-orders-table__cell">
-          <div class="driver-orders-table__cell-content driver-orders-table__operator">
+        <td class="details-modal-orders-table__cell">
+          <div class="details-modal-orders-table__cell-content details-modal-orders-table__operator">
 
             <div data-bind="text: operatorName"></div>
             <button class="hrm-button hrm-circle-icon-button hrm-circle-arrow-down-icon-button hrm-circle-icon-button--theme_neutral"
@@ -2988,10 +3341,10 @@
         afterAdd: $component.afterDetailsAdd,
         beforeRemove: $component.beforeDetailsRemove,
       } -->
-      <tr class="driver-orders-table__order-row">
+      <tr class="details-modal-orders-table__order-row">
         <td colspan="4">
 
-          <div class="driver-orders-table__order order-block details-block">
+          <div class="details-modal-orders-table__order order-block details-block">
             <div class="order-block__header">
               <h3 class="order-block__title">Состав заказа</h3>
               <div class="order-block__sum">
@@ -3177,7 +3530,7 @@
     <tfoot>
       <tr>
         <td colspan="4">
-          <div class="driver-orders-table__total">
+          <div class="details-modal-orders-table__total">
             <div>
               Всего заказов: <b data-bind="text: orders.length"></b>
             </div>
@@ -3193,7 +3546,7 @@
 </template>
 
 
-<template id="employee-details-modal-dialog-template">
+<template id="driver-details-modal-dialog-template">
   <!-- ko template: { afterRender: afterRender } -->
     <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
     <button class="hrm-button modal-dialog-content__close"
@@ -3229,8 +3582,8 @@
       </div>
       </div>
 
-      <div class="driver-orders">
-        <div class="driver-orders-tabs"
+      <div class="details-modal-orders">
+        <div class="details-modal-orders-tabs"
             data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
         </div>
 
@@ -3239,7 +3592,7 @@
             afterAdd: hrmFadeAfterAddFactory(200, 200),
             beforeRemove: hrmFadeBeforeRemoveFactory(200)
         } -->
-        <div class="driver-orders__scroll"
+        <div class="details-modal-orders__scroll"
             data-bind="hrmScrollable">
           <!-- ko template: {
             name: 'orders-table-template',
@@ -3256,39 +3609,39 @@
             afterAdd: hrmFadeAfterAddFactory(200, 200),
             beforeRemove: hrmFadeBeforeRemoveFactory(200)
         } -->
-        <div class="driver-orders__scroll"
+        <div class="details-modal-orders__scroll"
             data-bind="hrmScrollable">
             <!-- ko let: { activeRoute: ko.observable(null) } -->
-<table class="driver-routes-table"
+<table class="details-modal-routes-table"
         data-bind="hrmTable">
   <thead>
     <tr>
-      <th class="driver-routes-table__cell driver-routes-table__cell--order">
-        <div class="driver-routes-table__cell-content">
+      <th class="details-modal-routes-table__cell details-modal-routes-table__cell--order">
+        <div class="details-modal-routes-table__cell-content">
           Маршрут
           <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                   data-bind="hrmTooltip, hrmTooltipText: 'Маршрут'"></button>
         </div>
       </th>
 
-      <th class="driver-routes-table__cell driver-routes-table__cell--time">
-        <div class="driver-routes-table__cell-content">
+      <th class="details-modal-routes-table__cell details-modal-routes-table__cell--time">
+        <div class="details-modal-routes-table__cell-content">
           Начало/завершение
           <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                   data-bind="hrmTooltip, hrmTooltipText: 'Начало/завершение'"></button>
         </div>
       </th>
 
-      <th class="driver-routes-table__cell driver-routes-table__cell--sum">
-        <div class="driver-routes-table__cell-content">
+      <th class="details-modal-routes-table__cell details-modal-routes-table__cell--sum">
+        <div class="details-modal-routes-table__cell-content">
           Дистанция, км
           <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                   data-bind="hrmTooltip, hrmTooltipText: 'Дистанция, км'"></button>
         </div>
       </th>
 
-      <th class="driver-routes-table__cell driver-routes-table__cell--operator">
-        <div class="driver-routes-table__cell-content">
+      <th class="details-modal-routes-table__cell details-modal-routes-table__cell--operator">
+        <div class="details-modal-routes-table__cell-content">
           Расч./факт. время в пути
           <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
                   data-bind="hrmTooltip, hrmTooltipText: 'Расч./факт. время в пути'"></button>
@@ -3303,27 +3656,27 @@
     <!-- ko foreach: { data: routes, as: 'route' } -->
 
     <tr data-bind="css: {
-      'driver-routes-table__active-row': activeRoute() === route
+      'details-modal-routes-table__active-row': activeRoute() === route
     }">
-      <td class="driver-routes-table__cell">
-        <div class="driver-routes-table__cell-content">
+      <td class="details-modal-routes-table__cell">
+        <div class="details-modal-routes-table__cell-content">
             <!-- ko foreach: orders -->
-            <div data-bind="text: address" class="driver-routes-table__order-address"></div>
+            <div data-bind="text: address" class="details-modal-routes-table__order-address"></div>
             <!-- /ko -->
         </div>
       </td>
-      <td class="driver-routes-table__cell">
-        <div class="driver-routes-table__cell-content">
+      <td class="details-modal-routes-table__cell">
+        <div class="details-modal-routes-table__cell-content">
           <div data-bind="text: startedAt"></div>
             <div data-bind="text: finishedAt"></div>
         </div>
       </td>
-      <td class="driver-routes-table__cell">
-        <div class="driver-routes-table__cell-content"
+      <td class="details-modal-routes-table__cell">
+        <div class="details-modal-routes-table__cell-content"
         data-bind="text: distKm"></div>
       </td>
-      <td class="driver-routes-table__cell">
-        <div class="driver-routes-table__cell-content driver-routes-table__time">
+      <td class="details-modal-routes-table__cell">
+        <div class="details-modal-routes-table__cell-content details-modal-routes-table__time">
           <div>
             <div data-bind="text: estimatedTime"></div>
             <div data-bind="text: actualTime"></div>
@@ -3350,10 +3703,10 @@
         afterAdd: $component.afterDetailsAdd,
         beforeRemove: $component.beforeDetailsRemove,
       } -->
-    <tr class="driver-routes-table__route-row">
+    <tr class="details-modal-routes-table__route-row">
       <td colspan="4">
 
-        <div class="driver-routes-table__route route-block details-block">
+        <div class="details-modal-routes-table__route route-block details-block">
 
 
         <!-- ko template: {
@@ -3392,7 +3745,7 @@
 
 
 <script type="text/javascript">
-    ko.components.register('driver-modal-dialog', {
+    ko.components.register('driver-details-modal-dialog', {
         viewModel: {
             createViewModel: function (params, componentInfo) {
                 const $element = $(componentInfo.element);
@@ -3440,7 +3793,7 @@
 
                     this.changeOrderDriver = (driverId) => {
                         const orderId = this.activeOrder().id;
-                        console.log('change driver', orderId, driverId);
+                        console.log('change order driver', orderId, driverId);
                     };
 
                     this.getOrdersSum = orders => {
@@ -3710,7 +4063,508 @@
                 });
             }
         },
-        template: { element: 'driver-modal-dialog-template' }
+        template: { element: 'driver-details-modal-dialog-template' }
+    });
+</script>
+
+  <template id="lateness-details-modal-dialog-template">
+  <!-- ko template: { afterRender: afterRender } -->
+    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+    <button class="hrm-button modal-dialog-content__close"
+            data-bind="click: function() {cancel();}"
+            aria-label="Close">
+    </button>
+    <!-- /ko -->
+
+    <!-- ko if: !isLoading() -->
+      <div class="modal-dialog-content__header">
+        <div>
+        <div class="modal-dialog-content__title" data-bind="text: $component.title">
+
+        </div>
+
+      
+      </div>
+      </div>
+
+      <div class="details-modal-orders">
+        <div class="details-modal-orders-tabs"
+            data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
+        </div>
+
+        <!-- ko template: {
+            foreach: hrmTemplateIf(activeTab() === 0, $data),
+            afterAdd: hrmFadeAfterAddFactory(200, 200),
+            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <div class="details-modal-orders__scroll"
+            data-bind="hrmScrollable">
+          <!-- ko template: {
+            name: 'orders-table-template',
+            data: {
+              orders: orders(),
+            }
+          } -->
+          <!-- /ko -->
+        </div>
+        <!-- /ko -->
+
+        <!-- ko template: {
+            foreach: hrmTemplateIf(activeTab() === 1, $data),
+            afterAdd: hrmFadeAfterAddFactory(200, 200),
+            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <div class="details-modal-orders__scroll"
+            data-bind="hrmScrollable">
+            <!-- ko let: { activeRoute: ko.observable(null) } -->
+<table class="details-modal-routes-table"
+        data-bind="hrmTable">
+  <thead>
+    <tr>
+      <th class="details-modal-routes-table__cell details-modal-routes-table__cell--order">
+        <div class="details-modal-routes-table__cell-content">
+          Маршрут
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                  data-bind="hrmTooltip, hrmTooltipText: 'Маршрут'"></button>
+        </div>
+      </th>
+
+      <th class="details-modal-routes-table__cell details-modal-routes-table__cell--time">
+        <div class="details-modal-routes-table__cell-content">
+          Начало/завершение
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                  data-bind="hrmTooltip, hrmTooltipText: 'Начало/завершение'"></button>
+        </div>
+      </th>
+
+      <th class="details-modal-routes-table__cell details-modal-routes-table__cell--sum">
+        <div class="details-modal-routes-table__cell-content">
+          Дистанция, км
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                  data-bind="hrmTooltip, hrmTooltipText: 'Дистанция, км'"></button>
+        </div>
+      </th>
+
+      <th class="details-modal-routes-table__cell details-modal-routes-table__cell--operator">
+        <div class="details-modal-routes-table__cell-content">
+          Расч./факт. время в пути
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                  data-bind="hrmTooltip, hrmTooltipText: 'Расч./факт. время в пути'"></button>
+        </div>
+      </th>
+
+
+    </tr>
+  </thead>
+
+  <tbody>
+    <!-- ko foreach: { data: routes, as: 'route' } -->
+
+    <tr data-bind="css: {
+      'details-modal-routes-table__active-row': activeRoute() === route
+    }">
+      <td class="details-modal-routes-table__cell">
+        <div class="details-modal-routes-table__cell-content">
+            <!-- ko foreach: orders -->
+            <div data-bind="text: address" class="details-modal-routes-table__order-address"></div>
+            <!-- /ko -->
+        </div>
+      </td>
+      <td class="details-modal-routes-table__cell">
+        <div class="details-modal-routes-table__cell-content">
+          <div data-bind="text: startedAt"></div>
+            <div data-bind="text: finishedAt"></div>
+        </div>
+      </td>
+      <td class="details-modal-routes-table__cell">
+        <div class="details-modal-routes-table__cell-content"
+        data-bind="text: distKm"></div>
+      </td>
+      <td class="details-modal-routes-table__cell">
+        <div class="details-modal-routes-table__cell-content details-modal-routes-table__time">
+          <div>
+            <div data-bind="text: estimatedTime"></div>
+            <div data-bind="text: actualTime"></div>
+          </div>
+
+          <button class="hrm-button hrm-circle-icon-button hrm-circle-arrow-down-icon-button hrm-circle-icon-button--theme_neutral"
+                  data-bind="click: function() {
+                    if (activeRoute() === route) {
+                      activeRoute(null);
+                    } else {
+                      activeRoute(route);
+                    }
+
+                  }, css: {
+            'active': activeRoute() === route
+          }">
+          </button>
+        </div>
+      </td>
+    </tr>
+
+    <!-- ko template: {
+        foreach: hrmTemplateIf(activeRoute() === route, $data),
+        afterAdd: $component.afterDetailsAdd,
+        beforeRemove: $component.beforeDetailsRemove,
+      } -->
+    <tr class="details-modal-routes-table__route-row">
+      <td colspan="4">
+
+        <div class="details-modal-routes-table__route route-block details-block">
+
+
+        <!-- ko template: {
+          name: 'orders-table-template',
+          data: {
+            orders: route.orders
+          }
+        } -->
+        <!-- /ko -->
+
+        </div>
+
+      </td>
+    </tr>
+    <!-- /ko -->
+
+    <!-- /ko -->
+  </tbody>
+</table>
+<!-- /ko -->
+
+          </div>
+        <!-- /ko -->
+
+      </div>
+    <!-- /ko -->
+
+    <!-- ko if: isLoading() -->
+    <div class="loader">
+      <i class="fa fa-spinner fa-pulse loader__indicator">
+      </i>
+    </div>
+    <!-- /ko -->
+  <!-- /ko -->
+</template>
+
+
+<script type="text/javascript">
+    ko.components.register('lateness-details-modal-dialog', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+                $element.addClass([
+                    'modal-dialog-content',
+                    'modal-dialog-content--initializing'
+                ]);
+
+
+
+                return new (function () {
+                    this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+                    this.windowResizeHandler = () => {
+                        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                    };
+                    $(window).on('resize', this.windowResizeHandler);
+
+                    this.initializing = ko.observable(true);
+
+                    this.isSubmitted = ko.observable(true);
+                    this.isLoading = ko.observable(true);
+
+                    this.formControlErrorStateMatcher = function (formControl) {
+                        return ko.pureComputed(() => {
+                            return this.isSubmitted() && !formControl.isValid();
+                        });
+                    };
+
+                    this.tabs = [
+                        new HrmTabGroupItem('Заказы'),
+                        new HrmTabGroupItem('Маршруты'),
+                    ];
+                    this.activeTab = ko.observable(0);
+
+                    this.position = params.data.position;
+                    this.interval = params.data.interval;
+                    this.title = params.data.title;
+
+                    this.orders = ko.observableArray([]);
+                    this.routes = ko.observableArray([]);
+
+                    this.changeOrderDriver = (driverId) => {
+                        const orderId = this.activeOrder().id;
+                        console.log('change order driver', orderId, driverId);
+                    };
+
+                    this.getOrdersSum = orders => {
+                        return orders.reduce((acc, o) => acc + o.sum, 0);
+                    }
+
+
+
+                    this.loadData = (id) => {
+                        setTimeout(() => {
+
+                            const orders = [
+                                {
+                                    id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                    deliveryTime: '1ч 4мин',
+                                    sum: 900,
+                                    operatorName: 'Булекова Ольга',
+                                    driverId: 'driver2',
+                                    driverName: 'Харитонов Алексей',
+                                    items: [
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Вилка',
+                                            count: 2,
+                                            price: 0
+                                        }
+                                    ],
+                                    processing: {
+                                        createdAt: '11:09',
+                                        confirmedAt: '11:09',
+                                        printedAt: '11:09',
+                                        readyAt: '11:09',
+                                        sendedAt: '11:09',
+                                        paidAt: '11:09',
+                                        deliveredAt: '11:09',
+                                    },
+                                    delivery: {
+                                        date: '12:09 03.04.2020',
+                                        time: '12 мин',
+                                        address: 'г. Ленинский городской округ, раб. пос. Боброво, ул. Крымская, д.15'
+                                    }
+                                },
+                                {
+                                    id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                    deliveryTime: '1ч 4мин',
+                                    sum: 900,
+                                    operatorName: 'Булекова Ольга',
+                                    driverId: 'driver1',
+                                    driverName: 'Харитонов Алексей',
+                                    items: [
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Вилка',
+                                            count: 2,
+                                            price: 0
+                                        }
+                                    ],
+                                    processing: {
+                                        createdAt: '11:09',
+                                        confirmedAt: '11:09',
+                                        printedAt: '11:09',
+                                        readyAt: '11:09',
+                                        sendedAt: '11:09',
+                                        paidAt: '11:09',
+                                        deliveredAt: '11:09',
+                                    },
+                                    delivery: {
+                                        date: '12:09 03.04.2020',
+                                        time: '12 мин',
+                                        address: 'г. Ленинский городской округ, раб. пос. Боброво, ул. Крымская, д.15'
+                                    }
+                                },
+                                {
+                                    id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                    deliveryTime: '1ч 4мин',
+                                    sum: 900,
+                                    operatorName: 'Булекова Ольга',
+                                    driverId: 'driver1',
+                                    driverName: 'Харитонов Алексей',
+                                    items: [
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Вилка',
+                                            count: 2,
+                                            price: 0
+                                        }
+                                    ],
+                                    processing: {
+                                        createdAt: '11:09',
+                                        confirmedAt: '11:09',
+                                        printedAt: '11:09',
+                                        readyAt: '11:09',
+                                        sendedAt: '11:09',
+                                        paidAt: '11:09',
+                                        deliveredAt: '11:09',
+                                    },
+                                    delivery: {
+                                        date: '12:09 03.04.2020',
+                                        time: '12 мин',
+                                        address: 'г. Ленинский городской округ, раб. пос. Боброво, ул. Крымская, д.15'
+                                    }
+                                },
+                                {
+                                    id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                    deliveryTime: '1ч 4мин',
+                                    sum: 900,
+                                    operatorName: 'Булекова Ольга',
+                                    driverId: 'driver2',
+                                    driverName: 'Харитонов Алексей',
+                                    items: [
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Вилка',
+                                            count: 2,
+                                            price: 0
+                                        }
+                                    ],
+                                    processing: {
+                                        createdAt: '11:09',
+                                        confirmedAt: '11:09',
+                                        printedAt: '11:09',
+                                        readyAt: '11:09',
+                                        sendedAt: '11:09',
+                                        paidAt: '11:09',
+                                        deliveredAt: '11:09',
+                                    },
+                                    delivery: {
+                                        date: '12:09 03.04.2020',
+                                        time: '12 мин',
+                                        address: 'г. Ленинский городской округ, раб. пос. Боброво, ул. Крымская, д.15'
+                                    }
+                                }
+                            ];
+                            this.orders(orders);
+
+                            const routes = [
+                                {
+                                    orders: orders.slice(0, 1),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    orders: orders.slice(0, 2),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 16.9,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    orders: orders.slice(0, 1),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                }
+                            ];
+                            this.routes(routes);
+
+                            this.isLoading(false);
+
+                        }, 3000);
+                    };
+
+                    this.loadData();
+
+                    this.save = function () {
+                        this.isSubmitted(true);
+                    };
+
+                    this.cancel = function () {
+                        params.cancel();
+                    };
+
+
+
+
+                    this.afterRender = function () {
+                        $element.removeClass('modal-dialog-content--initializing');
+                        this.initializing(false);
+                    }.bind(this);
+
+                    this.afterDetailsAdd = el => {
+                        let $block = $(el).find('.details-block');
+                        $block.hide();
+                        $(el).fadeIn(0, () => {
+                            $block.slideDown(300);
+                        });
+                    };
+
+                    this.beforeDetailsRemove = el => {
+                        let $block = $(el).find('.details-block');
+                        $block.slideUp(300, () => {
+                            $(el).fadeOut(0, () => {
+                                $(el).remove();
+                            })
+                        })
+                    }
+
+                    this.dispose = function () {
+                        $(window).off('resize', this.windowResizeHandler);
+                    };
+                });
+            }
+        },
+        template: { element: 'lateness-details-modal-dialog-template' }
     });
 </script>
 
@@ -6065,7 +6919,7 @@ css: {
   })
 </script>
 
-
+  
 
 <!-- Блок сотрудника в таблице -->
 <script id="delivery-employee-block-template"
@@ -6913,7 +7767,7 @@ css: {
           }
 
           const openDriverModal = (employee) => {
-            params.utils.openModal('driver', {
+            params.utils.openModal('driver-details', {
               employee: employee,
               employees: position.visibleEmployees()
             }, () => {
@@ -7065,7 +7919,7 @@ css: {
 
       const holidaySurcharge = ko.observable('');
       holidaySurcharge.subscribe(_ => {
-        root.calculate();
+        root.calculate('delivery');
       });
 
       /**
@@ -7151,7 +8005,7 @@ css: {
         this.link = employee.link;                   // ссылка на личное дело
 
         this.level = ko.observable(employee.level);  // разряд
-        this.level.subscribe(_ => this.root.calculate());
+        this.level.subscribe(_ => this.root.calculate('production'));
 
         this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
         this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
@@ -7180,7 +8034,7 @@ css: {
           this.workingIntervals.remove(interval);
         };
 
-        this.workingTime.subscribe(_ => this.root.calculate());
+        this.workingTime.subscribe(_ => this.root.calculate('production'));
 
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
@@ -7194,7 +8048,7 @@ css: {
           }, 0);
         });
 
-        this.accountOperations.subscribe(_ => this.root.calculate());
+        this.accountOperations.subscribe(_ => this.root.calculate('production'));
 
         // штрафы
         this.fines = ko.observableArray(employee.fines || []);
@@ -7204,7 +8058,7 @@ css: {
           }, 0);
         });
 
-        this.fines.subscribe(_ => this.root.calculate());
+        this.fines.subscribe(_ => this.root.calculate('production'));
 
         // бонусы
         this.bonuses = ko.observableArray(employee.bonuses || []);
@@ -7214,7 +8068,7 @@ css: {
           }, 0);
         });
 
-        this.bonuses.subscribe(_ => this.root.calculate());
+        this.bonuses.subscribe(_ => this.root.calculate('production'));
 
         // компенсация
         this.compensation = ko.observable(employee.compensation || '');
@@ -7255,7 +8109,7 @@ css: {
         this.toPayment = ko.observable(employee.toPayment || 0);
 
         this.visible = ko.observable(employee.visible) // участвует в расчете
-        this.visible.subscribe(_ => this.root.calculate());
+        this.visible.subscribe(_ => this.root.calculate('production'));
 
         this.loaded = employee.loaded; // загружен для Все филиалы
       }
@@ -7295,7 +8149,7 @@ css: {
           this.workingIntervals.remove(interval);
         };
 
-        this.workingTime.subscribe(_ => this.root.calculate());
+        this.workingTime.subscribe(_ => this.root.calculate('delivery'));
 
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
@@ -7309,7 +8163,7 @@ css: {
           }, 0);
         });
 
-        this.accountOperations.subscribe(_ => this.root.calculate());
+        this.accountOperations.subscribe(_ => this.root.calculate('delivery'));
 
         this.ordersCount = ko.observable(employee.ordersCount);
         this.ordersValue = ko.observable(employee.ordersValue);
@@ -7335,7 +8189,7 @@ css: {
           }, 0);
         });
 
-        this.fines.subscribe(_ => this.root.calculate());
+        this.fines.subscribe(_ => this.root.calculate('delivery'));
 
         // бонусы
         this.bonuses = ko.observableArray(employee.bonuses || []);
@@ -7345,7 +8199,7 @@ css: {
           }, 0);
         });
 
-        this.bonuses.subscribe(_ => this.root.calculate());
+        this.bonuses.subscribe(_ => this.root.calculate('delivery'));
 
         // опоздания
         this.lateness = {
@@ -7365,7 +8219,7 @@ css: {
         this.toPayment = ko.observable(employee.toPayment || 0);
 
         this.visible = ko.observable(employee.visible) // участвует в расчете
-        this.visible.subscribe(_ => this.root.calculate());
+        this.visible.subscribe(_ => this.root.calculate('delivery'));
       }
 
 
@@ -7386,7 +8240,7 @@ css: {
         this.workloadUnits = positionData.workloadUnits;
 
         this.workload.subscribe(v => {
-          root.calculate();
+          root.calculate('production');
         });
 
         // доп. нагрузка
@@ -7413,7 +8267,7 @@ css: {
         this.performanceStandartUnits = positionData.performanceStandartUnits;
 
         this.visible = ko.observable(positionData.visible); // Отображается в таблице
-        this.visible.subscribe(_ => this.root.calculate());
+        this.visible.subscribe(_ => this.root.calculate('production'));
 
         this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this)));
 
@@ -7437,7 +8291,7 @@ css: {
         this.addEmployee = (employee) => {
           employee.visible = true;
           this.employees.push(new EmployeeModel(employee, this));
-          this.root.calculate();
+          this.root.calculate('production');
         };
 
         this.updateEmployees = (updatedList) => {
@@ -7538,7 +8392,7 @@ css: {
         this.workloadUnits = positionData.workloadUnits;
 
         this.workload.subscribe(v => {
-          root.calculate();
+          root.calculate('delivery');
         });
 
         // доп. нагрузка
@@ -7647,6 +8501,183 @@ css: {
         deliveryTotal,
         total
       }
+    };
+
+    const LatenessModel = function (root) {
+      this.root = root;
+      this.loaded = ko.observable(false);
+
+      this.activate = () => {
+        setTimeout(() => {
+          this.loaded(true);
+        }, 1000);
+      };
+
+      this.deactivate = () => {
+        this.loaded(false);
+      }
+
+      function PositionIntervalModel(params) {
+        const lateness = {};
+        this.lateness = {
+          light: ko.observable(lateness.light || 0),
+          medium: ko.observable(lateness.medium || 0),
+          hard: ko.observable(lateness.hard || 0),
+          total: ko.observable(lateness.total || 0),
+        };
+
+        this.korf = ko.observable(0);
+        this.workload = ko.observable(0);
+        this.employees = ko.observable(0);
+
+        params.forEach(p => {
+          this[p.id] = ko.observable(0)
+        });
+      }
+
+      function PositionModel(positionData, intervals, root) {
+        this.root = root;
+
+        this.id = positionData.id;
+        this.name = positionData.name;
+
+        this.total = {
+          lateness: {
+            light: ko.observable(0),
+            medium: ko.observable(0),
+            hard: ko.observable(0),
+            total: ko.observable(0),
+          },
+          korf: ko.observable(0),
+          workload: ko.observable(0),
+          employees: ko.observable(0),
+        };
+
+        this.params = [
+
+        ];
+
+        const params = positionData.params || [];
+        params.forEach(param => {
+          this.params.push(param)
+          this.total[param.id] = ko.observable(0);
+        });
+
+        this.paramsCount = this.params.length + 3;
+
+        this.intervals = intervals.map(_ => new PositionIntervalModel(this.params));
+
+        this.openLatenessModal = (position, intervalIndex) => {
+          console.log('open', position, intervalIndex)
+          this.root.openModal('employee-details-modal', {
+            title: 'заголовок-позиция',
+
+          });
+        };
+      };
+
+      this.intervals = [
+        [null, 12],
+        [12, 13],
+        [13, 14],
+        [14, 15],
+        [15, 16],
+        [16, 17],
+        [17, 18],
+        [18, 19],
+        [19, 20],
+        [20, 21],
+        [21, 22],
+        [22, 23],
+        [23, null],
+      ];
+
+      this.intervalsTotal = this.intervals.map(_ => {
+        return {
+          light: ko.observable(0),
+          medium: ko.observable(0),
+          hard: ko.observable(0),
+          total: ko.observable(0),
+        }
+      });
+
+      this.total = {
+        light: ko.observable(0),
+        medium: ko.observable(0),
+        hard: ko.observable(0),
+        total: ko.observable(0)
+      };
+
+      this.getIntervalString = (interval) => {
+        if (!interval[0]) return '<' + interval[1];
+        if (!interval[1]) return '>' + interval[0];
+
+        return interval[0] + '-' + interval[1];
+      }
+
+      this.operator = new PositionModel({
+        id: 'operator',
+        name: 'Оператор',
+        params: [
+          { id: 'ordersCount', name: 'Кол-во заказов' },
+        ],
+      }, this.intervals, root);
+
+      this.administrator = new PositionModel({
+        id: 'administrator',
+        name: 'Администратор филиала',
+        params: [
+          { id: 'ordersCount', name: 'Кол-во заказов' }
+        ],
+      }, this.intervals, root);
+
+      this.sushiMaster = new PositionModel({
+        id: 'sushi-master',
+        name: 'Повар-сушист',
+        params: [
+          { id: 'employeesWithNorm', name: 'Сотр. с норм.' },
+          { id: 'revenue', name: 'Выручка' }
+        ],
+      }, this.intervals, root);
+
+      this.pizzaMaster = new PositionModel({
+        id: 'pizza-master',
+        name: 'Повар-пиццемейкер',
+        params: [
+          { id: 'employeesWithNorm', name: 'Сотр. с норм.' },
+          { id: 'pizzaCount', name: 'Кол-во пицц' }
+        ],
+      }, this.intervals, root);
+
+      this.hotShop = new PositionModel({
+        id: 'hot-shop',
+        name: 'Горячий цех',
+        params: [
+          { id: 'revenue', name: 'Выручка' }
+        ],
+      }, this.intervals, root);
+
+      this.driver = new PositionModel({
+        id: 'driver',
+        name: 'Водитель',
+        params: [
+          { id: 'ordersCount', name: 'Кол-во заказов' }
+        ],
+      }, this.intervals, root);
+
+      this.positions = [
+        this.operator,
+        this.administrator,
+        this.sushiMaster,
+        this.pizzaMaster,
+        this.hotShop,
+        this.driver
+      ];
+
+      this.filters = {
+        lateness: ko.observable(null),
+        positions: ko.observableArray([]),
+      };
     }
 
     const ViewModel = function () {
@@ -7694,6 +8725,7 @@ css: {
       })();
 
       this.summaryModel = new PositionsModel(this);
+      this.latenessModel = new LatenessModel(this);
 
       this.inputModel = {
         filial: ko.observable(''),
@@ -8440,6 +9472,13 @@ css: {
           }
         }
       })();
+      this.tabs.activeTab.subscribe(v => {
+        if (v == 2) {
+          this.latenessModel.activate();
+        } else {
+          this.latenessModel.deactivate();
+        }
+      })
 
       this.productionPositions = ko.pureComputed(() => {
         return this.summaryModel.positions();
@@ -8652,7 +9691,8 @@ css: {
       }
 
       // Перерасчет значений в таблицах
-      this.calculate = () => {
+      this.calculate = (changeSource) => {
+        // changeSource: 'production', 'delivery'
         console.log('recalculate');
 
 
@@ -8867,7 +9907,203 @@ css: {
         })();
 
 
+        /** УСТАНОВКА ДАННЫХ ТАБЛИЦЫ ОПОЗДАНИЯ */
+        (() => {
+          const model = this.latenessModel;
 
+          // Оператор
+          (() => {
+            // Оператор (интервалы)
+            const operator = model.operator;
+            operator.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const ordersCount = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.ordersCount(ordersCount);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Оператор (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const ordersCount = operator.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+
+            operator.total.korf(korf);
+            operator.total.workload(workload);
+            operator.total.ordersCount(ordersCount);
+          })();
+
+          // Администратор
+          (() => {
+            // Администратор (интервалы)
+            const administrator = model.administrator;
+            administrator.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const ordersCount = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.ordersCount(ordersCount);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Администратор (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const ordersCount = administrator.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+
+            administrator.total.korf(korf);
+            administrator.total.workload(workload);
+            administrator.total.ordersCount(ordersCount);
+          })();
+
+          // Повар-сушист
+          (() => {
+            // Повар-сушист (интервалы)
+            const sushiMaster = model.sushiMaster;
+            sushiMaster.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const employeesWithNorm = getRandom(0, 10);
+              const revenue = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.employeesWithNorm(employeesWithNorm);
+              intervalModel.revenue(revenue);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Повар-сушист (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const revenue = sushiMaster.intervals.reduce((acc, i) => acc + i.revenue(), 0);
+
+            sushiMaster.total.korf(korf);
+            sushiMaster.total.workload(workload);
+            sushiMaster.total.employeesWithNorm('');
+            sushiMaster.total.revenue(revenue);
+          })();
+
+          // Повар-пиццемейкер
+          (() => {
+            // Повар-пиццемейкер (интервалы)
+            const pizzaMaster = model.pizzaMaster;
+            pizzaMaster.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const employeesWithNorm = getRandom(0, 10);
+              const pizzaCount = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.employeesWithNorm(employeesWithNorm);
+              intervalModel.pizzaCount(pizzaCount);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Повар-пиццемейкер (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const pizzaCount = pizzaMaster.intervals.reduce((acc, i) => acc + i.pizzaCount(), 0);
+
+            pizzaMaster.total.korf(korf);
+            pizzaMaster.total.workload(workload);
+            pizzaMaster.total.employeesWithNorm('');
+            pizzaMaster.total.pizzaCount(pizzaCount);
+          })();
+
+          // Горячий цех
+          (() => {
+            // Горячий цех (интервалы)
+            const hotShop = model.hotShop;
+            hotShop.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const revenue = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.revenue(revenue);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Горячий цех (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const revenue = hotShop.intervals.reduce((acc, i) => acc + i.revenue(), 0);
+
+            hotShop.total.korf(korf);
+            hotShop.total.workload(workload);
+            hotShop.total.revenue(revenue);
+          })();
+
+          // Водитель
+          (() => {
+            // Водитель (интервалы)
+            const driver = model.driver;
+            driver.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const ordersCount = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.ordersCount(ordersCount);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Водитель (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const ordersCount = driver.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+
+            driver.total.korf(korf);
+            driver.total.workload(workload);
+            driver.total.ordersCount(ordersCount);
+          })();
+
+        })();
 
 
         /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ СВОДНОЙ ТАБЛИЦЫ */
@@ -8927,7 +10163,6 @@ css: {
     }
   });
 </script>
-
 </body>
 
 </html>

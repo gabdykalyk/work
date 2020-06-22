@@ -1,6 +1,4 @@
-@@include('./_orders-table.html')
-
-<template id="employee-details-modal-dialog-template">
+<template id="lateness-details-modal-dialog-template">
   <!-- ko template: { afterRender: afterRender } -->
     <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
     <button class="hrm-button modal-dialog-content__close"
@@ -12,32 +10,16 @@
     <!-- ko if: !isLoading() -->
       <div class="modal-dialog-content__header">
         <div>
-        <div class="modal-dialog-content__title">
-          Заказы водителя
-        </div>
-
-        <!-- ko let: {control: ko.observable(null) } -->
-        <div data-bind="hrmFormField, hrmFormFieldControlRef: control">
-
-          <div class="driver-name"  data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-            <select data-bind="value: employeeId,
-            valueAllowUnset: true,
-            options: $component.employees,
-            optionsText: 'name',
-            optionsValue: 'id',
-            hrmSelect,
-            hrmFormFieldSelectControl: control">
-            </select>
-          </div>
+        <div class="modal-dialog-content__title" data-bind="text: $component.title">
 
         </div>
 
-        <!-- /ko -->
+      
       </div>
       </div>
 
-      <div class="driver-orders">
-        <div class="driver-orders-tabs"
+      <div class="details-modal-orders">
+        <div class="details-modal-orders-tabs"
             data-bind="component: {name: 'hrm-tab-group', params: {items: tabs, activeItem: activeTab }}">
         </div>
 
@@ -46,7 +28,7 @@
             afterAdd: hrmFadeAfterAddFactory(200, 200),
             beforeRemove: hrmFadeBeforeRemoveFactory(200)
         } -->
-        <div class="driver-orders__scroll"
+        <div class="details-modal-orders__scroll"
             data-bind="hrmScrollable">
           <!-- ko template: {
             name: 'orders-table-template',
@@ -63,7 +45,7 @@
             afterAdd: hrmFadeAfterAddFactory(200, 200),
             beforeRemove: hrmFadeBeforeRemoveFactory(200)
         } -->
-        <div class="driver-orders__scroll"
+        <div class="details-modal-orders__scroll"
             data-bind="hrmScrollable">
             @@include('./_routes-tab.html')
           </div>

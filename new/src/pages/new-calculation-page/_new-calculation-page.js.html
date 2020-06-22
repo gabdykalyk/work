@@ -92,7 +92,7 @@
 
       const holidaySurcharge = ko.observable('');
       holidaySurcharge.subscribe(_ => {
-        root.calculate();
+        root.calculate('delivery');
       });
 
       /**
@@ -178,7 +178,7 @@
         this.link = employee.link;                   // ссылка на личное дело
 
         this.level = ko.observable(employee.level);  // разряд
-        this.level.subscribe(_ => this.root.calculate());
+        this.level.subscribe(_ => this.root.calculate('production'));
 
         this.hasProblems = employee.hasProblems;                         // есть проблемы с документами
         this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
@@ -207,7 +207,7 @@
           this.workingIntervals.remove(interval);
         };
 
-        this.workingTime.subscribe(_ => this.root.calculate());
+        this.workingTime.subscribe(_ => this.root.calculate('production'));
 
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
@@ -221,7 +221,7 @@
           }, 0);
         });
 
-        this.accountOperations.subscribe(_ => this.root.calculate());
+        this.accountOperations.subscribe(_ => this.root.calculate('production'));
 
         // штрафы
         this.fines = ko.observableArray(employee.fines || []);
@@ -231,7 +231,7 @@
           }, 0);
         });
 
-        this.fines.subscribe(_ => this.root.calculate());
+        this.fines.subscribe(_ => this.root.calculate('production'));
 
         // бонусы
         this.bonuses = ko.observableArray(employee.bonuses || []);
@@ -241,7 +241,7 @@
           }, 0);
         });
 
-        this.bonuses.subscribe(_ => this.root.calculate());
+        this.bonuses.subscribe(_ => this.root.calculate('production'));
 
         // компенсация
         this.compensation = ko.observable(employee.compensation || '');
@@ -282,7 +282,7 @@
         this.toPayment = ko.observable(employee.toPayment || 0);
 
         this.visible = ko.observable(employee.visible) // участвует в расчете
-        this.visible.subscribe(_ => this.root.calculate());
+        this.visible.subscribe(_ => this.root.calculate('production'));
 
         this.loaded = employee.loaded; // загружен для Все филиалы
       }
@@ -322,7 +322,7 @@
           this.workingIntervals.remove(interval);
         };
 
-        this.workingTime.subscribe(_ => this.root.calculate());
+        this.workingTime.subscribe(_ => this.root.calculate('delivery'));
 
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
@@ -336,7 +336,7 @@
           }, 0);
         });
 
-        this.accountOperations.subscribe(_ => this.root.calculate());
+        this.accountOperations.subscribe(_ => this.root.calculate('delivery'));
 
         this.ordersCount = ko.observable(employee.ordersCount);
         this.ordersValue = ko.observable(employee.ordersValue);
@@ -362,7 +362,7 @@
           }, 0);
         });
 
-        this.fines.subscribe(_ => this.root.calculate());
+        this.fines.subscribe(_ => this.root.calculate('delivery'));
 
         // бонусы
         this.bonuses = ko.observableArray(employee.bonuses || []);
@@ -372,7 +372,7 @@
           }, 0);
         });
 
-        this.bonuses.subscribe(_ => this.root.calculate());
+        this.bonuses.subscribe(_ => this.root.calculate('delivery'));
 
         // опоздания
         this.lateness = {
@@ -392,7 +392,7 @@
         this.toPayment = ko.observable(employee.toPayment || 0);
 
         this.visible = ko.observable(employee.visible) // участвует в расчете
-        this.visible.subscribe(_ => this.root.calculate());
+        this.visible.subscribe(_ => this.root.calculate('delivery'));
       }
 
 
@@ -413,7 +413,7 @@
         this.workloadUnits = positionData.workloadUnits;
 
         this.workload.subscribe(v => {
-          root.calculate();
+          root.calculate('production');
         });
 
         // доп. нагрузка
@@ -440,7 +440,7 @@
         this.performanceStandartUnits = positionData.performanceStandartUnits;
 
         this.visible = ko.observable(positionData.visible); // Отображается в таблице
-        this.visible.subscribe(_ => this.root.calculate());
+        this.visible.subscribe(_ => this.root.calculate('production'));
 
         this.employees = ko.observableArray(positionData.employees.map((e) => new EmployeeModel(e, this)));
 
@@ -464,7 +464,7 @@
         this.addEmployee = (employee) => {
           employee.visible = true;
           this.employees.push(new EmployeeModel(employee, this));
-          this.root.calculate();
+          this.root.calculate('production');
         };
 
         this.updateEmployees = (updatedList) => {
@@ -565,7 +565,7 @@
         this.workloadUnits = positionData.workloadUnits;
 
         this.workload.subscribe(v => {
-          root.calculate();
+          root.calculate('delivery');
         });
 
         // доп. нагрузка
@@ -678,6 +678,17 @@
 
     const LatenessModel = function (root) {
       this.root = root;
+      this.loaded = ko.observable(false);
+
+      this.activate = () => {
+        setTimeout(() => {
+          this.loaded(true);
+        }, 1000);
+      };
+
+      this.deactivate = () => {
+        this.loaded(false);
+      }
 
       function PositionIntervalModel(params) {
         const lateness = {};
@@ -725,10 +736,14 @@
           this.total[param.id] = ko.observable(0);
         });
 
+        this.paramsCount = this.params.length + 3;
+
         this.intervals = intervals.map(_ => new PositionIntervalModel(this.params));
 
-        this.openLatenessModal = (intervalIndex, latenessDegree) => {
+        this.openLatenessModal = (position, intervalIndex) => {
+          console.log('open', position, intervalIndex)
           this.root.openModal('employee-details-modal', {
+            title: 'заголовок-позиция',
 
           });
         };
@@ -761,7 +776,7 @@
 
       this.total = {
         light: ko.observable(0),
-        medium: ko.observalbe(0),
+        medium: ko.observable(0),
         hard: ko.observable(0),
         total: ko.observable(0)
       };
@@ -793,7 +808,7 @@
         id: 'sushi-master',
         name: 'Повар-сушист',
         params: [
-          { id: 'empoloyeesWithNorm', name: 'Сотр. с норм.' },
+          { id: 'employeesWithNorm', name: 'Сотр. с норм.' },
           { id: 'revenue', name: 'Выручка' }
         ],
       }, this.intervals, root);
@@ -802,7 +817,7 @@
         id: 'pizza-master',
         name: 'Повар-пиццемейкер',
         params: [
-          { id: 'empoloyeesWithNorm', name: 'Сотр. с норм.' },
+          { id: 'employeesWithNorm', name: 'Сотр. с норм.' },
           { id: 'pizzaCount', name: 'Кол-во пицц' }
         ],
       }, this.intervals, root);
@@ -811,7 +826,7 @@
         id: 'hot-shop',
         name: 'Горячий цех',
         params: [
-          { id: 'ordersCount', name: 'Выручка' }
+          { id: 'revenue', name: 'Выручка' }
         ],
       }, this.intervals, root);
 
@@ -833,7 +848,7 @@
       ];
 
       this.filters = {
-        lateness: ko.observable(0),
+        lateness: ko.observable(null),
         positions: ko.observableArray([]),
       };
     }
@@ -1630,6 +1645,13 @@
           }
         }
       })();
+      this.tabs.activeTab.subscribe(v => {
+        if (v == 2) {
+          this.latenessModel.activate();
+        } else {
+          this.latenessModel.deactivate();
+        }
+      })
 
       this.productionPositions = ko.pureComputed(() => {
         return this.summaryModel.positions();
@@ -1842,7 +1864,8 @@
       }
 
       // Перерасчет значений в таблицах
-      this.calculate = () => {
+      this.calculate = (changeSource) => {
+        // changeSource: 'production', 'delivery'
         console.log('recalculate');
 
 
@@ -2057,7 +2080,203 @@
         })();
 
 
+        /** УСТАНОВКА ДАННЫХ ТАБЛИЦЫ ОПОЗДАНИЯ */
+        (() => {
+          const model = this.latenessModel;
 
+          // Оператор
+          (() => {
+            // Оператор (интервалы)
+            const operator = model.operator;
+            operator.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const ordersCount = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.ordersCount(ordersCount);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Оператор (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const ordersCount = operator.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+
+            operator.total.korf(korf);
+            operator.total.workload(workload);
+            operator.total.ordersCount(ordersCount);
+          })();
+
+          // Администратор
+          (() => {
+            // Администратор (интервалы)
+            const administrator = model.administrator;
+            administrator.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const ordersCount = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.ordersCount(ordersCount);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Администратор (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const ordersCount = administrator.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+
+            administrator.total.korf(korf);
+            administrator.total.workload(workload);
+            administrator.total.ordersCount(ordersCount);
+          })();
+
+          // Повар-сушист
+          (() => {
+            // Повар-сушист (интервалы)
+            const sushiMaster = model.sushiMaster;
+            sushiMaster.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const employeesWithNorm = getRandom(0, 10);
+              const revenue = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.employeesWithNorm(employeesWithNorm);
+              intervalModel.revenue(revenue);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Повар-сушист (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const revenue = sushiMaster.intervals.reduce((acc, i) => acc + i.revenue(), 0);
+
+            sushiMaster.total.korf(korf);
+            sushiMaster.total.workload(workload);
+            sushiMaster.total.employeesWithNorm('');
+            sushiMaster.total.revenue(revenue);
+          })();
+
+          // Повар-пиццемейкер
+          (() => {
+            // Повар-пиццемейкер (интервалы)
+            const pizzaMaster = model.pizzaMaster;
+            pizzaMaster.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const employeesWithNorm = getRandom(0, 10);
+              const pizzaCount = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.employeesWithNorm(employeesWithNorm);
+              intervalModel.pizzaCount(pizzaCount);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Повар-пиццемейкер (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const pizzaCount = pizzaMaster.intervals.reduce((acc, i) => acc + i.pizzaCount(), 0);
+
+            pizzaMaster.total.korf(korf);
+            pizzaMaster.total.workload(workload);
+            pizzaMaster.total.employeesWithNorm('');
+            pizzaMaster.total.pizzaCount(pizzaCount);
+          })();
+
+          // Горячий цех
+          (() => {
+            // Горячий цех (интервалы)
+            const hotShop = model.hotShop;
+            hotShop.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const revenue = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.revenue(revenue);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Горячий цех (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const revenue = hotShop.intervals.reduce((acc, i) => acc + i.revenue(), 0);
+
+            hotShop.total.korf(korf);
+            hotShop.total.workload(workload);
+            hotShop.total.revenue(revenue);
+          })();
+
+          // Водитель
+          (() => {
+            // Водитель (интервалы)
+            const driver = model.driver;
+            driver.intervals.forEach((intervalModel, intervalIndex) => {
+              const korf = getRandom(0, 5);
+              const workload = getRandom(0, 10);
+              const employees = getRandom(0, 10);
+              const ordersCount = getRandom(0, 10);
+              const latenessLight = getRandom(0, 3);
+              const latenessMedium = getRandom(0, 3);
+              const latenessHard = getRandom(0, 3);
+
+              intervalModel.korf(korf);
+              intervalModel.workload(workload);
+              intervalModel.employees(employees);
+              intervalModel.ordersCount(ordersCount);
+              intervalModel.lateness.light(latenessLight);
+              intervalModel.lateness.medium(latenessMedium);
+              intervalModel.lateness.hard(latenessHard);
+            });
+            // Водитель (итого)
+            const korf = getRandom(0, 5);
+            const workload = getRandom(0, 10);
+            const ordersCount = driver.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+
+            driver.total.korf(korf);
+            driver.total.workload(workload);
+            driver.total.ordersCount(ordersCount);
+          })();
+
+        })();
 
 
         /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ СВОДНОЙ ТАБЛИЦЫ */

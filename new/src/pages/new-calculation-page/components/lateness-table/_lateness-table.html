@@ -1,0 +1,212 @@
+@@include('./_templates.html')
+
+<div class="lateness-table" data-bind="using: latenessModel">
+    <!-- ko template: {
+      foreach: hrmTemplateIf(loaded(), $data),
+      afterAdd: hrmFadeAfterAddFactory(200)
+    } -->
+
+<div data-bind="component: {
+  name: 'hrm-scrollable-wrapper',
+  params: { options: {left: {disabled: true}} }
+}">
+
+    <table class="lateness-table__positions"
+      data-bind="hrmTable, let: {latenessCellsCount: table.filters.lateness() > 0 ? 1 : 4 }">
+      <thead>
+        <!-- Названия позиций -->
+        <tr>
+          <th class="lateness-table__fixed" rowspan="2">Время</th>
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <th class="lateness-table__position-title" data-bind="attr: {
+            colspan: position.paramsCount + latenessCellsCount
+          }">
+            <div>
+              <!-- ko text: position.name -->
+              <!-- /ko -->
+            </div>
+          </th>
+          <!-- /ko -->
+
+          <th class="lateness-table__position-title" data-bind="attr: {
+            colspan: latenessCellsCount
+          }">Итого</th>
+        </tr>
+        <!-- /Названия позиций -->
+
+        <!-- Параметры позиций -->
+        <tr>
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <th class="lateness-table__position-param" data-bind="attr: {'data-position': position.name}">
+            <div>
+              КОРФ
+            </div>
+          </th>
+
+          <th class="lateness-table__position-param">
+            <div>
+              Нагрузка
+            </div>
+          </th>
+
+          <th class="lateness-table__position-param">
+            <div>
+              Сотр.
+            </div>
+          </th>
+
+          <!-- ko foreach: { data: position.params, as: 'param' } -->
+          <th class="lateness-table__position-param">
+            <div>
+              <!-- ko text: name -->
+              <!-- /ko -->
+            </div>
+          </th>
+          <!-- /ko -->
+
+          <!-- ko template: { name: 'lateness-params-template' } -->
+          <!-- /ko -->
+          <!-- /ko -->
+
+          <!-- Секция ИТОГО, параметры -->
+          <!-- ko template: { name: 'lateness-params-template' } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, параметры -->
+        </tr>
+        <!-- /Параметры позиций -->
+      </thead>
+
+      <tbody>
+        <!-- ko foreach: { data: table.intervals, as: 'interval' } -->
+        <tr>
+          <td class="lateness-table__fixed">
+            <div>
+              <!-- ko text: $parent.getIntervalString(interval) -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+          <!-- ko let: {positionInterval: position.intervals[intervalIndex()]} -->
+
+          <td class="lateness-table__cell">
+            <div>
+
+              <!-- ko text: positionInterval.korf -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval.workload -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval.employees -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <!-- ko foreach: { data: position.params, as: 'param' } -->
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: positionInterval[param.id] -->
+              <!-- /ko -->
+            </div>
+          </td>
+          <!-- /ko -->
+
+          <!-- ko template: {
+            name: 'interval-lateness-template',
+            data: {
+              lateness: positionInterval.lateness,
+              latenessPosition: position,
+              latenessInterval: interval,
+              latenessIntervalIndex: intervalIndex,
+            }
+          } -->
+          <!-- /ko -->
+
+          <!-- /ko -->
+          <!-- /ko -->
+
+
+          <!-- Секция ИТОГО, значения -->
+          <!-- ko template: {
+            name: 'interval-lateness-template',
+            data: {
+              lateness: table.intervalsTotal[intervalIndex()],
+              latenessPosition: null,
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, значения -->
+        </tr>
+        <!-- /ko -->
+      </tbody>
+
+      <tfoot>
+        <tr class="lateness-table__total">
+          <td class="lateness-table__fixed"></td>
+
+          <!-- ko foreach: { data: table.positions, as: 'position' } -->
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.korf -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.workload -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total.employees -->
+              <!-- /ko -->
+            </div>
+          </td>
+
+          <!-- ko foreach: { data: position.params, as: 'param' } -->
+          <td class="lateness-table__cell">
+            <div>
+              <!-- ko text: position.total[param.id] -->
+              <!-- /ko -->
+            </div>
+          </td>
+          <!-- /ko -->
+
+          <!-- ko template: {
+            name: 'lateness-total-template',
+            data: {
+              lateness: position.total.lateness
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /ko -->
+
+          <!-- Секция ИТОГО, итого -->
+          <!-- ko template: {
+            name: 'lateness-total-template',
+            data: {
+              lateness: table.total
+            }
+          } -->
+          <!-- /ko -->
+          <!-- /Секция ИТОГО, итого -->
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+    <!-- /ko -->
+
+  </div>
