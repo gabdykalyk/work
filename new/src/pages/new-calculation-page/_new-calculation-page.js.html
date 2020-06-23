@@ -120,7 +120,6 @@
       }
 
       this.reset = () => {
-        console.log('reset', this._defaultState.positions.employees)
         this.setPositions(this._defaultState.positions);
         this.setDriversData(this._defaultState.drivers);
         this.holidaySurcharge(this._defaultState.holidaySurcharge);
@@ -361,13 +360,13 @@
             id: this.id,
             link: this.link,
             hasProblems: this.hasProblems,
-            upRecommended: this.upRecommended,
-            downRecommended: this.downRecommended,
+            upRecommended: this.upRecommended(),
+            downRecommended: this.downRecommended(),
             premiumAccount: this.premiumAccount(),
             account: this.account(),
             accountOperations: this.accountOperations(),
             level: this.level(),
-            workingIntervals: this.workingIntervals(),
+            workingIntervals: this.workingIntervals().map(i => i.value()),
             compensation: this.compensation(),
             workload: this.workload(),
             workloadUnits: this.workloadUnits,
@@ -511,7 +510,7 @@
             premiumAccount: this.premiumAccount(),
             account: this.account(),
             accountOperations: this.accountOperations(),
-            workingIntervals: this.workingIntervals(),
+            workingIntervals: this.workingIntervals().map(i => i.value()),
             ordersCount: this.ordersCount(),
             ordersValue: this.ordersValue(),
             averageBill: this.averageBill(),
@@ -1148,7 +1147,7 @@
       this.showErrorMessage = ko.observable(false);
 
       this.versions = ko.observableArray([]);
-      this.currentVersion = this.versions[0];
+      this.currentVersion = ko.observable(this.versions[0]);
 
       this.inBookmarks = ko.observable(false);
       this.addToBookmarks = () => {
@@ -3010,7 +3009,6 @@
               this.isNew(false);
               // Обновление данных
               this.summaryModel.save();
-              console.log('save')
               this.showSuccessMessage(true);
               const newVersion = {
                 avatar: '/',
@@ -3020,8 +3018,8 @@
               this.versions.unshift(newVersion);
               this.currentVersion(newVersion);
               setTimeout(() => {
-
                 this.showSuccessMessage(false);
+                this.hasChanges(false);
               }, 3000)
             } else { // Ошибка сохранения
               this.showErrorMessage(true);
@@ -3046,6 +3044,7 @@
         this.blocked(true);
         this.summaryModel.reset();
         this.calculate();
+        this.hasChanges(false);
         this.blocked(false);
       }
     };

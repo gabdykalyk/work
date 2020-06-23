@@ -100,7 +100,7 @@
             <button class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
                     data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'versions-dropdown-template'">
               <!-- ko if: currentVersion -->
-              <!-- ko text: currentVersion.time() -->
+              <!-- ko text: currentVersion().time -->
               <!-- /ko -->
               <!-- /ko -->
             </button>
@@ -2797,7 +2797,7 @@
       return {
         id: employeeData.id,
         name: employeeData.name,
-        checked: ko.observable(employeeData.visible()),
+        checked: ko.observable(!!employeeData.visible()),
         visible: ko.observable(true)
       }
     }
@@ -2991,6 +2991,8 @@
               });
               this.activeTab(0);
             }
+
+            console.log('modal', ko.toJS(this.positions))
 
             this.cancel = function () {
               if ('cancel' in params) {
@@ -6923,7 +6925,7 @@ css: {
 
             <!-- ko template: {
               name: 'employee-row-template',
-              data: { employee: employee, position: position, positionName: false
+              data: { employee: employee, position: position, positionName: false }
             } -->
             <!-- /ko -->
 
@@ -8324,7 +8326,6 @@ css: {
       }
 
       this.reset = () => {
-        console.log('reset', this._defaultState.positions.employees)
         this.setPositions(this._defaultState.positions);
         this.setDriversData(this._defaultState.drivers);
         this.holidaySurcharge(this._defaultState.holidaySurcharge);
@@ -8565,13 +8566,13 @@ css: {
             id: this.id,
             link: this.link,
             hasProblems: this.hasProblems,
-            upRecommended: this.upRecommended,
-            downRecommended: this.downRecommended,
+            upRecommended: this.upRecommended(),
+            downRecommended: this.downRecommended(),
             premiumAccount: this.premiumAccount(),
             account: this.account(),
             accountOperations: this.accountOperations(),
             level: this.level(),
-            workingIntervals: this.workingIntervals(),
+            workingIntervals: this.workingIntervals().map(i => i.value()),
             compensation: this.compensation(),
             workload: this.workload(),
             workloadUnits: this.workloadUnits,
@@ -8715,7 +8716,7 @@ css: {
             premiumAccount: this.premiumAccount(),
             account: this.account(),
             accountOperations: this.accountOperations(),
-            workingIntervals: this.workingIntervals(),
+            workingIntervals: this.workingIntervals().map(i => i.value()),
             ordersCount: this.ordersCount(),
             ordersValue: this.ordersValue(),
             averageBill: this.averageBill(),
@@ -9352,7 +9353,7 @@ css: {
       this.showErrorMessage = ko.observable(false);
 
       this.versions = ko.observableArray([]);
-      this.currentVersion = this.versions[0];
+      this.currentVersion = ko.observable(this.versions[0]);
 
       this.inBookmarks = ko.observable(false);
       this.addToBookmarks = () => {
@@ -11214,7 +11215,6 @@ css: {
               this.isNew(false);
               // Обновление данных
               this.summaryModel.save();
-              console.log('save')
               this.showSuccessMessage(true);
               const newVersion = {
                 avatar: '/',
@@ -11224,8 +11224,8 @@ css: {
               this.versions.unshift(newVersion);
               this.currentVersion(newVersion);
               setTimeout(() => {
-
                 this.showSuccessMessage(false);
+                this.hasChanges(false);
               }, 3000)
             } else { // Ошибка сохранения
               this.showErrorMessage(true);
@@ -11250,6 +11250,7 @@ css: {
         this.blocked(true);
         this.summaryModel.reset();
         this.calculate();
+        this.hasChanges(false);
         this.blocked(false);
       }
     };
