@@ -114,7 +114,6 @@
       }
 
       this.setDriversData = (driversData) => {
-        console.log('drivers', driversData)
         this.driversData(new DeliveryPositionModel(driversData, root));
         this._defaultState.drivers = driversData;
       }
@@ -828,106 +827,6 @@
         return interval[0] + '-' + interval[1];
       }
 
-      function PositionIntervalModel(params) {
-        const lateness = {};
-        this.lateness = {
-          light: ko.observable(lateness.light || 0),
-          medium: ko.observable(lateness.medium || 0),
-          hard: ko.observable(lateness.hard || 0),
-        };
-
-        this.lateness.total = ko.pureComputed(() => {
-          return this.lateness.light() + this.lateness.medium() + this.lateness.hard();
-        });
-
-        this.korf = ko.observable(0);
-        this.workload = ko.observable(0);
-        this.employees = ko.observable(0);
-
-        params.forEach(p => {
-          this[p.id] = ko.observable(0)
-        });
-
-        this.setData = data => {
-          this.korf(data.korf);
-          this.workload(data.workload);
-          this.employees(data.employees);
-
-          params.forEach(p => {
-            this[p.id](data[p.id]);
-          });
-
-          this.lateness.light(data.lateness.light);
-          this.lateness.medium(data.lateness.medium);
-          this.lateness.hard(data.lateness.hard);
-        }
-      }
-
-      function PositionModel(positionData, intervals, root) {
-        this.root = root;
-
-        this.id = positionData.id;
-        this.name = positionData.name;
-
-        this.visible = ko.observable(true);
-
-        this.total = {
-          lateness: {},
-          korf: ko.observable(0),
-          workload: ko.observable(0),
-        };
-
-        this.params = [
-
-        ];
-
-        const params = positionData.params || [];
-        params.forEach(param => {
-          this.params.push(param)
-          this.total[param.id] = ko.observable(0);
-        });
-
-        this.intervals = intervals.map(_ => new PositionIntervalModel(this.params));
-
-        this.paramsCount = this.params.length + 3;
-
-        this.total.lateness.light = ko.pureComputed(() => {
-          return this.intervals.reduce((acc, i) => acc + i.lateness.light(), 0);
-        });
-
-        this.total.lateness.medium = ko.pureComputed(() => {
-          return this.intervals.reduce((acc, i) => acc + i.lateness.medium(), 0);
-        });
-
-        this.total.lateness.hard = ko.pureComputed(() => {
-          return this.intervals.reduce((acc, i) => acc + i.lateness.hard(), 0);
-        });
-
-        this.total.lateness.total = ko.pureComputed(() => {
-          return this.total.lateness.light() + this.total.lateness.medium() + this.total.lateness.hard();
-        });
-
-        this.total.employees = ko.pureComputed(() => {
-          return this.intervals.reduce((acc, i) => acc + i.employees(), 0);
-        });
-
-        this.openLatenessModal = (intervalIndex, latenessDegree) => {
-          const interval = intervals[intervalIndex];
-          this.root.utils.openModal('lateness-details', {
-            interval,
-            position: this,
-            title: `Опоздания - ${this.name} - ${getIntervalString(interval)}`,
-
-          });
-        };
-
-        this.setData = (data) => {
-          data.forEach((interval, index) => {
-            this.intervals[index].setData(interval);
-          });
-        }
-      };
-
       this.intervals = [
         [null, 12],
         [12, 13],
@@ -950,7 +849,7 @@
         id: 'operator',
         name: 'Оператор',
         params: [
-          { id: 'ordersCount', name: 'Кол-во заказов' },
+          { id: 'ordersCount', name: 'Кол-во заказов', sum: true, format: 0 },
         ],
       }, this.intervals, root);
 
@@ -958,7 +857,7 @@
         id: 'administrator',
         name: 'Администратор филиала',
         params: [
-          { id: 'ordersCount', name: 'Кол-во заказов' }
+          { id: 'ordersCount', name: 'Кол-во заказов', sum: true, format: 0 }
         ],
       }, this.intervals, root);
 
@@ -966,8 +865,8 @@
         id: 'sushi-master',
         name: 'Повар-сушист',
         params: [
-          { id: 'employeesWithNorm', name: 'Сотр. с норм.' },
-          { id: 'revenue', name: 'Выручка' }
+          { id: 'employeesWithNorm', name: 'Сотр. с норм.', sum: false, format: 2, noTotal: true },
+          { id: 'revenue', name: 'Выручка', sum: true, format: 0 }
         ],
       }, this.intervals, root);
 
@@ -975,7 +874,7 @@
         id: 'pizza-master',
         name: 'Повар-пиццемейкер',
         params: [
-          { id: 'employeesWithNorm', name: 'Сотр. с норм.' },
+          { id: 'employeesWithNorm', name: 'Сотр. с норм.', sum: false, format: 2 },
           { id: 'pizzaCount', name: 'Кол-во пицц' }
         ],
       }, this.intervals, root);
@@ -984,7 +883,7 @@
         id: 'hot-shop',
         name: 'Горячий цех',
         params: [
-          { id: 'revenue', name: 'Выручка' }
+          { id: 'revenue', name: 'Выручка', sum: true, format: 0 }
         ],
       }, this.intervals, root);
 
@@ -992,7 +891,7 @@
         id: 'driver',
         name: 'Водитель',
         params: [
-          { id: 'ordersCount', name: 'Кол-во заказов' }
+          { id: 'ordersCount', name: 'Кол-во заказов', sum: true, format: 0 }
         ],
       }, this.intervals, root);
 
@@ -1005,8 +904,36 @@
         this.driver
       ];
 
-      this.visiblePositions = ko.pureComputed(() => {
-        return this.positions.filter(p => p.visible());
+      this.total = ko.pureComputed(() => {
+        let positions = this.positions.filter(p => p.visible())
+          .map(position => position.lateness.intervals());
+        let intervals = this.intervals.map((_, intervalIndex) => {
+          return positions.map(p => p[intervalIndex]);
+        });
+        intervals = intervals.map(interval => {
+          return interval.reduce((acc, i) => {
+            return {
+              light: acc.light + i.light,
+              medium: acc.medium + i.medium,
+              hard: acc.hard + i.hard,
+            }
+          }, { light: 0, medium: 0, hard: 0 })
+        });
+        intervals.forEach(i => {
+          i.total = i.light + i.medium + i.hard;
+        });
+        let total = intervals.reduce((acc, i) => {
+          return {
+            light: acc.light + i.light,
+            medium: acc.medium + i.medium,
+            hard: acc.hard + i.hard,
+            total: acc.total + i.total,
+          };
+        }, { light: 0, medium: 0, hard: 0, total: 0 });
+
+        return {
+          intervals, total
+        }
       });
 
       this.filters = {
@@ -1015,55 +942,11 @@
       };
 
       this.filters.positions.subscribe(v => {
-        if (!v.length) {
-          this.positions.forEach(p => p.visible(true));
-          return;
-        }
-
         this.positions.forEach(p => {
-          if (v.includes(p.id)) p.visible(true);
+          if (!v.length) p.visible(true);
+          else if (v.includes(p.id)) p.visible(true);
           else p.visible(false);
         })
-      })
-
-      this.intervalsTotal = this.intervals.map((_, i) => {
-        let positions = this.positions.map(p => p.intervals[i].lateness);
-
-        const light = ko.pureComputed(() => {
-          return positions.reduce((acc, p) => acc + p.light(), 0);
-        });
-        const medium = ko.pureComputed(() => {
-          return positions.reduce((acc, p) => acc + p.medium(), 0);
-        });
-        const hard = ko.pureComputed(() => {
-          return positions.reduce((acc, p) => acc + p.hard(), 0);
-        });
-        const total = ko.pureComputed(() => {
-          return light() + medium() + hard();
-        })
-
-        return {
-          light,
-          medium,
-          hard,
-          total
-        };
-      });
-
-      this.total = {
-        light: ko.pureComputed(() => {
-          return this.intervalsTotal.reduce((acc, i) => acc + i.light(), 0);
-        }),
-        medium: ko.pureComputed(() => {
-          return this.intervalsTotal.reduce((acc, i) => acc + i.medium(), 0);
-        }),
-        hard: ko.pureComputed(() => {
-          return this.intervalsTotal.reduce((acc, i) => acc + i.hard(), 0);
-        }),
-      };
-
-      this.total.total = ko.pureComputed(() => {
-        return this.total.light() + this.total.medium() + this.total.hard();
       });
 
       this.setData = (data) => {
@@ -1078,6 +961,117 @@
       this.isValid = () => {
         return true;
       }
+
+      function PositionModel(positionData, intervals, root) {
+        this.root = root;
+
+        this.id = positionData.id;
+        this.name = positionData.name;
+
+        this.visible = ko.observable(true);
+
+        this.korf = {
+          intervals: ko.observableArray(intervals.map(_ => 0)),
+          total: ko.observable(0)
+        };
+
+        this.workload = {
+          intervals: ko.observableArray(intervals.map(_ => 0)),
+          total: ko.observable(0)
+        };
+
+        this.getWorkloadColor = (intervalIndex) => {
+          if (intervalIndex % 5) return '#FDFFB3';
+          if (intervalIndex % 4) return '#D0F4E3';
+          if (intervalIndex % 3) return '#B8EFD5';
+          if (intervalIndex % 2) return '#FFE6F2';
+          return '#FFD3E8';
+        }
+
+        this.employees = {
+          intervals: ko.observableArray(intervals.map(_ => 0)),
+        };
+        this.employees.total = ko.pureComputed(() => {
+          return this.employees.intervals().reduce((acc, i) => acc + i, 0);
+        });
+
+        this.lateness = {
+          intervals: ko.observableArray(intervals.map(_ => {
+            return {
+              light: 0,
+              medium: 0,
+              hard: 0
+            }
+          })),
+        };
+        this.lateness.intervalsTotal = ko.pureComputed(() => {
+          return this.lateness.intervals().map((i) => {
+            return i.light + i.medium + i.hard;
+          });
+        });
+        this.lateness.total = ko.pureComputed(() => {
+          let result = this.lateness.intervals().reduce((acc, i) => {
+            return {
+              light: acc.light + i.light,
+              medium: acc.medium + i.medium,
+              hard: acc.hard + i.hard,
+            }
+          }, { light: 0, medium: 0, hard: 0 });
+          result.total = result.light + result.medium + result.hard;
+          return result;
+        });
+
+        this.params = [
+
+        ];
+
+        const params = positionData.params || [];
+        params.forEach(param => {
+          const paramModel = {
+            intervals: ko.observableArray(intervals.map(_ => 0)),
+          };
+          if (param.sum) {
+            paramModel.total = ko.pureComputed(() => {
+              return paramModel.intervals().reduce((acc, i) => acc + i, 0);
+            });
+          } else {
+            paramModel.total = ko.observable(param.noTotal ? '' : 0);
+          }
+          this[param.id] = paramModel;
+          this.params.push(param);
+        });
+
+        this.paramsCount = this.params.length + 3;
+
+        this.openLatenessModal = (intervalIndex, latenessDegree) => {
+          const interval = intervals[intervalIndex];
+          this.root.utils.openModal('lateness-details', {
+            interval,
+            position: this,
+            title: `Опоздания - ${this.name} - ${getIntervalString(interval)}`,
+
+          });
+        };
+
+        this.setData = (data) => {
+          this.korf.intervals(data.korf.intervals);
+          this.korf.total(data.korf.total);
+
+          this.workload.intervals(data.workload.intervals);
+          this.workload.total(data.workload.total);
+
+          this.employees.intervals(data.employees.intervals);
+
+          this.params.forEach(param => {
+            this[param.id].intervals(data[param.id].intervals);
+            if (!param.sum) {
+              this[param.id].total(data[param.id].total);
+            }
+          });
+
+          this.lateness.intervals(data.lateness.intervals);
+        }
+      };
     }
 
     const ViewModel = function () {
@@ -1092,6 +1086,21 @@
           $page.removeClass('hrm-page--initializing');
         };
         this.modalOpens = ko.observableArray([]);
+
+        function createModalDialog(id, data, onSave) {
+          return {
+            dialogTemplateName: id + '-modal-template',
+            data: data,
+            options: {
+              modalClass: 'calculation-modal calculation-modal--' + id
+            },
+            close: result => {
+              if (result !== undefined && typeof onSave === 'function') {
+                onSave(result);
+              }
+            }
+          }
+        }
 
         this.utils = {
           openModal: (id, data, onSave) => {
@@ -1895,411 +1904,215 @@
             this.summaryModel.setDriversData(driversData);
 
             // Опоздания
-            const lateness = {
-              operator: [
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-              ],
-              administrator: [
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-              ],
-              sushiMaster: [
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-              ],
-              pizzaMaster: [
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, employeesWithNorm: 10, pizzaCount: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-              ],
-              hotShop: [
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, revenue: 300, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-              ],
-              driver: [
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-                {
-                  korf: 2, workload: 10, employees: 3, ordersCount: 10, lateness: {
-                    light: 1, medium: 2, hard: 3
-                  }
-                },
-              ]
+            const latenessData = {
+              operator: {
+                korf: {
+                  intervals: [0.3, 1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4],
+                  total: 0.0
+                },
+                workload: {
+                  intervals: [300.0, 1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4 ],
+                  total: 300.0
+                },
+                employees: {
+                  intervals: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5,5, 5, 0]
+                },
+                ordersCount: {
+                  intervals: [3, 2, 3, 7, 9, 3, 4, 5, 5, 9, 9, 5, 3 ],
+                },
+                lateness: {
+                  intervals: [
+                    { light: 0, medium: 1, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 1, medium: 0, hard: 1 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 1 },
+                    { light: 1, medium: 2, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                  ]
+                }
+              },
+              administrator: {
+                korf: {
+                  intervals: [1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3],
+                  total: 0.0
+                },
+                workload: {
+                  intervals: [1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0],
+                  total: 300.0
+                },
+                employees: {
+                  intervals: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]
+                },
+                ordersCount: {
+                  intervals: [2, 3, 7, 9, 3, 4, 5, 5, 9, 9, 5, 3, 0],
+                },
+                lateness: {
+                  intervals: [
+                    { light: 0, medium: 1, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 1, medium: 0, hard: 1 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 1 },
+                    { light: 1, medium: 2, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                  ]
+                }
+              },
+              sushiMaster: {
+                korf: {
+                  intervals: [1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3],
+                  total: 0.0
+                },
+                workload: {
+                  intervals: [1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0],
+                  total: 300.0
+                },
+                employees: {
+                  intervals: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]
+                },
+                employeesWithNorm: {
+                  intervals: [3.80, 3.80, 3.80, 3,80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 0.00],
+                },
+                revenue: {
+                  intervals: [5519, 3465, 7714, 10485, 7674, 1295, 3870, 3020, 12637, 8409, 9285, 1140, 0],
+                },
+                lateness: {
+                  intervals: [
+                    { light: 0, medium: 1, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 1, medium: 0, hard: 1 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 1 },
+                    { light: 1, medium: 2, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                  ]
+                }
+              },
+              pizzaMaster: {
+                korf: {
+                  intervals: [1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3],
+                  total: 0.0
+                },
+                workload: {
+                  intervals: [1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0],
+                  total: 300.0
+                },
+                employees: {
+                  intervals: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]
+                },
+                employeesWithNorm: {
+                  intervals: [3.80, 3.80, 3.80, 3,80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 0.00],
+                },
+                pizzaCount: {
+                  intervals: [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+                },
+                lateness: {
+                  intervals: [
+                    { light: 0, medium: 1, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 1, medium: 0, hard: 1 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 1 },
+                    { light: 1, medium: 2, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                  ]
+                }
+              },
+              hotShop: {
+                korf: {
+                  intervals: [1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3],
+                  total: 0.0
+                },
+                workload: {
+                  intervals: [1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0],
+                  total: 300.0
+                },
+                employees: {
+                  intervals: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]
+                },
+                revenue: {
+                  intervals: [5519, 3465, 7714, 10485, 7674, 1295, 3870, 3020, 12637, 8409, 9285, 1140, 0],
+                },
+                lateness: {
+                  intervals: [
+                    { light: 0, medium: 1, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 1, medium: 0, hard: 1 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 1 },
+                    { light: 1, medium: 2, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                  ]
+                }
+              },
+              driver: {
+                korf: {
+                  intervals: [1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3],
+                  total: 0.0
+                },
+                workload: {
+                  intervals: [1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0],
+                  total: 300.0
+                },
+                employees: {
+                  intervals: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]
+                },
+                ordersCount: {
+                  intervals: [2, 3, 7, 9, 3, 4, 5, 5, 9, 9, 5, 3, 0],
+                },
+                lateness: {
+                  intervals: [
+                    { light: 0, medium: 1, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 1, medium: 0, hard: 1 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 2, medium: 1, hard: 0 },
+                    { light: 2, medium: 0, hard: 1 },
+                    { light: 1, medium: 2, hard: 0 },
+                    { light: 1, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                    { light: 0, medium: 0, hard: 0 },
+                  ]
+                }
+              },
+
+
             };
-            this.latenessModel.setData(lateness);
+            this.latenessModel.setData(latenessData);
 
             loadingDelay.then(() => {
               this.isBuilt(true);
@@ -2778,194 +2591,189 @@
 
           // Оператор
           (() => {
-            // Оператор (интервалы)
-            const operator = model.operator;
-            operator.intervals.forEach((intervalModel, intervalIndex) => {
-              const korf = getRandom(0, 5);
-              const workload = getRandom(0, 10);
-              const employees = getRandom(0, 10);
-              const ordersCount = getRandom(0, 10);
-              const latenessLight = getRandom(0, 3);
-              const latenessMedium = getRandom(0, 3);
-              const latenessHard = getRandom(0, 3);
+            const position = model.operator;
+            position.korf.intervals([1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3]);
+            position.korf.total(0.0);
 
-              intervalModel.korf(korf);
-              intervalModel.workload(workload);
-              intervalModel.employees(employees);
-              intervalModel.ordersCount(ordersCount);
-              intervalModel.lateness.light(latenessLight);
-              intervalModel.lateness.medium(latenessMedium);
-              intervalModel.lateness.hard(latenessHard);
-            });
-            // Оператор (итого)
-            const korf = getRandom(0, 5);
-            const workload = getRandom(0, 10);
-            const ordersCount = operator.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+            position.workload.intervals([1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0]);
+            position.workload.total(300.0);
 
-            operator.total.korf(korf);
-            operator.total.workload(workload);
-            operator.total.ordersCount(ordersCount);
+            position.employees.intervals([4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]);
+
+            position.ordersCount.intervals([2, 3, 7, 9, 3, 4, 5, 5, 9, 9, 5, 3, 0]);
+
+            position.lateness.intervals([
+              { light: 0, medium: 1, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 1, medium: 0, hard: 1 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 1 },
+              { light: 1, medium: 2, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+            ]);
           })();
 
           // Администратор
           (() => {
-            // Администратор (интервалы)
-            const administrator = model.administrator;
-            administrator.intervals.forEach((intervalModel, intervalIndex) => {
-              const korf = getRandom(0, 5);
-              const workload = getRandom(0, 10);
-              const employees = getRandom(0, 10);
-              const ordersCount = getRandom(0, 10);
-              const latenessLight = getRandom(0, 3);
-              const latenessMedium = getRandom(0, 3);
-              const latenessHard = getRandom(0, 3);
+            const position = model.administrator;
+            position.korf.intervals([1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3]);
+            position.korf.total(0.0);
 
-              intervalModel.korf(korf);
-              intervalModel.workload(workload);
-              intervalModel.employees(employees);
-              intervalModel.ordersCount(ordersCount);
-              intervalModel.lateness.light(latenessLight);
-              intervalModel.lateness.medium(latenessMedium);
-              intervalModel.lateness.hard(latenessHard);
-            });
-            // Администратор (итого)
-            const korf = getRandom(0, 5);
-            const workload = getRandom(0, 10);
-            const ordersCount = administrator.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+            position.workload.intervals([1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0]);
+            position.workload.total(300.0);
 
-            administrator.total.korf(korf);
-            administrator.total.workload(workload);
-            administrator.total.ordersCount(ordersCount);
+            position.employees.intervals([4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]);
+
+            position.ordersCount.intervals([2, 3, 7, 9, 3, 4, 5, 5, 9, 9, 5, 3, 0]);
+
+            position.lateness.intervals([
+              { light: 0, medium: 1, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 1, medium: 0, hard: 1 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 1 },
+              { light: 1, medium: 2, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+            ]);
           })();
 
           // Повар-сушист
           (() => {
-            // Повар-сушист (интервалы)
-            const sushiMaster = model.sushiMaster;
-            sushiMaster.intervals.forEach((intervalModel, intervalIndex) => {
-              const korf = getRandom(0, 5);
-              const workload = getRandom(0, 10);
-              const employees = getRandom(0, 10);
-              const employeesWithNorm = getRandom(0, 10);
-              const revenue = getRandom(0, 10);
-              const latenessLight = getRandom(0, 3);
-              const latenessMedium = getRandom(0, 3);
-              const latenessHard = getRandom(0, 3);
+            const position = model.sushiMaster;
+            position.korf.intervals([1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3]);
+            position.korf.total(0.0);
 
-              intervalModel.korf(korf);
-              intervalModel.workload(workload);
-              intervalModel.employees(employees);
-              intervalModel.employeesWithNorm(employeesWithNorm);
-              intervalModel.revenue(revenue);
-              intervalModel.lateness.light(latenessLight);
-              intervalModel.lateness.medium(latenessMedium);
-              intervalModel.lateness.hard(latenessHard);
-            });
-            // Повар-сушист (итого)
-            const korf = getRandom(0, 5);
-            const workload = getRandom(0, 10);
-            const revenue = sushiMaster.intervals.reduce((acc, i) => acc + i.revenue(), 0);
+            position.workload.intervals([1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0]);
+            position.workload.total(300.0);
 
-            sushiMaster.total.korf(korf);
-            sushiMaster.total.workload(workload);
-            sushiMaster.total.employeesWithNorm('');
-            sushiMaster.total.revenue(revenue);
+            position.employees.intervals([4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]);
+
+            position.employeesWithNorm.intervals([3.80, 3.80, 3.80, 3,80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 0.00]);
+
+            position.revenue.intervals([5519, 3465, 7714, 10485, 7674, 1295, 3870, 3020, 12637, 8409, 9285, 1140, 0]);
+
+            position.lateness.intervals([
+              { light: 0, medium: 1, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 1, medium: 0, hard: 1 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 1 },
+              { light: 1, medium: 2, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+            ]);
           })();
 
           // Повар-пиццемейкер
           (() => {
             // Повар-пиццемейкер (интервалы)
-            const pizzaMaster = model.pizzaMaster;
-            pizzaMaster.intervals.forEach((intervalModel, intervalIndex) => {
-              const korf = getRandom(0, 5);
-              const workload = getRandom(0, 10);
-              const employees = getRandom(0, 10);
-              const employeesWithNorm = getRandom(0, 10);
-              const pizzaCount = getRandom(0, 10);
-              const latenessLight = getRandom(0, 3);
-              const latenessMedium = getRandom(0, 3);
-              const latenessHard = getRandom(0, 3);
+            const position = model.pizzaMaster;
+            position.korf.intervals([1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3]);
+            position.korf.total(0.0);
 
-              intervalModel.korf(korf);
-              intervalModel.workload(workload);
-              intervalModel.employees(employees);
-              intervalModel.employeesWithNorm(employeesWithNorm);
-              intervalModel.pizzaCount(pizzaCount);
-              intervalModel.lateness.light(latenessLight);
-              intervalModel.lateness.medium(latenessMedium);
-              intervalModel.lateness.hard(latenessHard);
-            });
-            // Повар-пиццемейкер (итого)
-            const korf = getRandom(0, 5);
-            const workload = getRandom(0, 10);
-            const pizzaCount = pizzaMaster.intervals.reduce((acc, i) => acc + i.pizzaCount(), 0);
+            position.workload.intervals([1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0]);
+            position.workload.total(300.0);
 
-            pizzaMaster.total.korf(korf);
-            pizzaMaster.total.workload(workload);
-            pizzaMaster.total.employeesWithNorm('');
-            pizzaMaster.total.pizzaCount(pizzaCount);
+            position.employees.intervals([4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]);
+
+            position.employeesWithNorm.intervals([3.80, 3.80, 3.80, 3,80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 3.80, 0.00]);
+
+            position.pizzaCount.intervals([20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]);
+
+            position.lateness.intervals([
+              { light: 0, medium: 1, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 1, medium: 0, hard: 1 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 1 },
+              { light: 1, medium: 2, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+            ]);
           })();
 
           // Горячий цех
           (() => {
             // Горячий цех (интервалы)
-            const hotShop = model.hotShop;
-            hotShop.intervals.forEach((intervalModel, intervalIndex) => {
-              const korf = getRandom(0, 5);
-              const workload = getRandom(0, 10);
-              const employees = getRandom(0, 10);
-              const revenue = getRandom(0, 10);
-              const latenessLight = getRandom(0, 3);
-              const latenessMedium = getRandom(0, 3);
-              const latenessHard = getRandom(0, 3);
+            const position = model.hotShop;
+            position.korf.intervals([1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3]);
+            position.korf.total(0.0);
 
-              intervalModel.korf(korf);
-              intervalModel.workload(workload);
-              intervalModel.employees(employees);
-              intervalModel.revenue(revenue);
-              intervalModel.lateness.light(latenessLight);
-              intervalModel.lateness.medium(latenessMedium);
-              intervalModel.lateness.hard(latenessHard);
-            });
-            // Горячий цех (итого)
-            const korf = getRandom(0, 5);
-            const workload = getRandom(0, 10);
-            const revenue = hotShop.intervals.reduce((acc, i) => acc + i.revenue(), 0);
+            position.workload.intervals([1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0]);
+            position.workload.total(300.0);
 
-            hotShop.total.korf(korf);
-            hotShop.total.workload(workload);
-            hotShop.total.revenue(revenue);
+            position.employees.intervals([4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]);
+
+            position.revenue.intervals([5519, 3465, 7714, 10485, 7674, 1295, 3870, 3020, 12637, 8409, 9285, 1140, 0]);
+
+            position.lateness.intervals([
+              { light: 0, medium: 1, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 1, medium: 0, hard: 1 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 1 },
+              { light: 1, medium: 2, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+            ]);
           })();
 
           // Водитель
           (() => {
             // Водитель (интервалы)
-            const driver = model.driver;
-            driver.intervals.forEach((intervalModel, intervalIndex) => {
-              const korf = getRandom(0, 5);
-              const workload = getRandom(0, 10);
-              const employees = getRandom(0, 10);
-              const ordersCount = getRandom(0, 10);
-              const latenessLight = getRandom(0, 3);
-              const latenessMedium = getRandom(0, 3);
-              const latenessHard = getRandom(0, 3);
+            const position = model.driver;
+            position.korf.intervals([1.5, 0.1, 2.0, 0.1, 0.1, 0.3, 1.0, 0.8, 0.6, 2.2, 0.4, 0.3]);
+            position.korf.total(0.0);
 
-              intervalModel.korf(korf);
-              intervalModel.workload(workload);
-              intervalModel.employees(employees);
-              intervalModel.ordersCount(ordersCount);
-              intervalModel.lateness.light(latenessLight);
-              intervalModel.lateness.medium(latenessMedium);
-              intervalModel.lateness.hard(latenessHard);
-            });
-            // Водитель (итого)
-            const korf = getRandom(0, 5);
-            const workload = getRandom(0, 10);
-            const ordersCount = driver.intervals.reduce((acc, i) => acc + i.ordersCount(), 0);
+            position.workload.intervals([1452.4, 911.8, 2020.0, 2759.2, 2019.5, 340.8, 1018.4, 794.7, 3325.5, 2212.9, 2443.4, 300.0]);
+            position.workload.total(300.0);
 
-            driver.total.korf(korf);
-            driver.total.workload(workload);
-            driver.total.ordersCount(ordersCount);
+            position.employees.intervals([4, 4, 4, 4, 4, 4, 4, 4, 4, 4,4, 4, 0]);
+
+            position.ordersCount.intervals([2, 3, 7, 9, 3, 4, 5, 5, 9, 9, 5, 3, 0]);
+
+            position.lateness.intervals([
+              { light: 0, medium: 1, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 1, medium: 0, hard: 1 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 2, medium: 1, hard: 0 },
+              { light: 2, medium: 0, hard: 1 },
+              { light: 1, medium: 2, hard: 0 },
+              { light: 1, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+              { light: 0, medium: 0, hard: 0 },
+            ]);
           })();
 
         })();
@@ -2987,13 +2795,10 @@
           totalModel.fotRevenue(fotRevenue);
           totalModel.performanceStandart(performanceStandart);
         })();
-
-
       };
 
       this.getData = () => {
         const positionsData = this.summaryModel.getData();
-        console.log(positionsData);
         return positionsData;
       }
 
@@ -3049,40 +2854,17 @@
       }
     };
 
-
     ViewModel.prototype.dispose = function () {
       $(window).off('resize', this.windowResizeHandler);
       this.subscriptions.forEach(s => s.dispose());
     };
 
-    /***** Model activation *******/
     const viewModel = new ViewModel();
-
-
 
     ko.applyBindings(
       viewModel,
       $page.get()[0]
     );
 
-
-    /*****/
-
-
-    function createModalDialog(id, data, onSave) {
-      return {
-        dialogTemplateName: id + '-modal-template',
-        data: data,
-        options: {
-          modalClass: 'calculation-modal calculation-modal--' + id
-        },
-        close: result => {
-          console.log('close', result)
-          if (result !== undefined && typeof onSave === 'function') {
-            onSave(result);
-          }
-        }
-      }
-    }
   });
 </script>
