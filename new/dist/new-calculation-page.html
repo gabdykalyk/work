@@ -6705,7 +6705,7 @@ css: {
     <div class="positions-table"
          data-bind="let: {table: $data}">
 
-      <div data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}, descendantsComplete: onTableRender">
+      <div data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}">
         <table data-bind="hrmTable"
                class="positions-table__main-table">
 
@@ -7079,27 +7079,8 @@ css: {
             });
           }
 
-          const tableScroll = ko.observable(false);
-
-          const onTableRender = (el) => {
-
-            let scrollWrapper = el.querySelector('.os-content');
-            if (!scrollWrapper) return;
-
-            if (scrollWrapper.offsetWidth < scrollWrapper.scrollWidth) {
-              tableScroll(true);
-            }
-
-            params.utils.viewportSize.subscribe(_ => {
-              tableScroll(scrollWrapper.offsetWidth < scrollWrapper.scrollWidth);
-            });
-          }
-
           return {
             getColumnClicked,
-
-            onTableRender,
-            tableScroll,
 
             viewportSize: params.utils.viewportSize,
             tabName: params.tabName,
@@ -7670,9 +7651,9 @@ css: {
 
     <div class="hrm-table__fixed-section-container positions-table positions-table--delivery"
          data-bind="let: {table: $data}">
-      
+
       <div
-           data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}, descendantsComplete: onTableRender">
+           data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}">
         <table data-bind="hrmTable"
                class="positions-table__main-table">
 
@@ -7923,20 +7904,7 @@ css: {
             employee.visible(false);
           };
 
-          const tableScroll = ko.observable(false);
 
-          const onTableRender = (el) => {
-            let scrollWrapper = el.querySelector('.os-content');
-            if (!scrollWrapper) return;
-
-            if (scrollWrapper.offsetWidth < scrollWrapper.scrollWidth) {
-              tableScroll(true);
-            }
-
-            params.utils.viewportSize.subscribe(_ => {
-              tableScroll(scrollWrapper.offsetWidth < scrollWrapper.scrollWidth);
-            });
-          }
 
           const openDriverModal = (employee) => {
             params.utils.openModal('driver-details', {
@@ -7957,9 +7925,6 @@ css: {
 
           return {
             getColumnClicked,
-
-            onTableRender,
-            tableScroll,
 
             viewportSize: params.utils.viewportSize,
             tabName: params.tabName,
