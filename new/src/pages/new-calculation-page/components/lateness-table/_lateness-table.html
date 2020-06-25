@@ -178,7 +178,11 @@
         <!-- /ko -->
       </tr>
     </thead>
-    <tbody data-bind="let: { total: table.total() }">
+    <tbody data-bind="let: { total: table.total() }" data-bind="descendantsComplete: function() {
+      console.log('descendants1');
+    }, childrenComplete: function() {
+      console.log('children1');
+    }">
       <!-- ko foreach: { data: intervals, as: 'interval' } -->
       <tr data-bind="let: {latenessInterval: total.intervals[intervalIndex()]}">
         <!-- ko if: !latenessDegree() || latenessDegree() == 1 -->
@@ -258,7 +262,12 @@
   params: { options: {left: {disabled: true}} }
 }">
 
-    <table class="lateness-table__positions">
+    <table class="lateness-table__positions"
+    data-bind="descendantsComplete: function() {
+      console.log('descendants');
+    }, childrenComplete: function() {
+      console.log('children');
+    }">
 
       <tbody>
         <tr>

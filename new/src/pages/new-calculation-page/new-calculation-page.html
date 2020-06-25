@@ -96,21 +96,19 @@
             </button>
             <!-- /ko -->
 
-            <!-- ko if: inBookmarks -->
-            <button class="hrm-button hrm-circle-icon-button hrm-circle-bookmark-icon-button active"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Удалить раздел из избранного', click: removeFromBookmarks">
-            </button>
-            <!-- /ko -->
-
-            <!-- ko ifnot: inBookmarks -->
             <button class="hrm-button hrm-circle-icon-button hrm-circle-bookmark-icon-button"
-                    data-bind="hrmTooltip, hrmTooltipText: 'Добавить в избранное', click: addToBookmarks">
+              data-bind="hrmTooltip,
+              hrmTooltipText: inBookmarks()
+                ? 'Удалить раздел из избранного'
+                : 'Добавить в избранное',
+              click: function() {
+                if (inBookmarks()) removeFromBookmarks();
+                else addToBookmarks();
+              },
+              css: {
+                'active': inBookmarks
+              }">
             </button>
-            <!-- /ko -->
-
-
-
-
             <!-- /ko -->
 
             <a href="#"
@@ -207,12 +205,12 @@
 
             <div class="calculation-form__actions">
               <button class="hrm-button hrm-button--size_large hrm-basic-button calculation-form__action"
-                      data-bind="click: reset">
+                      data-bind="click: reset, disable: blockResetButton">
                 Отменить
               </button>
 
               <button class="hrm-button hrm-button--size_large hrm-basic-button hrm-accent-button calculation-form__action"
-                      data-bind="click: $root.submit.bind($root, null)">
+                      data-bind="click: $root.submit.bind($root, null), disable: blockSaveButton">
                 Сохранить
 
                 <!-- ko template: {
@@ -239,7 +237,7 @@
               </button>
 
               <button class="hrm-button hrm-button--size_large hrm-basic-button hrm-accent-button calculation-form__action"
-                      data-bind="click: $root.submit.bind($root, true)">
+                      data-bind="click: $root.submit.bind($root, true), disable: blockSaveButton">
                 Сохранить c ошибкой
 
                 <!-- ko template: {
@@ -270,11 +268,8 @@
   <script id="versions-dropdown-template"
           type="text/html">
         <!-- ko foreach: $root.versions -->
-  <div class="hrm-dropdown-menu__item"
-       data-bind="click: function() {
-          $root.activeVersion($data);
-        }">
-    <div class="version-preview">
+  <div class="hrm-dropdown-menu__item">
+    <a class="version-preview" data-bind="attr: {href: $data.link}">
       <div class="version-preview__userpic">
         <img data-bind="attr: {src: $data.avatar}"
              alt="">
@@ -285,7 +280,7 @@
         <div class="version-preview__time"
              data-bind="text: $data.time"></div>
       </div>
-    </div>
+    </a>
   </div>
   <!-- /ko -->
   </script>
@@ -293,38 +288,38 @@
   <script id="actions-dropdown-template"
           type="text/html">
 
-        <div class="hrm-dropdown-menu__item" data-bind="click: toExcel">
-          <div class="action-preview">
+        <div class="hrm-dropdown-menu__item">
+          <a class="action-preview" href="#">
             <svg width="14" height="14">
               <use href="#excel-icon"></use>
             </svg>
-            Выгрузить в excel
-          </div>
+            Выгрузить в Excel
+          </a>
         </div>
-        <div class="hrm-dropdown-menu__item" data-bind="toPrint">
-          <div class="action-preview">
+        <div class="hrm-dropdown-menu__item">
+          <a class="action-preview" href="#">
             <svg width="14" height="14">
               <use href="#print-icon"></use>
             </svg>
             Распечатать
-          </div>
+          </a>
         </div>
-        <div class="hrm-dropdown-menu__item" data-bind="toPhoto">
-          <div class="action-preview">
+        <div class="hrm-dropdown-menu__item">
+          <a class="action-preview" href="#">
             <svg width="14" height="14">
               <use href="#picture-icon"></use>
             </svg>
             Для фото
-          </div>
+          </a>
 
         </div>
-        <div class="hrm-dropdown-menu__item" data-bind="newCalculation">
-          <div class="action-preview">
+        <div class="hrm-dropdown-menu__item">
+          <a class="action-preview" href="#">
             <svg width="14" height="16">
               <use href="#calculation-icon"></use>
             </svg>
             Новый расчет
-          </div>
+          </a>
         </div>
   </script>
 
