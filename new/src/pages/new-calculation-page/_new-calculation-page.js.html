@@ -84,6 +84,33 @@
         avatar: '/assets/examples/avatar.jpg',
       }
     ],
+    compensations: [
+      {
+        id: 1,
+        name: 'Смена 6 или менее часов',
+        sum: 100
+      },
+      {
+        id: 2,
+        name: 'Отпустили в связи с производственной необходимостью',
+        sum: 100
+      },
+      {
+        id: 3,
+        name: 'Сотрудник отпросился',
+        sum: 0
+      },
+      {
+        id: 4,
+        name: 'Замена сотрудника',
+        sum: 0
+      },
+      {
+        id: 5,
+        name: 'Вызвали с выходного дня',
+        sum: 100
+      }
+    ]
   };
 
   $(function () {
@@ -139,7 +166,6 @@
         this._defaultState = this.getData();
         console.log('after save', this._defaultState.positions.employees)
       };
-
 
 
       this.productionTotal = {
@@ -208,6 +234,10 @@
       })
 
       this.isValid = () => {
+        if (this.positions().some(p => !p.isValid())) {
+          return false;
+        }
+
         return true;
       };
 
@@ -218,7 +248,7 @@
           },
           validation: {
             validator: value => {
-
+              console.log('value', value);
               if (!/^\d\d:\d\d – \d\d:\d\d$/.test(value)) {
                 return false;
               } else {
@@ -271,6 +301,33 @@
         this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
         this.downRecommended = ko.observable(employee.downRecommended);  // рекомендуется понижение
 
+        // компенсация
+        this.isCompensationEditable = ko.observable(false);
+        this.compensation = ko.observable(employee.compensation || '').extend({
+          required: {
+            message: () => 'Обязательное поле',
+            onlyIf: () => {
+              return this.isCompensationEditable();
+            }
+          }
+        });
+        this.compensation.subscribe(_ => this.root.calculate('production'));
+
+        this.checkCompensation = () => {
+          console.log('check', this.position.minDurationWithoutCompensation)
+          if (this.workingTime() < this.position.minDurationWithoutCompensation * 60) {
+            this.isCompensationEditable(true);
+          } else {
+            this.isCompensationEditable(false);
+          }
+        };
+        this.editCompensation = () => {
+          this.root.utils.openModal("compensations", {
+            employee: this,
+            compensations: window.directories.compensations
+          });
+        };
+
         // рабочее время
         const defaultIntervals = employee.workingIntervals || ['11:00 – 23:00'];
         this.workingIntervals = ko.observableArray(
@@ -286,6 +343,9 @@
             return minutes + interval.getInterval();
           }, 0);
         });
+
+        this.checkCompensation();
+
         this.addWorkingInterval = () => {
           const model = WorkingIntervalModel('');
           this.workingIntervals.push(model);
@@ -294,7 +354,11 @@
           this.workingIntervals.remove(interval);
         };
 
-        this.workingTime.subscribe(_ => this.root.calculate('production'));
+        this.workingTime.subscribe(v => {
+          this.checkCompensation();
+
+          this.root.calculate('production');
+        });
 
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
@@ -330,9 +394,6 @@
 
         this.bonuses.subscribe(_ => this.root.calculate('production'));
 
-        // компенсация
-        this.compensation = ko.observable(employee.compensation || '');
-
         this.workload = ko.observable(employee.workload || '');
         this.workloadUnits = this.position.workloadUnits;
 
@@ -350,20 +411,6 @@
         this.depremation = ko.observable(employee.depremation || '');
 
         this.correctedTime = ko.observable(employee.correctedTime || this.position.correctedTime);
-
-        // опоздания
-        this.lateness = {
-          light: ko.observable(0),
-          medium: ko.observable(0),
-          hard: ko.observable(0),
-          total: ko.observable(0),
-        };
-        if (employee.lateness) {
-          this.lateness.light(employee.lateness.light);
-          this.lateness.medium(employee.lateness.medium);
-          this.lateness.hard(employee.lateness.hard);
-          this.lateness.total(employee.lateness.light + employee.lateness.medium + employee.lateness.hard);
-        }
 
         this.total = ko.observable(employee.total || 0);
         this.toPayment = ko.observable(employee.toPayment || 0);
@@ -403,14 +450,21 @@
             correctedTime: this.correctedTime(),
             total: this.total(),
             toPayment: this.toPayment(),
-            lateness: {
-              light: this.lateness.light(),
-              medium: this.lateness.medium(),
-              hard: this.lateness.hard()
-            },
             visible: this.visible() ? 1 : 0
           }
         };
+
+        this.validationObject = ko.validatedObservable({
+          compensation: this.compensation,
+
+        }, { live: true })
+        this.isValid = () => {
+          if(!this.validationObject.isValid()) return false;
+          if (this.workingIntervals().some(i => !i.value.isValid())) {
+            console.log('w i not valid')
+            return false;
+          }
+        }
       }
 
       function DriverEmployeeModel(employee, positionModel) {
@@ -500,19 +554,6 @@
 
         this.bonuses.subscribe(_ => this.root.calculate('delivery'));
 
-        // опоздания
-        this.lateness = {
-          light: ko.observable(0),
-          medium: ko.observable(0),
-          hard: ko.observable(0),
-          total: ko.observable(0),
-        };
-        if (employee.lateness) {
-          this.lateness.light(employee.lateness.light);
-          this.lateness.medium(employee.lateness.medium);
-          this.lateness.hard(employee.lateness.hard);
-          this.lateness.total(employee.lateness.light + employee.lateness.medium + employee.lateness.hard);
-        }
 
         this.total = ko.observable(employee.total || 0);
         this.toPayment = ko.observable(employee.toPayment || 0);
@@ -548,11 +589,6 @@
             fines: this.fines(),
             total: this.total(),
             toPayment: this.toPayment(),
-            lateness: {
-              light: this.lateness.light(),
-              medium: this.lateness.medium(),
-              hard: this.lateness.hard()
-            },
             visible: this.visible() ? 1 : 0
           }
         }
@@ -600,6 +636,8 @@
         this.performanceStandart = ko.observable(positionData.performanceStandart);
         this.performanceStandartType = positionData.performanceStandartType;
         this.performanceStandartUnits = positionData.performanceStandartUnits;
+
+        this.minDurationWithoutCompensation = positionData.minDurationWithoutCompensation;
 
         this.visible = ko.observable(positionData.visible); // Отображается в таблице
         this.visible.subscribe(_ => this.root.calculate('production'));
@@ -689,6 +727,7 @@
             performanceStandartType: this.performanceStandartType,
             salary: this.salary,
             salaryBulk: this.salaryBulk,
+            lateness: this.lateness(),
             revenueStandart: this.revenueStandart,
             revenueStandartPerHour: this.revenueStandartPerHour,
             revenueStandartUnits: this.revenueStandartUnits,
@@ -696,6 +735,12 @@
             visible: this.visible() ? 1 : 0,
           };
         };
+
+        this.isValid = () => {
+          let invalidEmployee = this.visibleEmployees().find(e => !e.isValid());
+          if (invalidEmployee) return false;
+          return true;
+        }
       }
 
       function DeliveryPositionModel(positionData, root) {
@@ -744,6 +789,8 @@
         this.additionalWorkloadType = positionData.additionalWorkloadType;
         this.additionalWorkload = ko.observable(positionData.additionalWorkload);
         this.additionalWorkloadUnits = positionData.additionalWorkloadUnits;
+
+        this.minDurationWithoutCompensation = positionData.minDurationWithoutCompensation;
 
         // ФОТ, % в категории
         this.fotCategory = ko.observable(positionData.fotCategory);
@@ -1246,12 +1293,7 @@
                       depremation: 0,                         // депр.
                       correctedTime: '0',                  // корр. время
                       total: 7300,                            // всего
-                      toPayment: 7300,                        // к выплате
-                      lateness: {                             // опоздания сотрудника
-                        light: 1,                             // меньше 5 минут
-                        medium: 2,                            // 5-10 минут
-                        hard: 3                               // больше 10 минут
-                      },
+                      toPayment: 7300,
                       visible: false,
                     },
                     {
@@ -1283,14 +1325,10 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 2,
-                        medium: 1,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -1347,11 +1385,6 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     },
                     {
@@ -1383,14 +1416,10 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -1447,11 +1476,6 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     },
                     {
@@ -1483,14 +1507,10 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -1547,11 +1567,6 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     },
                     {
@@ -1583,14 +1598,11 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -1642,11 +1654,6 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     },
                     {
@@ -1678,14 +1685,10 @@
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+                  minDurationWithoutCompensation: 3,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -1713,6 +1716,7 @@
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  minDurationWithoutCompensation: 3,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -1740,6 +1744,7 @@
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  minDurationWithoutCompensation: 3,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -1767,6 +1772,7 @@
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  minDurationWithoutCompensation: 3,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -1794,6 +1800,7 @@
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -1844,6 +1851,7 @@
                 revenueStandart: 30,                        // Норматив выручки
                 revenueStandartPerHour: 0,
                 revenueStandartUnits: 2,
+                minDurationWithoutCompensation: 3,
                 lateness: {
                   light: 0,
                   medium: 0,
@@ -2533,7 +2541,6 @@
           visibleEmployees.forEach(employee => {
             const account = getRandom(0, 2000);
             const premiumAccount = getRandom(0, 2000);
-            const compensation = getRandom(0, 2000);
             const workload = getRandom(0, 2000);
             const salary = getRandom(0, 2000);
             const salaryBulk = getRandom(0, 2000);
@@ -2551,7 +2558,6 @@
 
             employee.account(account);
             employee.premiumAccount(premiumAccount);
-            employee.compensation(compensation);
             employee.workload(workload);
             employee.salary(salary);
             employee.salaryBulk(salaryBulk);
@@ -2576,13 +2582,11 @@
             hard: getRandom(0, 5),
           };
 
-
           position.fotCategory(fotCategory);
           position.fotRevenue(fotRevenue);
           position.performanceStandart(performanceStandart);
           position.lateness(lateness);
         });
-
 
 
         /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ПРОИЗВОДСТВО) */
@@ -2841,6 +2845,14 @@
       this.blockSaveButton = ko.observable(false);
       this.blockResetButton = ko.observable(false);
 
+      this.formControlErrorStateMatcher = (formControl) => {
+        return ko.pureComputed(() => {
+          if (!this.isSubmitted()) return null;
+          if (formControl.isValid()) return null;
+          return { message: formControl.error() };
+        });
+      }
+
       this.submit = (testError) => {
         this.isSubmitted(true);
 
@@ -2852,6 +2864,7 @@
           setTimeout(() => {
             // Данные сохранены
             if (!testError) {
+              this.isSubmitted(false);
               this.isNew(false);
               // Обновление данных
               this.summaryModel.save();

@@ -212,11 +212,31 @@ css: {
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('compensation') -->
+    <!-- ko if: employee.isCompensationEditable -->
+    <!-- ko let: { editableCell: ko.observable(null) } -->
+    <td class="positions-table__cell positions-table__cell--compensation"  data-bind="hrmTableEditableCell: editableCell,
+    hrmTableEditableCellError: $root.formControlErrorStateMatcher(employee.compensation),
+    click: function(_, e) {
+      e.stopPropagation();
+      editableCell().hideError();
+      employee.editCompensation();
+    },
+    css: {
+      'positions-table__cell--clicked': table.getColumnClicked('compensation'),
+    }" align="right">
+      <div class="positions-table__cell-content" data-bind="text: employee.compensation() ? employee.compensation().sum : 0"></div>
+    </td>
+    <!-- /ko -->
+    <!-- /ko -->
+
+
+    <!-- ko ifnot: employee.isCompensationEditable -->
     <td class="positions-table__cell positions-table__cell--compensation"  data-bind="css: {
       'positions-table__cell--clicked': table.getColumnClicked('compensation'),
     }" align="right">
-      <div class="positions-table__cell-content" data-bind="text: employee.compensation"></div>
+      <div class="positions-table__cell-content">0</div>
     </td>
+  <!-- /ko -->
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('workload') -->

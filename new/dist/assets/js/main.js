@@ -3092,6 +3092,10 @@ ko.bindingHandlers.hrmTable = {
         }
       };
 
+      this.hideError = () => {
+        this._errorTippyInstance.hide();
+      };
+
       this._errorTippyInstance = tippy(this.element, {
         arrow: false,
         distance: 7,

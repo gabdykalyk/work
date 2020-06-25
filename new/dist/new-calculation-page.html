@@ -723,6 +723,20 @@
 </script>
 
 <script type="text/html"
+        id="compensations-modal-template">
+
+  <div data-bind="component: {
+      name: 'compensations-modal-dialog',
+      params: {
+        data, modalElement,
+        cancel: function () { close(); },
+        submit: function ($data) {close($data);}
+      }}" role="document">
+  </div>
+
+</script>
+
+<script type="text/html"
         id="create-employee-modal-template">
 
   <div data-bind="component: {
@@ -3376,6 +3390,170 @@
   });
 </script>
 
+
+  <script type="text/javascript">
+  $(function () {
+
+    ko.components.register('compensations-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'modal-dialog--compensations'
+          ]);
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.compensations = params.data.compensations;
+            this.employee = params.data.employee;
+
+            let currentCompensation = null;
+
+            this.compensationId = ko.observable('').extend({
+              required: {
+                message: 'Обязательное поле'
+              }
+            });
+            this.sum = ko.observable(0);
+
+            this.compensationId.subscribe(v => {
+              currentCompensation = this.compensations.find(c => c.id == this.compensationId());
+              if (currentCompensation) this.sum(currentCompensation.sum);
+              else this.sum(0);
+            })
+            if (this.employee.compensation()) {
+              currentCompensation = this.employee.compensation();
+              this.compensationId(this.employee.compensation().id);
+            }
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if (currentCompensation) {
+                this.employee.compensation(currentCompensation);
+                if ('submit' in params) {
+                  params.submit();
+                }
+              }
+
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('compensations-modal-dialog-template')
+      }
+    });
+  });
+</script>
+
+<template id="compensations-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Создать сотрудника
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body compensation-form">
+
+    <div class="compensation-form__row">
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="compensation-form__id"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Компенсация
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: compensationId,
+              options: $component.compensations,
+              optionsText: 'name',
+              optionsValue: 'id',
+              valueAllowUnset: true,
+              hrmSelect,
+              hrmSelectPlaceholder: 'Компенсация',
+              hrmSelectSearchEnabled: true,
+              hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+          </select>
+        </div>
+
+        <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+          <!-- ko text: $parent.compensationId.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+
+
+
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="compensation-form__sum"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">Сумма, ₽</label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input data-bind="
+              value: sum,
+              hrmFormFieldInputControl: control
+          " readonly>
+        </div>
+
+
+      </div>
+      <!-- /ko -->
+
+    </div>
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>
 
   <template id="routes-modal-dialog-template">
   <!-- ko template: { afterRender: afterRender } -->
@@ -6334,11 +6512,31 @@ css: {
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('compensation') -->
+    <!-- ko if: employee.isCompensationEditable -->
+    <!-- ko let: { editableCell: ko.observable(null) } -->
+    <td class="positions-table__cell positions-table__cell--compensation"  data-bind="hrmTableEditableCell: editableCell,
+    hrmTableEditableCellError: $root.formControlErrorStateMatcher(employee.compensation),
+    click: function(_, e) {
+      e.stopPropagation();
+      editableCell().hideError();
+      employee.editCompensation();
+    },
+    css: {
+      'positions-table__cell--clicked': table.getColumnClicked('compensation'),
+    }" align="right">
+      <div class="positions-table__cell-content" data-bind="text: employee.compensation() ? employee.compensation().sum : 0"></div>
+    </td>
+    <!-- /ko -->
+    <!-- /ko -->
+
+
+    <!-- ko ifnot: employee.isCompensationEditable -->
     <td class="positions-table__cell positions-table__cell--compensation"  data-bind="css: {
       'positions-table__cell--clicked': table.getColumnClicked('compensation'),
     }" align="right">
-      <div class="positions-table__cell-content" data-bind="text: employee.compensation"></div>
+      <div class="positions-table__cell-content">0</div>
     </td>
+  <!-- /ko -->
   <!-- /ko -->
 
   <!-- ko if: table.isColumnVisible('workload') -->
@@ -8032,6 +8230,33 @@ css: {
         avatar: '/assets/examples/avatar.jpg',
       }
     ],
+    compensations: [
+      {
+        id: 1,
+        name: 'Смена 6 или менее часов',
+        sum: 100
+      },
+      {
+        id: 2,
+        name: 'Отпустили в связи с производственной необходимостью',
+        sum: 100
+      },
+      {
+        id: 3,
+        name: 'Сотрудник отпросился',
+        sum: 0
+      },
+      {
+        id: 4,
+        name: 'Замена сотрудника',
+        sum: 0
+      },
+      {
+        id: 5,
+        name: 'Вызвали с выходного дня',
+        sum: 100
+      }
+    ]
   };
 
   $(function () {
@@ -8087,7 +8312,6 @@ css: {
         this._defaultState = this.getData();
         console.log('after save', this._defaultState.positions.employees)
       };
-
 
 
       this.productionTotal = {
@@ -8156,6 +8380,10 @@ css: {
       })
 
       this.isValid = () => {
+        if (this.positions().some(p => !p.isValid())) {
+          return false;
+        }
+
         return true;
       };
 
@@ -8166,7 +8394,7 @@ css: {
           },
           validation: {
             validator: value => {
-
+              console.log('value', value);
               if (!/^\d\d:\d\d – \d\d:\d\d$/.test(value)) {
                 return false;
               } else {
@@ -8219,6 +8447,33 @@ css: {
         this.upRecommended = ko.observable(employee.upRecommended);      // рекомендуется повышение
         this.downRecommended = ko.observable(employee.downRecommended);  // рекомендуется понижение
 
+        // компенсация
+        this.isCompensationEditable = ko.observable(false);
+        this.compensation = ko.observable(employee.compensation || '').extend({
+          required: {
+            message: () => 'Обязательное поле',
+            onlyIf: () => {
+              return this.isCompensationEditable();
+            }
+          }
+        });
+        this.compensation.subscribe(_ => this.root.calculate('production'));
+
+        this.checkCompensation = () => {
+          console.log('check', this.position.minDurationWithoutCompensation)
+          if (this.workingTime() < this.position.minDurationWithoutCompensation * 60) {
+            this.isCompensationEditable(true);
+          } else {
+            this.isCompensationEditable(false);
+          }
+        };
+        this.editCompensation = () => {
+          this.root.utils.openModal("compensations", {
+            employee: this,
+            compensations: window.directories.compensations
+          });
+        };
+
         // рабочее время
         const defaultIntervals = employee.workingIntervals || ['11:00 – 23:00'];
         this.workingIntervals = ko.observableArray(
@@ -8234,6 +8489,9 @@ css: {
             return minutes + interval.getInterval();
           }, 0);
         });
+
+        this.checkCompensation();
+
         this.addWorkingInterval = () => {
           const model = WorkingIntervalModel('');
           this.workingIntervals.push(model);
@@ -8242,7 +8500,11 @@ css: {
           this.workingIntervals.remove(interval);
         };
 
-        this.workingTime.subscribe(_ => this.root.calculate('production'));
+        this.workingTime.subscribe(v => {
+          this.checkCompensation();
+
+          this.root.calculate('production');
+        });
 
         this.account = ko.observable(employee.account || 0);             // личный счет
         this.premiumAccount = ko.observable(employee.account || 0);      // премиальный счет
@@ -8278,9 +8540,6 @@ css: {
 
         this.bonuses.subscribe(_ => this.root.calculate('production'));
 
-        // компенсация
-        this.compensation = ko.observable(employee.compensation || '');
-
         this.workload = ko.observable(employee.workload || '');
         this.workloadUnits = this.position.workloadUnits;
 
@@ -8298,20 +8557,6 @@ css: {
         this.depremation = ko.observable(employee.depremation || '');
 
         this.correctedTime = ko.observable(employee.correctedTime || this.position.correctedTime);
-
-        // опоздания
-        this.lateness = {
-          light: ko.observable(0),
-          medium: ko.observable(0),
-          hard: ko.observable(0),
-          total: ko.observable(0),
-        };
-        if (employee.lateness) {
-          this.lateness.light(employee.lateness.light);
-          this.lateness.medium(employee.lateness.medium);
-          this.lateness.hard(employee.lateness.hard);
-          this.lateness.total(employee.lateness.light + employee.lateness.medium + employee.lateness.hard);
-        }
 
         this.total = ko.observable(employee.total || 0);
         this.toPayment = ko.observable(employee.toPayment || 0);
@@ -8351,14 +8596,21 @@ css: {
             correctedTime: this.correctedTime(),
             total: this.total(),
             toPayment: this.toPayment(),
-            lateness: {
-              light: this.lateness.light(),
-              medium: this.lateness.medium(),
-              hard: this.lateness.hard()
-            },
             visible: this.visible() ? 1 : 0
           }
         };
+
+        this.validationObject = ko.validatedObservable({
+          compensation: this.compensation,
+
+        }, { live: true })
+        this.isValid = () => {
+          if(!this.validationObject.isValid()) return false;
+          if (this.workingIntervals().some(i => !i.value.isValid())) {
+            console.log('w i not valid')
+            return false;
+          }
+        }
       }
 
       function DriverEmployeeModel(employee, positionModel) {
@@ -8448,19 +8700,6 @@ css: {
 
         this.bonuses.subscribe(_ => this.root.calculate('delivery'));
 
-        // опоздания
-        this.lateness = {
-          light: ko.observable(0),
-          medium: ko.observable(0),
-          hard: ko.observable(0),
-          total: ko.observable(0),
-        };
-        if (employee.lateness) {
-          this.lateness.light(employee.lateness.light);
-          this.lateness.medium(employee.lateness.medium);
-          this.lateness.hard(employee.lateness.hard);
-          this.lateness.total(employee.lateness.light + employee.lateness.medium + employee.lateness.hard);
-        }
 
         this.total = ko.observable(employee.total || 0);
         this.toPayment = ko.observable(employee.toPayment || 0);
@@ -8496,11 +8735,6 @@ css: {
             fines: this.fines(),
             total: this.total(),
             toPayment: this.toPayment(),
-            lateness: {
-              light: this.lateness.light(),
-              medium: this.lateness.medium(),
-              hard: this.lateness.hard()
-            },
             visible: this.visible() ? 1 : 0
           }
         }
@@ -8548,6 +8782,8 @@ css: {
         this.performanceStandart = ko.observable(positionData.performanceStandart);
         this.performanceStandartType = positionData.performanceStandartType;
         this.performanceStandartUnits = positionData.performanceStandartUnits;
+
+        this.minDurationWithoutCompensation = positionData.minDurationWithoutCompensation;
 
         this.visible = ko.observable(positionData.visible); // Отображается в таблице
         this.visible.subscribe(_ => this.root.calculate('production'));
@@ -8637,6 +8873,7 @@ css: {
             performanceStandartType: this.performanceStandartType,
             salary: this.salary,
             salaryBulk: this.salaryBulk,
+            lateness: this.lateness(),
             revenueStandart: this.revenueStandart,
             revenueStandartPerHour: this.revenueStandartPerHour,
             revenueStandartUnits: this.revenueStandartUnits,
@@ -8644,6 +8881,12 @@ css: {
             visible: this.visible() ? 1 : 0,
           };
         };
+
+        this.isValid = () => {
+          let invalidEmployee = this.visibleEmployees().find(e => !e.isValid());
+          if (invalidEmployee) return false;
+          return true;
+        }
       }
 
       function DeliveryPositionModel(positionData, root) {
@@ -8692,6 +8935,8 @@ css: {
         this.additionalWorkloadType = positionData.additionalWorkloadType;
         this.additionalWorkload = ko.observable(positionData.additionalWorkload);
         this.additionalWorkloadUnits = positionData.additionalWorkloadUnits;
+
+        this.minDurationWithoutCompensation = positionData.minDurationWithoutCompensation;
 
         // ФОТ, % в категории
         this.fotCategory = ko.observable(positionData.fotCategory);
@@ -9194,12 +9439,7 @@ css: {
                       depremation: 0,                         // депр.
                       correctedTime: '0',                  // корр. время
                       total: 7300,                            // всего
-                      toPayment: 7300,                        // к выплате
-                      lateness: {                             // опоздания сотрудника
-                        light: 1,                             // меньше 5 минут
-                        medium: 2,                            // 5-10 минут
-                        hard: 3                               // больше 10 минут
-                      },
+                      toPayment: 7300,
                       visible: false,
                     },
                     {
@@ -9231,14 +9471,10 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 2,
-                        medium: 1,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -9295,11 +9531,6 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     },
                     {
@@ -9331,14 +9562,10 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -9395,11 +9622,6 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     },
                     {
@@ -9431,14 +9653,10 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -9495,11 +9713,6 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     },
                     {
@@ -9531,14 +9744,11 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -9590,11 +9800,6 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     },
                     {
@@ -9626,14 +9831,10 @@ css: {
                       correctedTime: '0',
                       total: 7300,
                       toPayment: 7300,
-                      lateness: {
-                        light: 0,
-                        medium: 0,
-                        hard: 0
-                      },
                       visible: false,
                     }
                   ],
+                  minDurationWithoutCompensation: 3,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -9661,6 +9862,7 @@ css: {
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  minDurationWithoutCompensation: 3,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -9688,6 +9890,7 @@ css: {
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  minDurationWithoutCompensation: 3,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -9715,6 +9918,7 @@ css: {
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  minDurationWithoutCompensation: 3,
                   lateness: {
                     light: 0,
                     medium: 0,
@@ -9742,6 +9946,7 @@ css: {
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  minDurationWithoutCompensation: 3,
                   visible: 0,
                 },
                 {
@@ -9792,6 +9997,7 @@ css: {
                 revenueStandart: 30,                        // Норматив выручки
                 revenueStandartPerHour: 0,
                 revenueStandartUnits: 2,
+                minDurationWithoutCompensation: 3,
                 lateness: {
                   light: 0,
                   medium: 0,
@@ -10481,7 +10687,6 @@ css: {
           visibleEmployees.forEach(employee => {
             const account = getRandom(0, 2000);
             const premiumAccount = getRandom(0, 2000);
-            const compensation = getRandom(0, 2000);
             const workload = getRandom(0, 2000);
             const salary = getRandom(0, 2000);
             const salaryBulk = getRandom(0, 2000);
@@ -10499,7 +10704,6 @@ css: {
 
             employee.account(account);
             employee.premiumAccount(premiumAccount);
-            employee.compensation(compensation);
             employee.workload(workload);
             employee.salary(salary);
             employee.salaryBulk(salaryBulk);
@@ -10524,13 +10728,11 @@ css: {
             hard: getRandom(0, 5),
           };
 
-
           position.fotCategory(fotCategory);
           position.fotRevenue(fotRevenue);
           position.performanceStandart(performanceStandart);
           position.lateness(lateness);
         });
-
 
 
         /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ПРОИЗВОДСТВО) */
@@ -10789,6 +10991,14 @@ css: {
       this.blockSaveButton = ko.observable(false);
       this.blockResetButton = ko.observable(false);
 
+      this.formControlErrorStateMatcher = (formControl) => {
+        return ko.pureComputed(() => {
+          if (!this.isSubmitted()) return null;
+          if (formControl.isValid()) return null;
+          return { message: formControl.error() };
+        });
+      }
+
       this.submit = (testError) => {
         this.isSubmitted(true);
 
@@ -10800,6 +11010,7 @@ css: {
           setTimeout(() => {
             // Данные сохранены
             if (!testError) {
+              this.isSubmitted(false);
               this.isNew(false);
               // Обновление данных
               this.summaryModel.save();
