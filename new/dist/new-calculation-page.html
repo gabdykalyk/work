@@ -2567,11 +2567,13 @@
           <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
 
               <!-- ko foreach: {data: $parent.position.employees, as: 'employee'} -->
+              <!-- ko if: employee.visible -->
               <div class="employees-form__checkbox">
 
                     <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
                     <!-- /ko -->
               </div>
+              <!-- /ko -->
               <!-- /ko -->
 
 
@@ -2599,11 +2601,13 @@
               data-bind="text: position.name"></div>
 
         <!-- ko foreach: {data: position.employees, as: 'employee'} -->
+        <!-- ko if: employee.visible -->
         <div class="employees-form__checkbox">
 
               <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
               <!-- /ko -->
         </div>
+        <!-- /ko -->
         <!-- /ko -->
 
       </div>
@@ -2854,7 +2858,6 @@
             });
           } else {
             const positionsList = this.positions.map(p => p.name)
-            console.log('Сделать запрос, категории', positionsList);
             // Добавить новых работников в каждую категию
             updatedEmployees = this.positions.forEach(p => {
               p.loaded(true);
@@ -2908,6 +2911,7 @@
 
             this.term = ko.observable('');
             const termUpdateHandler = (value) => {
+              console.log('upate', value)
               const formattedValue = value.toLowerCase();
               this.positions.forEach(p => {
                 let hasVisibleEmployees = 0;
