@@ -6702,128 +6702,8 @@ css: {
       </div><!-- .calculation-tab__settings-group -->
     </div><!-- .calculation-tab__settings -->
 
-    <div class="hrm-table__fixed-section-container positions-table"
+    <div class="positions-table"
          data-bind="let: {table: $data}">
-      <!-- Fixed section -->
-      <!-- ko if: tableScroll -->
-      <table data-bind="hrmTable"
-             class="hrm-table__fixed-section hrm-table__fixed-section--position_left positions-table__fixed-section">
-        <thead>
-          <tr class="positions-table__row positions-table__head-row">
-            <th class="positions-table__cell positions-table__head-cell">
-              <div class="positions-table__cell-content">Сотрудник</div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- ko foreach: { data: table.positions, as: 'position' } -->
-
-          <!-- Блок позиции -->
-          <!-- ko if: position.visible -->
-          <!-- Заголовок позиции -->
-          <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
-            <td class="positions-table__cell positions-table__position-title">
-              <div class="positions-table__cell-content">
-                <div data-bind="template: {name: 'position-header-template', data: position}"></div>
-              </div>
-            </td>
-          </tr>
-          <!-- /Заголовок позиции -->
-
-          <!-- Список сотрудников по позиции -->
-          <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
-
-
-          <tr class="positions-table__row"
-          data-bind="click: function() {
-            employee.clicked(!employee.clicked());
-          },
-          css: {
-            'positions-table__row--clicked': employee.clicked,
-          }">
-            <td class="positions-table__cell">
-              <div class="positions-table__cell-content"
-                   data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
-
-                <!-- Данные сотрудника -->
-                <div
-                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: false} }">
-                </div>
-                <!-- /Данные сотрудника -->
-
-              </div>
-
-            </td>
-          </tr>
-
-
-          <!-- /ko -->
-          <!-- /Список сотрудников по позиции -->
-          <!-- /ko -->
-          <!-- /Блок позиции -->
-
-          <!-- /ko -->
-
-          <!-- Блок Прочее -->
-          <!-- ko if: table.hasOtherSection -->
-          <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
-            <td class="positions-table__cell positions-table__position-title">
-              <div class="positions-table__cell-content">
-
-                <div data-bind="template: {name: 'position-header-template', data: {name: 'Прочее'}}"></div>
-
-              </div>
-            </td>
-          </tr>
-
-          <!-- Список сотрудников по остальным позициям -->
-          <!-- ko foreach: { data: table.positions, as: 'position' } -->
-          <!-- ko ifnot: position.visible -->
-          <!-- ko foreach: { data: position.visibleEmployees, as: 'employee', beforeRemove: hrmFadeBeforeRemoveFactory(500) } -->
-
-
-          <tr class="positions-table__row"
-          data-bind="click: function() {
-            employee.clicked(!employee.clicked());
-          },
-          css: {
-            'positions-table__row--clicked': employee.clicked,
-          }">
-            <td class="positions-table__cell">
-              <div class="positions-table__cell-content"
-                   data-bind="style: {minHeight: employee.workingIntervals().length * 40 - 10}">
-
-                <!-- Данные сотрудника -->
-                <div
-                     data-bind="template: { name: 'employee-block-template', data: {employee: employee, positionName: position.name} }">
-                </div>
-                <!-- /Данные сотрудника -->
-
-              </div>
-            </td>
-          </tr>
-
-
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- /Список сотрудников по остальным позициям -->
-          <!-- /ko -->
-          <!-- /Блок Прочее -->
-
-
-          <!-- Total section -->
-          <tr class="positions-table__row positions-table__row--highlighted positions-table__total">
-            <td class="positions-table__cell">
-              <div class="positions-table__cell-content"></div>
-            </td>
-          </tr>
-          <!-- /Total section -->
-        </tbody>
-      </table>
-      <!-- /ko -->
-      <!-- /Fixed section -->
-
 
       <div data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}, descendantsComplete: onTableRender">
         <table data-bind="hrmTable"
@@ -6869,15 +6749,15 @@ css: {
             <!-- Название позиции -->
             <!-- ko if: position.visible -->
             <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
-              <td class="positions-table__cell positions-table__position-title"
-                  data-bind="attr: {colspan: $parent.columnCount}">
+              <td class="positions-table__cell positions-table__position-title">
 
                 <div class="positions-table__cell-content">
-                   <!-- ko ifnot: table.tableScroll -->
+
                   <div data-bind="template: {name: 'position-header-template', data: position}"></div>
-                  <!-- /ko -->
+
                 </div>
               </td>
+              <td data-bind="attr: {colspan: $parent.columnCount() - 1}"></td>
             </tr>
             <!-- /Название позиции -->
 
@@ -6900,12 +6780,12 @@ css: {
             <!-- Блок Прочие -->
             <!-- ko if: table.hasOtherSection -->
             <tr class="positions-table__row positions-table__row--highlighted positions-table__section-header">
-              <td class="positions-table__cell  positions-table__position-title"
-                  data-bind="attr: {colspan: columnCount}">
+              <td class="positions-table__cell  positions-table__position-title">
                 <div class="positions-table__cell-content">
                   <div data-bind="template: {name: 'position-header-template', data: {name: 'Прочие'}}"></div>
                 </div>
               </td>
+              <td data-bind="attr: {colspan: columnCount() - 1}"></td>
             </tr>
 
             <!-- ko foreach: { data: table.positions, as: 'position' } -->

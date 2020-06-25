@@ -1,18 +1,34 @@
 @calculation-colored-cell-color: #e1edff;
 
 .calculation-page {
-
   .positions-table {
     margin-top: 20px;
-
+    position: relative;
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 10px;
+      left: 0px;
+      width: 1px;
+      background-color: #DFE4EF;
+      z-index:10;
+    }
     td {
       &.highlighted-success {
-        background-color:  #D0F4E3!important;
+        background-color: #d0f4e3 !important;
       }
       &.highlighted-danger {
-        background-color: #FFD3E8!important;
+        background-color: #ffd3e8 !important;
       }
       cursor: default;
+    }
+
+    .os-host-overflow-x {
+      .positions-table__cell--name {
+        box-shadow: 4px 0px 5px -2px rgba(0, 21, 80, 0.3);
+      }
+
     }
 
     &__row {
@@ -23,7 +39,6 @@
           &:not(.positions-table__cell--colored) {
             background: rgba(255, 230, 242, 0.5);
           }
-
 
           &:after {
             content: '';
@@ -51,80 +66,80 @@
     &__row--clicked + .positions-table__row--clicked {
       td {
         &:after {
-          border-top-color: #DFE4EF;
+          border-top-color: #dfe4ef;
         }
       }
     }
 
     &__cell {
       &--clicked {
+        position: relative;
 
-          position: relative;
+        &:not(.positions-table__cell--colored) {
+          background: rgba(255, 230, 242, 0.5);
+        }
 
-          &:not(.positions-table__cell--colored) {
-            background: rgba(255, 230, 242, 0.5);
-          }
-
-          &:before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            bottom: -1px;
-            left: -1px;
-            right: -1px;
-            border-left: 1px solid #ff238d;
-            border-right: 1px solid #ff238d;
-          }
-
-
+        &:before {
+          content: '';
+          position: absolute;
+          top: -1px;
+          bottom: -1px;
+          left: -1px;
+          right: -1px;
+          border-left: 1px solid #ff238d;
+          border-right: 1px solid #ff238d;
+        }
       }
     }
 
+    &__cell--name {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 10;
+
+      &:before {
+        content: '';
+        position: absolute;
+        top: -1px;
+        bottom: -1px;
+        left: -1px;
+        right: -1px;
+        border: 1px solid #DFE4EF;
+        pointer-events: none;
+      }
+
+
+    }
+
     &__cell--clicked.positions-table__head-cell {
-      border-top: 1px solid #ff238d!important;
+      border-top: 1px solid #ff238d !important;
     }
 
     .positions-table__total {
       .positions-table__cell--clicked {
-        border-bottom: 1px solid #ff238d!important;
+        border-bottom: 1px solid #ff238d !important;
       }
     }
-
 
     &__cell--clicked + .positions-table__cell--clicked {
-        &:before {
-          border-left-color: #DFE4EF;
-        }
-    }
-
-
-
-
-    &__fixed-section {
-      width: 180px;
-      box-shadow: none;
-      background-color: transparent;
-      border: none;
-
-      th,
-      td {
-        border-right: none!important;
-        .positions-table__cell-content {
-          width: 160px;
-        }
-      }
-
-      tr:not(.positions-table__row--highlighted) {
-        background: white;
-        box-shadow: 4px 0 5px -2px rgba(0, 21, 80, 0.3);
+      &:before {
+        border-left-color: #dfe4ef;
       }
     }
-
-    
 
     &__row {
       &--highlighted {
         background-color: @light-grey-color;
+
+        .positions-table__cell--name {
+          background-color: @light-grey-color;
+          border-right-color: transparent;
+
+          &:before {
+            border-right-color: transparent;
+          }
+        }
       }
     }
 
@@ -153,9 +168,21 @@
       font-size: 13px;
       color: #000000;
       white-space: nowrap;
+      position: sticky;
+      left: 0;
+      border-right: none;
+      z-index: 12;
+      background: #f5f7fa;
 
       .positions-table__cell-content {
         white-space: nowrap;
+      }
+
+      & + td {
+        border-left: none;
+        background: #f5f7fa;
+        position: relative;
+        z-index:11;
       }
     }
 
@@ -209,7 +236,7 @@
         min-width: 100px;
       }
 
-      &[align="right"] {
+      &[align='right'] {
         .positions-table__cell-content {
           justify-content: flex-end;
         }
@@ -234,7 +261,7 @@
         justify-content: flex-start;
       }
       &__position {
-        color: #8E9CBB;
+        color: #8e9cbb;
         font-size: 13px;
       }
     }
@@ -266,7 +293,6 @@
       }
 
       &__actions {
-
         display: flex;
         justify-content: space-between;
       }
@@ -305,8 +331,6 @@
   .calculation-page {
     .positions-table {
       margin-right: -30px;
-
-
 
       &__main-table {
         .positions-table {
