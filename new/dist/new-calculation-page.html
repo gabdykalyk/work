@@ -5358,8 +5358,8 @@
     <td class="calculation-summary__cell calculation-summary__cell--lateness"  data-bind="css: {
       'calculation-summary__cell--column-clicked': table.getColumnClicked('lateness'),
     }">
-      <div class="calculation-summary__cell-content">
-        <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness} } -->
+      <div class="calculation-summary__cell-content" data-bind="hrmLog">
+        <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness(), total: position.totalLateness} } -->
         <!-- /ko -->
       </div>
     </td>
@@ -5473,7 +5473,7 @@
       'calculation-summary__cell--column-clicked': table.getColumnClicked('lateness'),
     }">
       <div class="calculation-summary__cell-content">
-        <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness} } -->
+        <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness(), total: position.totalLateness } } -->
         <!-- /ko -->
       </div>
     </td>
@@ -5558,7 +5558,7 @@
       'calculation-summary__cell--column-clicked': table.getColumnClicked('lateness'),
     }">
       <div class="calculation-summary__cell-content">
-        <!-- ko template: { name: 'lateness-template', data: {lateness: total.lateness} } -->
+        <!-- ko template: { name: 'lateness-template', data: {lateness: total.lateness(), total: total.lateness().total} } -->
         <!-- /ko -->
       </div>
     </td>
@@ -5588,7 +5588,7 @@
       'background-color': lateness.hard > 0 ? '#FFD3E8' : 'transparent',
     }"></div>
     <div class="lateness__cell lateness__cell--total"
-    data-bind="text: lateness.total || '0'"></div>
+    data-bind="text: total || '0'"></div>
   </div>
 </script>
 
@@ -6037,7 +6037,7 @@
                     'calculation-summary__cell--clicked': $data.clicked,
                     'calculation-summary__cell--clicked-bottom': $data.clicked,
                   }, click: function() { $data.clicked(!$data.clicked()); }">
-                <!-- ko template: { name: 'lateness-template', data: {lateness: lateness} } -->
+                <!-- ko template: { name: 'lateness-template', data: {lateness: lateness(), total: totalLateness} } -->
                 <!-- /ko -->
               </td>
 
@@ -6048,13 +6048,13 @@
                     'calculation-summary__cell--clicked': table.driversData.clicked,
                     'calculation-summary__cell--clicked-bottom': table.driversData.clicked,
                   }">
-                <!-- ko template: { name: 'lateness-template', data: {lateness: table.driversData.lateness} } -->
+                <!-- ko template: { name: 'lateness-template', data: {lateness: table.driversData.lateness(), total: table.driversData.totalLateness} } -->
                 <!-- /ko -->
               </td>
 
               <td class="calculation-summary__cell calculation-summary__cell--lateness   calculation-summary__cell--total">
                 <div class="calculation-summary__cell-content">
-                  <!-- ko template: { name: 'lateness-template', data: {lateness: table.total.lateness} } -->
+                  <!-- ko template: { name: 'lateness-template', data: {lateness: table.total.lateness(), total: table.total.lateness().total} } -->
                   <!-- /ko -->
                 </div>
               </td>
@@ -8229,14 +8229,30 @@ css: {
         fotCategory: ko.observable(100),
         fotRevenue: ko.observable(100),
         performanceStandart: ko.observable(-100),
-        lateness: {
-          light: ko.observable(0),
-          medium: ko.observable(0),
-          hard: ko.observable(0),
-          total: ko.observable(0),
-        },
         employees: ko.observable(0)
       };
+
+      this.total.lateness = ko.pureComputed(() => {
+        let result = {
+          light: 0,
+          medium: 0,
+          hard: 0,
+        }
+        root.activePositions().forEach(p => {
+          let lateness = p.lateness();
+          result.light += lateness.light;
+          result.medium += lateness.medium;
+          result.hard += lateness.hard;
+        });
+
+        let driversDataLateness = this.driversData().lateness();
+        result.light += driversDataLateness.light;
+        result.medium += driversDataLateness.medium;
+        result.hard += driversDataLateness.hard;
+
+        result.total = result.light + result.medium + result.hard;
+        return result;
+      })
 
       this.isValid = () => {
         return true;
@@ -8688,26 +8704,11 @@ css: {
           this.employees(updated.concat(newEmployees));
         }
 
-        this.lateness = ko.pureComputed(() => {
-          const result = {
-            light: 0,
-            medium: 0,
-            hard: 0,
-            total: 0,
-          };
-          this.employees().forEach(employee => {
-            const employeeLateness = employee.lateness;
-            result.light += employeeLateness.light() || 0;
-            result.medium += employeeLateness.medium() || 0;
-            result.hard += employeeLateness.hard() || 0;
-            result.total += result.light + result.medium + result.hard;
-          });
-
-          return result;
-        });
+        this.lateness = ko.observable(positionData.lateness);
 
         this.totalLateness = ko.pureComputed(() => {
-          return lateness.total;
+          let lateness= this.lateness();
+          return (lateness.light + lateness.medium + lateness.hard) || 0;
         });
 
         this.toggleClicked = () => {
@@ -8809,26 +8810,11 @@ css: {
         this.performanceStandartType = positionData.performanceStandartType;
         this.performanceStandartUnits = positionData.performanceStandartUnits;
 
-        this.lateness = ko.pureComputed(() => {
-          const result = {
-            light: 0,
-            medium: 0,
-            hard: 0,
-            total: 0,
-          };
-          this.employees().forEach(employee => {
-            const employeeLateness = employee.lateness;
-            result.light += employeeLateness.light() || 0;
-            result.medium += employeeLateness.medium() || 0;
-            result.hard += employeeLateness.hard() || 0;
-            result.total += result.light + result.medium + result.hard;
-          });
-
-          return result;
-        });
+        this.lateness = ko.observable(positionData.lateness);
 
         this.totalLateness = ko.pureComputed(() => {
-          return lateness.total;
+          let lateness = this.lateness();
+          return (lateness.light + lateness.medium + lateness.hard) || 0;
         });
 
         this.getData = () => {
@@ -9273,6 +9259,11 @@ css: {
                   revenueStandart: 30,                       // Норматив выручки
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   employees: [                               // сотрудники
                     {
                       name: 'Администратор #1 Up',            // имя сотрудника
@@ -9304,9 +9295,9 @@ css: {
                       total: 7300,                            // всего
                       toPayment: 7300,                        // к выплате
                       lateness: {                             // опоздания сотрудника
-                        light: 0,                             // меньше 5 минут
-                        medium: 0,                            // 5-10 минут
-                        hard: 0                               // больше 10 минут
+                        light: 1,                             // меньше 5 минут
+                        medium: 2,                            // 5-10 минут
+                        hard: 3                               // больше 10 минут
                       },
                       visible: false,
                     },
@@ -9340,8 +9331,8 @@ css: {
                       total: 7300,
                       toPayment: 7300,
                       lateness: {
-                        light: 0,
-                        medium: 0,
+                        light: 2,
+                        medium: 1,
                         hard: 0
                       },
                       visible: false,
@@ -9368,6 +9359,11 @@ css: {
                   revenueStandart: 30,
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   employees: [
                     {
                       name: 'Повар-сушист #1 problems',
@@ -9463,6 +9459,11 @@ css: {
                   revenueStandart: 30,
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   employees: [
                     {
                       name: 'Повар-пиццмейкер #1 problems + down',
@@ -9558,6 +9559,11 @@ css: {
                   revenueStandart: 30,
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   employees: [
                     {
                       name: 'Официант #1',
@@ -9727,6 +9733,11 @@ css: {
                       visible: false,
                     }
                   ],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   visible: 0,
                 },
                 {
@@ -9749,6 +9760,11 @@ css: {
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   visible: 0,
                 },
                 {
@@ -9771,6 +9787,11 @@ css: {
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   visible: 0,
                 },
                 {
@@ -9793,6 +9814,11 @@ css: {
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   visible: 0,
                 },
                 {
@@ -9865,6 +9891,11 @@ css: {
                 revenueStandart: 30,                        // Норматив выручки
                 revenueStandartPerHour: 0,
                 revenueStandartUnits: 2,
+                lateness: {
+                  light: 0,
+                  medium: 0,
+                  hard: 0
+                },
                 employees: [                                // сотрудники
                   {
                     name: 'Водитель #1',                    // имя сотрудника
@@ -10469,10 +10500,16 @@ css: {
           const fotCategory = getRandom(0, 80);
           const fotRevenue = getRandom(0, 80);
           const performanceStandart = getRandom(-80, 0);
+          const lateness = {
+            light: getRandom(0, 5),
+            medium: getRandom(0, 5),
+            hard: getRandom(0, 5),
+          };
 
           driversPosition.fotCategory(fotCategory);
           driversPosition.fotRevenue(fotRevenue);
           driversPosition.performanceStandart(performanceStandart);
+          driversPosition.lateness(lateness);
         })();
 
         /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ВОДИТЕЛИ) */
@@ -10579,10 +10616,17 @@ css: {
           const fotCategory = getRandom(0, 80);
           const fotRevenue = getRandom(0, 80);
           const performanceStandart = getRandom(-80, 0);
+          const lateness = {
+            light: getRandom(0, 5),
+            medium: getRandom(0, 5),
+            hard: getRandom(0, 5),
+          };
+
 
           position.fotCategory(fotCategory);
           position.fotRevenue(fotRevenue);
           position.performanceStandart(performanceStandart);
+          position.lateness(lateness);
         });
 
 

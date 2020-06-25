@@ -182,14 +182,30 @@
         fotCategory: ko.observable(100),
         fotRevenue: ko.observable(100),
         performanceStandart: ko.observable(-100),
-        lateness: {
-          light: ko.observable(0),
-          medium: ko.observable(0),
-          hard: ko.observable(0),
-          total: ko.observable(0),
-        },
         employees: ko.observable(0)
       };
+
+      this.total.lateness = ko.pureComputed(() => {
+        let result = {
+          light: 0,
+          medium: 0,
+          hard: 0,
+        }
+        root.activePositions().forEach(p => {
+          let lateness = p.lateness();
+          result.light += lateness.light;
+          result.medium += lateness.medium;
+          result.hard += lateness.hard;
+        });
+
+        let driversDataLateness = this.driversData().lateness();
+        result.light += driversDataLateness.light;
+        result.medium += driversDataLateness.medium;
+        result.hard += driversDataLateness.hard;
+
+        result.total = result.light + result.medium + result.hard;
+        return result;
+      })
 
       this.isValid = () => {
         return true;
@@ -641,26 +657,11 @@
           this.employees(updated.concat(newEmployees));
         }
 
-        this.lateness = ko.pureComputed(() => {
-          const result = {
-            light: 0,
-            medium: 0,
-            hard: 0,
-            total: 0,
-          };
-          this.employees().forEach(employee => {
-            const employeeLateness = employee.lateness;
-            result.light += employeeLateness.light() || 0;
-            result.medium += employeeLateness.medium() || 0;
-            result.hard += employeeLateness.hard() || 0;
-            result.total += result.light + result.medium + result.hard;
-          });
-
-          return result;
-        });
+        this.lateness = ko.observable(positionData.lateness);
 
         this.totalLateness = ko.pureComputed(() => {
-          return lateness.total;
+          let lateness= this.lateness();
+          return (lateness.light + lateness.medium + lateness.hard) || 0;
         });
 
         this.toggleClicked = () => {
@@ -762,26 +763,11 @@
         this.performanceStandartType = positionData.performanceStandartType;
         this.performanceStandartUnits = positionData.performanceStandartUnits;
 
-        this.lateness = ko.pureComputed(() => {
-          const result = {
-            light: 0,
-            medium: 0,
-            hard: 0,
-            total: 0,
-          };
-          this.employees().forEach(employee => {
-            const employeeLateness = employee.lateness;
-            result.light += employeeLateness.light() || 0;
-            result.medium += employeeLateness.medium() || 0;
-            result.hard += employeeLateness.hard() || 0;
-            result.total += result.light + result.medium + result.hard;
-          });
-
-          return result;
-        });
+        this.lateness = ko.observable(positionData.lateness);
 
         this.totalLateness = ko.pureComputed(() => {
-          return lateness.total;
+          let lateness = this.lateness();
+          return (lateness.light + lateness.medium + lateness.hard) || 0;
         });
 
         this.getData = () => {
@@ -1226,6 +1212,11 @@
                   revenueStandart: 30,                       // Норматив выручки
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   employees: [                               // сотрудники
                     {
                       name: 'Администратор #1 Up',            // имя сотрудника
@@ -1257,9 +1248,9 @@
                       total: 7300,                            // всего
                       toPayment: 7300,                        // к выплате
                       lateness: {                             // опоздания сотрудника
-                        light: 0,                             // меньше 5 минут
-                        medium: 0,                            // 5-10 минут
-                        hard: 0                               // больше 10 минут
+                        light: 1,                             // меньше 5 минут
+                        medium: 2,                            // 5-10 минут
+                        hard: 3                               // больше 10 минут
                       },
                       visible: false,
                     },
@@ -1293,8 +1284,8 @@
                       total: 7300,
                       toPayment: 7300,
                       lateness: {
-                        light: 0,
-                        medium: 0,
+                        light: 2,
+                        medium: 1,
                         hard: 0
                       },
                       visible: false,
@@ -1321,6 +1312,11 @@
                   revenueStandart: 30,
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   employees: [
                     {
                       name: 'Повар-сушист #1 problems',
@@ -1416,6 +1412,11 @@
                   revenueStandart: 30,
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   employees: [
                     {
                       name: 'Повар-пиццмейкер #1 problems + down',
@@ -1511,6 +1512,11 @@
                   revenueStandart: 30,
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   employees: [
                     {
                       name: 'Официант #1',
@@ -1680,6 +1686,11 @@
                       visible: false,
                     }
                   ],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   visible: 0,
                 },
                 {
@@ -1702,6 +1713,11 @@
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   visible: 0,
                 },
                 {
@@ -1724,6 +1740,11 @@
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   visible: 0,
                 },
                 {
@@ -1746,6 +1767,11 @@
                   revenueStandartPerHour: 0,
                   revenueStandartUnits: 2,
                   employees: [],
+                  lateness: {
+                    light: 0,
+                    medium: 0,
+                    hard: 0
+                  },
                   visible: 0,
                 },
                 {
@@ -1818,6 +1844,11 @@
                 revenueStandart: 30,                        // Норматив выручки
                 revenueStandartPerHour: 0,
                 revenueStandartUnits: 2,
+                lateness: {
+                  light: 0,
+                  medium: 0,
+                  hard: 0
+                },
                 employees: [                                // сотрудники
                   {
                     name: 'Водитель #1',                    // имя сотрудника
@@ -2422,10 +2453,16 @@
           const fotCategory = getRandom(0, 80);
           const fotRevenue = getRandom(0, 80);
           const performanceStandart = getRandom(-80, 0);
+          const lateness = {
+            light: getRandom(0, 5),
+            medium: getRandom(0, 5),
+            hard: getRandom(0, 5),
+          };
 
           driversPosition.fotCategory(fotCategory);
           driversPosition.fotRevenue(fotRevenue);
           driversPosition.performanceStandart(performanceStandart);
+          driversPosition.lateness(lateness);
         })();
 
         /** УСТАНОВКА ИТОГОВЫХ ДАННЫХ ТАБЛИЦЫ ДОЛЖНОСТЕЙ (ВОДИТЕЛИ) */
@@ -2532,10 +2569,17 @@
           const fotCategory = getRandom(0, 80);
           const fotRevenue = getRandom(0, 80);
           const performanceStandart = getRandom(-80, 0);
+          const lateness = {
+            light: getRandom(0, 5),
+            medium: getRandom(0, 5),
+            hard: getRandom(0, 5),
+          };
+
 
           position.fotCategory(fotCategory);
           position.fotRevenue(fotRevenue);
           position.performanceStandart(performanceStandart);
+          position.lateness(lateness);
         });
 
 
