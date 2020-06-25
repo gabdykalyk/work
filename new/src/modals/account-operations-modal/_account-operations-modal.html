@@ -41,7 +41,7 @@
               textInput: sum,
               hrmMask, hrmMaskPattern: 'decimal',
               hrmFormFieldInputControl: control,
-              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+              hrmFormFieldInputControlErrorStateMatcher: $parent.formControlErrorStateMatcher.bind($parent)
           ">
         </div>
 
@@ -79,14 +79,14 @@
 
 
     <div class="account-operation__remove">
-      <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko if: $parent.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
-              data-bind="click: $component.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'"></button>
+              data-bind="click: $parent.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'"></button>
       <!-- /ko -->
 
-      <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko ifnot: $parent.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
-              data-bind="click: $component.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'">Удалить</button>
+              data-bind="click: $parent.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'">Удалить</button>
       <!-- /ko -->
 
 
@@ -109,10 +109,13 @@
   <div class="hrm-basic-modal-dialog__body account-operations-form">
 
     <div class="modal-dialog__scroll">
-      <div class="account-operations-form__list" data-bind="hrmScrollable">
+      <div class="account-operations-form__list" data-bind="component: {
+        name: 'hrm-scrollable-wrapper',
+        params: { options: {} }
+      }">
         <!-- ko template: {
           name: 'account-operation-template',
-          foreach: $component.operations,
+          foreach: operations,
           afterAdd: hrmFadeAfterAddFactory(200),
           beforeRemove: hrmFadeBeforeRemoveFactory(200)
         } -->

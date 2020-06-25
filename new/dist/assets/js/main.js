@@ -2462,9 +2462,19 @@ ko.components.register('hrm-modal-container', {
       this._subscriptions.push(ko.bindingEvent.subscribe(this.element, 'childrenComplete', () => {
         this._$contentElement = $(this._contentElement());
 
-        this._$contentElement.overlayScrollbars({});
-
-        this._$contentElement.on('scroll', this._contentScrollHandler.bind(this));
+        this._$contentElement.overlayScrollbars({
+          scrollbars: {
+            clickScrolling: true
+          },
+          nativeScrollbarsOverlaid: {
+            initialize: true
+          },
+          callbacks: {
+            onScroll: () => {
+              this._contentScrollHandler();
+            }
+          }
+        });
 
         this.check();
       }));
@@ -2473,13 +2483,18 @@ ko.components.register('hrm-modal-container', {
     }
 
     check() {
-      this._scrolledHorizontalStart(this._$contentElement.scrollLeft() === 0);
+      let container = this._$contentElement.find('.os-viewport').get(0);
 
-      this._scrolledHorizontalEnd(this._$contentElement.outerWidth() + this._$contentElement.scrollLeft() + 5 >= this._$contentElement.prop('scrollWidth'));
+      let scrollLeft = container.scrollLeft;
+      let scrollTop = container.scrollTop;
 
-      this._scrolledVerticalStart(this._$contentElement.scrollTop() === 0);
+      this._scrolledHorizontalStart(scrollLeft === 0);
 
-      this._scrolledVerticalEnd(this._$contentElement.outerHeight() + this._$contentElement.scrollTop() + 5 >= this._$contentElement.prop('scrollHeight'));
+      this._scrolledHorizontalEnd(container.offsetWidth + scrollLeft + 5 >= container.scrollWidth);
+
+      this._scrolledVerticalStart(scrollTop === 0);
+
+      this._scrolledVerticalEnd(container.offsetHeight + scrollTop + 5 >= container.scrollHeight);
     }
 
     dispose() {
@@ -2499,9 +2514,11 @@ ko.components.register('hrm-modal-container', {
       }
     },
     template: `
-            <div class="hrm-scrollable-wrapper__content"
-                 data-bind="hrmElement: _contentElement">
-                <!-- ko template: {nodes: $componentTemplateNodes, data: _childData} --><!-- /ko -->
+            <div class="hrm-scrollable-wrapper__content">
+                 <div class="hrm-scrollable-wrapper__wrapper" data-bind="hrmElement: _contentElement">
+                 <!-- ko template: {nodes: $componentTemplateNodes, data: _childData} --><!-- /ko -->
+                 </div>
+
 
                 <!-- ko template: {
                     foreach: hrmTemplateIf(!_scrolledVerticalStart() && !options.top.disabled, $data),

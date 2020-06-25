@@ -1023,10 +1023,10 @@
     </div>
 
 
-    <div class="modal-dialog__scroll" data-bind="hrmScrollable">
+    <div class="modal-dialog__scroll" data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {}}}">
       <div class="modal-dialog__scroll-container columns-settings__list"
            >
-        <!-- ko foreach: { data: $component.columns, as: 'column' } -->
+        <!-- ko foreach: { data: columns, as: 'column' } -->
 
         <!-- ko if: column.visible() -->
 
@@ -1187,8 +1187,8 @@
 
     <div class="modal-dialog__scroll">
       <div class="positions-settings__list"
-           data-bind="hrmScrollable">
-        <!-- ko foreach: { data: $component.positions, as: 'position' } -->
+           data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {}} }">
+        <!-- ko foreach: { data: positions, as: 'position' } -->
 
         <!-- ko let: {checkboxGroup: ko.observable(null), visible: position.visible} -->
         <div class="positions-settings__list-item"
@@ -1359,7 +1359,7 @@
               textInput: sum,
               hrmMask, hrmMaskPattern: 'decimal',
               hrmFormFieldInputControl: control,
-              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+              hrmFormFieldInputControlErrorStateMatcher: $parent.formControlErrorStateMatcher.bind($parent)
           ">
         </div>
 
@@ -1397,14 +1397,14 @@
 
 
     <div class="account-operation__remove">
-      <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko if: $parent.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
-              data-bind="click: $component.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'"></button>
+              data-bind="click: $parent.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'"></button>
       <!-- /ko -->
 
-      <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <!-- ko ifnot: $parent.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
       <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
-              data-bind="click: $component.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'">Удалить</button>
+              data-bind="click: $parent.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'">Удалить</button>
       <!-- /ko -->
 
 
@@ -1427,10 +1427,13 @@
   <div class="hrm-basic-modal-dialog__body account-operations-form">
 
     <div class="modal-dialog__scroll">
-      <div class="account-operations-form__list" data-bind="hrmScrollable">
+      <div class="account-operations-form__list" data-bind="component: {
+        name: 'hrm-scrollable-wrapper',
+        params: { options: {} }
+      }">
         <!-- ko template: {
           name: 'account-operation-template',
-          foreach: $component.operations,
+          foreach: operations,
           afterAdd: hrmFadeAfterAddFactory(200),
           beforeRemove: hrmFadeBeforeRemoveFactory(200)
         } -->
@@ -2574,7 +2577,7 @@
         id="add-employees-modal-position-list-template">
 
         <div class="employees-form__employees-scrollable-list"
-        data-bind="hrmScrollable">
+        data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {} } }">
 
         <!-- ko let: {checkboxGroup: ko.observable(null)} -->
         <div class="employees-form__checkbox-group">
@@ -2602,7 +2605,7 @@
         id="add-employees-modal-other-list-template">
 
   <div class="employees-form__employees-scrollable-list"
-  data-bind="hrmScrollable">
+  data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {} } }">
 
   <!-- ko let: {checkboxGroup: ko.observable(null)} -->
   <div class="employees-form__checkbox-group">
@@ -5782,7 +5785,7 @@
     <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
     <div data-bind="component: {
       name: 'hrm-scrollable-wrapper',
-      params: { options: {left: {disabled: true}} }
+      params: { options: {} }
      }">
       <table class="calculation-summary__table calculation-summary__desktop"
              data-bind="hrmTable">
