@@ -171,9 +171,10 @@
       this.productionTotal = {
         workingTime: ko.observable(0),
         salaryBulk: ko.observable(0),
-        normalizationRatio: ko.observable(0),
+        normRatio: ko.observable(0),
         revenueStandart: ko.observable(0),
         bonusRatio: ko.observable(0),
+        depremationRatio: ko.observable(0),
         correctedTime: ko.observable(0),
         bonusExceed: ko.observable(0),
         total: ko.observable(0),
@@ -248,7 +249,6 @@
           },
           validation: {
             validator: value => {
-              console.log('value', value);
               if (!/^\d\d:\d\d – \d\d:\d\d$/.test(value)) {
                 return false;
               } else {
@@ -403,8 +403,9 @@
         this.revenueStandartPerHour = ko.observable(employee.revenueStandartPerHour || this.position.revenueStandartUnits);
         this.revenueStandart = ko.observable(employee.revenueStandart || this.position.revenueStandart);
 
-        this.normalizationRatio = ko.observable(employee.normalizationRatio || this.position.normalizationRatio);
+        this.normRatio = ko.observable(employee.normRatio || this.position.normRatio);
         this.bonusRatio = ko.observable(employee.bonusRatio || this.position.bonusRatio);
+        this.depremationRatio = ko.observable(employee.depremationRatio || this.position.depremationRatio);
 
         this.bonusExceed = ko.observable(employee.bonusExceed || '');
         this.depremation = ko.observable(employee.depremation || '');
@@ -418,6 +419,22 @@
         this.visible.subscribe(_ => this.root.calculate('production'));
 
         this.loaded = employee.loaded; // загружен для Все филиалы
+
+        this.removeWorkloadPartially = () => {
+          this.root.utils.openModal('employee-remove-workload-partially', {
+            employee: this
+          }, () => {
+            this.root.calculate('production', ['normRatio', 'bonusRatio', 'depremationRatio', 'salary']);
+          });
+        };
+
+        this.removeWorkloadCompletely = () => {
+          this.root.utils.openModal('employee-remove-workload-completely', {
+            employee: this
+          }, () => {
+            this.root.calculate('production', ['normRatio', 'bonusRatio', 'depremationRatio']);
+          });
+        }
 
         this.getData = () => {
           return {
@@ -440,8 +457,9 @@
             revenueStandartUnits: this.revenueStandartUnits,
             revenueStandartPerHour: this.revenueStandartPerHour(),
             revenueStandart: this.revenueStandart(),
-            normalizationRatio: this.normalizationRatio(),
+            normRatio: this.normRatio(),
             bonusRatio: this.bonusRatio(),
+            depremationRatio: this.depremationRatio(),
             bonusExceed: this.bonusExceed(),
             bonuses: this.bonuses(),
             fines: this.fines(),
@@ -1284,8 +1302,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,          // норматив выручки в час
                       revenueStandart: 130000,                // Норматив выручки
-                      normalizationRatio: 0.5,                // Коэф. нормализации
+                      normRatio: 0.5,                // Коэф. нормализации
                       bonusRatio: 0.5,                        // Коэф. премирования
+                      depremationRatio: 0.5,                  // Коэф. депремирования
                       bonusExceed: 100,                       // прем. за превыш. норм
                       bonuses: [],                            // бонусы
                       fines: [],                              // штрафы
@@ -1315,8 +1334,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -1375,8 +1395,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -1406,8 +1427,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -1466,8 +1488,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -1497,8 +1520,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -1557,8 +1581,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -1588,8 +1613,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -1644,8 +1670,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -1675,8 +1702,9 @@
                       revenueStandartUnits: 2,
                       revenueStandartPerHour: 10000,
                       revenueStandart: 130000,
-                      normalizationRatio: 0.5,
+                      normRatio: 0.5,
                       bonusRatio: 0.5,
+                      depremationRatio: 0.5,
                       bonusExceed: 100,
                       bonuses: [],
                       fines: [],
@@ -2397,11 +2425,12 @@
       }
 
       // Перерасчет значений в таблицах
-      this.calculate = (changeSource) => {
+      this.calculate = (changeSource, changedFields = []) => {
         this.hasChanges(true);
 
         // changeSource: 'production', 'delivery'
-        console.log('recalculate');
+        // changedFields: массив названий измененных полей
+        console.log('recalculate', changeSource, changedFields);
 
 
         /** УСТАНОВКА ДАННЫХ ДЛЯ ВОДИТЕЛЕЙ */
@@ -2541,12 +2570,9 @@
             const account = getRandom(0, 2000);
             const premiumAccount = getRandom(0, 2000);
             const workload = getRandom(0, 2000);
-            const salary = getRandom(0, 2000);
             const salaryBulk = getRandom(0, 2000);
             const revenueStandart = getRandom(0, 2000);
             const revenueStandartPerHour = getRandom(0, 2000);
-            const normalizationRatio = getRandom(0, 2000);
-            const bonusRatio = getRandom(0, 2000);
 
             // время в минутах
             const correctedTime = getRandom(0, 2000);
@@ -2558,17 +2584,34 @@
             employee.account(account);
             employee.premiumAccount(premiumAccount);
             employee.workload(workload);
-            employee.salary(salary);
             employee.salaryBulk(salaryBulk);
             employee.revenueStandart(revenueStandart);
             employee.revenueStandartPerHour(revenueStandartPerHour);
-            employee.normalizationRatio(normalizationRatio);
-            employee.bonusRatio(bonusRatio);
             employee.correctedTime(correctedTime);
             employee.bonusExceed(bonusExceed);
             employee.depremation(depremation);
             employee.total(total);
             employee.toPayment(toPayment);
+
+            if (!changedFields.includes('salary')) {
+              const salary = getRandom(0, 2000);
+              employee.salary(salary);
+            }
+
+            if (!changedFields.includes('normRatio')) {
+              const normRatio = getRandom(0, 2000);
+              employee.normRatio(normRatio);
+            }
+
+            if (!changedFields.includes('bonusRatio')) {
+              const bonusRatio = getRandom(0, 2000);
+              employee.bonusRatio(bonusRatio);
+            }
+
+            if (!changedFields.includes('depremationRatio')) {
+              const depremationRatio = getRandom(0, 2000);
+              employee.depremationRatio(depremationRatio);
+            }
           });
 
           // данные позиции
@@ -2598,9 +2641,10 @@
           }, 0);
 
           const salaryBulk = getRandom(0, 2000);
-          const normalizationRatio = getRandom(0, 3);
+          const normRatio = getRandom(0, 3);
           const revenueStandart = getRandom(0, 2000);
           const bonusRatio = getRandom(0, 3);
+          const depremationRatio = getRandom(0, 3);
 
           // время в минутах
           const correctedTime = activePositions.reduce((acc, p) => {
@@ -2614,9 +2658,10 @@
 
           totalModel.workingTime(workingTime);
           totalModel.salaryBulk(salaryBulk);
-          totalModel.normalizationRatio(normalizationRatio);
+          totalModel.normRatio(normRatio);
           totalModel.revenueStandart(revenueStandart);
           totalModel.bonusRatio(bonusRatio);
+          totalModel.depremationRatio(depremationRatio);
           totalModel.correctedTime(correctedTime);
           totalModel.bonusExceed(bonusExceed);
           totalModel.total(total);

@@ -52,7 +52,7 @@ salaryBulk|number|observable|Осн.часть зп
 revenueStandartUnits|string|статическое|Единица измерения
 revenueStandartPerHour|number|observable|Норматив выручки в час
 revenueStandart|number|статическое|Норматив выручки
-normalizationRatio|number|observable|Коэф.норм.
+normRatio|number|observable|Коэф.норм.
 bonusRatio|number|observable|Коэф.прем.
 bonusExceed|number|observable|Прем.за превыш.норм.
 correctedTime|string|observable|Корр. время

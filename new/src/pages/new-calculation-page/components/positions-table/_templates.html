@@ -1,13 +1,11 @@
 <!-- Выпадающее меню сотрудников -->
-<script id="employees-dropdown-template"
-        type="text/html">
+<script id="employees-dropdown-template" type="text/html">
         <div class="hrm-dropdown-menu__item" data-bind="click: addEmployees">Добавить сотрудников</div>
         <div class="hrm-dropdown-menu__item" data-bind="click: createEmployee">Новый сотрудник</div>
 </script>
 
 <!-- Заголовок позиции в таблице -->
-<script id="position-header-template"
-        type="text/html">
+<script id="position-header-template" type="text/html">
   <button data-bind="hrmTooltip, hrmTooltipHideOnClick, hrmTooltipText: 'Добавить сотрудников', click: table.addEmployeesInPosition"
     class="positions-table__add-employee hrm-button hrm-circle-icon-button hrm-circle-plus-icon-button hrm-circle-icon-button--theme_neutral positions-table__action">
   </button>
@@ -15,8 +13,7 @@
 </script>
 
 <!-- Блок сотрудника в таблице -->
-<script id="employee-block-template"
-        type="text/html">
+<script id="employee-block-template" type="text/html">
   <div class="employee">
     <div class="employee__remove">
       <button data-bind="
@@ -60,44 +57,38 @@
 </script>
 
 <!-- Рабочий интервал -->
-<script id="working-interval-template"
-        type="text/html">
+<script id="working-interval-template" type="text/html">
 
   <!-- ko let: {editableCell: ko.observable(null)} -->
-<td class="hrm-table__cell positions-table__cell working-interval__cell"
-    data-bind="hrmTableEditableCell: editableCell,
-            hrmTableEditableCellError: table.editableCellErrorStateMatcher(interval.value)">
+<td class="hrm-table__cell positions-table__cell working-interval__cell" data-bind="hrmTableEditableCell: editableCell,
+              hrmTableEditableCellError: table.editableCellErrorStateMatcher(interval.value)">
   <div class="working-interval">
-    <input class="working-interval__input"
-           data-bind="
-                textInput: interval.value,
-                hrmMask,
-                hrmMaskPattern: '99:99 – 99:99',
-                hrmTableEditableCellInputControl,
-                hrmTableEditableCellInputControlOwner: editableCell
-            "
-           placeholder="00:00 – 00:00">
+    <input class="working-interval__input" data-bind="
+                  textInput: interval.value,
+                  hrmMask,
+                  hrmMaskPattern: '99:99 – 99:99',
+                  hrmTableEditableCellInputControl,
+                  hrmTableEditableCellInputControlOwner: editableCell
+              " placeholder="00:00 – 00:00">
 
     <div class="working-interval__actions">
       <div class="working-interval__action">
         <!-- ko if: canRemove -->
         <button class="hrm-button hrm-icon-button hrm-times-icon-button
-                                  hrm-icon-button--theme_negative
-                                  working-interval__remove"
-                data-bind="
-                                click: function () {employee.removeWorkingInterval(interval);},
-                                attr: {title: 'Удалить интервал ' }
-                            ">
+                                    hrm-icon-button--theme_negative
+                                    working-interval__remove" data-bind="
+                                  click: function () {employee.removeWorkingInterval(interval);},
+                                  attr: {title: 'Удалить интервал ' }
+                              ">
         </button>
         <!-- /ko -->
       </div>
       <div class="working-interval__action">
         <!-- ko if: canAdd -->
         <button class="hrm-button hrm-icon-button hrm-plus-icon-button
-                                hrm-icon-button--theme_positive
-                                working-interval__add"
-                title="Добавить рабочий интервал"
-                data-bind="click: function () { employee.addWorkingInterval() }">
+                                  hrm-icon-button--theme_positive
+                                  working-interval__add" title="Добавить рабочий интервал"
+          data-bind="click: function () { employee.addWorkingInterval() }">
         </button>
         <!-- /ko -->
       </div>
@@ -109,8 +100,7 @@
 </script>
 
 <!-- Строка сотрудника в таблице -->
-<script id="employee-row-template"
-        type="text/html">
+<script id="employee-row-template" type="text/html">
 
 <tr class="positions-table__row"
 data-bind="click: function() {
@@ -239,6 +229,29 @@ css: {
   <!-- /ko -->
   <!-- /ko -->
 
+  <!-- ko if: table.isColumnVisible('remove-workload') -->
+  <td class="positions-table__cell positions-table__cell--remove-workload"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('remove-workload'),
+  }" align="right">
+    <div class="positions-table__cell-content">
+      <div class="d-flex">
+        <button class="battery-icon hrm-button hrm-icon-button hrm-battery-full-icon-button hrm-icon-button--theme_secondary"
+          data-bind="hrmTooltip, hrmTooltipHideOnClick, hrmTooltipText: 'Частично освободить от нагрузки',
+          click: function(_, e) {
+            e.stopPropagation();
+            employee.removeWorkloadPartially();
+        }"></button>
+      <button class="battery-icon hrm-button hrm-icon-button hrm-battery-empty-icon-button hrm-icon-button--theme_secondary"
+        data-bind="hrmTooltip, hrmTooltipHideOnClick, hrmTooltipText: 'Полностью освободить от нагрузки',
+        click: function(_, e) {
+          e.stopPropagation();
+          employee.removeWorkloadCompletely();
+      }"></button>
+      </div>
+    </div>
+  </td>
+  <!-- /ko -->
+
   <!-- ko if: table.isColumnVisible('workload') -->
   <td class="positions-table__cell positions-table__cell--workload"  data-bind="css: {
     'positions-table__cell--clicked': table.getColumnClicked('workload'),
@@ -275,7 +288,7 @@ css: {
   <td class="positions-table__cell positions-table__cell--normalization-ratio"  data-bind="css: {
     'positions-table__cell--clicked': table.getColumnClicked('normalization-ratio'),
   }" align="right">
-  <div class="positions-table__cell-content" data-bind="text: employee.normalizationRatio"></div>
+  <div class="positions-table__cell-content" data-bind="text: employee.normRatio"></div>
 </td>
   <!-- /ko -->
 
@@ -292,6 +305,14 @@ css: {
     'positions-table__cell--clicked': table.getColumnClicked('bonus-ratio'),
   }" align="right">
   <div class="positions-table__cell-content" data-bind="text: employee.bonusRatio"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('depremation-ratio') -->
+  <td class="positions-table__cell positions-table__cell--depremation-ratio"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('depremation-ratio'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.depremationRatio"></div>
 </td>
   <!-- /ko -->
 
@@ -372,8 +393,7 @@ css: {
 </script>
 
 <!-- Строка Итого -->
-<script id="total-row-template"
-        type="text/html">
+<script id="total-row-template" type="text/html">
 
 <tr class="positions-table__row positions-table__row--highlighted positions-table__total">
   <td class="positions-table__cell positions-table__cell--name positions-table__cell--empty"></td>
@@ -422,6 +442,12 @@ css: {
   }" align="right"></td>
   <!-- /ko -->
 
+  <!-- ko if: table.isColumnVisible('remove-workload') -->
+  <td class="positions-table__cell positions-table__cell--remove-workload positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('remove-workload'),
+  }" align="right"></td>
+  <!-- /ko -->
+
   <!-- ko if: table.isColumnVisible('salary') -->
   <td class="positions-table__cell positions-table__cell--salary positions-table__cell--empty" data-bind="css: {
     'positions-table__cell--clicked': table.getColumnClicked('salary'),
@@ -447,7 +473,7 @@ css: {
   <td class="positions-table__cell positions-table__cell--normalization-ratio" data-bind="css: {
     'positions-table__cell--clicked': table.getColumnClicked('normalization-ratio'),
   }" align="right">
-    <div class="positions-table__cell-content" data-bind="text: total.normalizationRatio()"></div>
+    <div class="positions-table__cell-content" data-bind="text: total.normRatio()"></div>
   </td>
   <!-- /ko -->
 
@@ -464,6 +490,14 @@ css: {
     'positions-table__cell--clicked': table.getColumnClicked('bonus-ratio'),
   }" align="right">
     <div class="positions-table__cell-content" data-bind="text: total.bonusRatio()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('depremation-ratio') -->
+  <td class="positions-table__cell positions-table__cell--depremation-ratio" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('depremation-ratio'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.depremationRatio()"></div>
   </td>
   <!-- /ko -->
 
