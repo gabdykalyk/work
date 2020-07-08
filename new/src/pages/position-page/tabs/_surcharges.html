@@ -1,0 +1,436 @@
+<!-- ko let: {'$tab': $root.surchargesTabViewModel} -->
+<div class="position-page__tab-pane position-page__surcharges-tab-pane"
+     data-bind="using: $tab.formModel.value">
+  <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+              hrm-button-with-plus-icon position-page__surcharges-tab-pane-add-button position-page__surcharges-tab-pane-first-add-button"
+          data-bind="click: function() {$tab.create();}">
+    Добавить доплату
+  </button>
+
+  <!-- ko template: {
+   foreach: hrmTemplateIf(surcharges().length > 0, $data),
+   afterAdd: hrmFadeAfterAddFactory(200),
+   beforeRemove: hrmFadeBeforeRemoveFactory(200)
+} -->
+  <!-- ko if: !$tab.isResetting() -->
+  <div class="position-page__surcharges-tab-pane-list">
+    <!-- ko foreach: {
+               data: surcharges,
+               as: 'surcharge',
+               afterAdd: hrmFadeAfterAddFactory(200),
+               beforeRemove: hrmFadeBeforeRemoveFactory(200)
+           } -->
+    <!-- ko let: {isOpen: ko.observable(true)} -->
+    <div class="position-page__surcharges-tab-pane-list-item">
+      <div class="position-page__surcharges-tab-pane-list-item-header">
+        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+        <button class="hrm-button hrm-circle-icon-button
+                                              hrm-circle-icon-button--theme_neutral
+                                              hrm-circle-arrow-down-icon-button
+                                              position-page__surcharges-tab-pane-list-item-toggle-button"
+                data-bind="click: function() {isOpen(!isOpen());}">
+        </button>
+        <!-- /ko -->
+
+        <span class="position-page__surcharges-tab-pane-list-item-title"
+              data-bind="text: 'Доплата ' + ($index() + 1), click: function() {isOpen(!isOpen());}">
+        </span>
+
+        <!-- ko if: $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+        <button class="hrm-button hrm-icon-button hrm-trash-icon-button
+                                              hrm-icon-button--theme_negative position-page__surcharges-tab-pane-list-item-delete-button"
+                title="Удалить"
+                data-bind="click: function () {$tab.delete($rawData);}">
+        </button>
+        <!-- /ko -->
+
+        <!-- ko if: $root.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative
+                                              hrm-button-with-trash-icon position-page__surcharges-tab-pane-list-item-delete-button"
+                data-bind="click: function () {$tab.delete($rawData);}">
+          Удалить
+        </button>
+        <!-- /ko -->
+      </div>
+
+      <div class="position-page__surcharges-tab-pane-list-item-body"
+           data-bind="hrmSlide, hrmSlideValue: isOpen() || $root.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth">
+        <div class="position-page__section-row">
+          <div class="position-page__section-row-content">
+            <div
+                 class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-orders-type-item">
+
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                <label class="hrm-form-field__label"
+                       data-bind="hrmFormFieldLabel: label">
+                  Тип заказа
+                </label>
+
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control"
+                     class="hrm-select--with-flag">
+                  <select data-bind="
+                      selectedOptions: surcharge.orderTypes, valueAllowUnset: true,
+                      hrmSelect, hrmSelectPlaceholder: 'Все', hrmSelectAllowClear: true,
+                      hrmFormFieldSelectControl: control,
+                      hrmFormFieldSelectControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)"
+                          multiple>
+                    <option></option>
+                    <option value="0">Зал</option>
+                    <option value="1">Самовывоз</option>
+                    <option value="2">Доставка</option>
+                  </select>
+
+                  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+                  <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup, }}">
+                    <div data-bind="component: {name: 'hrm-checkbox', params: {
+                      owner: checkboxGroup,
+                      checked: surcharge.orderTypesExclusionFlag
+                    }}"></div>
+                    <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup">Все,
+                      кроме</label>
+                  </div>
+                  <!-- /ko -->
+
+
+                </div>
+
+                <div data-bind="
+                    component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150
+                ">
+                  <!-- ko text: surcharge.orderTypes.error() -->
+                  <!-- /ko -->
+                </div>
+              </div>
+              <!-- /ko -->
+
+            </div>
+
+            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-dishes-item">
+
+            </div>
+
+
+          </div>
+        </div>
+
+
+        <div class="position-page__section-row">
+          <div class="position-page__section-row-content">
+            <div
+                 class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-type-item">
+
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                <label class="hrm-form-field__label"
+                       data-bind="hrmFormFieldLabel: label">
+                  Тип доплаты</label>
+
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control"
+                     class="hrm-select--with-flag">
+                  <select data-bind="
+                      selectedOptions: surcharge.type, valueAllowUnset: true,
+                      hrmSelect, hrmSelectPlaceholder: 'Выберите тип', hrmSelectAllowClear: true,
+                      hrmFormFieldSelectControl: control,
+                      hrmFormFieldSelectControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)">
+                    <option></option>
+                    <option value="1">Процент от выручки</option>
+                    <option value="2">Количество товаров</option>
+                    <option value="3">Количество заказов</option>
+                  </select>
+                </div>
+
+                <div data-bind="
+                    component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150
+                ">
+                  <!-- ko text: surcharge.type.error() -->
+                  <!-- /ko -->
+                </div>
+              </div>
+              <!-- /ko -->
+            </div>
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf(surcharge.type() == '1'),
+              afterAdd: hrmFadeAfterAddFactory(200, 250),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+
+              <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-salary-percent-item">
+                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                    class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                  <label class="hrm-form-field__label"
+                        data-bind="hrmFormFieldLabel: label">
+                    Процент</label>
+
+                  <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                    <input data-bind="
+                        textInput: surcharge.salaryPercent,
+                        hrmMask, hrmMaskPattern: 'decimal',
+                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                        hrmFormFieldInputControl: control,
+                        hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                    "
+                          placeholder="0">
+                  </div>
+
+                  <div data-bind="
+                      component: {name: 'hrm-form-field-error'},
+                      hrmSlide,
+                      hrmSlideValue: control() !== null ? control().errorState : false,
+                      hrmSlideDuration: 150
+                  ">
+                    <!-- ko text: surcharge.salaryPercent.error() -->
+                    <!-- /ko -->
+                  </div>
+                </div>
+                <!-- /ko -->
+              </div>
+
+              <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-min-salary-item">
+                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                    class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                  <label class="hrm-form-field__label"
+                        data-bind="hrmFormFieldLabel: label">
+                    От min выручки
+                  </label>
+
+                  <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                    <input data-bind="
+                        textInput: surcharge.minSalary,
+                        hrmMask, hrmMaskPattern: 'decimal',
+                        hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                        hrmFormFieldInputControl: control,
+                        hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                    "
+                          placeholder="0">
+                  </div>
+
+                  <div data-bind="
+                      component: {name: 'hrm-form-field-error'},
+                      hrmSlide,
+                      hrmSlideValue: control() !== null ? control().errorState : false,
+                      hrmSlideDuration: 150
+                  ">
+                    <!-- ko text: surcharge.minSalary.error() -->
+                    <!-- /ko -->
+                  </div>
+                </div>
+                <!-- /ko -->
+              </div>
+
+            <!-- /ko -->
+
+            <!-- ko template: {
+              foreach: hrmTemplateIf(surcharge.type() == '2'),
+              afterAdd: hrmFadeAfterAddFactory(200, 250),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+
+            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-per-products-unit-item">
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                  class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                <label class="hrm-form-field__label"
+                      data-bind="hrmFormFieldLabel: label">
+                  <span>За ед. товара, <i class="far fa-ruble-sign"></i></span>
+
+                </label>
+
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                  <input data-bind="
+                      textInput: surcharge.perProductsUnit,
+                      hrmMask, hrmMaskPattern: 'decimal',
+                      hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                      hrmFormFieldInputControl: control,
+                      hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                  "
+                        placeholder="0">
+                </div>
+
+                <div data-bind="
+                    component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150
+                ">
+                  <!-- ko text: surcharge.perProductsUnit.error() -->
+                  <!-- /ko -->
+                </div>
+              </div>
+              <!-- /ko -->
+            </div>
+
+            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-min-products-count-item">
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                  class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                <label class="hrm-form-field__label"
+                      data-bind="hrmFormFieldLabel: label">
+                  От min кол-ва, штук
+
+                </label>
+
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                  <input data-bind="
+                      textInput: surcharge.minProductsCount,
+                      hrmMask, hrmMaskPattern: 'decimal',
+                      hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                      hrmFormFieldInputControl: control,
+                      hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                  "
+                        placeholder="0">
+                </div>
+
+                <div data-bind="
+                    component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150
+                ">
+                  <!-- ko text: surcharge.minProductsCount.error() -->
+                  <!-- /ko -->
+                </div>
+              </div>
+              <!-- /ko -->
+            </div>
+
+          <!-- /ko -->
+
+          <!-- ko template: {
+              foreach: hrmTemplateIf(surcharge.type() == '3'),
+              afterAdd: hrmFadeAfterAddFactory(200, 250),
+              beforeRemove: hrmFadeBeforeRemoveFactory(200)
+            } -->
+
+            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-per-orders-unit-item">
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                  class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                <label class="hrm-form-field__label"
+                      data-bind="hrmFormFieldLabel: label">
+                  <span>За ед. заказа, <i class="far fa-ruble-sign"></i></span>
+
+                </label>
+
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                  <input data-bind="
+                      textInput: surcharge.perOrdersUnit,
+                      hrmMask, hrmMaskPattern: 'decimal',
+                      hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                      hrmFormFieldInputControl: control,
+                      hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                  "
+                        placeholder="0">
+                </div>
+
+                <div data-bind="
+                    component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150
+                ">
+                  <!-- ko text: surcharge.perOrdersUnit.error() -->
+                  <!-- /ko -->
+                </div>
+              </div>
+              <!-- /ko -->
+            </div>
+
+            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-min-orders-count-item">
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                  class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                <label class="hrm-form-field__label"
+                      data-bind="hrmFormFieldLabel: label">
+                  От min кол-ва, штук
+
+                  </button>
+                </label>
+
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                  <input data-bind="
+                      textInput: surcharge.minOrdersCount,
+                      hrmMask, hrmMaskPattern: 'decimal',
+                      hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                      hrmFormFieldInputControl: control,
+                      hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
+                  "
+                        placeholder="0">
+                </div>
+
+                <div data-bind="
+                    component: {name: 'hrm-form-field-error'},
+                    hrmSlide,
+                    hrmSlideValue: control() !== null ? control().errorState : false,
+                    hrmSlideDuration: 150
+                ">
+                  <!-- ko text: surcharge.minOrdersCount.error() -->
+                  <!-- /ko -->
+                </div>
+              </div>
+              <!-- /ko -->
+            </div>
+
+          <!-- /ko -->
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+  </div>
+  <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko template: {
+    foreach: hrmTemplateIf(surcharges().length > 0, $data),
+    afterAdd: hrmFadeAfterAddFactory(200),
+    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+  } -->
+  <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
+                  hrm-button-with-plus-icon position-page__surcharges-tab-pane-add-button position-page__surcharges-tab-pane-second-add-button"
+          data-bind="click: function() {$tab.create();}">
+    Добавить доплату
+  </button>
+  <!-- /ko -->
+
+  <!-- ko template: {
+    foreach: hrmTemplateIf(surcharges().length > 0, $data),
+    afterAdd: hrmFadeAfterAddFactory(200),
+    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+  } -->
+  <div class="position-page__tab-pane-action-list">
+    <button class="hrm-button hrm-basic-button
+                  position-page__tab-pane-action-list-item position-page__cancel-button"
+            data-bind="
+               click: function() {$tab.cancel();},
+               attr: {disabled: $root.formModel.value().surcharges().length === 0 && $tab.lastFormModelValue.surcharges.length === 0}
+           ">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button
+                  position-page__tab-pane-action-list-item position-page__save-button"
+            data-bind="
+               click: function() {$tab.submit();},
+               attr: {disabled: ($tab.isSubmitted() && !$tab.isValid()) || $root.formModel.value().surcharges().length === 0}
+           ">
+      Сохранить
+    </button>
+  </div>
+  <!-- /ko -->
+</div>
+<!-- /ko -->

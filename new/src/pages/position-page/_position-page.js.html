@@ -54,6 +54,65 @@
                 }
             };
 
+            this.createSurchargeFormModel = function (data) {
+                const formModel = ko.validatedObservable(null, {deep: true, live: true});
+
+                const type = ko.observable('').extend({
+                    required: {
+                        message: 'Обязательное поле'
+                    }
+                });
+
+                formModel({
+                    orderTypes: ko.observableArray([]),
+                    orderTypesExclusionFlag: ko.observable(false),
+                    dishes: ko.observableArray([]),
+                    dishesExclusionFlag: ko.observable(false),
+                    type: type,
+
+                    salaryPercent: ko.observable(0).extend({
+                        required: {
+                            message: 'Обязательное поле',
+                            onlyIf: () => type() == '1'
+                        }
+                    }),
+                    minSalary: ko.observable(0).extend({
+                        required: {
+                            message: 'Обязательное поле',
+                            onlyIf: () => type() == '1'
+                        }
+                    }),
+
+                    perProductsUnit: ko.observable(0).extend({
+                        required: {
+                            message: 'Обязательное поле',
+                            onlyIf: () => type() == '2'
+                        }
+                    }),
+                    minProductsCount: ko.observable(0).extend({
+                        required: {
+                            message: 'Обязательное поле',
+                            onlyIf: () => type() == '2'
+                        }
+                    }),
+
+                    perOrdersUnit: ko.observable(0).extend({
+                        required: {
+                            message: 'Обязательное поле',
+                            onlyIf: () => type() == '3'
+                        }
+                    }),
+                    minOrdersCount: ko.observable(0).extend({
+                        required: {
+                            message: 'Обязательное поле',
+                            onlyIf: () => type() == '3'
+                        }
+                    })
+                });
+
+                return formModel;
+            }
+
             this.createShiftFormModel = function (data) {
                 const formModel = ko.validatedObservable(null, {deep: true, live: true});
 
@@ -260,6 +319,9 @@
                     required: true
                 }),
                 specialities: ko.observableArray([]).extend({
+                    required: true
+                }),
+                surcharges: ko.observableArray([]).extend({
                     required: true
                 }),
                 shifts: ko.observableArray([]).extend({
@@ -1031,6 +1093,94 @@
             };
         };
 
+        const SurchargesTabViewModel = function(formModel, modalOpens, save) {
+            this.isSubmitted = ko.observable(false);
+            this.isResetting = ko.observable(false);
+
+            this.formModel = formModel;
+
+            this.formModelValue = ko.pureComputed(() => {
+                return {
+                    surcharges: this.formModel.value().surcharges()
+                    .map(surcharge => {
+                        let data = ko.toJS(surcharge);
+                        return {
+                            orderTypes: data.orderTypes,
+                            orderTypesExclusionFlag: data.orderTypeExcept,
+                            dishes: data.dishes,
+                            dishesExclusionFlag: data.dishesExcept,
+                            type: data.type,
+
+                            salaryPercent: data.salaryPercent,
+                            minSalary: data.minSalary,
+
+                            perProductsUnit: data.perProductsUnit,
+                            minProductsCount: data.minProductsCount,
+
+                            perOrdersUnit: data.perOrdersUnit,
+                            minOrdersCount: data.minOrdersCount,
+                        };
+                    })
+                }
+            });
+
+            this.lastFormModelValue = this.formModelValue();
+
+            this.isValid = ko.pureComputed(() => {
+                return this.formModel.value().surcharges.isValid() &&
+                this.formModel.value().surcharges().every(s => s.isValid());
+            });
+
+            this.cancel = function () {
+                this.isResetting(true);
+
+                this.formModel.value().surcharges(this.lastFormModelValue.surcharges.map(s => {
+                    return this.formModel.createSurchargeFormModel(s);
+                }));
+
+                this.isResetting(false);
+            };
+
+            this.submit = function () {
+                this.isSubmitted(true);
+
+                if (this.isValid()) {
+                    this.lastFormModelValue = this.formModelValue();
+
+                    save();
+                }
+            };
+
+            this.create = function () {
+                this.formModel.value().surcharges.push(this.formModel.createSurchargeFormModel({
+                    orderTypes: [],
+                    orderTypesExclusionFlag: false,
+                    dishes: [],
+                    dishesExclusionFlag: false,
+                    type: '',
+
+                    salaryPercent: '',
+                    minSalary: '',
+
+                    perProductsUnit: '',
+                    minProductsCount: '',
+
+                    perOrdersUnit: '',
+                    minOrdersCount: '',
+                }));
+            };
+
+            this.delete = function (surcharge) {
+                this.formModel.value().surcharges.remove(surcharge);
+            };
+
+            this.formControlErrorStateMatcher = function (formControl) {
+                return ko.pureComputed(() => {
+                    return this.isSubmitted() && !formControl.isValid();
+                });
+            };
+        }
+
         const ViewModel = function () {
             this.dishCategories = [
                 {id: '1', name: 'Пицца'},
@@ -1053,20 +1203,28 @@
             };
             this.viewportSize = ko.observable({width: $(window).width(), height: $(window).height()});
 
-            this.navigationTabs = [
-                new HrmTabGroupItem('Нагрузка'),
-                new HrmTabGroupItem('Расчет ЗП', true),
-                new HrmTabGroupItem('Разряды', true),
-                new HrmTabGroupItem('Специальности', true),
-                new HrmTabGroupItem('Смены', true),
-                new HrmTabGroupItem('Депозит', true),
-                new HrmTabGroupItem('Мат. ценности', true),
-                /*new HrmTabGroupItem('Договоры', true),
-                new HrmTabGroupItem('Доплаты', true),*/
-                new HrmTabGroupItem('Подбор персонала', true),
-            ];
+            let tabs = [
+                { id: 'WORKLOAD', name: 'Нагрузка' },
+                { id: 'SALARY', name: 'Расчет ЗП' },
+                { id: 'RANKS', name: 'Разряды' },
+                { id: 'SPECIALITIES', name: 'Специальности' },
+                { id: 'SHIFTS', name: 'Смены' },
+                { id: 'DEPOSIT', name: 'Депозит' },
+                { id: 'EQUIPMENT', name: 'Мат. ценности' },
+                { id: 'SURCHARGES', name: 'Доплаты' },
+                { id: 'RECRUITING', name: 'Подбор персонала' },
+            ]
 
-            this.activeTab = ko.observable(0);
+            this.tabIndexes = tabs.reduce((acc, tab, i) => {
+                acc[tab.id] = i;
+                return acc;
+            }, {});
+
+            this.navigationTabs = tabs.map((tab, i) => {
+                return new HrmTabGroupItem(tab.name, i > 0);
+            });
+
+            this.activeTab = ko.observable(this.tabIndexes.WORKLOAD);
 
             this.formModel = new FormModel();
 
@@ -1082,32 +1240,36 @@
             });
 
             this.workloadTabViewModel = new WorkloadTabViewModel(this.formModel, () => {
-                this.activeTab(1);
+                this.activeTab(this.tabIndexes.WORKLOAD + 1);
             });
 
             this.salaryTabViewModel = new SalaryTabViewModel(this.formModel, () => {
-                this.activeTab(2);
+                this.activeTab(this.tabIndexes.SALARY + 1);
             });
 
             this.ranksTabViewModel = new RanksTabViewModel(this.formModel, this.modalOpens, () => {
-                this.activeTab(3);
+                this.activeTab(this.tabIndexes.RANKS + 1);
             });
 
             this.specialitiesTabViewModel = new SpecialitiesTabViewModel(this.formModel, this.modalOpens, () => {
-                this.activeTab(4);
+                this.activeTab(this.tabIndexes.SPECIALITIES + 1);
             });
 
             this.shiftsTabViewModel = new ShiftsTabViewModel(this.formModel, this.modalOpens, () => {
-                this.activeTab(5);
+                this.activeTab(this.tabIndexes.SHIFTS + 1);
             });
 
             this.depositTabViewModel = new DepositTabViewModel(this.formModel, () => {
-                this.activeTab(6);
+                this.activeTab(this.tabIndexes.DEPOSIT + 1);
             });
 
             this.equipmentTabViewModel = new EquipmentTabViewModel(this.formModel, () => {
-                this.activeTab(7);
+                this.activeTab(this.tabIndexes.EQUIPMENT + 1);
             });
+
+            this.surchargesTabViewModel = new SurchargesTabViewModel(this.formModel, this.modalOpens, () => {
+                this.activeTab(this.tabIndexes.SURCHARGES + 1);
+            })
 
             this.recruitingTabViewModel = new RecruitingTabViewModel(this.formModel, () => {});
 
@@ -1127,14 +1289,12 @@
                 const isWorkloadTabPassed = this.workloadTabViewModel.isValid() && this.workloadTabViewModel.isSubmitted();
                 const isSalaryTabPassed = this.salaryTabViewModel.isValid() && this.salaryTabViewModel.isSubmitted();
 
-                this.navigationTabs[1].disabled(!isWorkloadTabPassed);
-                this.navigationTabs[2].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[3].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
+                this.navigationTabs[this.tabIndexes.SALARY].disabled(!isWorkloadTabPassed);
 
-                this.navigationTabs[4].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[5].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[6].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
-                this.navigationTabs[7].disabled(!isWorkloadTabPassed || !isSalaryTabPassed);
+                ['RANKS', 'SPECIALITIES', 'SHIFTS', 'DEPOSIT', 'EQUIPMENT', 'SURCHARGES', 'RECRUITING'].forEach(tabName => {
+                    let tabIndex = this.tabIndexes[tabName];
+                    this.navigationTabs[tabIndex].disabled(!isWorkloadTabPassed || !isSalaryTabPassed)
+                });
 
                 /*this.navigationTabs[8].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);
                 this.navigationTabs[9].disabled(!isWorkloadTabPassed || !isSalaryTabPassed || !isRanksTabPassed || !isSpecialitiesTabPassed);*/
@@ -1187,13 +1347,13 @@
 
                 setTimeout(() => {
                     // Раскомментировать, чтобы заполнить первую вкладку тестовыми данными:
-                    /*this.formModel.value().name('Администратор филиала');
+                    this.formModel.value().name('Администратор филиала');
                     this.formModel.value().workloadType('10');
                     this.formModel.value().productionStandard.value('2000');
                     this.workloadTabViewModel.submit();
                     this.formModel.value().bulk(1);
                     this.salaryTabViewModel.submit();
-                    this.activeTab(7);*/
+                    this.activeTab(7);
                 });
             })();
         };
