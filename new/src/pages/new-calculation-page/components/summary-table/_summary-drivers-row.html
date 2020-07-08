@@ -1,0 +1,112 @@
+<script type="text/html"
+        id="summary-drivers-row-template">
+
+  <tr class="calculation-summary__row"
+  data-bind="click: function() { position.clicked(!position.clicked()); }, css: {
+    'calculation-summary__row--clicked': position.clicked,
+  }">
+    <!-- Должность -->
+    <td class="calculation-summary__cell calculation-summary__cell--job"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('job'),
+    }">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.name"></div>
+    </td>
+
+    <!-- Тип нагрузки -->
+    <td class="calculation-summary__cell calculation-summary__cell--workload-type"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload-type'),
+    }">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.workloadType"></div>
+    </td>
+
+    <!-- Нагрузка -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="calculation-summary__cell calculation-summary__cell--workload-value" align="right"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+    }">
+      <div class="calculation-summary__cell-content" data-bind="text: position.workload">
+      </div>
+    </td>
+    <!-- /ko -->
+
+    <td class="calculation-summary__cell calculation-summary__cell--workload-units"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('workload'),
+    }">
+      <div class="calculation-summary__cell-content" data-bind="html: $root.getUnitsSuffixHtml(position.workloadUnits)">
+      </div>
+    </td>
+
+
+    <!-- Доп. нагрузка -->
+    <td class="calculation-summary__cell calculation-summary__cell--additional-workload" data-bind="style: {
+      'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('additional-workload'),
+    }">
+      <div class="calculation-summary__cell-content">
+          <div class="position-additional-workload position-additional-workload--delivery">
+            <div class="position-additional-workload__type">Время без дела:</div>
+            <div class="position-additional-workload__value">
+              <!-- ko text: position.additionalWorkload() + '%' -->
+              <!-- /ko -->
+            </div>
+          </div>
+      </div>
+    </td>
+
+    <!-- Сотрудники -->
+    <td class="calculation-summary__cell calculation-summary__cell--count"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('count'),
+    }">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.visibleEmployees().length"></div>
+    </td>
+
+    <!-- ФОТ, % в категории -->
+    <td class="calculation-summary__cell calculation-summary__cell--fot-category" data-bind="style: {
+      'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-category'),
+    }">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.fotCategory"></div>
+    </td>
+
+    <!-- ФОТ, % от выручки -->
+    <td class="calculation-summary__cell calculation-summary__cell--fot-revenue" data-bind="style: {
+      'background-color': '#FFD3E8'
+    }, css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('fot-revenue'),
+    }">
+      <div class="calculation-summary__cell-content"
+           data-bind="text: position.fotRevenue"></div>
+    </td>
+
+    <!-- Норм. выработки -->
+    <td class="calculation-summary__cell calculation-summary__cell--performance-standart"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('performance-standart'),
+    }">
+      <div class="calculation-summary__cell-content">
+           <div class="position-performance-standart">
+
+            <div class="position-performance-standart__label" data-bind="html: position.performanceStandartType + ', ' + $root.getUnitsSuffixHtml(position.performanceStandartUnits)"></div>
+
+
+            <div class="position-performance-standart__value" data-bind="text: position.performanceStandart"></div>
+           </div>
+      </div>
+    </td>
+
+    <!-- Опоздания -->
+    <td class="calculation-summary__cell calculation-summary__cell--lateness"  data-bind="css: {
+      'calculation-summary__cell--column-clicked': table.getColumnClicked('lateness'),
+    }">
+      <div class="calculation-summary__cell-content">
+        <!-- ko template: { name: 'lateness-template', data: {lateness: position.lateness(), total: position.totalLateness } } -->
+        <!-- /ko -->
+      </div>
+    </td>
+  </tr>
+</script>

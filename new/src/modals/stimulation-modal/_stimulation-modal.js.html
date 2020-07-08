@@ -1,0 +1,132 @@
+@@include('./_stimulation-modal.html')
+
+<script type="text/javascript">
+  $(function () {
+    ko.components.register('stimulation-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large',
+            'modal-dialog--stimulation'
+          ]);
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.fines = params.data.fines;
+            this.bonuses = params.data.bonuses;
+            this.authors = params.data.authors;
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            /* fine/bonus */
+            this.stimulationTypes = {
+              "FINE": 'fine',
+              "BONUS": 'bonus'
+            }
+
+            this.formModel = {
+              category: ko.observable(params.data.category),
+              stimulationType: ko.observable(this.stimulationTypes.FINE),
+              base: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              author: ko.observable('').extend({
+                required: {
+                  message: 'Обязательное поле'
+                }
+              }),
+              sum: ko.observable(0).extend({
+                required: {
+                  message: 'Обязательное поле'
+                },
+                number: {
+                  message: 'Некорректный формат'
+                }
+              }),
+              comment: ko.observable('').extend({
+
+              }),
+            };
+
+            this.reset = function () {
+              this.formModel.base('');
+              this.formModel.sum('');
+              this.formModel.author('');
+              this.formModel.comment('');
+            }
+
+            this.formModel.stimulationType.subscribe(() => {
+              this.reset();
+            });
+
+            const getFineById = (fineId) => {
+              for (let i in this.fines) {
+                const items = this.fines[i].items;
+                for (let k in items) {
+                  const fine = items[k];
+                  if (fine.id == fineId) return fine;
+                }
+              }
+            };
+
+            this.formModel.base.subscribe((value) => {
+              if (this.formModel.stimulationType() !== this.stimulationTypes.FINE) return;
+              if (!value) this.formModel.sum(0);
+              const fine = getFineById(value);
+              this.formModel.sum(fine ? fine.sum : 0);
+            });
+
+            this.validationObject = ko.validatedObservable({
+              base: this.formModel.base,
+              author: this.formModel.author,
+              sum: this.formModel.sum,
+            });
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if (this.validationObject.isValid()) {
+                if ('submit' in params) {
+
+                  params.submit({
+                    category: this.formModel.category(),
+                    stimulationType: this.formModel.stimulationType(),
+                    base: this.formModel.base(),
+                    author: this.formModel.author(),
+                    comment: this.formModel.comment(),
+                    sum: parseFloat(this.formModel.sum()),
+                  });
+                }
+              }
+
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('stimulation-modal-dialog-template')
+      }
+    });
+  });
+</script>

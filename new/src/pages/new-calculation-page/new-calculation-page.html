@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html class="hrm-page calculation-page hrm-page--initializing" data-bind="childrenComplete: childrenComplete" lang="ru">
+
+<head>
+  @@include('../../base/_page-head-content.html')
+</head>
+
+<body>
+  @@include('../../base/_sprite.html')
+  <div class="hrm-scaffold">
+    <div class="hrm-scaffold__sidebar"
+      data-bind="component: {name: 'hrm-main-sidebar', params: {collapsed: isSidebarCollapsed}}"></div>
+    <div class="hrm-scaffold__body">
+      <!-- Page content  -->
+      <div class="hrm-scaffold__content calculation-page__content">
+
+        <div class="calculation-page__header">
+          <span class="calculation-page__title">
+            <!-- ko text: isNew() ? 'Новый расчет' : 'Сохраненный расчет' -->
+            <!-- /ko -->
+          </span>
+          <div class="calculation-page__actions">
+            <!-- ko ifnot: isNew -->
+
+            <!-- ko if: $root.utils.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+            <button
+              class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
+              data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'versions-dropdown-template'">
+              <!-- ko if: currentVersion -->
+              <!-- ko text: currentVersion().time -->
+              <!-- /ko -->
+              <!-- /ko -->
+            </button>
+
+            <button
+              class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
+              data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'actions-dropdown-template'">
+              Действия
+            </button>
+            <!-- /ko -->
+
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-bookmark-icon-button" data-bind="hrmTooltip,
+              hrmTooltipText: inBookmarks()
+                ? 'Удалить раздел из избранного'
+                : 'Добавить в избранное',
+              click: function() {
+                if (inBookmarks()) removeFromBookmarks();
+                else addToBookmarks();
+              },
+              css: {
+                'active': inBookmarks
+              }">
+            </button>
+            <!-- /ko -->
+
+            <a href="#"
+              class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-arrow-left-icon">
+              К списку расчетов
+            </a>
+
+          </div>
+        </div>
+
+        <!-- ko if: !isNew() && $root.utils.viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+        <div class="calculation-page__actions">
+          <button
+            class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
+            data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'versions-dropdown-template'">
+            <!-- ko if: currentVersion -->
+            <!-- ko text: currentVersion.time() -->
+            <!-- /ko -->
+            <!-- /ko -->
+          </button>
+
+          <button
+            class="hrm-button hrm-button-with-icon-right hrm-button-with-arrow-down-icon-right hrm-button-with-icon--theme_secondary calculation-tab__settings-button calculation-tab__settings-employees"
+            data-bind="hrmDropdownMenu, hrmDropdownMenuTemplate: 'actions-dropdown-template'">
+            Действия
+          </button>
+        </div>
+        <!-- /ko -->
+
+        <div class="calculation-form">
+          <!-- Input table -->
+          <div
+            data-bind="component: {name: 'calculation-page-input-form', params: { model: $root.inputModel, onSubmit: $root.buildCalculation.bind($root) }}">
+          </div>
+          <!-- /Input table -->
+
+          <!-- ko template: {
+            foreach: hrmTemplateIf(loading(), $data),
+            afterAdd: hrmFadeAfterAddFactory(200, 200),
+          } -->
+          <div class="loader-block">
+            <i class="fa fa-spinner fa-pulse loader-block__indicator">
+            </i>
+            <span class="loader-block__text">Производится расчет</span>
+          </div>
+          <!-- /ko -->
+
+          <!-- ko template: {
+            foreach: hrmTemplateIf(!loading() && isBuilt(), $data),
+            afterAdd: afterRenderBuild,
+            beforeRemove: hrmFadeBeforeRemoveFactory(200)
+          } -->
+          <div class="calculation-form__content">
+            <!-- Summary table -->
+            <div data-bind="component: {name: 'calculation-page-summary-table', params: { model: $root.summaryModel }}">
+            </div>
+            <!-- /Summary table -->
+
+            <!-- Tabs -->
+            <div class="calculation-page__tabs"
+              data-bind="component: {name: 'hrm-tab-group', params: {items: tabs.tabs, activeItem: tabs.activeTab }}">
+            </div>
+
+
+
+            <!-- ko template: {
+                foreach: hrmTemplateIf(tabs.activeTab() === 0, $data),
+                afterAdd: tabs.afterOpen,
+                beforeRemove: hrmFadeBeforeRemoveFactory(200),
+              } -->
+            <div class="calculation-page__tab">
+              @@include('tabs/_production.html')
+            </div>
+            <!-- /ko -->
+
+            <!-- ko template: {
+                foreach: hrmTemplateIf(tabs.activeTab() === 1, $data),
+                afterAdd: tabs.afterOpen,
+                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+              } -->
+            <div class="calculation-page__tab">
+              @@include('tabs/_delivery.html')
+            </div>
+            <!-- /ko -->
+
+            <!-- ko template: {
+                foreach: hrmTemplateIf(tabs.activeTab() === 2, $data),
+                afterAdd: hrmFadeAfterAddFactory(200, 200),
+                beforeRemove: hrmFadeBeforeRemoveFactory(200)
+              } -->
+            <div class="calculation-page__tab">
+              @@include('tabs/_lateness.html')
+            </div>
+            <!-- /ko -->
+            <!-- /Tabs -->
+
+            <div class="calculation-form__actions">
+              <button class="hrm-button hrm-button--size_large hrm-basic-button calculation-form__action"
+                data-bind="click: reset, disable: blockResetButton">
+                Отменить
+              </button>
+
+              <button
+                class="hrm-button hrm-button--size_large hrm-basic-button hrm-accent-button calculation-form__action"
+                data-bind="click: $root.submit.bind($root, null), disable: blockSaveButton">
+                Сохранить
+
+                <!-- ko template: {
+                  foreach: hrmTemplateIf(showSuccessMessage(), $data),
+                  afterAdd: hrmFadeAfterAddFactory(200),
+                  beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                <div class="message message--success">
+                  <i class="far fa-check"></i>
+                  Расчет успешно сохранен
+                </div>
+                <!-- /ko -->
+
+                <!-- ko template: {
+                  foreach: hrmTemplateIf(showErrorMessage(), $data),
+                  afterAdd: hrmFadeAfterAddFactory(200),
+                  beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                <div class="message message--error">
+                  <i class="far fa-exclamation-circle"></i>
+                  Произошла ошибка при сохранении
+                </div>
+                <!-- /ko -->
+              </button>
+
+              <button
+                class="hrm-button hrm-button--size_large hrm-basic-button hrm-accent-button calculation-form__action"
+                data-bind="click: $root.submit.bind($root, true), disable: blockSaveButton">
+                Сохранить c ошибкой
+
+                <!-- ko template: {
+                  foreach: hrmTemplateIf(showErrorMessage(), $data),
+                  afterAdd: hrmFadeAfterAddFactory(200),
+                  beforeRemove: hrmFadeBeforeRemoveFactory(200)
+                } -->
+                <div class="message message--error">
+                  <i class="far fa-exclamation-circle"></i>
+                  Произошла ошибка при сохранении
+                </div>
+                <!-- /ko -->
+              </button>
+            </div>
+          </div>
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /Page content  -->
+
+
+
+    </div>
+
+    @@include('components/_modals.html')
+  </div>
+
+  <script id="versions-dropdown-template" type="text/html">
+        <!-- ko foreach: $root.versions -->
+  <div class="hrm-dropdown-menu__item">
+    <a class="version-preview" data-bind="attr: {href: $data.link}">
+      <div class="version-preview__userpic">
+        <img data-bind="attr: {src: $data.avatar}" alt="">
+      </div>
+      <div class="version-preview__content">
+        <div class="version-preview__user" data-bind="text: $data.name"></div>
+        <div class="version-preview__time" data-bind="text: $data.time"></div>
+      </div>
+    </a>
+  </div>
+  <!-- /ko -->
+  </script>
+
+  <script id="actions-dropdown-template" type="text/html">
+
+        <div class="hrm-dropdown-menu__item">
+          <a class="action-preview" href="#">
+            <svg width="14" height="14">
+              <use href="#excel-icon"></use>
+            </svg>
+            Выгрузить в Excel
+          </a>
+        </div>
+        <div class="hrm-dropdown-menu__item">
+          <a class="action-preview" href="#">
+            <svg width="14" height="14">
+              <use href="#print-icon"></use>
+            </svg>
+            Распечатать
+          </a>
+        </div>
+        <div class="hrm-dropdown-menu__item">
+          <a class="action-preview" href="#">
+            <svg width="14" height="14">
+              <use href="#picture-icon"></use>
+            </svg>
+            Для фото
+          </a>
+
+        </div>
+        <div class="hrm-dropdown-menu__item">
+          <a class="action-preview" href="#">
+            <svg width="14" height="16">
+              <use href="#calculation-icon"></use>
+            </svg>
+            Новый расчет
+          </a>
+        </div>
+  </script>
+
+  @@include('../../base/_page-scripts.html')
+
+  @@include('../../modals/confirm-modal/_confirm-modal.js.html')
+  @@include('../../modals/columns-settings-modal/_columns-settings-modal.js.html')
+  @@include('../../modals/positions-settings-modal/_positions-settings-modal.js.html')
+  @@include('../../modals/account-operations-modal/_account-operations-modal.js.html')
+  @@include('../../modals/employee-fine-modal/_employee-fine-modal.js.html')
+  @@include('../../modals/employee-bonus-modal/_employee-bonus-modal.js.html')
+  @@include('../../modals/create-employee-modal/_create-employee-modal.js.html')
+  @@include('../../modals/add-employees-modal/_add-employees-modal.js.html')
+  @@include('../../modals/stimulation-modal/_stimulation-modal.js.html')
+
+  @@include('./components/compensations-modal/_compensations-modal.js.html')
+  @@include('./components/remove-workload-modal/_remove-workload-modal.js.html')
+  @@include('./components/routes-modal/_routes-modal.js.html')
+  @@include('./components/details-modal/_driver-details-modal.js.html')
+  @@include('./components/details-modal/_lateness-details-modal.js.html')
+
+  @@include('./components/input-form/_input-form.js.html')
+  @@include('./components/summary-table/_summary-table.js.html')
+  @@include('./components/positions-table/_positions-table.js.html')
+  @@include('./components/delivery-table/_delivery-table.js.html')
+  @@include('./_new-calculation-page.js.html')
+</body>
+
+</html>

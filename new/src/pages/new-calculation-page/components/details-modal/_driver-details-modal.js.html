@@ -1,0 +1,324 @@
+@@include('./_driver-details-modal.html')
+
+<script type="text/javascript">
+    ko.components.register('driver-details-modal-dialog', {
+        viewModel: {
+            createViewModel: function (params, componentInfo) {
+                const $element = $(componentInfo.element);
+                $element.addClass([
+                    'modal-dialog-content',
+                    'modal-dialog-content--initializing'
+                ]);
+
+
+
+                return new (function () {
+                    this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+                    this.windowResizeHandler = () => {
+                        this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                    };
+                    $(window).on('resize', this.windowResizeHandler);
+
+                    this.initializing = ko.observable(true);
+
+                    this.isSubmitted = ko.observable(true);
+                    this.isLoading = ko.observable(true);
+
+                    this.formControlErrorStateMatcher = function (formControl) {
+                        return ko.pureComputed(() => {
+                            return this.isSubmitted() && !formControl.isValid();
+                        });
+                    };
+
+                    this.tabs = [
+                        new HrmTabGroupItem('Заказы'),
+                        new HrmTabGroupItem('Маршруты'),
+                    ];
+                    this.activeTab = ko.observable(0);
+
+                    this.employeeId = ko.observable(params.data.employee.id);
+                    this.employeeId.subscribe(v => {
+                        this.isLoading(true);
+                        this.loadData(v);
+                    });
+
+                    this.employees = params.data.employees;
+
+                    this.orders = ko.observableArray([]);
+                    this.routes = ko.observableArray([]);
+
+                    this.changeOrderDriver = (driverId) => {
+                        const orderId = this.activeOrder().id;
+                        console.log('change order driver', orderId, driverId);
+                    };
+
+                    this.getOrdersSum = orders => {
+                        return orders.reduce((acc, o) => acc + o.sum, 0);
+                    }
+
+
+
+                    this.loadData = (id) => {
+                        setTimeout(() => {
+
+                            const orders = [
+                                {
+                                    id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                    deliveryTime: '1ч 4мин',
+                                    sum: 900,
+                                    operatorName: 'Булекова Ольга',
+                                    driverId: 'driver2',
+                                    driverName: 'Харитонов Алексей',
+                                    items: [
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Вилка',
+                                            count: 2,
+                                            price: 0
+                                        }
+                                    ],
+                                    processing: {
+                                        createdAt: '11:09',
+                                        confirmedAt: '11:09',
+                                        printedAt: '11:09',
+                                        readyAt: '11:09',
+                                        sendedAt: '11:09',
+                                        paidAt: '11:09',
+                                        deliveredAt: '11:09',
+                                    },
+                                    delivery: {
+                                        date: '12:09 03.04.2020',
+                                        time: '12 мин',
+                                        address: 'г. Ленинский городской округ, раб. пос. Боброво, ул. Крымская, д.15'
+                                    }
+                                },
+                                {
+                                    id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                    deliveryTime: '1ч 4мин',
+                                    sum: 900,
+                                    operatorName: 'Булекова Ольга',
+                                    driverId: 'driver1',
+                                    driverName: 'Харитонов Алексей',
+                                    items: [
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Вилка',
+                                            count: 2,
+                                            price: 0
+                                        }
+                                    ],
+                                    processing: {
+                                        createdAt: '11:09',
+                                        confirmedAt: '11:09',
+                                        printedAt: '11:09',
+                                        readyAt: '11:09',
+                                        sendedAt: '11:09',
+                                        paidAt: '11:09',
+                                        deliveredAt: '11:09',
+                                    },
+                                    delivery: {
+                                        date: '12:09 03.04.2020',
+                                        time: '12 мин',
+                                        address: 'г. Ленинский городской округ, раб. пос. Боброво, ул. Крымская, д.15'
+                                    }
+                                },
+                                {
+                                    id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                    deliveryTime: '1ч 4мин',
+                                    sum: 900,
+                                    operatorName: 'Булекова Ольга',
+                                    driverId: 'driver1',
+                                    driverName: 'Харитонов Алексей',
+                                    items: [
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Вилка',
+                                            count: 2,
+                                            price: 0
+                                        }
+                                    ],
+                                    processing: {
+                                        createdAt: '11:09',
+                                        confirmedAt: '11:09',
+                                        printedAt: '11:09',
+                                        readyAt: '11:09',
+                                        sendedAt: '11:09',
+                                        paidAt: '11:09',
+                                        deliveredAt: '11:09',
+                                    },
+                                    delivery: {
+                                        date: '12:09 03.04.2020',
+                                        time: '12 мин',
+                                        address: 'г. Ленинский городской округ, раб. пос. Боброво, ул. Крымская, д.15'
+                                    }
+                                },
+                                {
+                                    id: 16567,
+                                    address: 'г. Москва, пос. Сосенское, ул. СНТ Филатов луг, д. 2',
+                                    deliveryTime: '1ч 4мин',
+                                    sum: 900,
+                                    operatorName: 'Булекова Ольга',
+                                    driverId: 'driver2',
+                                    driverName: 'Харитонов Алексей',
+                                    items: [
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Картошка с говядиной и грибами',
+                                            count: 1,
+                                            price: 266
+                                        },
+                                        {
+                                            name: 'Вилка',
+                                            count: 2,
+                                            price: 0
+                                        }
+                                    ],
+                                    processing: {
+                                        createdAt: '11:09',
+                                        confirmedAt: '11:09',
+                                        printedAt: '11:09',
+                                        readyAt: '11:09',
+                                        sendedAt: '11:09',
+                                        paidAt: '11:09',
+                                        deliveredAt: '11:09',
+                                    },
+                                    delivery: {
+                                        date: '12:09 03.04.2020',
+                                        time: '12 мин',
+                                        address: 'г. Ленинский городской округ, раб. пос. Боброво, ул. Крымская, д.15'
+                                    }
+                                }
+                            ];
+                            this.orders(orders);
+
+                            const routes = [
+                                {
+                                    orders: orders.slice(0, 1),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    orders: orders.slice(0, 2),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 16.9,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                },
+                                {
+                                    orders: orders.slice(0, 1),
+                                    startedAt: '03.04.2020 11:44',
+                                    finishedAt: '03.04.2020 12:38',
+                                    distKm: 12.4,
+                                    estimatedTime: '0:55',
+                                    actualTime: '0:35'
+                                }
+                            ];
+                            this.routes(routes);
+
+                            this.isLoading(false);
+
+                        }, 3000);
+                    };
+
+                    this.loadData(this.employeeId());
+
+                    this.save = function () {
+                        this.isSubmitted(true);
+                    };
+
+                    this.cancel = function () {
+                        params.cancel();
+                    };
+
+
+
+
+                    this.afterRender = function () {
+                        $element.removeClass('modal-dialog-content--initializing');
+                        this.initializing(false);
+                    }.bind(this);
+
+                    this.afterDetailsAdd = el => {
+                        let $block = $(el).find('.details-block');
+                        $block.hide();
+                        $(el).fadeIn(0, () => {
+                            $block.slideDown(300);
+                        });
+                    };
+
+                    this.beforeDetailsRemove = el => {
+                        let $block = $(el).find('.details-block');
+                        $block.slideUp(300, () => {
+                            $(el).fadeOut(0, () => {
+                                $(el).remove();
+                            })
+                        })
+                    }
+
+                    this.dispose = function () {
+                        $(window).off('resize', this.windowResizeHandler);
+                    };
+                });
+            }
+        },
+        template: { element: 'driver-details-modal-dialog-template' }
+    });
+</script>

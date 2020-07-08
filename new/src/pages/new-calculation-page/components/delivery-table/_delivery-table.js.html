@@ -1,0 +1,245 @@
+@@include('./_delivery-table.html')
+
+<script type="text/javascript">
+  $(function () {
+    function Column(id, title, fullTitle, colored) {
+      return {
+        id,
+        title,
+        fullTitle,
+        colored,
+        visible: ko.observable(true),
+        clicked: ko.observable(false)
+      }
+    }
+
+    ko.components.register('calculation-page-delivery-table', {
+      viewModel: {
+        /**
+        * @param {ObservableArray} params.positions
+        */
+        createViewModel: function (params, componentInfo) {
+          const editableCellErrorStateMatcher = (control) => {
+            return ko.pureComputed(() => {
+              return !control.isValid() ? { message: control.error() } : null;
+
+            });
+          };
+
+          const position = params.position;
+          const model = params.model;
+          const total = params.total;
+
+
+          /* Table columns */
+          const columns = [
+            Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет'),
+            Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом'),
+            Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
+            Column('work-time', 'Рабочее время', 'Рабочее время'),
+            Column('orders-count', 'Кол-во заказов', 'Кол-во заказов'),
+            Column('orders-value', 'Стоимость заказов, ₽', 'Стоимость заказов'),
+            Column('average-bill', 'Средний чек, ₽', 'Средний чек'),
+            Column('dist-km', 'Расст-е, км', 'Расст-е, км'),
+            Column('estimated-time', 'Расчет. время в пути', 'Расчет. время в пути'),
+            Column('actual-time', 'Факт. время в пути', 'Факт. время в пути'),
+            Column('kpi', 'KPI', 'KPI'),
+            Column('time-without-case', 'Время без дела, %', 'Время без дела, %'),
+            Column('time', 'Время', 'Время'),
+            Column('orders', 'Заказы', 'Заказы'),
+            Column('dist', 'Расст.', 'Расст.'),
+            Column('min-payment', 'Min оплата., ₽', 'Min оплата., ₽'),
+            Column('surcharge', 'Надбавка, ₽', 'Надбавка, ₽'),
+            Column('late-surcharge', 'Надб. за поздний выезд, ₽', 'Надб. за поздний выезд, ₽'),
+            Column('short-shift-surcharge', 'Надб. за короткую смену, ₽', 'Надб. за короткую смену, ₽'),
+            Column('premation', 'Прем., ₽', 'Премирование'),
+            Column('fine', 'Штраф, ₽', 'Штраф'),
+            Column('total', 'Всего начислено, ₽', 'Всего начислено, ₽', true),
+            Column('payment', 'К выплате, ₽', 'К выплате, ₽', true)
+          ];
+          const defaultColumnsState = localStorage.getItem('calculation-page-delivery-columns');
+          if (defaultColumnsState) {
+            const state = JSON.parse(defaultColumnsState);
+            columns.forEach(column => {
+              if (column.id in state && state[column.id] === 0) {
+                column.visible(false);
+              }
+            })
+          };
+
+          const activeColumns = ko.pureComputed(() => {
+            return columns.filter(c => c.visible()).length;
+          });
+          const isColumnVisible = (columnName) => {
+            const column = columns.find(c => c.id === columnName);
+            if (column) return column.visible;
+            else return false;
+          };
+          const columnCount = ko.pureComputed(() => {
+            return activeColumns() + 1;
+          });
+
+          const getColumnClicked = (columnName) => {
+            const column = columns.find(c => c.id === columnName);
+            if (column) return column.clicked;
+          }
+
+          /** Sets columns visibility */
+          function setColumns() {
+            params.utils.openModal('columns', { columns: columns }, () => {
+              saveColumnsState();
+            });
+          }
+
+          function setColumnsState(set) {
+            columns.forEach(c => {
+              const isVisible = set ? set.includes(c.id) : true;
+              c.visible(isVisible);
+            });
+            saveColumnsState();
+          }
+
+          function saveColumnsState() {
+            const state = columns.reduce((acc, column) => {
+              return {
+                ...acc,
+                [column.id]: column.visible() ? 1 : 0
+              }
+            }, {});
+            localStorage.setItem('calculation-page-delivery-columns', JSON.stringify(state));
+          }
+
+          const columnSets = [
+            ['account', 'account-operations', 'interval', 'orders-count', 'orders-value', 'average-bill', 'dist-km', 'actual-time', 'kpi', 'time-without-case', 'premation', 'fine', 'payment'],
+            ['time-without-case', 'payment']
+          ];
+          const columnSetsIndex = ko.observable(-1);
+          const blockMoreInfo = ko.pureComputed(() => {
+            return !columns.some(c => !c.visible());
+          });
+          const blockLessInfo = ko.pureComputed(() => {
+            return !columns
+              .filter(c => !columnSets[1].includes(c.id))
+              .some(c => c.visible());
+          });
+
+          const moreInfo = () => {
+            const hasInvisibleColumns = columns.filter(c => columnSets[0].includes(c.id))
+            .some(c => !c.visible());
+            if (hasInvisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState();
+            $(window).resize();
+          };
+
+          const lessInfo = () => {
+            const hasVisibleColumns = columns.filter(c => !columnSets[0].includes(c.id))
+                .some(c => c.visible());
+            if (hasVisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState(columnSets[1]);
+            $(window).resize();
+          };
+
+
+          /**
+          * Opens Account Operations modal
+          * @param {Object} employee
+          */
+          function performAccountOperations(employee) {
+            params.utils.openModal('account-operations', {
+              employee: employee,
+            });
+          }
+
+          /**
+          * Opens Employee bonus modal
+          * @param {Object} employee
+          */
+          function giveBonus(employee) {
+            params.utils.openModal('employee-bonus', {
+              employee: employee,
+              bonuses: window.directories.bonuses,
+              authors: window.directories.authors,
+            }, (result) => {
+              console.log('after bonus', result)
+            });
+          }
+
+          /**
+          * Opens Employee fine modal
+          * @param {Object} employee
+          */
+          function giveFine(employee) {
+            params.utils.openModal('employee-fine', {
+              employee: employee,
+              fines: window.directories.fines,
+              authors: window.directories.authors,
+            }, (result) => {
+              console.log('after fine', result)
+            });
+          }
+
+          /**
+          * Removes employee from calculation
+          * @param {Object} employee
+          */
+          function removeEmployee(employee) {
+            employee.visible(false);
+          };
+
+
+
+          const openDriverModal = (employee) => {
+            params.utils.openModal('driver-details', {
+              employee: employee,
+              employees: position().visibleEmployees()
+            }, () => {
+
+            });
+          }
+
+          const openRoutesModal = (employee) => {
+            params.utils.openModal('routes', {
+              employee: employee
+            }, () => {
+
+            });
+          }
+
+          return {
+            getColumnClicked,
+
+            viewportSize: params.utils.viewportSize,
+            tabName: params.tabName,
+
+            editableCellErrorStateMatcher,
+            columns,
+            activeColumns,
+            columnCount,
+            isColumnVisible,
+            setColumns,
+
+            moreInfo,
+            blockMoreInfo,
+            lessInfo,
+            blockLessInfo,
+
+            position,
+            total,
+
+            removeEmployee,
+
+            performAccountOperations,
+            giveBonus,
+            giveFine,
+
+            openDriverModal,
+            openRoutesModal,
+          };
+        }
+      },
+      template: {
+        element: document.getElementById('calculation-page-delivery-table-template')
+      }
+    });
+  })
+</script>

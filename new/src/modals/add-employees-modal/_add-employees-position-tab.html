@@ -1,0 +1,136 @@
+<script type="text/html"
+        id="add-employees-modal-employee-template">
+  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+<div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+  <div data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: employee.checked }}">
+  </div>
+  <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: employee.name"></label>
+</div>
+<!-- /ko -->
+</script>
+
+<script type="text/html"
+        id="add-employees-modal-position-list-template">
+
+        <div class="employees-form__employees-scrollable-list"
+        data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {} } }">
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="employees-form__checkbox-group">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+
+              <!-- ko foreach: {data: $parent.position.employees, as: 'employee'} -->
+              <!-- ko if: employee.visible -->
+              <div class="employees-form__checkbox">
+
+                    <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
+                    <!-- /ko -->
+              </div>
+              <!-- /ko -->
+              <!-- /ko -->
+
+
+          </div>
+        </div>
+        <!-- /ko -->
+
+        </div>
+</script>
+
+<script type="text/html"
+        id="add-employees-modal-other-list-template">
+
+  <div class="employees-form__employees-scrollable-list"
+  data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {} } }">
+
+  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+  <div class="employees-form__checkbox-group">
+    <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+
+      <!-- ko foreach: { data: $parent.positions, as: 'position' } -->
+      <div class="employees-form__position"
+            data-bind="if: position.hasVisibleEmployees">
+        <div class="employees-form__position-name"
+              data-bind="text: position.name"></div>
+
+        <!-- ko foreach: {data: position.employees, as: 'employee'} -->
+        <!-- ko if: employee.visible -->
+        <div class="employees-form__checkbox">
+
+              <!-- ko template: { name: 'add-employees-modal-employee-template', data: {employee: employee} } -->
+              <!-- /ko -->
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+
+      </div>
+      <!-- /ko -->
+    </div>
+  </div>
+  <!-- /ko -->
+
+  </div>
+
+</script>
+
+
+<template id="add-employees-position-tab-template">
+  <div class="employees-form__row">
+    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+    <div class="hrm-form-field-switch-group"
+         data-bind="hrmSwitchGroup, hrmSwitchGroupControlRef: control, hrmSwitchGroupLabelRef: label">
+      <div data-bind="component: {name: 'hrm-switch', params: {exportAs: control, checked: allBranches}}"></div>
+      <label data-bind="hrmSwitchGroupLabel: label">
+        Все филиалы
+      </label>
+    </div>
+    <!-- /ko -->
+
+    <div class="employees-form__search"
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по ФИО' }}">
+    </div>
+  </div><!-- .employees-form__row -->
+
+
+  <!-- Подгрузка сотрудников -->
+  <!-- ko template: {
+        foreach: hrmTemplateIf(loadingBranches(), $data),
+        afterAdd: hrmFadeAfterAddFactory(200, 200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+  <div>
+    <div class="employees-form__calculating">
+      <i class="fa fa-spinner fa-pulse
+                            employees-form__calculating-indicator">
+      </i>
+    </div>
+  </div>
+  <!-- /ko -->
+
+  <div class="employees-form__tab modal-dialog__scroll">
+  <!-- Отображение сотрудников -->
+  <!-- ko template: {
+        foreach: hrmTemplateIf(!loadingBranches(), $data),
+        afterAdd: hrmFadeAfterAddFactory(200, 200),
+        beforeRemove: hrmFadeBeforeRemoveFactory(200)
+      } -->
+
+  <!-- Список позиций -->
+  <!-- ko ifnot: isSingle -->
+  <!-- ko template: { name: 'add-employees-modal-other-list-template', data: {positions: positions} } -->
+  <!-- /ko -->
+  <!-- /ko -->
+  <!-- /Список позиций -->
+
+  <!-- Одна позиция -->
+  <!-- ko if: isSingle -->
+  <!-- ko template: { name: 'add-employees-modal-position-list-template', data: {position: positions[0]} } -->
+  <!-- /ko -->
+  <!-- /ko -->
+  <!-- /Одна позиция -->
+
+  <!-- /ko -->
+  <!-- /Отображение сотрудников -->
+  </div>
+
+</template>

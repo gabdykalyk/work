@@ -1,0 +1,72 @@
+@@include('./_summary-position-row.html')
+@@include('./_summary-drivers-row.html')
+@@include('./_summary-total-row.html')
+@@include('./_summary-table.html')
+
+<script type="text/javascript">
+  $(function () {
+    function Column(id, title, fullTitle, colspan) {
+      return {
+        id,
+        title,
+        fullTitle,
+        colspan,
+        clicked: ko.observable(false)
+      }
+    }
+
+    ko.components.register('calculation-page-summary-table', {
+      viewModel: {
+        /**
+        * @param {ObservableArray} params.positions
+        */
+        createViewModel: function (params, componentInfo) {
+          const model = params.model;
+          const positions = model.positions;
+
+          const visiblePositions = ko.computed(() => {
+            return positions().filter(p => {
+              if (p.visible()) return true;
+              if (p.visibleEmployees().length > 0) return true;
+            });
+          });
+
+          const driversData = model.driversData();
+
+          const total = model.total;
+
+          const columns = [
+            Column('job', 'Должность', 'Должность'),
+            Column('workload-type', 'Тип нагрузки', 'Тип нагрузки'),
+            Column('workload', 'Нагрузка', 'Нагрузка', 2),
+            Column('additional-workload', 'Доп. нагрузка', 'Дополнительная нагрузка'),
+            Column('count', 'Сотр.', 'Сотрудники'),
+            Column('fot-category', 'ФОТ, % в категории', 'ФОТ, % в категории'),
+            Column('fot-revenue', 'ФОТ, % от выручки', 'ФОТ, % от выручки'),
+            Column('performance-standart', 'Норм. выр-ки, %', 'Норма выработки, %'),
+            Column('lateness', 'Опоздания', 'Опоздания'),
+          ];
+
+          const getColumnClicked = (columnId) => {
+            let column = columns.find(c => c.id === columnId);
+            if (!column) return false;
+            return column.clicked;
+          };
+
+
+          return {
+            getColumnClicked,
+            positions,
+            visiblePositions,
+            total,
+            columns,
+            driversData
+          };
+        }
+      },
+      template: {
+        element: document.getElementById('calculation-page-summary-table-template')
+      }
+    });
+  })
+</script>

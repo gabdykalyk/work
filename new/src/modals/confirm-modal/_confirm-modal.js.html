@@ -1,0 +1,43 @@
+@@include('./_confirm-modal.html')
+
+<script>
+  $(function () {
+    ko.components.register('confirm-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'modal-dialog--confirm'
+          ]);
+
+          const ViewModel = function () {
+            this.text = params.data.text;
+            this.confirmButton = params.data.confirmButton || 'Подтвердить';
+            this.cancelButton = params.data.cancelButton || 'Отменить';
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              if ('submit' in params) {
+                params.submit(true);
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: 'confirm-modal-dialog-template'
+      }
+    });
+  })
+</script>

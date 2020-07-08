@@ -21,7 +21,9 @@
 
         _destroy() {
             this._subscriptions.forEach(s => s.dispose());
-            this._disabledSubscription.dispose();
+            if (this._disabledSubscription !== null) {
+                this._disabledSubscription.dispose();
+            }
         }
 
         _setDisabled(disabled) {
@@ -51,6 +53,7 @@
 
             if (!this._disabled) {
                 if (this._overlayScrollbarsInstance === null) {
+
                     $element.overlayScrollbars(this._overlayScrollbarsOptions);
                     this._overlayScrollbarsInstance = $element.overlayScrollbars();
                 }

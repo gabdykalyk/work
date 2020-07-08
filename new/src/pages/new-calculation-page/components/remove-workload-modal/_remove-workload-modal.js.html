@@ -1,0 +1,334 @@
+<script type="text/javascript">
+  $(function () {
+
+    ko.components.register('employee-remove-workload-partially-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'modal-dialog--remove-workload'
+          ]);
+
+          const ViewModel = function () {
+            this.employee = params.data.employee;
+            this.isSubmitted = ko.observable(false);
+
+            this.salary = ko.observable(this.employee.salary()).extend({
+              required: {
+                message: 'Обязательное поле'
+              }
+            });
+            this.normRatio = ko.observable(this.employee.normRatio()).extend({
+              required: {
+                message: 'Обязательное поле'
+              }
+            });
+            this.bonusRatio = ko.observable(this.employee.bonusRatio()).extend({
+              required: {
+                message: 'Обязательное поле'
+              }
+            });
+            this.depremationRatio = ko.observable(this.employee.depremationRatio()).extend({
+              required: {
+                message: 'Обязательное поле'
+              }
+            });
+
+            this.validationObject = ko.validatedObservable({
+              salary: this.salary,
+              normRatio: this.normRatio,
+              bonusRatio: this.bonusRatio,
+              depremationRatio: this.depremationRatio,
+            });
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if (this.validationObject.isValid()) {
+                this.employee.salary(this.salary());
+                this.employee.normRatio(this.normRatio());
+                this.employee.bonusRatio(this.bonusRatio());
+                this.employee.depremationRatio(this.depremationRatio());
+                if ('submit' in params) {
+                  params.submit();
+                }
+              }
+
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('remove-workload-partially-modal-dialog-template')
+      }
+    });
+
+
+    ko.components.register('employee-remove-workload-completely-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'modal-dialog--remove-workload'
+          ]);
+
+          const ViewModel = function () {
+            this.employee = params.data.employee;
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.employee.normRatio(0);
+                this.employee.bonusRatio(0);
+                this.employee.depremationRatio(0);
+
+              if ('submit' in params) {
+                params.submit();
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('remove-workload-completely-modal-dialog-template')
+      }
+    });
+  });
+</script>
+
+<template id="remove-workload-completely-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button" data-bind="click: function() { cancel(); }"
+    aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Полностью освободить от нагрузки
+      <br>
+      <span class="font-weight-normal" data-bind="text: employee.name"></span>
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body">
+    Для сотрудника <span class="bold" data-bind="text: employee.name"></span> будет полностью снята нагрузка за текущую
+    смену. Сотрудник за отработанную смену получит только свою заработную плату без учёта коэффициентов: норматива,
+    премирования, депремирования.
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         " data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         " data-bind="click: function() {submit();}">
+      Снять нагрузку
+    </button>
+  </div>
+
+</template>
+
+<template id="remove-workload-partially-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button" data-bind="click: function() { cancel(); }"
+    aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Частично освободить от нагрузки
+      <br>
+      <span class="font-weight-normal" data-bind="text: employee.name"></span>
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body">
+
+    <div class="row">
+      <div class="col col-6 col-md-3 mb-4">
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">
+            Оклад, ₽
+
+            <button
+            class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-circle-icon-button--size_small"
+            data-bind="hrmTooltip, hrmTooltipText: 'Оклад, ₽'"></button>
+          </label>
+
+
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="
+                  textInput: salary,
+                  hrmMask, hrmMaskPattern: 'decimal',
+                  hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                  hrmFormFieldInputControl: control,
+                  hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+              " placeholder="0" im-insert="true" class="hrm-form-field__control hrm-form-field__control--type_input"
+              id="hrm-form-field-input-control-2">
+          </div>
+
+          <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150">
+            <!-- ko text: $parent.salary.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+      <div class="col col-6 col-md-3 mb-4">
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">
+            Коэфф. норм.
+            <button
+            class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral  hrm-circle-icon-button--size_small"
+            data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент норматива'"></button>
+          </label>
+
+
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="
+                  textInput: normRatio,
+                  hrmMask, hrmMaskPattern: 'decimal',
+                  hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                  hrmFormFieldInputControl: control,
+                  hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+              " placeholder="0" im-insert="true" class="hrm-form-field__control hrm-form-field__control--type_input"
+              id="hrm-form-field-input-control-2">
+          </div>
+
+          <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150">
+            <!-- ko text: $parent.salary.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+      <div class="col col-6 col-md-3 mb-4">
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">
+            Коэфф. прем-я
+            <button
+            class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral  hrm-circle-icon-button--size_small"
+            data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент премирования'"></button>
+          </label>
+
+
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="
+                  textInput: bonusRatio,
+                  hrmMask, hrmMaskPattern: 'decimal',
+                  hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                  hrmFormFieldInputControl: control,
+                  hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+              " placeholder="0" im-insert="true" class="hrm-form-field__control hrm-form-field__control--type_input"
+              id="hrm-form-field-input-control-2">
+          </div>
+
+          <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150">
+            <!-- ko text: $parent.salary.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+      <div class="col col-6 col-md-3 mb-4">
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">
+            Коэфф. депр-я
+
+            <button
+            class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-circle-icon-button--size_small"
+            data-bind="hrmTooltip, hrmTooltipText: 'Коэффициент депремирования'"></button>
+          </label>
+
+
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="
+                  textInput: depremationRatio,
+                  hrmMask, hrmMaskPattern: 'decimal',
+                  hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                  hrmFormFieldInputControl: control,
+                  hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+              " placeholder="0" im-insert="true" class="hrm-form-field__control hrm-form-field__control--type_input"
+              id="hrm-form-field-input-control-2">
+          </div>
+
+          <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150">
+            <!-- ko text: $parent.salary.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+    </div>
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         " data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         " data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>

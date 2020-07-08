@@ -1,0 +1,130 @@
+@@include('./_account-operations-modal.html')
+
+<script>
+  $(function () {
+    function AccountOperation(operationData) {
+      operationData = operationData || {};
+
+      this.type = ko.observable(operationData.type || 'fine').extend({
+        required: {
+          message: 'Обязательное поле'
+        }
+      });
+      this.sum = ko.observable(parseFloat(operationData.sum) || '').extend({
+        required: {
+          message: 'Обязательное поле'
+        },
+        number: {
+          message: 'Некорректный формат'
+        }
+      });
+      this.comment = ko.observable(operationData.comment || '');
+      this.commentPlaceholder = ko.pureComputed(() => {
+        return this.type() === 'fine' ? 'Комментарий к списанию' : 'Комментарий к начислению';
+      });
+      this.total = ko.pureComputed(() => {
+        const sign = this.type() === 'fine' ? -1 : 1;
+        return this.sum() * sign;
+      });
+
+      this.getData = () => {
+        let sum = parseFloat(this.sum());
+        sum = sum.toFixed(2);
+
+        return {
+          type: this.type(),
+          sum: parseFloat(sum),
+          comment: this.comment()
+        };
+      }
+    }
+
+    ko.components.register('account-operations-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'modal-dialog--account-operations'
+          ]);
+
+          const ViewModel = function (operations) {
+            this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+            this.windowResizeHandler = () => {
+              this.viewportSize({ width: $(window).width(), height: $(window).height() });
+            };
+            $(window).on('resize', this.windowResizeHandler);
+
+            this.formatSign = (number) => {
+              const formattedNumber = parseFloat(ko.unwrap(number));
+              if (!formattedNumber) return number;
+              if (formattedNumber > 0) return '+' + formattedNumber;
+              return formattedNumber;
+            };
+
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.operations = ko.observableArray(operations.map(o => new AccountOperation(o)));
+            if (!this.operations().length) this.operations.push(new AccountOperation());
+
+            this.total = ko.pureComputed(() => {
+              return this.operations().reduce((sum, operation) => {
+
+                return Math.floor((sum + operation.total()) * 100) / 100;
+              }, 0);
+            })
+
+            this.addOperation = () => {
+              this.operations.push(new AccountOperation());
+            }
+
+            this.removeOperation = (operation) => {
+              this.operations.remove(operation);
+            }
+
+            /** Закрыть окно без изменений */
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            /** Применить изменения */
+            this.apply = function () {
+              employee.accountOperations(this.operations()
+                .map(operation => operation.getData())
+                .filter(operation => operation.sum));
+            }
+
+            this.submit = function () {
+              if ('submit' in params) {
+                this.apply();
+                params.submit(true);
+              }
+            };
+
+            this.dispose = function () {
+              $(window).off('resize', this.windowResizeHandler);
+            };
+
+          }
+
+          const employee = params.data.employee;
+          return new ViewModel(employee.accountOperations());
+        }
+      },
+      template: {
+        element: 'account-operations-modal-dialog-template'
+      }
+    });
+  })
+</script>

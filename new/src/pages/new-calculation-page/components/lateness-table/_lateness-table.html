@@ -1,0 +1,334 @@
+<template id="lateness-position-template">
+  <table class="lateness-table-position" data-bind="hrmTable, let: { intervals: table.intervals, latenessDegree: table.filters.lateness }">
+    <thead>
+      <tr>
+        <th data-bind="attr: {colspan: position.paramsCount + (latenessDegree() ? 1 : 4) }">
+          <div data-bind="text: position.name"></div>
+        </th>
+      </tr>
+      <tr>
+        <th class="lateness-table__position-param">
+          <div>КОРФ</div>
+        </th>
+        <th>
+          <div>Нагрузка</div>
+        </th>
+        <th class="lateness-table__position-param">
+          <div>Сотр.</div>
+        </th>
+        <!-- ko foreach: position.params -->
+        <th class="lateness-table__position-param">
+          <div data-bind="text: $data.name"></div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 1 -->
+        <th class="lateness-table__position-param lateness-table__lateness-degree">
+          <div>&lt;5</div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 2 -->
+        <th class="lateness-table__position-param lateness-table__lateness-degree">
+          <div>5-10</div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 3 -->
+        <th class="lateness-table__position-param lateness-table__lateness-degree">
+          <div>&gt;10</div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() -->
+        <th class="lateness-table__position-param">
+          <div>Всего</div>
+        </th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: { data: intervals, as: 'interval' } -->
+      <tr data-bind="let: {
+        latenessInterval: position.lateness.intervals()[intervalIndex()],
+        i: intervalIndex()
+      }">
+        <td align="right">
+          <div data-bind="text: position.korf.intervals()[i]"></div>
+        </td>
+        <td align="right" data-bind="style: {
+          'background-color': position.getWorkloadColor(i)
+        }">
+          <div data-bind="text: position.workload.intervals()[i]"></div>
+        </td>
+        <td align="right">
+          <div data-bind="text: position.employees.intervals()[i]"></div>
+        </td>
+
+        <!-- ko foreach: { data: position.params, as: 'param' } -->
+        <!-- ko let: { paramModel: position[param.id] } -->
+        <td align="right">
+          <div data-bind="text: paramModel.intervals()[i]"></div>
+        </td>
+        <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: !latenessDegree() || latenessDegree() == 1 -->
+        <td align="center" data-bind="style: {
+          'background-color': latenessInterval.light > 0 ? '#B8EFD5' : ''
+        }">
+          <div data-bind="text: latenessInterval.light || ''"></div>
+        </td>
+        <!-- /ko -->
+
+        <!-- ko if: !latenessDegree() || latenessDegree() == 2 -->
+        <td align="center" data-bind="style: {
+          'background-color': latenessInterval.medium > 0 ? '#FDFFB3' : ''
+        }">
+          <div data-bind="text: latenessInterval.medium || ''"></div>
+        </td>
+        <!-- /ko -->
+
+        <!-- ko if: !latenessDegree() || latenessDegree() == 3 -->
+        <td  align="center" data-bind="style: {
+          'background-color': latenessInterval.hard > 0 ? '#FFE6F2' : ''
+        }">
+          <div data-bind="text: latenessInterval.hard || ''"></div>
+        </td>
+        <!-- /ko -->
+
+        <!-- ko if: !latenessDegree() -->
+        <td  align="center" data-bind="style: {
+          'background-color': position.lateness.intervalsTotal()[i] ? '' : ''
+        }">
+          <div data-bind="text: position.lateness.intervalsTotal()[i] || ''"></div>
+        </td>
+        <!-- /ko -->
+
+      </tr>
+      <!-- /ko -->
+
+      <tr data-bind="let: {latenessTotal: position.lateness.total()}">
+        <td align="right" class="lateness-table__highlighted">
+          <div data-bind="text: position.korf.total"></div>
+        </td>
+        <td align="right" class="lateness-table__highlighted">
+          <div data-bind="text: position.workload.total"></div>
+        </td>
+        <td align="right" class="lateness-table__highlighted">
+          <div data-bind="text: position.employees.total"></div>
+        </td>
+        <!-- ko foreach: { data: position.params, as: 'param' } -->
+        <!-- ko let: { paramModel: position[param.id] } -->
+        <td align="right" class="lateness-table__highlighted">
+          <div data-bind="text: paramModel.total"></div>
+        </td>
+        <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: !latenessDegree() || latenessDegree() == 1 -->
+        <td align="center">
+          <div data-bind="text: latenessTotal.light || ''"></div>
+        </td>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 2 -->
+        <td align="center">
+          <div data-bind="text: latenessTotal.medium || ''"></div>
+        </td>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 3 -->
+        <td align="center">
+          <div data-bind="text: latenessTotal.hard || ''"></div>
+        </td>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() -->
+        <td align="center">
+          <div data-bind="text: latenessTotal.total || ''"></div>
+        </td>
+        <!-- /ko -->
+      </tr>
+    </tbody>
+  </table>
+</template>
+
+<template id="lateness-total-template">
+  <table class="lateness-table-total" data-bind="hrmTable, let: { intervals: table.intervals, latenessDegree: table.filters.lateness }">
+    <thead>
+      <tr>
+        <th data-bind="attr: {colspan: latenessDegree() ? 1 : 4 }">
+          <div>Итого</div>
+        </th>
+      </tr>
+      <tr>
+        <!-- ko if: !latenessDegree() || latenessDegree() == 1 -->
+        <th align="center" class="lateness-table__position-param lateness-table__lateness-degree">
+          <div>&lt;5</div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 2 -->
+        <th align="center" class="lateness-table__position-param lateness-table__lateness-degree">
+          <div>5-10</div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 3 -->
+        <th align="center" class="lateness-table__position-param lateness-table__lateness-degree">
+          <div>&gt;10</div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() -->
+        <th align="center" class="lateness-table__position-param">
+          <div>Всего</div>
+        </th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody data-bind="let: { total: table.total() }" data-bind="descendantsComplete: function() {
+      console.log('descendants1');
+    }, childrenComplete: function() {
+      console.log('children1');
+    }">
+      <!-- ko foreach: { data: intervals, as: 'interval' } -->
+      <tr data-bind="let: {latenessInterval: total.intervals[intervalIndex()]}">
+        <!-- ko if: !latenessDegree() || latenessDegree() == 1 -->
+        <th align="center" data-bind="style: {
+          'background-color': latenessInterval.light > 0 ? '#B8EFD5' : ''
+        }">
+          <div data-bind="text: latenessInterval.light"></div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 2 -->
+        <th align="center" data-bind="style: {
+          'background-color': latenessInterval.medium > 0 ? '#FDFFB3' : ''
+        }">
+          <div data-bind="text: latenessInterval.medium"></div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 3 -->
+        <th align="center" data-bind="style: {
+          'background-color': latenessInterval.hard > 0 ? '#FFE6F2' : ''
+        }">
+          <div data-bind="text: latenessInterval.hard"></div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() -->
+        <th align="center">
+          <div data-bind="text: latenessInterval.total"></div>
+        </th>
+        <!-- /ko -->
+      </tr>
+      <!-- /ko -->
+
+      <tr data-bind="let: { latenessTotal: table.total().total }">
+        <!-- ko if: !latenessDegree() || latenessDegree() == 1 -->
+        <th>
+          <div data-bind="text: latenessTotal.light"></div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 2 -->
+        <th>
+          <div data-bind="text: latenessTotal.medium"></div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() || latenessDegree() == 3 -->
+        <th>
+          <div data-bind="text: latenessTotal.hard"></div>
+        </th>
+        <!-- /ko -->
+        <!-- ko if: !latenessDegree() -->
+        <th>
+          <div data-bind="text: latenessTotal.total"></div>
+        </th>
+        <!-- /ko -->
+      </tr>
+    </tbody>
+  </table>
+</template>
+
+<div class="lateness-table" data-bind="using: latenessModel">
+  <!-- ko template: {
+    foreach: hrmTemplateIf(!loaded(), $data),
+    afterAdd: hrmFadeAfterAddFactory(200, 200),
+    beforeRemove: hrmFadeBeforeRemoveFactory(200)
+  } -->
+  <div class="loader">
+    <i class="fa fa-spinner fa-pulse loader__indicator">
+    </i>
+  </div>
+  <!-- /ko -->
+
+  <!-- ko template: {
+      foreach: hrmTemplateIf(loaded(), $data),
+      afterAdd: hrmFadeAfterAddFactory(200)
+    } -->
+
+  <div data-bind="component: {
+  name: 'hrm-scrollable-wrapper',
+  params: { options: {left: {disabled: true}} }
+}">
+
+    <table class="lateness-table__positions"
+    data-bind="descendantsComplete: function() {
+      console.log('descendants');
+    }, childrenComplete: function() {
+      console.log('children');
+    }">
+
+      <tbody>
+        <tr>
+          <td class="lateness-table__container-cell lateness-table__fixed">
+
+            <table class="lateness-table__intervals" data-bind="hrmTable">
+              <thead>
+                <tr>
+                  <th height="80">
+                    <div>Всего</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- ko foreach: table.intervals -->
+                <tr>
+                  <td>
+                    <div data-bind="text: table.getIntervalString($data)"></div>
+                  </td>
+                </tr>
+                <!-- /ko -->
+                <tr>
+                  <td class="lateness-table__highlighted">
+                    <div></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+          </td>
+
+
+          <!-- ko foreach: {
+            data: table.positions.filter(p => p.visible()),
+            as: 'position'
+          } -->
+          <td class="lateness-table__container-cell">
+            <!-- ko template: {
+              name: 'lateness-position-template',
+              data: {
+                position: position,
+              }
+            } -->
+            <!-- /ko -->
+          </td>
+          <!-- /ko -->
+
+
+          <!-- ko if: table.positions.filter(p => p.visible()).length > 1 -->
+          <td class="lateness-table__container-cell">
+            <!-- ko template: {
+              name: 'lateness-total-template'
+            } -->
+            <!-- /ko -->
+          </td>
+          <!-- /ko -->
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+  <!-- /ko -->
+
+</div>

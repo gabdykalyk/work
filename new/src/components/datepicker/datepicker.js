@@ -1,12 +1,14 @@
 (() => {
     class HrmDatepickerViewModel {
-        constructor(element, value) {
+        constructor(element, value, config) {
             this._subscriptions = [];
             this._valueSubscription = null;
             this._value = null;
             this._daterangepicker = null;
             this._applyHandler = null;
             this.element = element;
+
+            this.config = config || {};
 
             this._init(value);
         }
@@ -16,12 +18,13 @@
 
             $element.attr('autocomplete', 'off');
 
-            $element.daterangepicker({
+            const params = {
                 singleDatePicker: true,
                 showDropdown: false,
-                autoUpdateInput: false,
+                autoUpdateInput: this.config.autoUpdateInput,
+                autoApply: true,
                 locale: {
-                    format: 'DD.MM.YYYY, dddd',
+                    format: this.config.format || 'DD.MM.YYYY, dddd',
                     monthNames: [
                         'Январь',
                         'Февраль',
@@ -47,7 +50,9 @@
                     ],
                     firstDay: 1
                 }
-            });
+            };
+
+            $element.daterangepicker(params);
 
             this._applyHandler = () => {
                 let newValue = this._daterangepicker.startDate.format(this._daterangepicker.locale.format);
@@ -102,7 +107,8 @@
     ko.bindingHandlers.hrmDatepicker = {
         init: function (element, valueAccessor, allBindings) {
             const value = allBindings.get('value');
-            const viewModel = new HrmDatepickerViewModel(element, value);
+            const config = allBindings.get('hrmDatepickerConfig');
+            const viewModel = new HrmDatepickerViewModel(element, value, config);
 
             instances.set(element, viewModel);
 

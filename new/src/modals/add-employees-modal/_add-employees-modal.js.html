@@ -1,0 +1,235 @@
+@@include('./_add-employees-position-tab.html')
+@@include('./_add-employees-modal.html')
+
+<script type="text/javascript">
+  $(function () {
+    const modes = {
+      SINGLE: 'single',
+      TABS: 'tabs',
+      LIST: 'list'
+    };
+
+    function EmployeeModel(employeeData) {
+      return {
+        id: employeeData.id,
+        name: employeeData.name,
+        checked: ko.observable(!!employeeData.visible()),
+        visible: ko.observable(true)
+      }
+    }
+
+    function PositionModel(positionData) {
+      const name = positionData.name;
+      const id = positionData.id;
+      const employees = ko.observableArray(positionData.employees().map(EmployeeModel));
+      const hasVisibleEmployees = ko.observable(true);
+      const visible = positionData.visible();
+      const loaded = ko.observable(positionData.allEmployeesLoaded());
+
+      function getData() {
+        return {
+          id,
+          employees: ko.toJS(employees),
+          loaded
+        }
+      }
+
+      return {
+        name,
+        id,
+        employees,
+        visible,
+        hasVisibleEmployees,
+        loaded,
+        getData
+      }
+    }
+
+    function NewEmployeeModel(employeeData) {
+      return {
+        id: employeeData.id,
+        name: employeeData.name,
+        checked: ko.observable(false),
+        visible: ko.observable(true),
+        loaded: true,
+      }
+    }
+
+    ko.components.register('add-employees-position-tab', {
+      viewModel: function (params) {
+        this.term = params.term;
+        this.mode = params.mode || ('position' in params ? modes.SINGLE : modes.LIST);
+
+        this.isSingle = this.mode === modes.SINGLE;
+
+        if (this.isSingle) {
+          this.positions = [params.position];
+        } else {
+          this.positions = params.positions;
+        }
+
+        const isAlreadyLoaded = this.positions.every(p => p.loaded());
+
+        this.allBranches = ko.observable(isAlreadyLoaded);
+        this.loadingBranches = ko.observable(false);
+        this.allBranches.subscribe(value => {
+          if (value) {
+            this.loadingBranches(true)
+            this.loadBranches(() => {
+              this.loadingBranches(false);
+            });
+          } else {
+            this.restoreEmployeesList();
+          }
+        });
+
+        this.restoreEmployeesList = () => {
+          this.positions.forEach(p => {
+            p.loaded(false);
+            const oldEmployeesList = p.employees().filter(e => !e.loaded)
+            p.employees(oldEmployeesList)
+          })
+        };
+
+        this.loadBranches = (cb) => {
+          if (this.isSingle) {
+            const position = this.positions[0];
+            position.loaded(true);
+            console.log('Сделать запрос, категория', position.name);
+            // Данные
+            const employeesList = [
+              { name: 'Рабочий #1', id: position.name + '1' },
+              { name: 'Рабочий #2', id: position.name + '2' },
+              { name: 'Рабочий #3', id: position.name + '3' }
+            ];
+
+            // Добавить новых работников
+            employeesList.forEach(e => {
+              position.employees.push(NewEmployeeModel(e))
+            });
+          } else {
+            const positionsList = this.positions.map(p => p.name)
+            // Добавить новых работников в каждую категию
+            updatedEmployees = this.positions.forEach(p => {
+              p.loaded(true);
+              const employeesList = [
+                { name: 'Рабочий #1', id: p.name + '1' },
+                { name: 'Рабочий #2', id: p.name + '2' },
+                { name: 'Рабочий #3', id: p.name + '3' }
+              ];
+              employeesList.forEach(e => {
+                p.employees.push(NewEmployeeModel(e))
+              });
+            })
+          }
+
+          setTimeout(cb, 3000)
+        }
+      },
+      template: {
+        element: 'add-employees-position-tab-template'
+      }
+    })
+
+    ko.components.register('add-employees-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'hrm-modal-dialog--size_large',
+            'modal-dialog--add-employees'
+          ]);
+
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.mode = params.data.mode || ('position' in params.data ? modes.SINGLE : modes.TABS);
+
+            this.positions = this.mode === modes.SINGLE
+              ? [PositionModel(params.data.position)]
+              : params.data.positions.map(PositionModel);
+
+            this.term = ko.observable('');
+            const termUpdateHandler = (value) => {
+              console.log('upate', value)
+              const formattedValue = value.toLowerCase();
+              this.positions.forEach(p => {
+                let hasVisibleEmployees = 0;
+                p.employees().forEach(e => {
+                  let isVisible = true;
+                  if (formattedValue.length >= 1) {
+                    const name = e.name.toLowerCase();
+                    isVisible = name.indexOf(formattedValue) !== -1;
+                  }
+                  e.visible(isVisible);
+                  if (isVisible) hasVisibleEmployees++;
+                });
+                p.hasVisibleEmployees(hasVisibleEmployees);
+              })
+            }
+            this.term.subscribe(value => {
+              termUpdateHandler(value);
+            });
+
+            this.tabs = null;
+            this.activePosition = null;
+            this.list = null;
+            this.title = 'Добавить сотрудников';
+
+            if (this.mode === modes.SINGLE) {
+              this.activePosition = ko.observable(this.positions[0]);
+              this.title = this.activePosition().name;
+            } else if (this.mode === modes.LIST) {
+              this.list = this.positions;
+              this.title = 'Прочие';
+            } else {
+              this.list = this.positions.filter(position => !position.visible);
+              const visiblePositions = this.positions.filter(position => position.visible);
+              this.tabs = (() => {
+                const tabs = visiblePositions.map(position => new HrmTabGroupItem(position.name));
+                if (this.list.length) tabs.push(new HrmTabGroupItem('Прочие'));
+                return tabs;
+              })();
+              this.activeTab = ko.observable(0);
+              this.activePosition = ko.pureComputed(() => {
+                return visiblePositions[this.activeTab()];
+              });
+              this.activeTab(0);
+            }
+
+            console.log('modal', ko.toJS(this.positions))
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+              if ('submit' in params) {
+                params.submit(this.positions.map(p => p.getData()));
+              }
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('add-employees-modal-dialog-template')
+      }
+    });
+  });
+</script>

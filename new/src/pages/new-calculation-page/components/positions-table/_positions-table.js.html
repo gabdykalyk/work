@@ -1,0 +1,299 @@
+@@include('./_positions-table.html')
+
+<script type="text/javascript">
+  $(function () {
+    function Column(id, title, fullTitle, colored) {
+      return {
+        id,
+        title,
+        fullTitle,
+        colored,
+        visible: ko.observable(true),
+        clicked: ko.observable(false)
+      }
+    }
+
+    ko.components.register('calculation-page-positions-table', {
+      viewModel: {
+        /**
+        * @param {ObservableArray} params.positions
+        */
+        createViewModel: function (params, componentInfo) {
+          const editableCellErrorStateMatcher = (control) => {
+            return ko.pureComputed(() => {
+              return !control.isValid() ? { message: control.error() } : null;
+
+            });
+          };
+
+
+
+          const positions = params.positions;
+          const model = params.model;
+
+          /** Invisible positions */
+          const hasOtherSection = ko.pureComputed(() => {
+            return positions().some(position => {
+              return !position.visible();
+            });
+          });
+
+          const total = params.total;
+
+
+          /* Table columns */
+          const columns = [
+            Column('account', 'Прем./ЛС, ₽', 'Премиальный счет/личный счет, ₽'),
+            Column('account-operations', 'Операции с ЛС, ₽', 'Операции с личным счетом, ₽'),
+            Column('level', 'Разряд', 'Разряд'),
+            Column('interval', 'Начало/конец работы', 'Начало/конец работы'),
+            Column('work-time', 'Рабочее время', 'Рабочее время'),
+            Column('compensation', 'Компенс.', 'Компенсация'),
+            Column('remove-workload', 'Освободить от нагрузки', 'Освободить от нагрузки'),
+            Column('workload', 'Нагрузка', 'Нагрузка'),
+            Column('salary', 'Оклад, ₽', 'Оклад, ₽'),
+            Column('salary-bulk', 'Осн. часть зп, ₽', 'Основная часть зарплаты, ₽'),
+            Column('revenue-standart-hour', 'Норм. выр-ки/ч', 'Норматив выручки/ч'),
+            Column('normalization-ratio', 'Коэфф. норм.', 'Коэффициент  норматива'),
+            Column('revenue-standart', 'Норм. выр-ки', 'Норматив выручки'),
+            Column('bonus-ratio', 'Коэфф. прем.-я', 'Коэффициент премирования'),
+            Column('depremation-ratio', 'Коэфф. депр.-я', 'Коэффициент депремирования'),
+            Column('corrected-time', 'Корр. время', 'Корректированное время'),
+            Column('bonus-exceed', 'Премия за прев. норм., ₽', 'Премия за превышение норматива, ₽'),
+            Column('depremation', 'Депр., ₽', 'Депремирование, ₽'),
+            Column('premation', 'Премия, ₽', 'Премия, ₽'),
+            Column('fine', 'Штраф, ₽', 'Штраф, ₽'),
+
+            Column('total', 'Всего начислено, ₽', 'Всего начислено, ₽', true),
+            Column('payment', 'К выплате, ₽', 'К выплате, ₽', true)
+          ];
+          const defaultColumnsState = localStorage.getItem('calculation-page-employees-columns');
+          if (defaultColumnsState) {
+            const state = JSON.parse(defaultColumnsState);
+            columns.forEach(column => {
+              if (column.id in state && state[column.id] === 0) {
+                column.visible(false);
+              }
+            })
+          };
+
+          const activeColumns = ko.pureComputed(() => {
+            return columns.filter(c => c.visible()).length;
+          });
+          const isColumnVisible = (columnName) => {
+            const column = columns.find(c => c.id === columnName);
+            if (column) return column.visible;
+            else return false;
+          };
+          const columnCount = ko.pureComputed(() => {
+            return activeColumns() + 1;
+          });
+
+          const getColumnClicked = (columnName) => {
+            const column = columns.find(c => c.id === columnName);
+            if (column) return column.clicked;
+          }
+
+
+          /** Sets positions visibility */
+          function setPositions() {
+            params.utils.openModal('positions', { positions: positions })
+          }
+
+          /** Sets columns visibility */
+          function setColumns() {
+            params.utils.openModal('columns', { columns: columns }, () => {
+              saveColumnsState();
+            });
+          }
+
+          function setColumnsState(set) {
+            columns.forEach(c => {
+              const isVisible = set ? set.includes(c.id) : true;
+              c.visible(isVisible);
+            });
+            saveColumnsState();
+          }
+
+          function saveColumnsState() {
+            const state = columns.reduce((acc, column) => {
+              return {
+                ...acc,
+                [column.id]: column.visible() ? 1 : 0
+              }
+            }, {});
+            localStorage.setItem('calculation-page-employees-columns', JSON.stringify(state));
+          }
+
+
+
+          const columnSets = [
+            ['account', 'account-operations', 'level', 'interval', 'compensation', 'salary-bulk', 'bonus-exceed', 'depremation', 'premation', 'fine', 'payment'],
+            ['payment']
+          ];
+          const columnSetsIndex = ko.observable(-1);
+          const blockMoreInfo = ko.pureComputed(() => {
+            return !columns.some(c => !c.visible());
+          });
+          const blockLessInfo = ko.pureComputed(() => {
+            return !columns
+              .filter(c => !columnSets[1].includes(c.id))
+              .some(c => c.visible());
+          });
+
+          const moreInfo = () => {
+            const hasInvisibleColumns = columns.filter(c => columnSets[0].includes(c.id))
+            .some(c => !c.visible());
+            if (hasInvisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState();
+            $(window).resize();
+          };
+
+          const lessInfo = () => {
+            const hasVisibleColumns = columns.filter(c => !columnSets[0].includes(c.id))
+                .some(c => c.visible());
+            if (hasVisibleColumns) setColumnsState(columnSets[0]);
+            else setColumnsState(columnSets[1]);
+            $(window).resize();
+          };
+
+
+          function updatePositionEmployees(positionData) {
+            const positionModel = model.getPositionById(positionData.id);
+            positionModel.allEmployeesLoaded(positionData.loaded);
+            positionModel.updateEmployees(positionData.employees);
+          }
+
+          /** Creates new employee */
+          function createEmployee() {
+            params.utils.openModal(
+              'create-employee',
+              { positions: positions() },
+              (data) => {
+                const position = model.getPositionById(data.position);
+                position.addEmployee({
+                  name: data.name,
+                  level: data.level,
+                });
+              });
+          };
+
+          /** Adds employees to calculation */
+          function addEmployees() {
+            params.utils.openModal('add-employees', {
+              positions: positions(),
+              mode: 'tabs',
+            }, (updatedList) => {
+              updatedList.forEach(updatePositionEmployees)
+            });
+          };
+
+          /**
+          * Adds employees to calculation (specified position)
+          * @param {Object} position
+          */
+          function addEmployeesInPosition(position) {
+            const originalPosition = model.getPositionById(position.id);
+
+            if (originalPosition) {
+              params.utils.openModal('add-employees',
+                { position: originalPosition, mode: 'single' },
+                (updatedList) => {
+                  updatedList.forEach(updatePositionEmployees)
+                });
+            } else {
+              const invisiblePositions = positions().filter(p => !p.visible());
+              params.utils.openModal('add-employees',
+                { positions: invisiblePositions, mode: 'list' },
+                (updatedList) => {
+                  updatedList.forEach(updatePositionEmployees)
+                });
+            }
+          };
+
+          /**
+          * Removes employee from calculation
+          * @param {Object} employee
+          */
+          function removeEmployee(employee) {
+            employee.visible(false);
+          };
+
+          /**
+          * Opens Account Operations modal
+          * @param {Object} employee
+          */
+          function performAccountOperations(employee) {
+            params.utils.openModal('account-operations', {
+              employee: employee,
+            });
+          }
+
+          /**
+          * Opens Employee bonus modal
+          * @param {Object} employee
+          */
+          function giveBonus(employee) {
+            params.utils.openModal('employee-bonus', {
+              employee: employee,
+              bonuses: window.directories.bonuses,
+              authors: window.directories.authors,
+            }, (result) => {
+              console.log('after bonus', result)
+            });
+          }
+
+          /**
+          * Opens Employee fine modal
+          * @param {Object} employee
+          */
+          function giveFine(employee) {
+            params.utils.openModal('employee-fine', {
+              employee: employee,
+              fines: window.directories.fines,
+              authors: window.directories.authors,
+            }, (result) => {
+              console.log('after fine', result)
+            });
+          }
+
+          return {
+            getColumnClicked,
+
+            viewportSize: params.utils.viewportSize,
+            tabName: params.tabName,
+
+            editableCellErrorStateMatcher,
+            columns,
+            activeColumns,
+            columnCount,
+            isColumnVisible,
+            setColumns,
+
+            moreInfo,
+            blockMoreInfo,
+            lessInfo,
+            blockLessInfo,
+
+            setPositions,
+            positions,
+            hasOtherSection,
+            total,
+
+            addEmployees,
+            addEmployeesInPosition,
+            createEmployee,
+            removeEmployee,
+
+            performAccountOperations,
+            giveBonus,
+            giveFine
+          };
+        }
+      },
+      template: {
+        element: document.getElementById('calculation-page-positions-table-template')
+      }
+    });
+  })
+</script>

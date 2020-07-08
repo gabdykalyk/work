@@ -1,0 +1,203 @@
+<template id="bonus-block-template">
+  <div class="bonus-block">
+    <div class="bonus-block__content">
+      <!-- Base select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="bonus-block__row bonus-block__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание премии
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="bindInner, value: base,
+            hrmSelect,
+            hrmSelectSearchEnabled: true,
+            hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+            hrmFormFieldSelectControl: control,
+            hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+            <option></option>
+
+            <!-- ko foreach: {data: $component.bonusBases, as: 'group'} -->
+            <optgroup data-bind="attr: {label: group.name}">
+              <!-- ko foreach: { data: group.items, as: 'option' } -->
+              <option data-bind="value: option.id, text: option.name"></option>
+              <!-- /ko -->
+
+            </optgroup>
+            <!-- /ko -->
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+     hrmSlide,
+     hrmSlideValue: control() !== null ? control().errorState : false,
+     hrmSlideDuration: 150">
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Base select -->
+
+      <div class="bonus-block__row">
+        <!-- Sum field -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+        <div class="bonus-block__sum"
+             data-bind="
+      hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+  ">
+          <label data-bind="hrmFormFieldLabel: label">Сумма,
+            <i class="far fa-ruble-sign"></i>
+          </label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="
+              textInput: sum,
+              hrmMask, hrmMaskPattern: 'decimal',
+              hrmFormFieldInputControl: control,
+              hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+          ">
+          </div>
+
+          <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+            <!-- ko text: $parent.sum.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- /Sum field -->
+
+
+        <!-- Author select -->
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+        <div class="bonus-block__author"
+             data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+          <label data-bind="hrmFormFieldLabel: label">Автор штрафа</label>
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <select data-bind="bindInner, value: author,
+       hrmSelect,
+       hrmSelectSearchEnabled: true,
+       hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+       hrmFormFieldSelectControl: control,
+       hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+              <option></option>
+              <!-- ko foreach: $component.authors -->
+              <option data-bind="value: id, text: name"></option>
+              <!-- /ko -->
+            </select>
+          </div>
+
+          <div data-bind="component: {name: 'hrm-form-field-error'},
+   hrmSlide,
+   hrmSlideValue: control() !== null ? control().errorState : false,
+   hrmSlideDuration: 150">
+            <!-- ko text: $parent.author.error() -->
+            <!-- /ko -->
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- /Author select -->
+      </div>
+
+      <!-- Comment field -->
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="bonus-block__row bonus-block__comment"
+           data-bind="
+     hrmFormField, hrmFormFieldControlRef: control
+ ">
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <textarea data-bind="
+             textInput: comment,
+             hrmFormFieldInputControl: control,
+             hrmAutoResize
+         "
+                    placeholder="Комментарий"></textarea>
+        </div>
+
+      </div>
+      <!-- /ko -->
+      <!-- /Comment field -->
+    </div>
+
+    <div class="bonus-block__remove">
+      <!-- ko if: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
+              data-bind="click: $component.removeBonus, hrmTooltip, hrmTooltipText: 'Удалить'"></button>
+      <!-- /ko -->
+
+      <!-- ko ifnot: $component.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
+              data-bind="click: $component.removeBonus, hrmTooltip, hrmTooltipText: 'Удалить'" >Удалить</button>
+      <!-- /ko -->
+    </div>
+  </div>
+</template>
+
+<template id="employee-bonus-modal-dialog-template">
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Выписать премию
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body bonus-form">
+    <div class="modal-dialog__scroll">
+      <div class="bonus-form__scroll-list"
+           data-bind="hrmScrollable">
+        <!-- ko template: {
+          name: 'bonus-block-template',
+          foreach: bonuses,
+          afterAdd: hrmFadeAfterAddFactory(200),
+          beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <!-- /ko -->
+
+
+      </div>
+    </div>
+    <div class="bonus-form__actions">
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon"
+              data-bind="click: addBonus">Добавить премию</button>
+
+      <div class="bonus-form__total color--secondary">
+        Итого: <span class="bonus-form__total-value"
+              data-bind="hrmColoredSign: total">
+          <!-- ko text: $component.formatSign(total) -->
+          <!-- /ko -->
+          <i class="far fa-ruble-sign"
+             aria-hidden="true"></i>
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+        position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+        position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+</template>

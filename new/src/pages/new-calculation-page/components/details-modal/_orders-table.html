@@ -1,0 +1,288 @@
+<template id="orders-table-template">
+  <!-- ko let: { activeOrder: ko.observable(null) } -->
+  <table class="details-modal-orders-table"
+         data-bind="hrmTable">
+    <thead>
+      <tr>
+        <th class="details-modal-orders-table__cell details-modal-orders-table__cell--order">
+          <div class="details-modal-orders-table__cell-content">
+            № заказа
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: '№ заказа'"></button>
+          </div>
+        </th>
+
+        <th class="details-modal-orders-table__cell details-modal-orders-table__cell--time">
+          <div class="details-modal-orders-table__cell-content">
+            Время доставки
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Время доставки'"></button>
+          </div>
+        </th>
+
+        <th class="details-modal-orders-table__cell details-modal-orders-table__cell--sum">
+          <div class="details-modal-orders-table__cell-content">
+            Сумма заказа, ₽
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Сумма заказа, ₽'"></button>
+          </div>
+        </th>
+
+        <th class="details-modal-orders-table__cell details-modal-orders-table__cell--operator">
+          <div class="details-modal-orders-table__cell-content">
+            Обработал
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Обработал'"></button>
+          </div>
+        </th>
+
+
+      </tr>
+    </thead>
+
+    <tbody>
+      <!-- ko foreach: { data: orders, as: 'order' } -->
+
+      <tr data-bind="css: {
+        'details-modal-orders-table__active-row': activeOrder() === order
+      }">
+        <td class="details-modal-orders-table__cell">
+          <div class="details-modal-orders-table__cell-content"
+               data-bind="text: id"></div>
+        </td>
+        <td class="details-modal-orders-table__cell">
+          <div class="details-modal-orders-table__cell-content"
+               data-bind="text: deliveryTime"></div>
+        </td>
+        <td class="details-modal-orders-table__cell">
+          <div class="details-modal-orders-table__cell-content"
+               data-bind="text: sum"></div>
+        </td>
+        <td class="details-modal-orders-table__cell">
+          <div class="details-modal-orders-table__cell-content details-modal-orders-table__operator">
+
+            <div data-bind="text: operatorName"></div>
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-arrow-down-icon-button hrm-circle-icon-button--theme_neutral"
+                    data-bind="click: function() {
+                      if (activeOrder() === order) {
+                       activeOrder(null);
+                      } else {
+                        activeOrder(order);
+                      }
+
+                    }, css: {
+              'active': activeOrder() === order
+            }">
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- ko template: {
+        foreach: hrmTemplateIf(activeOrder() === order, $data),
+        afterAdd: $component.afterDetailsAdd,
+        beforeRemove: $component.beforeDetailsRemove,
+      } -->
+      <tr class="details-modal-orders-table__order-row">
+        <td colspan="4">
+
+          <div class="details-modal-orders-table__order order-block details-block">
+            <div class="order-block__header">
+              <h3 class="order-block__title">Состав заказа</h3>
+              <div class="order-block__sum">
+                <!-- ko text: sum + '₽' -->
+                <!-- /ko -->
+              </div>
+            </div>
+
+            <table class="order-block__items"
+            data-bind="hrmTable">
+              <tbody>
+                <!-- ko foreach: items -->
+                <tr>
+                  <td>
+                    <!-- ko text: name -->
+                    <!-- /ko -->
+                  </td>
+
+                  <td>
+                    <!-- ko text: count -->
+                    <!-- /ko -->
+                  </td>
+
+                  <td>
+                    <!-- ko text: price -->
+                    <!-- /ko -->
+                  </td>
+                </tr>
+                <!-- /ko -->
+              </tbody>
+            </table>
+
+            <div class="order-block__info">
+
+              <div class="order-block__processing">
+                <h3 class="order-block__title">История изменений</h3>
+                <table class="order-processing-table"
+                data-bind="hrmTable">
+                <tbody>
+                  <tr class="order-processing-table__row order-processing-table__row--created"
+                      data-bind="css: {
+                    'order-processing-table__row--warning_light': true
+                  }">
+                    <td>
+                      Создан/открыт
+                    </td>
+                    <td>
+                      <!-- ko text: processing.createdAt -->
+                      <!-- /ko -->
+                    </td>
+                  </tr>
+                  <tr class="order-processing-table__row order-processing-table__row--confirmed"
+                      data-bind="css: {
+                    'order-processing-table__row--warning_medium': true
+                  }">
+                    <td>
+                      Подтвержден
+                    </td>
+                    <td>
+                      <!-- ko text: processing.confirmedAt -->
+                      <!-- /ko -->
+                    </td>
+                  </tr>
+                  <tr class="order-processing-table__row order-processing-table__row--printed"
+                      data-bind="css: {
+                    'order-processing-table__row--warning_hard': true
+                  }">
+                    <td>
+                      Распечатан
+                    </td>
+                    <td>
+                      <!-- ko text: processing.printedAt -->
+                      <!-- /ko -->
+                    </td>
+                  </tr>
+                  <tr class="order-processing-table__row order-processing-table__row--ready">
+                    <td>
+                      Приготовлен
+                    </td>
+                    <td>
+                      <!-- ko text: processing.readyAt -->
+                      <!-- /ko -->
+                    </td>
+                  </tr>
+                  <tr class="order-processing-table__row order-processing-table__row--sended">
+                    <td>
+                      Отправлен
+                    </td>
+                    <td>
+                      <!-- ko text: processing.sendedAt -->
+                      <!-- /ko -->
+                    </td>
+                  </tr>
+                  <tr class="order-processing-table__row order-processing-table__row--paid">
+                    <td>
+                      Оплачен
+                    </td>
+                    <td>
+                      <!-- ko text: processing.paidAt -->
+                      <!-- /ko -->
+                    </td>
+                  </tr>
+                  <tr class="order-processing-table__row order-processing-table__row--delivered">
+                    <td>
+                      Доставлен
+                    </td>
+                    <td>
+                      <!-- ko text: processing.deliveredAt -->
+                      <!-- /ko -->
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="order-block__data">
+                <div class="order-block__data-block">
+                  <h4 class="order-block__title">Оператор</h4>
+                  <div data-bind="text: operatorName"></div>
+                </div>
+                <div class="order-block__data-block">
+                  <h4 class="order-block__title">Водитель</h4>
+
+                  <!-- ko if: true -->
+                  <!-- ko let: {control: ko.observable(null), driverValue: ko.observable(order.driverId) } -->
+
+                  <div class="order-block__driver"
+                       data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+                    <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                      <select data-bind="bindInner, value: driverValue,
+                          valueAllowUnset: true,
+                          change: function() {
+                            $component.changeDriver(driverValue());
+                          },
+                          hrmSelect,
+                          hrmFormFieldSelectControl: control">
+                          <!-- ko foreach: $component.employees -->
+                          <option data-bind="value: id, text: name"></option>
+                          <!-- /ko -->
+                      </select>
+                    </div>
+
+                  </div>
+                  <!-- /ko -->
+
+                  <!-- /ko -->
+
+                  <!-- ko ifnot: true -->
+                  <div data-bind="text: driverName"></div>
+                  <!-- /ko -->
+                </div>
+                <div class="order-block__data-block order-block__delivery">
+                  <h4 class="order-block__title">Доставка</h4>
+
+                  <div class="order-block__delivery-item">
+                    <i class="far fa-clock"></i>
+                    <span data-bind="text: delivery.date"></span>
+                  </div>
+                  <div class="order-block__delivery-item">
+                    <i class="far fa-exclamation-circle"></i>
+                    <span data-bind="text: delivery.time"></span>
+                  </div>
+                  <div class="order-block__delivery-item">
+                    <i class="fal fa-map-marker-alt"></i>
+                    <span data-bind="text: delivery.address"></span>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </td>
+      </tr>
+      <!-- /ko -->
+
+      <!-- /ko -->
+    </tbody>
+
+    <tfoot>
+      <tr>
+        <td colspan="4">
+          <div class="details-modal-orders-table__total">
+            <div>
+              Всего заказов: <b data-bind="text: orders.length"></b>
+            </div>
+            <div>
+              Сумма заказов: <b data-bind="text: $component.getOrdersSum(orders)"></b>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+  <!-- /ko -->
+</template>

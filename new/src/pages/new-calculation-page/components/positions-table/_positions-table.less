@@ -1,0 +1,358 @@
+@calculation-colored-cell-color: #e1edff;
+
+.calculation-page {
+	.positions-table {
+		margin-top: 20px;
+		position: relative;
+		&:before {
+			content: '';
+			position: absolute;
+			top: 0;
+			bottom: 10px;
+			left: 0px;
+			width: 1px;
+			background-color: #dfe4ef;
+			z-index: 10;
+		}
+		td {
+			&.highlighted-success {
+				background-color: #d0f4e3 !important;
+			}
+			&.highlighted-danger {
+				background-color: #ffd3e8 !important;
+			}
+			cursor: default;
+		}
+
+		.os-host-overflow-x {
+			.positions-table__cell--name {
+				box-shadow: 4px 0px 5px -2px rgba(0, 21, 80, 0.3);
+			}
+		}
+
+		&__row {
+			&--clicked {
+				& > td {
+					position: relative;
+
+					&:not(.positions-table__cell--colored) {
+						background: #fff3f8;
+					}
+
+					&:after {
+						content: '';
+						position: absolute;
+						top: -1px;
+						bottom: -1px;
+						pointer-events: none;
+						left: -1px;
+						right: -1px;
+						border-top: 1px solid #ff238d;
+						border-bottom: 1px solid #ff238d;
+					}
+
+					&:first-child {
+						border-left: 1px solid #ff238d;
+					}
+
+					&:last-child {
+						border-right: 1px solid #ff238d;
+					}
+				}
+			}
+		}
+
+		&__row--clicked + .positions-table__row--clicked {
+			td {
+				&:after {
+					border-top-color: #dfe4ef;
+				}
+			}
+		}
+
+		&__cell {
+			&--clicked {
+				position: relative;
+
+				&:not(.positions-table__cell--colored) {
+					background: rgba(255, 230, 242, 0.5);
+				}
+
+				&:before {
+					content: '';
+					position: absolute;
+					top: -1px;
+					bottom: -1px;
+					left: -1px;
+					right: -1px;
+					border-left: 1px solid #ff238d;
+					border-right: 1px solid #ff238d;
+				}
+			}
+		}
+
+		&__cell--name {
+			position: sticky !important;
+			left: 0;
+			background: white;
+			z-index: 10 !important;
+
+			&:before {
+				content: '';
+				position: absolute;
+				top: -1px;
+				bottom: -1px;
+				left: -1px;
+				right: -1px;
+				border: 1px solid #dfe4ef;
+				pointer-events: none;
+			}
+		}
+
+		&__cell--clicked.positions-table__head-cell {
+			border-top: 1px solid #ff238d !important;
+		}
+
+		.positions-table__total {
+			.positions-table__cell--clicked {
+				border-bottom: 1px solid #ff238d !important;
+			}
+		}
+
+		&__cell--clicked + .positions-table__cell--clicked {
+			&:before {
+				border-left-color: #dfe4ef;
+			}
+		}
+
+		&__row {
+			&--highlighted {
+				background-color: @light-grey-color;
+
+				.positions-table__cell--name {
+					background-color: @light-grey-color;
+					border-right-color: transparent;
+
+					&:before {
+						border-right-color: transparent;
+					}
+				}
+			}
+		}
+
+		&__section-header,
+		&__total {
+			height: 40px;
+		}
+
+		&__head-cell {
+			.positions-table__cell-content {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				justify-content: space-between;
+				align-items: flex-start;
+				height: 50px;
+			}
+
+			.positions-table__info-icon {
+				margin: 0;
+			}
+		}
+
+		&__position-title {
+			font-weight: bold;
+			font-size: 13px;
+			color: #000000;
+			white-space: nowrap;
+			position: sticky !important;
+			left: 0;
+			border-right: none;
+			z-index: 12 !important;
+			background: #f5f7fa;
+
+			.positions-table__cell-content {
+				white-space: nowrap;
+			}
+
+			& + td {
+				border-left: none;
+				background: #f5f7fa;
+			}
+		}
+
+		&__cell {
+			&--empty {
+				border-left: none;
+				border-right: none;
+			}
+
+			&--colored {
+				background-color: @calculation-colored-cell-color;
+			}
+
+			&--inactive {
+				background-color: @light-grey-color;
+			}
+
+			&--interval:not(.positions-table__head-cell) {
+				padding: 0;
+			}
+
+			// Минимальшая ширина ячеек
+			&--name {
+				.positions-table__cell-content {
+					min-width: 158px;
+				}
+			}
+			&--interval,
+			&--bonus-exceed {
+				.positions-table__cell-content {
+					min-width: 100px;
+				}
+			}
+			&--salary-bulk,
+			&--revenue-standart-hour,
+			&--normalization-ratio,
+			&--revenue-standart {
+				.positions-table__cell-content {
+					min-width: 70px;
+				}
+			}
+
+			&--time-without-case {
+				.positions-table__cell-content {
+					min-width: 50px;
+				}
+			}
+
+			&--payment,
+			&--total {
+				min-width: 100px;
+			}
+
+			&[align='right'] {
+				.positions-table__cell-content {
+					justify-content: flex-end;
+				}
+			}
+		}
+
+		&__action {
+			margin-right: 10px;
+		}
+
+		.employee {
+			display: flex;
+			width: 100%;
+			align-items: center;
+			&__info {
+				flex-grow: 1;
+				white-space: normal;
+			}
+			&__actions {
+				display: flex;
+				flex-direction: column;
+				justify-content: flex-start;
+			}
+			&__position {
+				color: #8e9cbb;
+				font-size: 13px;
+			}
+		}
+
+		.working-intervals {
+			height: 100%;
+			width: 100%;
+
+			&__row {
+				border-top: 1px solid @border-color;
+
+				&:first-child {
+					border: none;
+				}
+			}
+		}
+
+		.working-interval {
+			display: flex;
+			align-items: center;
+			padding: 0 10px;
+			min-height: 40px;
+			width: 155px;
+
+			&__input {
+				width: 80px;
+				margin: 0;
+				padding: 0;
+			}
+
+			&__actions {
+				display: flex;
+				justify-content: space-between;
+			}
+
+			&__action {
+				width: 20px;
+				margin-left: 7px;
+				button {
+					margin: 0;
+				}
+			}
+		}
+	}
+
+	td.positions-table__cell--orders-count,
+	td.positions-table__cell--dist-km {
+		cursor: pointer;
+	}
+
+	.positions-table--delivery {
+		.positions-table__head-cell {
+			.positions-table__cell-content {
+				height: 60px;
+			}
+		}
+	}
+
+	.os-scrollbar {
+		&-horizontal {
+			z-index: 10;
+		}
+	}
+
+	.battery-icon {
+		margin-left: 10px;
+		margin-right: 10px;
+	}
+}
+
+@media screen and (max-width: @tablet-max-width) {
+	.calculation-page {
+		.positions-table {
+			margin-right: -30px;
+
+			&__main-table {
+				.positions-table {
+					&__cell {
+						&--name {
+							width: 178px;
+							.positions-table__cell-content {
+								width: 158px;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@media screen and (max-width: @mobile-max-width) {
+	.calculation-page {
+		.positions-table {
+			margin-left: -20px;
+			margin-right: -20px;
+		}
+	}
+}

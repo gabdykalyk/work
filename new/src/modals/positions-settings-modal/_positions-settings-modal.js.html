@@ -1,0 +1,89 @@
+@@include('./_positions-settings-modal.html')
+
+<script type="text/javascript">
+    $(function () {
+        function PositionModel(positionData) {
+            const checked =  ko.observable(!!positionData.visible());
+            function apply() {
+                positionData.visible(checked());
+            }
+            return {
+                name: positionData.name,
+                checked,
+                visible: ko.observable(true),
+                apply
+            }
+        }
+
+        ko.components.register('positions-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'hrm-modal-dialog--size_large',
+                        'modal-dialog--positions-settings'
+                    ]);
+
+                    const ViewModel = function(positions) {
+                        /** Positions model */
+                        this.positions = positions.map(PositionModel);
+
+                        /** Поисковый запрос */
+                        this.term = ko.observable('');
+                        /** Скрыть/Показать позиции в списке */
+                        this.term.subscribe(value => {
+                            const formattedTerm = value.toLowerCase();
+
+                            this.positions.forEach(p => {
+                                let isVisible = true;
+                                if (formattedTerm.length >= 1) {
+                                    const formattedName = p.name.toLowerCase();
+                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
+                                }
+                                p.visible(isVisible);
+                            })
+                        });
+
+                        /** Сбросить все чекбоксы и поисковый запрос */
+                        this.reset = function () {
+                            this.term('');
+                            this.positions.forEach(p => {
+                                p.checked(false);
+                            });
+                        }
+
+                        /** Закрыть окно без изменений */
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        /** Применить изменения */
+                        this.apply = function() {
+                            this.positions.forEach(p => {
+                                p.apply();
+                            });
+                        }
+
+                        this.submit = function () {
+                            if ('submit' in params) {
+                                this.apply();
+                                params.submit(true);
+                            }
+                        };
+                    }
+
+                    return new ViewModel(params.data.positions());
+                }
+            },
+            template: {
+                element: document.getElementById('positions-modal-dialog-template')
+            }
+        });
+    });
+</script>

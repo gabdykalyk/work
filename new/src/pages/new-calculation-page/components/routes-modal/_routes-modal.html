@@ -1,0 +1,105 @@
+<template id="routes-modal-dialog-template">
+  <!-- ko template: { afterRender: afterRender } -->
+  <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.mobileMaxWidth -->
+  <button class="hrm-button modal-dialog-content__close"
+          data-bind="click: function() {cancel();}"
+          aria-label="Close">
+  </button>
+  <!-- /ko -->
+
+  <!-- ko if: !isLoading() -->
+  <div class="routes" data-bind="hrmScrollable">
+  <table data-bind="hrmTable"
+         class="routes-table">
+    <thead>
+      <tr>
+        <th class="routes-table__cell routes-table__cell--route">
+          <div class="routes-table__cell-content">
+            Заказ/маршрут
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Заказ/маршрут'"></button>
+          </div>
+        </th>
+        <th class="routes-table__cell routes-table__cell--dates">
+          <div class="routes-table__cell-content">
+            Начало/завершение
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Начало/завершение'"></button>
+          </div>
+        </th>
+        <th class="routes-table__cell routes-table__cell--dist">
+          <div class="routes-table__cell-content">
+            Дистанция, км
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Дистанция, км'"></button>
+          </div>
+        </th>
+        <th class="routes-table__cell routes-table__cell--time">
+          <div class="routes-table__cell-content">
+            Расч./факт. время в пути
+            <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                    data-bind="hrmTooltip, hrmTooltipText: 'Расч./факт. время в пути'"></button>
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ko foreach: routes -->
+      <tr class="routes-table__route-row">
+        <td colspan="3">
+
+          <!-- ko foreach: orders -->
+          <div class="routes-table__cell-content routes-table__route">
+            <span class="routes-table__route-id"
+                  data-bind="text: id"></span>
+            <span class="routes-table__route-address"
+                  data-bind="text: address"></span>
+          </div>
+          <!-- /ko -->
+
+        </td>
+      </tr>
+      <tr>
+        <td class="routes-table__cell routes-table__cell--route">
+          <!-- ko foreach: orders -->
+          <div class="routes-table__cell-content routes-table__route">
+            <span class="routes-table__route-id"
+                  data-bind="text: id"></span>
+            <span class="routes-table__route-address"
+                  data-bind="text: address"></span>
+          </div>
+          <!-- /ko -->
+        </td>
+        <td class="routes-table__cell routes-table__cell--dates">
+          <div class="routes-table__cell-content">
+            <div data-bind="text: startedAt"></div>
+            <div data-bind="text: finishedAt"></div>
+          </div>
+        </td>
+        <td align="right"
+            class="routes-table__cell routes-table__cell--dist">
+          <div class="routes-table__cell-content"
+               data-bind="text: distKm">
+          </div>
+        </td>
+        <td class="routes-table__cell routes-table__cell--time">
+          <div class="routes-table__cell-content">
+            <div data-bind="text: estimatedTime"></div>
+            <div data-bind="text: actualTime"></div>
+          </div>
+        </td>
+      </tr>
+      <!-- /ko -->
+    </tbody>
+  </table>
+</div>
+  <!-- /ko -->
+
+  <!-- ko if: isLoading() -->
+  <div class="loader">
+    <i class="fa fa-spinner fa-pulse loader__indicator">
+    </i>
+  </div>
+  <!-- /ko -->
+  <!-- /ko -->
+</template>

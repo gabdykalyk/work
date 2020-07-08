@@ -1,0 +1,260 @@
+<template id="stimulation-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Выписать штраф/премию смене
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body stimulation-settings"
+       data-bind="using: formModel">
+    <div class="stimulation-settings__row">
+      <!-- Category select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__category"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Категория
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: category,
+                   hrmSelect,
+                   hrmSelectPlaceholder: 'Все', hrmSelectAllowClear: true,
+                   hrmFormFieldSelectControl: control">
+            <option></option>
+            <option value="production">Производство</option>
+            <option value="delivery">Доставка</option>
+          </select>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Category select -->
+
+
+      <!-- Type toggler -->
+      <div class="hrm-radio-group stimulation-settings__type">
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_negative">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: stimulationType"
+                 type="radio"
+                 value="fine"
+                 id="fine-radio" />
+          <label class="hrm-radio-group__radio-label"
+                 for="fine-radio">
+            Штраф
+          </label>
+        </div>
+
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_positive">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: stimulationType"
+                 type="radio"
+                 value="bonus"
+                 id="bonus-radio" />
+          <label class="hrm-radio-group__radio-label"
+                 for="bonus-radio">
+            Премия
+          </label>
+        </div>
+      </div>
+      <!-- /Type toggler -->
+    </div>
+
+
+    <div class="stimulation-settings__row">
+      <!-- Base select -->
+
+      <!-- ko if: stimulationType() === 'fine' -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание штрафа
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
+              hrmSelect,
+              hrmSelectSearchEnabled: true,
+              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+            <option></option>
+            <!-- ko foreach: $component.fines -->
+            <optgroup data-bind="attr: { label: name }">
+              <!-- ko foreach: items -->
+              <option data-bind="value: id, text: name"></option>
+              <!-- /ko -->
+            </optgroup>
+            <!-- /ko -->
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+            hrmSlide,
+            hrmSlideValue: control() !== null ? control().errorState : false,
+            hrmSlideDuration: 150">
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /ko -->
+
+
+      <!-- ko ifnot: stimulationType() === 'fine' -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__base"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Основание премии
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: base,
+              hrmSelect,
+              hrmSelectSearchEnabled: true,
+              hrmSelectPlaceholder: 'Не выбрано', hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+
+            <option></option>
+            <!-- ko foreach: $component.bonuses -->
+            <optgroup data-bind="attr: { label: name }">
+              <!-- ko foreach: items -->
+              <option data-bind="value: id, text: name"></option>
+              <!-- /ko -->
+            </optgroup>
+            <!-- /ko -->
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+            hrmSlide,
+            hrmSlideValue: control() !== null ? control().errorState : false,
+            hrmSlideDuration: 150">
+          <!-- ko text: $parent.base.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- /Base select -->
+
+
+    </div>
+
+    <div class="stimulation-settings__row">
+      <!-- Author select -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="stimulation-settings__select stimulation-settings__author"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          <!-- ko text: stimulationType() === 'fine' ? 'Автор штрафа' : 'Автор премии' -->
+          <!-- /ko -->
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: author,
+            hrmSelect,
+            hrmSelectSearchEnabled: true,
+            hrmSelectPlaceholder: 'Не выбран', hrmSelectAllowClear: true,
+            hrmFormFieldSelectControl: control,
+            hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+            <option></option>
+            <!-- ko foreach: $component.authors -->
+            <option data-bind="value: id, text: name"></option>
+            <!-- /ko -->
+          </select>
+        </div>
+
+        <div data-bind="component: {name: 'hrm-form-field-error'},
+        hrmSlide,
+        hrmSlideValue: control() !== null ? control().errorState : false,
+        hrmSlideDuration: 150">
+          <!-- ko text: $parent.author.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Author select -->
+
+      <!-- Sum field -->
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="stimulation-settings__sum"
+           data-bind="
+           hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label
+       ">
+        <label data-bind="hrmFormFieldLabel: label">Сумма, ₽</label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input data-bind="
+                   attr: {readonly: stimulationType() === 'fine'},
+                   textInput: sum,
+                   hrmFormFieldInputControl: control,
+                   hrmFormFieldInputControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)
+               "
+                 type="number">
+        </div>
+
+        <div data-bind="
+               component: {name: 'hrm-form-field-error'},
+               hrmSlide,
+               hrmSlideValue: control() !== null ? control().errorState : false,
+               hrmSlideDuration: 150
+           ">
+          <!-- ko text: $parent.sum.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /Sum field -->
+    </div>
+
+    <div class="stimulation-settings__row">
+      <!-- Comment field -->
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="stimulation-settings__comment"
+           data-bind="
+           hrmFormField, hrmFormFieldControlRef: control
+       ">
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+          <textarea data-bind="
+                   textInput: comment,
+                   hrmFormFieldInputControl: control,
+                   hrmAutoResize
+               "
+                    placeholder="Комментарий"></textarea>
+        </div>
+
+      </div>
+      <!-- /ko -->
+      <!-- /Comment field -->
+    </div>
+
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>

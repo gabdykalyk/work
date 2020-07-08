@@ -1,0 +1,103 @@
+@@include('./_columns-settings-modal.html')
+
+<script type="text/javascript">
+    $(function () {
+        function ColumnModel(column) {
+            const checked = ko.observable(column.visible());
+            function apply() {
+                column.visible(checked());
+            }
+            return {
+                id: column.id,
+                name: column.fullTitle,
+                checked,
+                visible: ko.observable(true),
+                apply
+            }
+        }
+
+        ko.components.register('columns-modal-dialog', {
+            viewModel: {
+                createViewModel: function (params, componentInfo) {
+                    const $element = $(componentInfo.element);
+                    $element.addClass([
+                        'modal-dialog',
+                        'modal-dialog-centered',
+                        'hrm-modal-dialog',
+                        'hrm-basic-modal-dialog',
+                        'hrm-modal-dialog--size_large',
+                        'modal-dialog--columns'
+                    ]);
+
+
+                    const viewModel = new (function () {
+                        this.columns = params.data.columns.map(ColumnModel);
+
+                        this.viewportSize = ko.observable({ width: $(window).width(), height: $(window).height() });
+
+                        this.windowResizeHandler = () => {
+                            this.viewportSize({ width: $(window).width(), height: $(window).height() });
+                        };
+
+                        $(window).on('resize', this.windowResizeHandler);
+
+                        /** Поисковый запрос */
+                        this.term = ko.observable('');
+                        /** Скрыть/Показать позиции в списке */
+                        this.term.subscribe(value => {
+                            const formattedTerm = value.toLowerCase();
+
+                            this.columns.forEach(c => {
+                                let isVisible = true;
+                                if (formattedTerm.length >= 1) {
+                                    const formattedName = c.name.toLowerCase();
+                                    isVisible = formattedName.indexOf(formattedTerm) !== -1;
+                                    console.log(isVisible)
+                                }
+                                c.visible(isVisible);
+                            })
+                        });
+
+                        /** Сбросить все чекбоксы и поисковый запрос */
+                        this.reset = function () {
+                            this.term('');
+                            this.columns.forEach(c => {
+                                c.checked(false);
+                            });
+                        }
+
+                        /** Закрыть окно без изменений */
+                        this.cancel = function () {
+                            if ('cancel' in params) {
+                                params.cancel();
+                            }
+                        };
+
+                        /** Применить изменения */
+                        this.apply = function () {
+                            this.columns.forEach(c => {
+                                c.apply()
+                            });
+                        }
+
+                        this.submit = function () {
+                            if ('submit' in params) {
+                                this.apply();
+                                params.submit(true);
+                            }
+                        };
+                    });
+
+                    viewModel.dispose = () => {
+                        $(window).off('resize', viewModel.windowResizeHandler);
+                    }
+
+                    return viewModel;
+                }
+            },
+            template: {
+                element: document.getElementById('columns-modal-dialog-template')
+            }
+        });
+    });
+</script>

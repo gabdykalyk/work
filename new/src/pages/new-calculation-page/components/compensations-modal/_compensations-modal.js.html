@@ -1,0 +1,163 @@
+<script type="text/javascript">
+  $(function () {
+
+    ko.components.register('compensations-modal-dialog', {
+      viewModel: {
+        createViewModel: function (params, componentInfo) {
+          const $element = $(componentInfo.element);
+
+          $element.addClass([
+            'modal-dialog',
+            'modal-dialog-centered',
+            'hrm-modal-dialog',
+            'hrm-basic-modal-dialog',
+            'modal-dialog--compensations'
+          ]);
+
+          const ViewModel = function () {
+            this.isSubmitted = ko.observable(false);
+
+            this.formControlErrorStateMatcher = (formControl) => {
+              return ko.pureComputed(() => {
+                return this.isSubmitted() && !formControl.isValid();
+              });
+            };
+
+            this.compensations = params.data.compensations;
+            this.employee = params.data.employee;
+
+            let currentCompensation = null;
+
+            this.compensationId = ko.observable('').extend({
+              required: {
+                message: 'Обязательное поле'
+              }
+            });
+            this.sum = ko.observable(0);
+
+            this.compensationId.subscribe(v => {
+              currentCompensation = this.compensations.find(c => c.id == this.compensationId());
+              if (currentCompensation) this.sum(currentCompensation.sum);
+              else this.sum(0);
+            })
+            if (this.employee.compensation()) {
+              currentCompensation = this.employee.compensation();
+              this.compensationId(this.employee.compensation().id);
+            }
+
+            this.cancel = function () {
+              if ('cancel' in params) {
+                params.cancel();
+              }
+            };
+
+            this.submit = function () {
+              this.isSubmitted(true);
+
+              if (currentCompensation) {
+                this.employee.compensation(currentCompensation);
+                if ('submit' in params) {
+                  params.submit();
+                }
+              }
+
+            };
+          }
+
+          return new ViewModel();
+        }
+      },
+      template: {
+        element: document.getElementById('compensations-modal-dialog-template')
+      }
+    });
+  });
+</script>
+
+<template id="compensations-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Создать сотрудника
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body compensation-form">
+
+    <div class="compensation-form__row">
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null) } -->
+      <div class="compensation-form__id"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">
+          Компенсация
+        </label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <select data-bind="value: compensationId,
+              options: $component.compensations,
+              optionsText: 'name',
+              optionsValue: 'id',
+              valueAllowUnset: true,
+              hrmSelect,
+              hrmSelectPlaceholder: 'Компенсация',
+              hrmSelectSearchEnabled: true,
+              hrmSelectAllowClear: true,
+              hrmFormFieldSelectControl: control,
+              hrmFormFieldSelectControlErrorStateMatcher: $component.formControlErrorStateMatcher.bind($component)">
+          </select>
+        </div>
+
+        <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+          <!-- ko text: $parent.compensationId.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+
+
+
+      <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+      <div class="compensation-form__sum"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label">
+        <label data-bind="hrmFormFieldLabel: label">Сумма, ₽</label>
+
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input data-bind="
+              value: sum,
+              hrmFormFieldInputControl: control
+          " readonly>
+        </div>
+
+
+      </div>
+      <!-- /ko -->
+
+    </div>
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+
+</template>

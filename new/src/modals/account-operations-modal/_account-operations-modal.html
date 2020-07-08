@@ -1,0 +1,164 @@
+<template id="account-operation-template">
+  <div class="account-operation"
+       data-bind="hrmLog">
+    <div class="account-operation__type">
+
+      <div class="hrm-radio-group"
+           data-bind="let: {radioGroupId: 'account-operation-' + $index()}">
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_negative">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: type, attr: {id: radioGroupId + '-fine'}"
+                 type="radio"
+                 value="fine"
+                 checked />
+          <label class="hrm-radio-group__radio-label"
+                 data-bind="attr: {'for': radioGroupId + '-fine'}">
+            Списать
+          </label>
+        </div>
+
+        <div class="hrm-radio-group__radio hrm-radio-group__radio--theme_positive">
+          <input class="hrm-radio-group__radio-input"
+                 data-bind="checked: type, attr: {id: radioGroupId + '-bonus'}"
+                 type="radio"
+                 value="bonus" />
+          <label class="hrm-radio-group__radio-label"
+                 data-bind="attr: {'for': radioGroupId + '-bonus'}">
+            Начислить
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="account-operation__sum">
+      <!-- ko let: {control: ko.observable(null)} -->
+      <div class="account-operation__sum-value"
+           data-bind="hrmFormField, hrmFormFieldControlRef: control">
+        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+          <input type="text" placeholder="0"
+                 data-bind="
+              textInput: sum,
+              hrmMask, hrmMaskPattern: 'decimal',
+              hrmFormFieldInputControl: control,
+              hrmFormFieldInputControlErrorStateMatcher: $parent.formControlErrorStateMatcher.bind($parent)
+          ">
+        </div>
+
+        <div data-bind="
+          component: {name: 'hrm-form-field-error'},
+          hrmSlide,
+          hrmSlideValue: control() !== null ? control().errorState : false,
+          hrmSlideDuration: 150
+      ">
+          <!-- ko text: $parent.sum.error() -->
+          <!-- /ko -->
+        </div>
+      </div>
+      <!-- /ko -->
+      <div class="account-operation__sum-sign">₽</div>
+    </div>
+
+
+    <!-- ko let: {control: ko.observable(null)} -->
+    <div class="account-operation__comment"
+         data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+      <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control, hrmFormFieldBasisAllowClear">
+        <textarea data-bind="
+            attr: {placeholder: commentPlaceholder},
+            textInput: comment,
+            hrmFormFieldInputControl: control,
+            hrmAutoResize"
+                  placeholder="Комментарий"></textarea>
+      </div>
+
+    </div>
+    <!-- /ko -->
+
+
+
+    <div class="account-operation__remove">
+      <!-- ko if: $parent.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-icon-button hrm-trash-icon-button hrm-icon-button--theme_negative"
+              data-bind="click: $parent.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'"></button>
+      <!-- /ko -->
+
+      <!-- ko ifnot: $parent.viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon"
+              data-bind="click: $parent.removeOperation, hrmTooltip, hrmTooltipText: 'Удалить'">Удалить</button>
+      <!-- /ko -->
+
+
+    </div>
+  </div>
+</template>
+
+<template id="account-operations-modal-dialog-template">
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Операции с личным счетом
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body account-operations-form">
+
+    <div class="modal-dialog__scroll">
+      <div class="account-operations-form__list" data-bind="component: {
+        name: 'hrm-scrollable-wrapper',
+        params: { options: {} }
+      }">
+        <!-- ko template: {
+          name: 'account-operation-template',
+          foreach: operations,
+          afterAdd: hrmFadeAfterAddFactory(200),
+          beforeRemove: hrmFadeBeforeRemoveFactory(200)
+        } -->
+        <!-- /ko -->
+      </div>
+    </div>
+
+
+
+    <div class="account-operations-form__actions">
+      <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon"
+              data-bind="click: addOperation">Добавить</button>
+
+      <div class="account-operations-form__total color--secondary">
+        Итого: <span class="account-operations-form__total-value"
+              data-bind="hrmColoredSign: total">
+          <!-- ko text: $component.formatSign(total) -->
+          <!-- /ko -->
+          <i class="far fa-ruble-sign"
+             aria-hidden="true"></i>
+        </span>
+
+      </div>
+
+
+
+    </div>
+
+
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list">
+    <button class="hrm-button hrm-basic-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-cancel-button"
+            data-bind="click: function() {cancel();}">
+      Отменить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-accent-button hrm-basic-modal-dialog__action-list-item
+         position-page__speciality-modal-dialog-submit-button"
+            data-bind="click: function() {submit();}">
+      Сохранить
+    </button>
+  </div>
+</template>

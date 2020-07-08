@@ -1,0 +1,460 @@
+
+
+<!-- Блок сотрудника в таблице -->
+<script id="delivery-employee-block-template"
+        type="text/html">
+  <div class="employee">
+    <div class="employee__remove">
+      <button data-bind="
+      hrmTooltip,
+      hrmTooltipText: 'Удалить из расчета',,
+      click: table.removeEmployee.bind(table, employee)"
+              class="hrm-button hrm-circle-icon-button hrm-circle-times-icon-button hrm-circle-icon-button--theme_secondary positions-table__action employe__remove-button">
+      </button>
+    </div>
+
+    <div class="employee__info">
+      <a class="employee__name"
+        href="#"
+        data-bind="text: employee.name, click: function(_, e) { e.stopPropagation(); }"></a>
+
+    </div>
+
+    <div class="employee__actions">
+      <!-- ko if: employee.hasProblems -->
+      <button
+              class="hrm-button hrm-icon-button hrm-icon-button--theme_negative hrm-sheet-icon-button employee__action employee__action--documents" data-bind="hrmTooltip, hrmTooltipText: 'Есть проблемы с документами'"></button>
+      <!-- /ko -->
+    </div>
+  </div>
+</script>
+
+<!-- Строка сотрудника в таблице -->
+<script id="delivery-employee-row-template"
+        type="text/html">
+
+<tr class="positions-table__row" data-bind="click: function() { employee.clicked(!employee.clicked())}, css: {
+  'positions-table__row--clicked': employee.clicked,
+}">
+  <td class="positions-table__cell positions-table__cell--name">
+    <div class="positions-table__cell-content">
+
+      <!-- Данные сотрудника -->
+      <div
+           data-bind="template: { name: 'delivery-employee-block-template', data: {employee: employee } }">
+      </div>
+      <!-- /Данные сотрудника -->
+
+    </div>
+  </td>
+
+  <!-- ko if: table.isColumnVisible('account') -->
+    <td class="positions-table__cell positions-table__cell--account" data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('account'),
+    }" align="right">
+      <div class="positions-table__cell-content">
+        <!-- ko text: employee.premiumAccount() + '/' + employee.account() -->
+        <!-- /ko -->
+      </div>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('account-operations') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--account-operations"
+        data-bind="click: function(_, e) {
+          e.stopPropagation();
+          table.performAccountOperations(employee);
+        }, hrmTableEditableCell: editableCell, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('account-operations'),
+        }" align="right">
+        <div class="positions-table__cell-content" data-bind="text: $root.utils.formatSign(employee.accountState), hrmColoredSign: employee.accountState"></div>
+    </td>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('interval') -->
+    <td class="positions-table__cell positions-table__cell--interval" data-bind="click: function(_, e) { e.stopPropagation(); }, css: {
+      'positions-table__cell--clicked': table.getColumnClicked('interval'),
+    }">
+      <table class="working-intervals">
+        <tbody data-bind="let: {intervalsCount: employee.workingIntervals().length}">
+          <!-- ko foreach: employee.workingIntervals() -->
+          <tr class="working-intervals__row">
+
+              <!-- ko template: { name: 'working-interval-template', data: { interval: $data, canRemove: intervalsCount > 1, canAdd: $index() === intervalsCount - 1 } } -->
+              <!-- /ko -->
+
+          </tr>
+          <!-- /ko -->
+        </tbody>
+      </table>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('work-time') -->
+    <td class="positions-table__cell positions-table__cell--work-time"  data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('work-time'),
+    }" align="right">
+      <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(employee.workingTime())"></div>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders-count') -->
+    <td class="positions-table__cell positions-table__cell--orders-count"  data-bind="css: {
+      'positions-table__cell--clicked': table.getColumnClicked('orders-count'),
+    }, click: function(_, e) { e.stopPropagation(); table.openDriverModal(employee); } " align="right">
+      <a class="positions-table__cell-content" href="javascript: void(0)" data-bind="text: employee.ordersCount">
+
+      </a>
+    </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders-value') -->
+  <td class="positions-table__cell positions-table__cell--orders-value"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders-value'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: employee.ordersValue"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('average-bill') -->
+  <td class="positions-table__cell positions-table__cell--average-bill"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('average-bill'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: employee.averageBill"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('dist-km') -->
+  <td class="positions-table__cell positions-table__cell--dist-km"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('dist-km'),
+  }, click: function(_, e) {e.stopPropagation(); table.openRoutesModal(employee); } " align="right">
+    <a href="javascript: void(0)" data-bind="text: employee.distKm" class="positions-table__cell-content"></a>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('estimated-time') -->
+  <td class="positions-table__cell positions-table__cell--estimated-time"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('estimated-time'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.estimatedTime"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('actual-time') -->
+  <td class="positions-table__cell positions-table__cell--actual-time"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('actual-time'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.actualTime"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('kpi') -->
+  <td class="positions-table__cell positions-table__cell--kpi"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('kpi'),
+    'highlighted-success': true,
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.kpi"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('time-without-case') -->
+  <td class="positions-table__cell positions-table__cell--time-without-case"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('time-without-case'),
+    'highlighted-danger': true
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.timeWithoutCase"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('time') -->
+  <td class="positions-table__cell positions-table__cell--time"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('time'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(employee.time)"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders') -->
+  <td class="positions-table__cell positions-table__cell--orders"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.orders"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('dist') -->
+  <td class="positions-table__cell positions-table__cell--dist"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('dist'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.dist"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('min-payment') -->
+  <td class="positions-table__cell positions-table__cell--min-payment"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('min-payment'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.minPayment"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('surcharge') -->
+  <td class="positions-table__cell positions-table__cell--surcharge"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('surcharge'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.surcharge"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('late-surcharge') -->
+  <td class="positions-table__cell positions-table__cell--late-surcharge"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('late-surcharge'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.lateSurcharge"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('short-shift-surcharge') -->
+  <td class="positions-table__cell positions-table__cell--short-shift-surcharge"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('short-shift-surcharge'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: employee.shortShiftSurcharge"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('premation') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--premation" align="right"
+        data-bind="click: function(_, e) {
+          e.stopPropagation();
+          table.giveBonus(employee);
+        }, hrmTableEditableCell: editableCell, style: {
+          'background-color': employee.bonusesState() > 0 ? '#D0F4E3' : ''
+        }, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('premation'),
+        }">
+        <div class="positions-table__cell-content" data-bind="text: employee.bonusesState"></div>
+    </td>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('fine') -->
+    <!-- ko let: {editableCell: ko.observable(null)} -->
+    <td class="positions-table__cell positions-table__cell--fine" align="right"
+        data-bind="click: function(_,e) {
+          e.stopPropagation();
+          table.giveFine(employee);
+        }, hrmTableEditableCell: editableCell,
+        style: {
+          'background-color': employee.finesState() > 0 ? '#FFD3E8' : ''
+        }, css: {
+          'positions-table__cell--clicked': table.getColumnClicked('fine'),
+        }">
+        <div class="positions-table__cell-content" data-bind="text: employee.finesState"></div>
+    </td>
+    <!-- /ko -->
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('total') -->
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('total'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: employee.total"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('payment') -->
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored"  data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('payment'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: employee.toPayment"></div>
+  </td>
+  <!-- /ko -->
+</tr>
+
+</script>
+
+<!-- Строка Итого -->
+<script id="delivery-total-row-template"
+        type="text/html">
+
+<tr class="positions-table__row positions-table__row--highlighted positions-table__total">
+  <td class="positions-table__cell positions-table__cell--name positions-table__cell--empty"></td>
+
+  <!-- ko if: table.isColumnVisible('account') -->
+  <td class="positions-table__cell positions-table__cell--account positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('account'),
+  }" align="right"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('account-operations') -->
+  <td class="positions-table__cell positions-table__cell--account-operations positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('account-operations'),
+  }"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('interval') -->
+  <td class="positions-table__cell positions-table__cell--interval positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('interval'),
+  }"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('work-time') -->
+  <td class="positions-table__cell positions-table__cell--work-time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('work-time'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: $root.utils.formatTime(total.workingTime())"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders-count') -->
+  <td class="positions-table__cell positions-table__cell--orders-count" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders-count'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: total.ordersCount()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders-value') -->
+  <td class="positions-table__cell positions-table__cell--orders-value" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders-value'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: total.ordersValue()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('average-bill') -->
+  <td class="positions-table__cell positions-table__cell--average-bill" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('average-bill'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: total.averageBill()"></div>
+
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('dist-km') -->
+  <td class="positions-table__cell positions-table__cell--dist-km" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('dist-km'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.distKm()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('estimated-time') -->
+  <td class="positions-table__cell positions-table__cell--estimated-time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('estimated-time'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: total.estimatedTime()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('actual-time') -->
+  <td class="positions-table__cell positions-table__cell--actual-time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('actual-time'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.actualTime()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('kpi') -->
+  <td class="positions-table__cell positions-table__cell--kpi" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('kpi'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.kpi()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('time-without-case') -->
+  <td class="positions-table__cell positions-table__cell--time-without-case" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('time-without-case'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.timeWithoutCase()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('time') -->
+  <td class="positions-table__cell positions-table__cell--time" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('time'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.time()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('orders') -->
+  <td class="positions-table__cell positions-table__cell--orders" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('orders'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.orders()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('dist') -->
+  <td class="positions-table__cell positions-table__cell--dist positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('dist'),
+  }" align="right"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('min-payment') -->
+  <td class="positions-table__cell positions-table__cell--min-payment positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('min-payment'),
+  }" align="right"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('surcharge') -->
+  <td class="positions-table__cell positions-table__cell--surcharge positions-table__cell--empty" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('surcharge'),
+  }" align="right"></td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('late-surcharge') -->
+  <td class="positions-table__cell positions-table__cell--late-surcharge" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('late-surcharge'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: total.lateSurcharge()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('short-shift-surcharge') -->
+  <td class="positions-table__cell positions-table__cell--short-shift-surcharge " data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('short-shift-surcharge'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: total.shortShiftSurcharge()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('premation') -->
+  <td class="positions-table__cell positions-table__cell--premation" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('premation'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: total.bonus()"></div>
+</td >
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('fine') -->
+  <td class="positions-table__cell positions-table__cell--fine" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('fine'),
+  }" align="right">
+  <div class="positions-table__cell-content" data-bind="text: total.fine()"></div>
+</td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('total') -->
+  <td class="positions-table__cell  positions-table__cell--total positions-table__cell--colored" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('total'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.total()"></div>
+  </td>
+  <!-- /ko -->
+
+  <!-- ko if: table.isColumnVisible('payment') -->
+  <td class="positions-table__cell  positions-table__cell--payment positions-table__cell--colored" data-bind="css: {
+    'positions-table__cell--clicked': table.getColumnClicked('payment'),
+  }" align="right">
+    <div class="positions-table__cell-content" data-bind="text: total.toPayment()"></div>
+  </td>
+  <!-- /ko -->
+</tr>
+
+</script>

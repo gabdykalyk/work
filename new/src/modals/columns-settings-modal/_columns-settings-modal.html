@@ -1,0 +1,59 @@
+<template id="columns-modal-dialog-template">
+
+  <button class="hrm-button hrm-basic-modal-dialog__close-button"
+          data-bind="click: function() { cancel(); }"
+          aria-label="Close">
+  </button>
+
+  <div class="hrm-basic-modal-dialog__header">
+    <h2 class="hrm-basic-modal-dialog__title">
+      Настройка столбцов
+    </h2>
+  </div>
+
+  <div class="hrm-basic-modal-dialog__body columns-settings">
+    <div class="columns-settings__search"
+         data-bind="component: {name: 'hrm-search-field', params: { termModel: term, placeholder: 'Поиск по наименованию' }}">
+    </div>
+
+
+    <div class="modal-dialog__scroll" data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {}}}">
+      <div class="modal-dialog__scroll-container columns-settings__list"
+           >
+        <!-- ko foreach: { data: columns, as: 'column' } -->
+
+        <!-- ko if: column.visible() -->
+
+        <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+        <div class="columns-settings__list-item">
+          <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup}}">
+            <div
+                 data-bind="component: {name: 'hrm-checkbox', params: {owner: checkboxGroup, checked: column.checked }}">
+            </div>
+            <label
+                   data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup, text: column.name"></label>
+          </div>
+        </div>
+        <!-- /ko -->
+
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+
+
+  </div>
+
+  <div class="hrm-basic-modal-dialog__action-list columns-settings__action-list">
+    <button class="hrm-button hrm-basic-button  hrm-button--size_large hrm-basic-modal-dialog__action-list-item"
+            data-bind="click: function() {reset();}">
+      Сбросить
+    </button>
+
+    <button class="hrm-button hrm-basic-button hrm-button--size_large  hrm-accent-button hrm-basic-modal-dialog__action-list-item"
+            data-bind="click: function() {submit();}">
+      Применить
+    </button>
+  </div>
+
+</template>

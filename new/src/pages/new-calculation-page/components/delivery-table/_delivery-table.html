@@ -1,0 +1,136 @@
+@@include('./_templates.html')
+
+<template id="calculation-page-delivery-table-template">
+  <div class="calculation-tab"
+       data-bind="class: 'calculation-' + tabName">
+
+    <div class="calculation-tab__settings">
+      <div class="calculation-tab__settings-group">
+
+        <!-- Пересчитать маршруты -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_mobile hrm-button-with-icon--theme_secondary hrm-button-with-route-icon  calculation-tab__settings-button calculation-tab__recalculate-routes"
+                data-bind="click: $root.recalculateRoutes">
+          Пересчитать маршруты
+        </button>
+
+        <!-- ko if: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+        <!-- Штраф/премия -->
+        <button class="hrm-button hrm-basic-button hrm-button--size_medium  calculation-tab__settings-button calculation-tab__settings-stimulation"
+                data-bind="click: function() { $root.stimulation.set('delivery'); }, disable: $root.stimulation.isDeliveryBlocked">
+          Штраф/премия смене
+        </button>
+        <!-- /ko -->
+
+        <!-- ko ifnot: viewportSize().width > HRM_BREAKPOINTS.mobileMaxWidth -->
+        <!-- Штраф/премия -->
+        <button data-bind="click: function() { $root.stimulation.set('delivery'); }"
+                class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_desktop hrm-button-with-money-icon hrm-button-with-icon--theme_secondary  calculation-tab__settings-button calculation-tab__settings-stimulation"></button>
+        <!-- /ko -->
+
+
+
+        <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+        <div class="holiday-surcharge" data-bind="hrmFormField, hrmFormFieldControlRef: control">
+
+          <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+            <input data-bind="value: $root.summaryModel.holidaySurcharge,
+                            hrmMask,
+                            hrmMaskPattern: 'decimal',
+                            hrmFormFieldInputControl: control"
+                   placeholder="Праздничная надбавка">
+          </div>
+
+          <div class="holiday-surcharge__append">%</div>
+        </div>
+        <!-- /ko -->
+
+
+      </div><!-- .calculation-tab__settings-group -->
+      <div class="calculation-tab__settings-group">
+        <!-- Столбцы -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon calculation-tab__settings-button calculation-tab__settings-columns"
+                data-bind="click: setColumns">
+          Настроить столбцы
+        </button>
+
+        <!-- Меньше информации -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon  calculation-tab__settings-button calculation-tab__settings-less-info"
+                data-bind="click: lessInfo, disable: blockLessInfo">
+          Меньше информации
+        </button>
+
+        <!-- Больше информации -->
+        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--hide_tablet hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon hrm-button-with-icon--hide_tablet  calculation-tab__settings-button calculation-tab__settings-more-info"
+                data-bind="click: moreInfo, disable: blockMoreInfo">
+          Больше информации
+        </button>
+      </div><!-- .calculation-tab__settings-group -->
+    </div><!-- .calculation-tab__settings -->
+
+    <div class="hrm-table__fixed-section-container positions-table positions-table--delivery"
+         data-bind="let: {table: $data}">
+
+      <div
+           data-bind="component: { name: 'hrm-scrollable-wrapper', params: { options: {left: {disabled: true}} }}">
+        <table data-bind="hrmTable"
+               class="positions-table__main-table">
+
+          <colgroup>
+            <col class="positions-table__col positions-table__col--name">
+            <!-- ko foreach: table.columns -->
+            <!-- ko if: $data.visible -->
+            <col class="positions-table__col"
+                 data-bind="class: 'position-table__col--' + id">
+            <!-- /ko -->
+            <!-- /ko -->
+          </colgroup>
+
+          <thead>
+            <tr class="positions-table__row positions-table__head-row">
+              <th class="positions-table__cell positions-table__head-cell positions-table__cell--name">
+                <div class="positions-table__cell-content">Сотрудник</div>
+              </th>
+
+              <!-- ko foreach: table.columns -->
+              <!-- ko if: $data.visible -->
+              <th class="positions-table__cell positions-table__head-cell"
+                  data-bind="class: 'positions-table__cell--' + id, css: {
+                    'positions-table__cell--colored': colored,
+                      'positions-table__cell--clicked': table.getColumnClicked($data.id),
+                  }, click: function() { $data.clicked(!$data.clicked())}">
+                <div class="positions-table__cell-content">
+                  <span data-bind="text: title"></span>
+                  <button class="hrm-button hrm-circle-icon-button hrm-circle-info-icon-button hrm-circle-icon-button--theme_neutral hrm-table__head-cell-info-button positions-table__info-icon"
+                          data-bind="hrmTooltip, hrmTooltipText: fullTitle"></button>
+                </div>
+              </th>
+              <!-- /ko -->
+              <!-- /ko -->
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <!-- Список сотрудников по позиции -->
+            <!-- ko foreach: { data: position().visibleEmployees, as: 'employee', beforeRemove: $root.fadePosition } -->
+
+            <!-- ko template: {
+              name: 'delivery-employee-row-template',
+              data: { employee: employee, position: position }
+            } -->
+            <!-- /ko -->
+
+            <!-- /ko -->
+            <!-- Список сотрудников по позиции -->
+
+            <!-- Total section -->
+            <!-- ko template: { name: 'delivery-total-row-template', data: { total: table.total } } -->
+            <!-- /ko -->
+            <!-- /Total section -->
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</template>
