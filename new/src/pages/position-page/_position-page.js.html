@@ -1172,6 +1172,13 @@
             };
 
             this.create = function () {
+                if (this.formModel.value().surcharges().length && !this.isValid()) {
+                    this.isSubmitted(true);
+                    this.blockAddButton(true);
+                    return;
+                }
+
+                this.isSubmitted(false);
                 this.formModel.value().surcharges.push(this.formModel.createSurchargeFormModel({
                     orderTypes: [],
                     orderTypesExclusionFlag: false,

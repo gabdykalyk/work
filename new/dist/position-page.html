@@ -2586,7 +2586,7 @@
                   <input data-bind="
                       textInput: surcharge.minProductsCount,
                       hrmMask, hrmMaskPattern: 'decimal',
-                      hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                      hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                       hrmFormFieldInputControl: control,
                       hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                   "
@@ -2662,7 +2662,7 @@
                   <input data-bind="
                       textInput: surcharge.minOrdersCount,
                       hrmMask, hrmMaskPattern: 'decimal',
-                      hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
+                      hrmMaskOptions: {digits: '0', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                       hrmFormFieldInputControl: control,
                       hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                   "
@@ -5287,6 +5287,13 @@
             };
 
             this.create = function () {
+                if (this.formModel.value().surcharges().length && !this.isValid()) {
+                    this.isSubmitted(true);
+                    this.blockAddButton(true);
+                    return;
+                }
+
+                this.isSubmitted(false);
                 this.formModel.value().surcharges.push(this.formModel.createSurchargeFormModel({
                     orderTypes: [],
                     orderTypesExclusionFlag: false,
