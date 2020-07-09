@@ -232,6 +232,13 @@ ko.bindingHandlers.hrmColoredSign = {
     $(element).toggleClass('color--secondary', value === 0);
   }
 };
+ko.bindingHandlers.stopEvents = {
+  init: function (element) {
+    $(element).on('click input change mousedown', e => {
+      e.stopPropagation();
+    });
+  }
+};
 "use strict";
 
 ko.components.register('hrm-basic-footer', {
@@ -284,6 +291,16 @@ ko.components.register('hrm-checkbox', {
           this.checked = ko.observable(false);
         }
 
+        if (params !== undefined && 'disabled' in params) {
+          this.disabled = ko.isObservable(params.disabled) ? params.disabled : ko.observable(params.disabled);
+        } else {
+          this.disabled = ko.observable(false);
+        }
+
+        $element.toggleClass('disabled', this.disabled());
+        this.disabled.subscribe(v => {
+          $element.toggleClass('disabled', v);
+        });
         this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
 
         (() => {
@@ -304,7 +321,7 @@ ko.components.register('hrm-checkbox', {
   },
   template: `
         <label class="hrm-checkbox__layout">
-            <input data-bind="checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}"
+            <input data-bind="checked: checked, disable: disabled, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}"
                    type="checkbox" hidden>
         </label>
     `
@@ -481,7 +498,19 @@ ko.bindingHandlers.hrmCheckboxGroupLabel = {
 })();
 "use strict";
 
-let DishesSelect = {
+function _toConsumableArray(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+      arr2[i] = arr[i];
+    }
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+}
+
+window.DishesSelect = {
   loaded: ko.observable(false),
   loading: ko.observable(false),
   loadPromise: null,
@@ -536,6 +565,20 @@ let DishesSelect = {
             id: '3665',
             name: 'Цветная капуста в яйце+рыбные тефтели терияки'
           }]
+        }, {
+          noCategory: true,
+          id: '',
+          name: '',
+          dishes: [{
+            id: '5373',
+            name: 'Блюдо без категории 1'
+          }, {
+            id: '5374',
+            name: 'Блюдо без категории 2'
+          }, {
+            id: '5665',
+            name: 'Блюдо без категории 3'
+          }]
         }];
         this.render();
         this.loading(false);
@@ -561,183 +604,127 @@ let DishesSelect = {
       this.rendered(true);
       res();
     });
-  }
+  },
 
-};
-ko.components.register('dishes-select', {
-  viewModel: function (params) {
-    this.dishes = params.dishes;
-    this.isLoaded = ko.observable(false);
-    this.dishesList = ko.observableArray([]);
-    this.control = params.control;
-
-    if (params.dishesList) {
-      this.dishesList(params.dishesList);
-      this.isLoaded(true);
-    } else {
-      DishesSelect.load().then(() => {
-        this.dishesSet = DishesSelect.dishes;
-        this.isLoaded(true);
-      });
+  matcher({
+    term
+  }, data) {
+    if (!term) {
+      return data;
     }
 
-    this.renderDishesSelectBlock = el => {
-      DishesSelect.render().then(() => {
-        this._renderDishesSelectBlock(el);
-      });
-    };
+    term = term.toLowerCase();
 
-    this._renderDishesSelectBlock = el => {
-      const that = this;
-      const select = el.querySelector('select');
-      const selectClone = DishesSelect.html.cloneNode(true);
-      $(select).append($(selectClone).children());
-      $(select).find('option').each(function (index, option) {
-        option.selected = that.dishes().includes(option.value);
+    if (!data.id) {
+      return null;
+    }
+
+    if (data.id[0] != 'c') {
+      const categoryId = data.element.dataset.category;
+      const category = DishesSelect.dishes.find(c => c.id === categoryId);
+      if (!category) return null;
+      const categoryName = category.name.toLowerCase();
+      const dishText = data.text.toLowerCase();
+      const match = categoryName.includes(term) || dishText.includes(term);
+      return match ? data : null;
+    } else {
+      const category = DishesSelect.dishes.find(c => c.id === data.id.slice(1));
+      if (!category) return null;
+      if (!category.id) return null;
+      const categoryName = category.name.toLowerCase();
+      const match = categoryName.includes(term) || category.dishes.some(d => {
+        return d.name.toLowerCase().includes(term);
       });
-      ko.applyBindingsToNode(select, {
-        selectedOptions: this.dishes,
-        valueAllowUnset: true,
-        hrmSelect: true,
-        hrmSelectPlaceholder: 'Все',
-        hrmSelectAllowClear: true,
-        hrmFormFieldSelectControl: params.control,
-        hrmFormFieldSelectControlErrorStateMatcher: params.errorStateMatcher,
-        select2: {
-          containerCssClass: 'form-control',
-          wrapperCssClass: 'select2-container--form-control conditions-list__dish-select',
-          allowClear: false,
-          placeholder: 'Не выбрано',
-          templateSelection: this.dishesAndCategoriesTemplateSelection,
-          templateResult: this.dishesAndCategoriesTemplateResult,
-          matcher: this.dishesAndCategoriesMatcher,
-          minimumResultsForSearch: 0
-        },
-        visible: true,
-        event: {
-          change: (_, event) => {
-            this.dishesAndCategoriesChange(event);
+      return match ? data : null;
+    }
+  },
+
+  templateSelection(state) {
+    if (!state.id) {
+      return state.text;
+    }
+
+    var $result = $('<span>').text(state.text);
+
+    if (state.id[0] == 'c') {
+      $result.addClass('dish-category-value');
+    }
+
+    return $result;
+  },
+
+  templateResult(state) {
+    if (!state.id) {
+      return state.text;
+    }
+
+    var $result = $('<span>').text(state.text);
+
+    if (state.id[0] == 'c') {
+      $result.addClass('dish-category-option');
+    } else {
+      $result.addClass('dish-option');
+    }
+
+    let category = state.element.dataset.category;
+    if (category) $result.attr('has-category', category);
+    return $result;
+  },
+
+  onChange(event) {
+    var options = $(event.target).find('option').get();
+    var value = $(event.target).val();
+
+    if (value) {
+      var selectedCategories = value.filter(function (v) {
+        return v[0] == 'c';
+      });
+      var selectedOptions = value.filter(function (v) {
+        return v[0] != 'c';
+      });
+      options.forEach(function (option) {
+        var optionValue = $(option).attr('value');
+        if (!optionValue) return;
+        var isCategory = optionValue[0] == 'c';
+
+        if (!isCategory) {
+          var categoryId = $(option).data('category');
+
+          if (selectedCategories.includes('c' + categoryId)) {
+            if (selectedOptions.includes(optionValue)) {
+              var index = selectedOptions.indexOf(optionValue);
+              selectedOptions.splice(index, 1);
+            }
+
+            $(option).attr('disabled', true);
+          } else {
+            $(option).attr('disabled', false);
+
+            if (selectedOptions.includes(optionValue)) {}
           }
         }
       });
+      var newValue = [].concat(_toConsumableArray(selectedCategories), _toConsumableArray(selectedOptions));
+      $(event.target).val(newValue).trigger('change.select2');
+    }
+  }
+
+};
+ko.bindingHandlers.hrmLoadDishes = {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const $element = $(element);
+    ko.applyBindingsToDescendants(bindingContext, element);
+    DishesSelect.load().then(() => {
+      DishesSelect.render().then(() => {
+        const selectClone = DishesSelect.html.cloneNode(true);
+        $element.append($(selectClone).children());
+      });
+    });
+    return {
+      controlsDescendantBindings: true
     };
-
-    this.dishesAndCategoriesMatcher = ({
-      term
-    }, data) => {
-      if (!term) {
-        return data;
-      }
-
-      term = term.toLowerCase();
-
-      if (!data.id) {
-        return null;
-      }
-
-      if (data.id[0] != 'c') {
-        const categoryId = data.element.dataset.category;
-        const category = this.dishesSet().find(c => c.id === categoryId);
-        if (!category) return null;
-        const categoryName = category.name.toLowerCase();
-        const dishText = data.text.toLowerCase();
-        const match = categoryName.includes(term) || dishText.includes(term);
-        return match ? data : null;
-      } else {
-        const category = this.dishesSet().find(c => c.id === data.id.slice(1));
-        if (!category) return null;
-        const categoryName = category.name.toLowerCase();
-        const match = categoryName.includes(term) || category.dishes.some(d => {
-          return d.name.toLowerCase().includes(term);
-        });
-        return match ? data : null;
-      }
-    };
-
-    this.dishesAndCategoriesTemplateSelection = function selection(state) {
-      if (!state.id) {
-        return state.text;
-      }
-
-      var $result = $('<span>').text(state.text);
-
-      if (state.id[0] == 'c') {
-        $result.addClass('dish-category-value');
-      }
-
-      return $result;
-    };
-
-    this.dishesAndCategoriesTemplateResult = function result(state) {
-      if (!state.id) {
-        return state.text;
-      }
-
-      var $result = $('<span>').text(state.text);
-
-      if (state.id[0] == 'c') {
-        $result.addClass('dish-category-option');
-      } else {
-        $result.addClass('dish-option');
-      }
-
-      return $result;
-    };
-
-    this.dishesAndCategoriesChange = function onChange(event) {
-      var options = $(event.target).find('option').get();
-      var value = $(event.target).val();
-
-      if (value) {
-        var selectedCategories = value.filter(function (v) {
-          return v[0] == 'c';
-        });
-        var selectedOptions = value.filter(function (v) {
-          return v[0] != 'c';
-        });
-        options.forEach(function (option) {
-          var optionValue = $(option).attr('value');
-          if (!optionValue) return;
-          var isCategory = optionValue[0] == 'c';
-
-          if (!isCategory) {
-            var categoryId = $(option).data('category');
-
-            if (selectedCategories.includes('c' + categoryId)) {
-              if (selectedOptions.includes(optionValue)) {
-                var index = selectedOptions.indexOf(optionValue);
-                selectedOptions.splice(index, 1);
-              }
-
-              $(option).attr('disabled', true);
-            } else {
-              $(option).attr('disabled', false);
-            }
-          }
-        });
-        var newValue = [].concat(_toConsumableArray(selectedCategories), _toConsumableArray(selectedOptions));
-        $(event.target).val(newValue).trigger('change.select2');
-      }
-    };
-  },
-  template: `
-  <!-- ko template: { onRender: renderDishesSelectBlock } -->
-  <template id="dishes-select-template">
-    <option></option>
-    <!-- ko foreach: { data : $data.categories, as: 'category'} -->
-    <option data-bind="attr: { value: 'c' + category.id, 'data-category': category.id }, text: category.name"></option>
-    <!-- ko foreach: { data: category.dishes, as: 'dish' } -->
-    <option data-dish data-bind="attr: { value: 'd' + dish.id, 'data-category': category.id }, text: dish.name"></option>
-    <!-- /ko -->
-    <!-- /ko -->
-  </template>
-
-  <div class="dishes-select" data-bind="descendantsComplete: renderDishesSelectBlock">
-  <select multiple data-bind="visible: false, hrmFormFieldSelectControl: control" data-placeholder="Не выбрано">
-  </select>
-  </div>
-  `
-});
+  }
+};
 "use strict";
 
 // hrmDropdownMenu
@@ -1885,6 +1872,102 @@ ko.components.register('hrm-form-field-error', {
 });
 "use strict";
 
+ko.bindingHandlers.hrmModalContainerModalWrapper = {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    const options = $.extend({
+      closeOnBackdropClick: true,
+      escapePress: 'close'
+    }, allBindings()['hrmModalContainerModalWrapperOptions']);
+    const close = allBindings()['hrmModalContainerModalWrapperClose'];
+    const $element = $(element);
+    const $modal = $element.find('.hrm-modal');
+    $modal.appendTo('body');
+    $modal.modal({
+      backdrop: false,
+      keyboard: false,
+      focus: true
+    });
+
+    if ('modalClass' in options) {
+      $modal.addClass(options.modalClass);
+    }
+
+    $modal.keyup(event => {
+      if (event.keyCode === 27) {
+        if (options.escapePress === 'close') {
+          close.call(viewModel);
+        } else if (options.escapePress instanceof Function) {
+          options.escapePress();
+        }
+      }
+    });
+
+    if (options.closeOnBackdropClick) {
+      $modal.on('click', event => {
+        if (event.target === $modal.get()[0]) {
+          close.call(viewModel);
+        }
+      });
+    }
+
+    const innerBindingContext = ko.bindingEvent.startPossiblyAsyncContentBinding($modal.get()[0], bindingContext);
+    ko.applyBindings(innerBindingContext, $modal.get()[0]);
+    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+      $modal.modal('hide').remove();
+    });
+  }
+};
+ko.components.register('hrm-modal-container', {
+  viewModel: {
+    createViewModel: function (params) {
+      const viewModel = new function () {
+        this.opens = params.opens;
+
+        this.close = function (open, value) {
+          this.opens.remove(open);
+
+          if ('close' in open) {
+            open.close(value);
+          }
+        };
+      }();
+      viewModel.initializing = ko.observable(true);
+
+      viewModel.onInit = function () {
+        viewModel.initializing(false);
+      };
+
+      return viewModel;
+    }
+  },
+  template: `
+        <!-- ko template: {afterRender: onInit} -->
+            <!-- ko foreach: opens -->
+                <!-- ko let: {modalElement: ko.observable()} -->
+                    <div data-bind="
+                         hrmModalContainerModalWrapper,
+                         hrmModalContainerModalWrapperOptions: $data.options,
+                         hrmModalContainerModalWrapperClose: function (value) {$component.close($data, value);}
+                    ">
+                        <div class="modal hrm-modal" role="dialog" tabindex="1" data-bind="element: modalElement">
+                            <!-- ko template: {
+                                name: dialogTemplateName,
+                                data: {
+                                    data: $data.data,
+                                    modalElement: modalElement(),
+                                    close: function (value) {$component.close($data, value);}
+                                }
+                            } -->
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                <!-- /ko -->
+            <!-- /ko -->
+        <!-- /ko -->
+    `
+});
+"use strict";
+
 (() => {
   ko.components.register('hrm-main-sidebar', {
     viewModel: {
@@ -2444,102 +2527,6 @@ ko.components.register('hrm-form-field-error', {
 })();
 "use strict";
 
-ko.bindingHandlers.hrmModalContainerModalWrapper = {
-  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-    const options = $.extend({
-      closeOnBackdropClick: true,
-      escapePress: 'close'
-    }, allBindings()['hrmModalContainerModalWrapperOptions']);
-    const close = allBindings()['hrmModalContainerModalWrapperClose'];
-    const $element = $(element);
-    const $modal = $element.find('.hrm-modal');
-    $modal.appendTo('body');
-    $modal.modal({
-      backdrop: false,
-      keyboard: false,
-      focus: true
-    });
-
-    if ('modalClass' in options) {
-      $modal.addClass(options.modalClass);
-    }
-
-    $modal.keyup(event => {
-      if (event.keyCode === 27) {
-        if (options.escapePress === 'close') {
-          close.call(viewModel);
-        } else if (options.escapePress instanceof Function) {
-          options.escapePress();
-        }
-      }
-    });
-
-    if (options.closeOnBackdropClick) {
-      $modal.on('click', event => {
-        if (event.target === $modal.get()[0]) {
-          close.call(viewModel);
-        }
-      });
-    }
-
-    const innerBindingContext = ko.bindingEvent.startPossiblyAsyncContentBinding($modal.get()[0], bindingContext);
-    ko.applyBindings(innerBindingContext, $modal.get()[0]);
-    ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
-      $modal.modal('hide').remove();
-    });
-  }
-};
-ko.components.register('hrm-modal-container', {
-  viewModel: {
-    createViewModel: function (params) {
-      const viewModel = new function () {
-        this.opens = params.opens;
-
-        this.close = function (open, value) {
-          this.opens.remove(open);
-
-          if ('close' in open) {
-            open.close(value);
-          }
-        };
-      }();
-      viewModel.initializing = ko.observable(true);
-
-      viewModel.onInit = function () {
-        viewModel.initializing(false);
-      };
-
-      return viewModel;
-    }
-  },
-  template: `
-        <!-- ko template: {afterRender: onInit} -->
-            <!-- ko foreach: opens -->
-                <!-- ko let: {modalElement: ko.observable()} -->
-                    <div data-bind="
-                         hrmModalContainerModalWrapper,
-                         hrmModalContainerModalWrapperOptions: $data.options,
-                         hrmModalContainerModalWrapperClose: function (value) {$component.close($data, value);}
-                    ">
-                        <div class="modal hrm-modal" role="dialog" tabindex="1" data-bind="element: modalElement">
-                            <!-- ko template: {
-                                name: dialogTemplateName,
-                                data: {
-                                    data: $data.data,
-                                    modalElement: modalElement(),
-                                    close: function (value) {$component.close($data, value);}
-                                }
-                            } -->
-                            <!-- /ko -->
-                        </div>
-                    </div>
-                <!-- /ko -->
-            <!-- /ko -->
-        <!-- /ko -->
-    `
-});
-"use strict";
-
 // hrmScrollable
 (() => {
   class HrmScrollableViewModel {
@@ -2886,6 +2873,10 @@ ko.bindingHandlers.hrmSelect = {
     const placeholder = allBindings.has('hrmSelectPlaceholder') ? allBindings.get('hrmSelectPlaceholder') : ' ';
     const allowClear = allBindings.has('hrmSelectAllowClear') ? allBindings.get('hrmSelectAllowClear') : false;
     const dropdownParent = allBindings.has('hrmSelectDropdownParent') ? allBindings.get('hrmSelectDropdownParent') : $('body');
+    const templateSelection = allBindings.has('hrmSelectTemplateSelection') ? allBindings.get('hrmSelectTemplateSelection') : state => $('<span>').addClass('hrm-select__rendered-text').text(state.text);
+    const templateResult = allBindings.has('hrmSelectTemplateResult') ? allBindings.get('hrmSelectTemplateResult') : null;
+    const matcher = allBindings.has('hrmSelectMatcher') ? allBindings.get('hrmSelectMatcher') : null;
+    const dropdownClass = allBindings.has('hrmSelectDropdownCssClass') ? allBindings.get('hrmSelectDropdownCssClass') : '';
 
     if (customValuesAllowed && !isMultiple && !searchEnabled) {
       throw Error('You have to enable both options "hrmSelectCustomValuesAllowed" and "hrmSelectSearchEnabled"');
@@ -2896,13 +2887,24 @@ ko.bindingHandlers.hrmSelect = {
       language: 'ru',
       width: '100%',
       dropdownAutoWidth: true,
-      dropdownCssClass: 'hrm-select__dropdown',
+      dropdownCssClass: 'hrm-select__dropdown ' + dropdownClass,
       dropdownParent,
       placeholder,
       allowClear,
-      templateSelection: state => $('<span>').addClass('hrm-select__rendered-text').text(state.text),
       tags: customValuesAllowed
     };
+
+    if (templateSelection) {
+      options.templateSelection = templateSelection;
+    }
+
+    if (templateResult) {
+      options.templateResult = templateResult;
+    }
+
+    if (matcher) {
+      options.matcher = matcher;
+    }
 
     const Select = $.fn.select2.amd.require('jquery.select2');
 
@@ -3165,151 +3167,6 @@ ko.bindingHandlers.bindInner = {
     }
   };
 })();
-"use strict";
-
-class HrmTabGroupItem {
-  constructor(text, disabled = false) {
-    this.text = text;
-    this.disabled = ko.observable(disabled);
-  }
-
-}
-
-ko.components.register('hrm-tab-group', {
-  viewModel: {
-    createViewModel: function (params, componentInfo) {
-      const $element = $(componentInfo.element);
-      $element.addClass(['hrm-tab-group']);
-
-      const HrmTabGroupViewModel = function () {
-        this.moreButtonElementWidth = 33.5;
-        this.itemMargin = 30;
-        this.subscriptions = [];
-        this.element = componentInfo.element;
-
-        this.windowResizeHandler = () => {
-          this.viewportSize({
-            width: $(window).width(),
-            height: $(window).height()
-          });
-          this.updateWidth();
-        };
-
-        this.viewportSize = ko.observable({
-          width: $(window).width(),
-          height: $(window).height()
-        });
-        this.items = params.items;
-        this.activeItem = hrmExtractComponentParam(params, 'activeItem', 0);
-        this.width = ko.observable($element.width());
-        this.itemWidths = ko.pureComputed(() => {
-          const $itemMirror = $('<span>').css({
-            'font-weight': 500,
-            'font-size': '13px',
-            'white-space': 'nowrap'
-          });
-          const $container = $('<div>').css({
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            width: '100%',
-            height: '100%',
-            visibility: 'hidden'
-          });
-          $container.appendTo(document.body);
-          $container.append($itemMirror);
-          const result = ko.unwrap(this.items).map(item => {
-            $itemMirror.text(item.text);
-            return $itemMirror.width();
-          });
-          $container.remove();
-          return result;
-        });
-        this.maxFitItem = ko.pureComputed(() => {
-          const itemWidths = this.itemWidths();
-          const width = this.width();
-          let w = 0;
-
-          for (let i = 0; i < itemWidths.length; i++) {
-            if (i > 0) {
-              w += itemWidths[i] + this.itemMargin;
-            } else {
-              w += itemWidths[i];
-            }
-
-            if (w >= width - this.moreButtonElementWidth - this.itemMargin) {
-              return i !== 0 ? i - 1 : null;
-            }
-          }
-
-          return itemWidths.length > 0 ? itemWidths.length - 1 : null;
-        });
-
-        this.updateWidth = function () {
-          this.width($element.width());
-        };
-
-        (() => {
-          $(window).on('resize', this.windowResizeHandler);
-          this.windowResizeHandler();
-        })();
-      };
-
-      HrmTabGroupViewModel.prototype.dispose = function () {
-        this.subscriptions.forEach(s => s.dispose());
-        $(window).off('resize', this.windowResizeHandler);
-      };
-
-      return new HrmTabGroupViewModel();
-    }
-  },
-  template: `
-        <div class="hrm-tab-group__content-wrapper">
-            <div class="hrm-tab-group__content"">
-
-                <!-- ko if: items.length > 0 -->
-                    <!-- ko foreach: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth ? items.slice(0, maxFitItem() + 1) : items -->
-                        <div class="hrm-tab-group__item"
-                             data-bind="
-                                click: function() {if (!disabled()) {$component.activeItem($index());}},
-                                css: {
-                                    'hrm-tab-group__item--active': $component.activeItem() === $index(),
-                                    'hrm-tab-group__item--disabled': disabled
-                                },
-                                text: text
-                             ">
-                        </div>
-                    <!-- /ko -->
-
-                    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth -->
-                        <!-- ko if: maxFitItem() < items.length - 1 -->
-                            <button class="hrm-button hrm-tab-group__more-button"
-                                    data-bind="
-                                        hrmDropdownMenu,
-                                        hrmDropdownMenuTemplate: 'hrm-tab-group-more-button-dropdown-menu-template',
-                                        hrmDropdownMenuPlacement: 'bottom-end'
-                                    ">
-                                Еще...
-                            </button>
-
-                            <script id="hrm-tab-group-more-button-dropdown-menu-template" type="text/html">
-                                <!-- ko foreach: items.slice(maxFitItem() + 1) -->
-                                    <div class="hrm-dropdown-menu__item"
-                                         data-bind="
-                                            text: text,
-                                            click: function() {if (!disabled()) {$component.activeItem($index() + $component.maxFitItem() + 1);}},
-                                            css: {'hrm-dropdown-menu__item--disabled': disabled}
-                                         ">
-                                    </div>
-                                <!-- /ko -->
-                            </script>
-                        <!-- /ko -->
-                    <!-- /ko -->
-                <!-- /ko -->
-            </div>
-        </div>
-    `
-});
 "use strict";
 
 ko.bindingHandlers.hrmTable = {
@@ -3787,6 +3644,151 @@ ko.bindingHandlers.hrmTable = {
     }
   };
 })();
+"use strict";
+
+class HrmTabGroupItem {
+  constructor(text, disabled = false) {
+    this.text = text;
+    this.disabled = ko.observable(disabled);
+  }
+
+}
+
+ko.components.register('hrm-tab-group', {
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
+      $element.addClass(['hrm-tab-group']);
+
+      const HrmTabGroupViewModel = function () {
+        this.moreButtonElementWidth = 33.5;
+        this.itemMargin = 30;
+        this.subscriptions = [];
+        this.element = componentInfo.element;
+
+        this.windowResizeHandler = () => {
+          this.viewportSize({
+            width: $(window).width(),
+            height: $(window).height()
+          });
+          this.updateWidth();
+        };
+
+        this.viewportSize = ko.observable({
+          width: $(window).width(),
+          height: $(window).height()
+        });
+        this.items = params.items;
+        this.activeItem = hrmExtractComponentParam(params, 'activeItem', 0);
+        this.width = ko.observable($element.width());
+        this.itemWidths = ko.pureComputed(() => {
+          const $itemMirror = $('<span>').css({
+            'font-weight': 500,
+            'font-size': '13px',
+            'white-space': 'nowrap'
+          });
+          const $container = $('<div>').css({
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%',
+            visibility: 'hidden'
+          });
+          $container.appendTo(document.body);
+          $container.append($itemMirror);
+          const result = ko.unwrap(this.items).map(item => {
+            $itemMirror.text(item.text);
+            return $itemMirror.width();
+          });
+          $container.remove();
+          return result;
+        });
+        this.maxFitItem = ko.pureComputed(() => {
+          const itemWidths = this.itemWidths();
+          const width = this.width();
+          let w = 0;
+
+          for (let i = 0; i < itemWidths.length; i++) {
+            if (i > 0) {
+              w += itemWidths[i] + this.itemMargin;
+            } else {
+              w += itemWidths[i];
+            }
+
+            if (w >= width - this.moreButtonElementWidth - this.itemMargin) {
+              return i !== 0 ? i - 1 : null;
+            }
+          }
+
+          return itemWidths.length > 0 ? itemWidths.length - 1 : null;
+        });
+
+        this.updateWidth = function () {
+          this.width($element.width());
+        };
+
+        (() => {
+          $(window).on('resize', this.windowResizeHandler);
+          this.windowResizeHandler();
+        })();
+      };
+
+      HrmTabGroupViewModel.prototype.dispose = function () {
+        this.subscriptions.forEach(s => s.dispose());
+        $(window).off('resize', this.windowResizeHandler);
+      };
+
+      return new HrmTabGroupViewModel();
+    }
+  },
+  template: `
+        <div class="hrm-tab-group__content-wrapper">
+            <div class="hrm-tab-group__content"">
+
+                <!-- ko if: items.length > 0 -->
+                    <!-- ko foreach: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth ? items.slice(0, maxFitItem() + 1) : items -->
+                        <div class="hrm-tab-group__item"
+                             data-bind="
+                                click: function() {if (!disabled()) {$component.activeItem($index());}},
+                                css: {
+                                    'hrm-tab-group__item--active': $component.activeItem() === $index(),
+                                    'hrm-tab-group__item--disabled': disabled
+                                },
+                                text: text
+                             ">
+                        </div>
+                    <!-- /ko -->
+
+                    <!-- ko if: viewportSize().width <= HRM_BREAKPOINTS.tabletMaxWidth -->
+                        <!-- ko if: maxFitItem() < items.length - 1 -->
+                            <button class="hrm-button hrm-tab-group__more-button"
+                                    data-bind="
+                                        hrmDropdownMenu,
+                                        hrmDropdownMenuTemplate: 'hrm-tab-group-more-button-dropdown-menu-template',
+                                        hrmDropdownMenuPlacement: 'bottom-end'
+                                    ">
+                                Еще...
+                            </button>
+
+                            <script id="hrm-tab-group-more-button-dropdown-menu-template" type="text/html">
+                                <!-- ko foreach: items.slice(maxFitItem() + 1) -->
+                                    <div class="hrm-dropdown-menu__item"
+                                         data-bind="
+                                            text: text,
+                                            click: function() {if (!disabled()) {$component.activeItem($index() + $component.maxFitItem() + 1);}},
+                                            css: {'hrm-dropdown-menu__item--disabled': disabled}
+                                         ">
+                                    </div>
+                                <!-- /ko -->
+                            </script>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+    `
+});
 "use strict";
 
 // hrmTooltip

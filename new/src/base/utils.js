@@ -235,3 +235,11 @@ ko.bindingHandlers.hrmColoredSign = {
     $(element).toggleClass('color--secondary', value === 0);
   },
 };
+
+ko.bindingHandlers.stopEvents = {
+  init: function(element) {
+    $(element).on('click input change mousedown', e => {
+      e.stopPropagation();
+    })
+  }
+}

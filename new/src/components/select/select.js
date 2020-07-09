@@ -22,6 +22,22 @@ ko.bindingHandlers.hrmSelect = {
       ? allBindings.get('hrmSelectDropdownParent')
       : $('body');
 
+    const templateSelection = allBindings.has('hrmSelectTemplateSelection')
+    ? allBindings.get('hrmSelectTemplateSelection')
+    : (state) => $('<span>').addClass('hrm-select__rendered-text').text(state.text);
+
+    const templateResult = allBindings.has('hrmSelectTemplateResult')
+    ? allBindings.get('hrmSelectTemplateResult')
+    : null;
+
+    const matcher = allBindings.has('hrmSelectMatcher')
+    ? allBindings.get('hrmSelectMatcher')
+    : null;
+
+    const dropdownClass = allBindings.has('hrmSelectDropdownCssClass')
+    ? allBindings.get('hrmSelectDropdownCssClass')
+    : '';
+
     if (customValuesAllowed && !isMultiple && !searchEnabled) {
       throw Error(
         'You have to enable both options "hrmSelectCustomValuesAllowed" and "hrmSelectSearchEnabled"',
@@ -33,14 +49,24 @@ ko.bindingHandlers.hrmSelect = {
       language: 'ru',
       width: '100%',
       dropdownAutoWidth: true,
-      dropdownCssClass: 'hrm-select__dropdown',
+      dropdownCssClass: 'hrm-select__dropdown ' + dropdownClass,
       dropdownParent,
       placeholder,
       allowClear,
-      templateSelection: (state) =>
-        $('<span>').addClass('hrm-select__rendered-text').text(state.text),
       tags: customValuesAllowed,
     };
+
+    if (templateSelection) {
+      options.templateSelection = templateSelection;
+    }
+
+    if (templateResult) {
+      options.templateResult = templateResult;
+    }
+
+    if (matcher) {
+      options.matcher = matcher;
+    }
 
     const Select = $.fn.select2.amd.require('jquery.select2');
     const Search = $.fn.select2.amd.require('select2/selection/search');

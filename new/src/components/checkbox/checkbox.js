@@ -1,92 +1,110 @@
 ko.components.register('hrm-checkbox', {
-    viewModel: {
-        createViewModel: function (params, componentInfo) {
-            const $element = $(componentInfo.element);
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
 
-            $element.addClass(['hrm-checkbox']);
+      $element.addClass(['hrm-checkbox']);
 
-            const ViewModel = function () {
-                this._subscriptions = [];
+      const ViewModel = function () {
+        this._subscriptions = [];
 
-                if (params !== undefined && 'checked' in params) {
-                    this.checked = ko.isObservable(params.checked) ? params.checked : ko.observable(params.checked);
-                } else {
-                    this.checked = ko.observable(false);
-                }
-
-                this.checkboxGroup = params !== undefined && 'owner' in params ? params.owner : null;
-
-                (() => {
-                    $element.toggleClass('hrm-checkbox--checked', this.checked());
-
-                    this._subscriptions.push(this.checked.subscribe(checked => {
-                        $element.toggleClass('hrm-checkbox--checked', checked);
-                    }));
-                })();
-            };
-
-            ViewModel.prototype.dispose = function() {
-                this._subscriptions.forEach(s => s.dispose());
-            };
-
-            return new ViewModel();
+        if (params !== undefined && 'checked' in params) {
+          this.checked = ko.isObservable(params.checked)
+            ? params.checked
+            : ko.observable(params.checked);
+        } else {
+          this.checked = ko.observable(false);
         }
+
+        if (params !== undefined && 'disabled' in params) {
+          this.disabled = ko.isObservable(params.disabled)
+            ? params.disabled
+            : ko.observable(params.disabled);
+        } else {
+          this.disabled = ko.observable(false);
+        }
+
+        $element.toggleClass('disabled', this.disabled());
+        this.disabled.subscribe((v) => {
+          $element.toggleClass('disabled', v);
+        });
+
+        this.checkboxGroup =
+          params !== undefined && 'owner' in params ? params.owner : null;
+
+        (() => {
+          $element.toggleClass('hrm-checkbox--checked', this.checked());
+
+          this._subscriptions.push(
+            this.checked.subscribe((checked) => {
+              $element.toggleClass('hrm-checkbox--checked', checked);
+            }),
+          );
+        })();
+      };
+
+      ViewModel.prototype.dispose = function () {
+        this._subscriptions.forEach((s) => s.dispose());
+      };
+
+      return new ViewModel();
     },
-    template: `
+  },
+  template: `
         <label class="hrm-checkbox__layout">
-            <input data-bind="checked: checked, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}"
+            <input data-bind="checked: checked, disable: disabled, attr: {id: checkboxGroup !== null && checkboxGroup() !== null ? checkboxGroup().id : undefined}"
                    type="checkbox" hidden>
         </label>
-    `
+    `,
 });
 
 let hrmCheckboxGroupNextId = 0;
 
 ko.components.register('hrm-checkbox-group', {
-    viewModel: {
-        createViewModel: function (params, componentInfo) {
-            const $element = $(componentInfo.element);
+  viewModel: {
+    createViewModel: function (params, componentInfo) {
+      const $element = $(componentInfo.element);
 
-            $element.addClass(['hrm-checkbox-group']);
+      $element.addClass(['hrm-checkbox-group']);
 
-            const ViewModel = function () {
-                this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
+      const ViewModel = function () {
+        this.id = 'hrm-checkbox-group-' + hrmCheckboxGroupNextId++;
 
-                (() => {
-                    if (params !== undefined && 'exportAs' in params) {
-                        if (ko.isObservableArray(params.exportAs)) {
-                            params.exportAs.push(this);
-                        } else {
-                            params.exportAs(this);
-                        }
-                    }
-                })();
-            };
+        (() => {
+          if (params !== undefined && 'exportAs' in params) {
+            if (ko.isObservableArray(params.exportAs)) {
+              params.exportAs.push(this);
+            } else {
+              params.exportAs(this);
+            }
+          }
+        })();
+      };
 
-            ViewModel.prototype.dispose = function() {
-                if (params !== undefined && 'exportAs' in params) {
-                    if (ko.isObservableArray(params.exportAs)) {
-                        params.exportAs.remove(this);
-                    } else {
-                        params.exportAs(null);
-                    }
-                }
-            };
-
-            return new ViewModel();
+      ViewModel.prototype.dispose = function () {
+        if (params !== undefined && 'exportAs' in params) {
+          if (ko.isObservableArray(params.exportAs)) {
+            params.exportAs.remove(this);
+          } else {
+            params.exportAs(null);
+          }
         }
+      };
+
+      return new ViewModel();
     },
-    template: `
+  },
+  template: `
         <!-- ko template: {nodes: $componentTemplateNodes} --><!-- /ko -->
-    `
+    `,
 });
 
 ko.bindingHandlers.hrmCheckboxGroupLabel = {
-    init: function(element, valueAccessor, allBindings) {
-        const checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
+  init: function (element, valueAccessor, allBindings) {
+    const checkboxGroup = allBindings.get('hrmCheckboxGroupLabelOwner');
 
-        const $element = $(element);
-        $element.addClass('hrm-checkbox-group__label');
-        $element.attr('for', checkboxGroup().id);
-    }
+    const $element = $(element);
+    $element.addClass('hrm-checkbox-group__label');
+    $element.attr('for', checkboxGroup().id);
+  },
 };

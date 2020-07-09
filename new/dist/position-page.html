@@ -2256,7 +2256,7 @@
      data-bind="using: $tab.formModel.value">
   <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
               hrm-button-with-plus-icon position-page__surcharges-tab-pane-add-button position-page__surcharges-tab-pane-first-add-button"
-          data-bind="click: function() {$tab.create();}">
+          data-bind="click: function() {$tab.create();}, disable: $tab.blockAddButton">
     Добавить доплату
   </button>
 
@@ -2315,17 +2315,17 @@
 
               <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
               <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
-                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+              class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
                 <label class="hrm-form-field__label"
                        data-bind="hrmFormFieldLabel: label">
                   Тип заказа
                 </label>
 
                 <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control"
-                     class="hrm-select--with-flag">
+                     class="hrm-select hrm-select-with-flag">
                   <select data-bind="
                       selectedOptions: surcharge.orderTypes, valueAllowUnset: true,
-                      hrmSelect, hrmSelectPlaceholder: 'Все', hrmSelectAllowClear: true,
+                      hrmSelect, hrmSelectPlaceholder: 'Все',
                       hrmFormFieldSelectControl: control,
                       hrmFormFieldSelectControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)"
                           multiple>
@@ -2336,10 +2336,11 @@
                   </select>
 
                   <!-- ko let: {checkboxGroup: ko.observable(null)} -->
-                  <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup, }}">
+                  <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup, }}, stopEvents">
                     <div data-bind="component: {name: 'hrm-checkbox', params: {
                       owner: checkboxGroup,
-                      checked: surcharge.orderTypesExclusionFlag
+                      checked: surcharge.orderTypesExclusionFlag,
+                      disabled: !surcharge.orderTypes().length
                     }}"></div>
                     <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup">Все,
                       кроме</label>
@@ -2364,7 +2365,57 @@
             </div>
 
             <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-dishes-item">
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                <label class="hrm-form-field__label"
+                        data-bind="hrmFormFieldLabel: label">
+                    Блюда/категории
+                </label>
 
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control"
+                    class="hrm-select hrm-select-with-flag hrm-dishes-select">
+                  <select multiple data-bind="
+                        selectedOptions: surcharge.dishes, valueAllowUnset: true,
+                        hrmSelect, hrmSelectPlaceholder: 'Все',
+                        hrmSelectTemplateResult: DishesSelect.templateResult,
+                        hrmSelectTemplateSelection: DishesSelect.templateSelection,
+                        hrmSelectMatcher: DishesSelect.matcher,
+                        hrmSelectDropdownCssClass: 'hrm-dishes-select-dropdown position-page-hrm-dishes-select-dropdown',
+                        hrmFormFieldSelectControl: control,
+                        hrmFormFieldSelectControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab),
+                        hrmLoadDishes, event: {
+                          change: function($data, event) {
+                            DishesSelect.onChange(event);
+                          }
+                        }">
+                    <option></option>
+                  </select>
+
+                  <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+                  <div data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup, }}, stopEvents">
+                    <div data-bind="component: {name: 'hrm-checkbox', params: {
+                      owner: checkboxGroup,
+                      checked: surcharge.dishesExclusionFlag,
+                      disabled: !surcharge.dishes().length
+                    }}"></div>
+                    <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup">Все,
+                      кроме</label>
+                  </div>
+                  <!-- /ko -->
+                </div>
+
+                <div data-bind="
+                      component: {name: 'hrm-form-field-error'},
+                      hrmSlide,
+                      hrmSlideValue: control() !== null ? control().errorState : false,
+                      hrmSlideDuration: 150
+                  ">
+                  <!-- ko text: surcharge.dishes.error() -->
+                  <!-- /ko -->
+                </div>
+              </div>
+              <!-- /ko -->
             </div>
 
 
@@ -2374,8 +2425,7 @@
 
         <div class="position-page__section-row">
           <div class="position-page__section-row-content">
-            <div
-                 class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-type-item">
+            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-type-item">
 
               <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
               <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
@@ -2385,7 +2435,7 @@
                   Тип доплаты</label>
 
                 <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control"
-                     class="hrm-select--with-flag">
+                     class="hrm-select">
                   <select data-bind="
                       selectedOptions: surcharge.type, valueAllowUnset: true,
                       hrmSelect, hrmSelectPlaceholder: 'Выберите тип', hrmSelectAllowClear: true,
@@ -2417,70 +2467,69 @@
               beforeRemove: hrmFadeBeforeRemoveFactory(200)
             } -->
 
-              <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-salary-percent-item">
-                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
-                    class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
-                  <label class="hrm-form-field__label"
-                        data-bind="hrmFormFieldLabel: label">
-                    Процент</label>
+            <div
+                 class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-params-item">
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float position-page__surcharges-tab-pane-procent-item">
+                <label class="hrm-form-field__label"
+                       data-bind="hrmFormFieldLabel: label">
+                  Процент</label>
 
-                  <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                    <input data-bind="
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                  <input data-bind="
                         textInput: surcharge.salaryPercent,
                         hrmMask, hrmMaskPattern: 'decimal',
                         hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                         hrmFormFieldInputControl: control,
                         hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                     "
-                          placeholder="0">
-                  </div>
+                         placeholder="0">
+                </div>
 
-                  <div data-bind="
+                <div data-bind="
                       component: {name: 'hrm-form-field-error'},
                       hrmSlide,
                       hrmSlideValue: control() !== null ? control().errorState : false,
                       hrmSlideDuration: 150
                   ">
-                    <!-- ko text: surcharge.salaryPercent.error() -->
-                    <!-- /ko -->
-                  </div>
+                  <!-- ko text: surcharge.salaryPercent.error() -->
+                  <!-- /ko -->
                 </div>
-                <!-- /ko -->
               </div>
+              <!-- /ko -->
 
-              <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-min-salary-item">
-                <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
-                <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
-                    class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
-                  <label class="hrm-form-field__label"
-                        data-bind="hrmFormFieldLabel: label">
-                    От min выручки
-                  </label>
+              <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+              <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float position-page__surcharges-tab-pane-min-count-item">
+                <label class="hrm-form-field__label"
+                       data-bind="hrmFormFieldLabel: label">
+                  От min выручки
+                </label>
 
-                  <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
-                    <input data-bind="
+                <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control">
+                  <input data-bind="
                         textInput: surcharge.minSalary,
                         hrmMask, hrmMaskPattern: 'decimal',
                         hrmMaskOptions: {digits: '0,2', groupSeparator: ' ', autoGroup: true, allowMinus: false, rightAlign: false},
                         hrmFormFieldInputControl: control,
                         hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                     "
-                          placeholder="0">
-                  </div>
+                         placeholder="0">
+                </div>
 
-                  <div data-bind="
+                <div data-bind="
                       component: {name: 'hrm-form-field-error'},
                       hrmSlide,
                       hrmSlideValue: control() !== null ? control().errorState : false,
                       hrmSlideDuration: 150
                   ">
-                    <!-- ko text: surcharge.minSalary.error() -->
-                    <!-- /ko -->
-                  </div>
+                  <!-- ko text: surcharge.minSalary.error() -->
+                  <!-- /ko -->
                 </div>
-                <!-- /ko -->
               </div>
+              <!-- /ko -->
+            </div>
 
             <!-- /ko -->
 
@@ -2490,12 +2539,13 @@
               beforeRemove: hrmFadeBeforeRemoveFactory(200)
             } -->
 
-            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-per-products-unit-item">
+            <div
+                 class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-params-item">
               <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
               <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
-                  class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float position-page__surcharges-tab-pane-per-unit-item">
                 <label class="hrm-form-field__label"
-                      data-bind="hrmFormFieldLabel: label">
+                       data-bind="hrmFormFieldLabel: label">
                   <span>За ед. товара, <i class="far fa-ruble-sign"></i></span>
 
                 </label>
@@ -2508,7 +2558,7 @@
                       hrmFormFieldInputControl: control,
                       hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                   "
-                        placeholder="0">
+                         placeholder="0">
                 </div>
 
                 <div data-bind="
@@ -2522,14 +2572,12 @@
                 </div>
               </div>
               <!-- /ko -->
-            </div>
 
-            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-min-products-count-item">
               <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
               <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
-                  class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float position-page__surcharges-tab-pane-min-count-item">
                 <label class="hrm-form-field__label"
-                      data-bind="hrmFormFieldLabel: label">
+                       data-bind="hrmFormFieldLabel: label">
                   От min кол-ва, штук
 
                 </label>
@@ -2542,7 +2590,7 @@
                       hrmFormFieldInputControl: control,
                       hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                   "
-                        placeholder="0">
+                         placeholder="0">
                 </div>
 
                 <div data-bind="
@@ -2558,20 +2606,21 @@
               <!-- /ko -->
             </div>
 
-          <!-- /ko -->
+            <!-- /ko -->
 
-          <!-- ko template: {
+            <!-- ko template: {
               foreach: hrmTemplateIf(surcharge.type() == '3'),
               afterAdd: hrmFadeAfterAddFactory(200, 250),
               beforeRemove: hrmFadeBeforeRemoveFactory(200)
             } -->
 
-            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-per-orders-unit-item">
+            <div
+                 class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-params-item">
               <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
               <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
-                  class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float position-page__surcharges-tab-pane-per-unit-item">
                 <label class="hrm-form-field__label"
-                      data-bind="hrmFormFieldLabel: label">
+                       data-bind="hrmFormFieldLabel: label">
                   <span>За ед. заказа, <i class="far fa-ruble-sign"></i></span>
 
                 </label>
@@ -2584,7 +2633,7 @@
                       hrmFormFieldInputControl: control,
                       hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                   "
-                        placeholder="0">
+                         placeholder="0">
                 </div>
 
                 <div data-bind="
@@ -2598,14 +2647,12 @@
                 </div>
               </div>
               <!-- /ko -->
-            </div>
 
-            <div class="position-page__section-row-item position-page__surcharges-tab-pane-section-row-min-orders-count-item">
               <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
               <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
-                  class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                   class="hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float position-page__surcharges-tab-pane-min-count-item">
                 <label class="hrm-form-field__label"
-                      data-bind="hrmFormFieldLabel: label">
+                       data-bind="hrmFormFieldLabel: label">
                   От min кол-ва, штук
 
                   </button>
@@ -2619,7 +2666,7 @@
                       hrmFormFieldInputControl: control,
                       hrmFormFieldInputControlErrorStateMatcher: $tab.formControlErrorStateMatcher.bind($tab)
                   "
-                        placeholder="0">
+                         placeholder="0">
                 </div>
 
                 <div data-bind="
@@ -2635,7 +2682,7 @@
               <!-- /ko -->
             </div>
 
-          <!-- /ko -->
+            <!-- /ko -->
 
           </div>
         </div>
@@ -2655,7 +2702,7 @@
   } -->
   <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral
                   hrm-button-with-plus-icon position-page__surcharges-tab-pane-add-button position-page__surcharges-tab-pane-second-add-button"
-          data-bind="click: function() {$tab.create();}">
+          data-bind="click: function() {$tab.create();}, disable: $tab.blockAddButton">
     Добавить доплату
   </button>
   <!-- /ko -->
@@ -2687,6 +2734,16 @@
   <!-- /ko -->
 </div>
 <!-- /ko -->
+
+<template id="dishes-select-template">
+  <option></option>
+  <!-- ko foreach: { data : $data.categories, as: 'category'} -->
+  <option data-bind="attr: { value: 'c' + category.id, 'data-category': category.id }, text: category.name"></option>
+  <!-- ko foreach: { data: category.dishes, as: 'dish' } -->
+  <option data-dish data-bind="attr: { value: 'd' + dish.id, 'data-category': category.id }, text: dish.name"></option>
+  <!-- /ko -->
+  <!-- /ko -->
+</template>
 
                     <!-- /ko -->
 
@@ -4115,52 +4172,65 @@
             this.createSurchargeFormModel = function (data) {
                 const formModel = ko.validatedObservable(null, {deep: true, live: true});
 
-                const type = ko.observable('').extend({
+                const type = ko.observable(data.type).extend({
                     required: {
                         message: 'Обязательное поле'
                     }
                 });
 
+                const orderTypes = ko.observableArray(data.orderTypes);
+                const orderTypesExclusionFlag = ko.observable(data.orderTypesExclusionFlag);
+
+                orderTypes.subscribe(v => {
+                    if (!v.length) orderTypesExclusionFlag(false);
+                });
+
+                const dishes = ko.observableArray(data.dishes);
+                const dishesExclusionFlag = ko.observable(data.dishesExclusionFlag);
+
+                dishes.subscribe(v => {
+                    if (!v.length) dishesExclusionFlag(false);
+                });
+
                 formModel({
-                    orderTypes: ko.observableArray([]),
-                    orderTypesExclusionFlag: ko.observable(false),
-                    dishes: ko.observableArray([]),
-                    dishesExclusionFlag: ko.observable(false),
-                    type: type,
-
-                    salaryPercent: ko.observable(0).extend({
+                    orderTypes,
+                    orderTypesExclusionFlag,
+                    dishes,
+                    dishesExclusionFlag,
+                    type,
+                    salaryPercent: ko.observable(data.salaryPercent).extend({
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => type() == '1'
                         }
                     }),
-                    minSalary: ko.observable(0).extend({
+                    minSalary: ko.observable(data.minSalary).extend({
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => type() == '1'
                         }
                     }),
 
-                    perProductsUnit: ko.observable(0).extend({
+                    perProductsUnit: ko.observable(data.perProductsUnit).extend({
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => type() == '2'
                         }
                     }),
-                    minProductsCount: ko.observable(0).extend({
+                    minProductsCount: ko.observable(data.minProductsCount).extend({
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => type() == '2'
                         }
                     }),
 
-                    perOrdersUnit: ko.observable(0).extend({
+                    perOrdersUnit: ko.observable(data.perOrdersUnit).extend({
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => type() == '3'
                         }
                     }),
-                    minOrdersCount: ko.observable(0).extend({
+                    minOrdersCount: ko.observable(data.minOrdersCount).extend({
                         required: {
                             message: 'Обязательное поле',
                             onlyIf: () => type() == '3'
@@ -5155,6 +5225,8 @@
             this.isSubmitted = ko.observable(false);
             this.isResetting = ko.observable(false);
 
+            this.blockAddButton = ko.observable(false);
+
             this.formModel = formModel;
 
             this.formModelValue = ko.pureComputed(() => {
@@ -5164,9 +5236,9 @@
                         let data = ko.toJS(surcharge);
                         return {
                             orderTypes: data.orderTypes,
-                            orderTypesExclusionFlag: data.orderTypeExcept,
+                            orderTypesExclusionFlag: data.orderTypesExclusionFlag,
                             dishes: data.dishes,
-                            dishesExclusionFlag: data.dishesExcept,
+                            dishesExclusionFlag: data.dishesExclusionFlag,
                             type: data.type,
 
                             salaryPercent: data.salaryPercent,
@@ -5189,10 +5261,17 @@
                 this.formModel.value().surcharges().every(s => s.isValid());
             });
 
+            this.isValid.subscribe(v => {
+                if (v) this.blockAddButton(false);
+            })
+
             this.cancel = function () {
                 this.isResetting(true);
 
+                console.log(this.lastFormModelValue)
+
                 this.formModel.value().surcharges(this.lastFormModelValue.surcharges.map(s => {
+                    console.log(s)
                     return this.formModel.createSurchargeFormModel(s);
                 }));
 
@@ -5204,8 +5283,10 @@
 
                 if (this.isValid()) {
                     this.lastFormModelValue = this.formModelValue();
-
+                    console.log(this.lastFormModelValue)
                     save();
+                } else {
+                    this.blockAddButton(true);
                 }
             };
 
