@@ -240,6 +240,104 @@
                     <!-- /ko -->
                 </div>
                 <div class="templates__section">
+                    <div class="templates__section-title">Поле ввода с выпадающим списком и флагом</div>
+
+                    <!-- ko let: {
+                        control: ko.observable(null),
+                        label: ko.observable(null),
+                    } -->
+                    <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                         class="templates__form-field hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                        <label class="hrm-form-field__label"
+                               data-bind="hrmFormFieldLabel: label">
+                            Тип заказа
+                        </label>
+
+                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control"
+                             class="hrm-select hrm-select-with-flag">
+                            <select data-bind="
+                                selectedOptions: orderTypes, valueAllowUnset: true,
+                                hrmSelect, hrmSelectPlaceholder: 'Все',
+                                hrmFormFieldSelectControl: control"
+                                    multiple>
+                                <option></option>
+                                <option value="0">Зал</option>
+                                <option value="1">Самовывоз</option>
+                                <option value="2">Доставка</option>
+                            </select>
+
+                            <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+                            <div
+                                 data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup, }}, stopEvents">
+                                <div data-bind="component: {name: 'hrm-checkbox', params: {
+                                    owner: checkboxGroup,
+                                    checked: $root.orderTypesExclusionFlag,
+                                    disabled: !$root.orderTypes().length
+                                    }}"></div>
+                                <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup">Все,
+                                    кроме</label>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+
+                <template id="dishes-select-template">
+                    <option></option>
+                    <!-- ko foreach: { data : $data.categories, as: 'category'} -->
+                    <option data-bind="attr: { value: 'c' + category.id, 'data-category': category.id }, text: category.name"></option>
+                    <!-- ko foreach: { data: category.dishes, as: 'dish' } -->
+                    <option data-dish data-bind="attr: { value: 'd' + dish.id, 'data-category': category.id }, text: dish.name"></option>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </template>
+
+                <div class="templates__section">
+                    <div class="templates__section-title">Поле выбора блюд и категорий</div>
+                    <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
+                    <div data-bind="hrmFormField, hrmFormFieldControlRef: control, hrmFormFieldLabelRef: label"
+                         class="templates__form-field hrm-form-field hrm-form-field--has-label hrm-form-field--should-label-float">
+                        <label class="hrm-form-field__label"
+                               data-bind="hrmFormFieldLabel: label">
+                            Блюда/категории
+                        </label>
+
+                        <div data-bind="hrmFormFieldBasis, hrmFormFieldBasisControl: control"
+                             class="hrm-select hrm-select-with-flag hrm-dishes-select">
+                            <select multiple
+                                    data-bind="
+                                    selectedOptions: dishes, valueAllowUnset: true,
+                                    hrmSelect, hrmSelectPlaceholder: 'Все',
+                                    hrmSelectTemplateResult: DishesSelect.templateResult,
+                                    hrmSelectTemplateSelection: DishesSelect.templateSelection,
+                                    hrmSelectMatcher: DishesSelect.matcher,
+                                    hrmSelectDropdownCssClass: 'hrm-dishes-select-dropdown',
+                                    hrmFormFieldSelectControl: control,
+                                    hrmLoadDishes, event: {
+                                        change: function($data, event) {
+                                        DishesSelect.onChange(event);
+                                        }
+                                    }">
+                                <option></option>
+                            </select>
+
+                            <!-- ko let: {checkboxGroup: ko.observable(null)} -->
+                            <div
+                                 data-bind="component: {name: 'hrm-checkbox-group', params: {exportAs: checkboxGroup, }}, stopEvents">
+                                <div data-bind="component: {name: 'hrm-checkbox', params: {
+                                    owner: checkboxGroup,
+                                    checked: $root.dishesExclusionFlag,
+                                    disabled: !$root.dishes().length
+                                }}"></div>
+                                <label data-bind="hrmCheckboxGroupLabel, hrmCheckboxGroupLabelOwner: checkboxGroup">Все, кроме</label>
+                            </div>
+                            <!-- /ko -->
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <div class="templates__section">
                     <div class="templates__section-title">Поле ввода с маской и без подписи</div>
 
                     <!-- ko let: {control: ko.observable(null), label: ko.observable(null)} -->
@@ -644,15 +742,18 @@
                         </button>
                     </div>
                     <div class="templates__list mt-4">
-                        <button class="hrm-button hrm-basic-button templates__basic-button" disabled>
+                        <button class="hrm-button hrm-basic-button templates__basic-button"
+                                disabled>
                             Назад
                         </button>
 
-                        <button class="hrm-button hrm-basic-button hrm-accent-button templates__basic-button" disabled>
+                        <button class="hrm-button hrm-basic-button hrm-accent-button templates__basic-button"
+                                disabled>
                             Далее
                         </button>
 
-                        <button class="hrm-button hrm-basic-button hrm-primary-button templates__basic-button" disabled>
+                        <button class="hrm-button hrm-basic-button hrm-primary-button templates__basic-button"
+                                disabled>
                             <span class="hrm-primary-button__content">Войти</span>
                             <span class="hrm-primary-button__background hrm-primary-button__hover-background"></span>
                             <span class="hrm-primary-button__background hrm-primary-button__active-background"></span>
@@ -681,17 +782,18 @@
                     </div>
 
                     <div class="templates__list mt-4">
-                        <button class="hrm-button hrm-basic-button hrm-button--size_medium templates__basic-button" disabled>
+                        <button class="hrm-button hrm-basic-button hrm-button--size_medium templates__basic-button"
+                                disabled>
                             Назад
                         </button>
 
-                        <button
-                                class="hrm-button hrm-basic-button hrm-button--size_medium hrm-accent-button templates__basic-button" disabled>
+                        <button class="hrm-button hrm-basic-button hrm-button--size_medium hrm-accent-button templates__basic-button"
+                                disabled>
                             Далее
                         </button>
 
-                        <button
-                                class="hrm-button hrm-basic-button hrm-button--size_medium hrm-primary-button templates__basic-button" disabled>
+                        <button class="hrm-button hrm-basic-button hrm-button--size_medium hrm-primary-button templates__basic-button"
+                                disabled>
                             <span class="hrm-primary-button__content">Войти</span>
                             <span class="hrm-primary-button__background hrm-primary-button__hover-background"></span>
                             <span class="hrm-primary-button__background hrm-primary-button__active-background"></span>
@@ -759,58 +861,58 @@
                     </div>
 
                     <div class="templates__list">
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_neutral hrm-button-with-plus-icon templates__button-with-icon"
+                                disabled>
                             Добавить
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive hrm-button-with-check-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive hrm-button-with-check-icon templates__button-with-icon"
+                                disabled>
                             Заполнить автоматически
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-times-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-times-icon templates__button-with-icon"
+                                disabled>
                             Очистить
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-arrow-left-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-arrow-left-icon templates__button-with-icon"
+                                disabled>
                             Вернуться
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive hrm-button-with-excel-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_positive hrm-button-with-excel-icon templates__button-with-icon"
+                                disabled>
                             Выгрузить в excel
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary  hrm-button-with-printer-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary  hrm-button-with-printer-icon templates__button-with-icon"
+                                disabled>
                             Распечатать
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_negative hrm-button-with-trash-icon templates__button-with-icon"
+                                disabled>
                             Удалить
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-settings-icon templates__button-with-icon"
+                                disabled>
                             Настроить столбцы
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-less-icon templates__button-with-icon"
+                                disabled>
                             Меньше информации
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-more-icon templates__button-with-icon"
+                                disabled>
                             Больше информации
                         </button>
 
-                        <button
-                                class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-route-icon  templates__button-with-icon" disabled>
+                        <button class="hrm-button hrm-button-with-icon hrm-button-with-icon--theme_secondary hrm-button-with-route-icon  templates__button-with-icon"
+                                disabled>
                             Пересчитать маршруты
                         </button>
                     </div>
@@ -1513,6 +1615,18 @@
                     levels: [1, 2]
                 },
             ]);
+
+            this.orderTypes = ko.observableArray([]);
+            this.orderTypesExclusionFlag = ko.observable(false);
+            this.orderTypes.subscribe(v => {
+                if (!v.length) this.orderTypesExclusionFlag(false);
+            });
+
+            this.dishes = ko.observableArray([]);
+            this.dishesExclusionFlag = ko.observable(false);
+            this.dishes.subscribe(v => {
+                if (!v.length) this.dishesExclusionFlag(false);
+            });
 
             this.openModal = (modalId, mode) => {
                 if (modalId === 'positions') {
