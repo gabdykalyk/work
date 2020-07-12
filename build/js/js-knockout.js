@@ -80,15 +80,32 @@ ko.bindingHandlers.select2 = {
     update: function (element, valueAccessor, allBindings) {
         const $element = $(element);
         const isMultiple = $element.prop('multiple');
+        const value = !isMultiple
+            ? allBindings.get('value')
+            : allBindings.get('selectedOptions');
 
-        if (!isMultiple) {
-            const valueObservable = allBindings()['value'];
-
-            if (valueObservable && ko.isObservable(valueObservable)) {
-                valueObservable.subscribe(v => {
-                    $element.val(v).trigger('change');
-                });
-            }
+        if (value !== undefined && ko.isObservable(value)) {
+            value.subscribe((v) => {
+                $element.trigger('change.select2');
+            });
         }
     }
+};
+
+ko.bindingHandlers.log = {
+    update: function (
+        element,
+        valueAccessor,
+        allBindings,
+        viewModel,
+        bindingContext,
+    ) {
+        console.group('log');
+        console.info('element', element);
+        console.info('valueAccessor', valueAccessor());
+        console.info('allBindings', allBindings());
+        console.info('viewModel', viewModel);
+        console.info('bindingContext', bindingContext);
+        console.groupEnd('log');
+    },
 };
