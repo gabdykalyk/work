@@ -40,6 +40,13 @@
     }
   }
 
+  &__filters--period_years &__filters-actions {
+    @media (max-width: 991px) {
+      width: 100%;
+      padding-top: 0;
+    }
+  }
+
   &__filters-actions-content {
     display: flex;
 
@@ -86,6 +93,14 @@
     }
   }
 
+  &__filters--period_months &__period-filter,
+  &__filters--period_weeks &__period-filter,
+  &__filters--period_days &__period-filter {
+    @media (max-width: 767px) {
+      width: 100%;
+    }
+  }
+
   &__day-picker-input-group {
     width: 100%;
     display: flex;
@@ -111,6 +126,28 @@
 
   &__day-picker-input-group-button {
     height: 100%;
+  }
+
+  &__day-picker-input-group-datepicker {
+    .datepicker-days {
+      table {
+        border-collapse: separate;
+      }
+
+      .day {
+        border-width: 1px;
+        border-radius: 3px;
+        border-style: solid;
+        border-color: transparent;
+
+        &:hover,
+        &.active {
+          background-color: #e6e6e6;
+          color: #000 !important;
+          border-color: #D3D3D3 !important;
+        }
+      }
+    }
   }
 
   &__week-picker-input-group {
@@ -142,22 +179,34 @@
 
   &__week-picker-input-group-datepicker {
     .datepicker-days {
-      tr:hover {
-        .day {
-          background-color: #eee;
-        }
+      table {
+        border-collapse: separate;
       }
 
       .day {
-        &:not(:first-child) {
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
+        border-width: 1px 0;
+        border-radius: 0;
+        border-style: solid;
+        border-color: transparent;
+
+        &:first-child {
+          border-left-width: 1px;
+          border-top-left-radius: 3px;
+          border-bottom-left-radius: 3px;
         }
 
-        &:not(:last-child) {
-          border-top-right-radius: 0;
-          border-bottom-right-radius: 0;
+        &:last-child {
+          border-right-width: 1px;
+          border-top-right-radius: 3px;
+          border-bottom-right-radius: 3px;
         }
+      }
+
+      tr:hover .day,
+      .day.active {
+        background-color: #e6e6e6;
+        color: #000 !important;
+        border-color: #D3D3D3 !important;
       }
     }
   }
@@ -243,6 +292,8 @@
   }
 
   &__month-picker-dropdown {
+    width: 0 !important;
+
     .select2-results__group {
       font-size: 12px !important;
     }
@@ -282,6 +333,12 @@
           margin-bottom: 10px;
         }
       }
+    }
+
+    .scroll-y {
+      margin-top: 14px;
+      margin-bottom: 14px;
+      height: calc(100% - 24px) !important;
     }
   }
 }

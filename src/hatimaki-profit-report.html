@@ -27,7 +27,7 @@
 						</div>
 						<hr class="hidden-xs hidden-sm">
 
-						<div class="profit-report__filters" data-bind="using: filters()">
+						<div class="profit-report__filters" data-bind="using: filters(), class: filtersClass">
 							<div class="row">
 								<div class="col-md-4 col-sm-5 col-xs-12 profit-report__filter profit-report__type-filter">
 									<div class="btn-group" data-toggle="buttons">
@@ -42,7 +42,7 @@
 									</div>
 								</div>
 
-								<div class="col-md-3 col-sm-3 col-xs-6 profit-report__filter">
+								<div class="col-md-3 col-sm-3 col-xs-6 profit-report__filter profit-report__period-filter">
 									<div class="form-group">
 										<label for="period">Период сравнения</label>
 										<select class="form-control" data-bind="value: period" id="period">
@@ -162,7 +162,7 @@
 									</div>
 								</div>
 
-								<div class="col-sm-4 col-xs-12 profit-report__filters-actions">
+								<div class="col-md-4 col-sm-6 col-xs-12 profit-report__filters-actions">
 									<div class="profit-report__filters-actions-content">
 										<button class="btn btn-default btn-p25 profit-report__filters-action profit-report__filters-clear-button"
 												data-bind="click: function () {$root.resetFilters();}">
@@ -279,6 +279,8 @@
 						this._$element = $(componentInfo.element);
 						this._$select = null;
 						this._$button = null;
+						this._selfUpdate = false;
+						this._isDatepickerVisible = false;
 
 						this.afterRender = function () {
 							this._$select = this._$element.find('.profit-report__day-picker-input-group-select');
@@ -286,28 +288,44 @@
 
 							this._$element.addClass('input-group profit-report__day-picker-input-group');
 
-							this._$element.find('.profit-report__day-picker-input-group-button').datepicker({
+							this._$button.datepicker({
 								language: 'ru',
 								multidate: true,
 								multidateSeparator: ', '
-							}).on('changeDate', (event) => {
-								this._$select.empty().trigger('change');
-
-								_.sortBy(event.dates, date => date.getTime()).forEach(value => {
-									const optionValue = moment(value).format('DD.MM.YYYY');
-
-									if (this._$select.find("option[value='" + optionValue + "']").length == 0) {
-										const newOption = new Option(optionValue, optionValue, true, true);
-										this._$select.append(newOption).trigger('change');
-									}
-								});
 							});
+
+							this._$button.on('show', () => this._isDatepickerVisible = true);
+							this._$button.on('hide', () => this._isDatepickerVisible = false);
+
+							this._$button.on('changeDate', (event) => {
+								if (!this._selfUpdate) {
+									this._$select.empty().trigger('change');
+
+									_.sortBy(event.dates, date => date.getTime()).forEach(value => {
+										const optionValue = moment(value).format('DD.MM.YYYY');
+
+										if (this._$select.find("option[value='" + optionValue + "']").length == 0) {
+											const newOption = new Option(optionValue, optionValue, true, true);
+											this._$select.append(newOption).trigger('change');
+										}
+									});
+								}
+
+								if (this._isDatepickerVisible) {
+									this._$button.datepicker('hide');
+									this._$button.datepicker('show');
+								}
+							});
+
+							this._$button.data('datepicker').picker.addClass('profit-report__day-picker-input-group-datepicker');
 
 							this._$select.on('select2:unselect', event => {
 								const value = event.params.data.id;
 								let dates = this._$button.datepicker('getDates');
 								dates = jQuery.grep(dates, date => moment(date).format('DD.MM.YYYY') != value);
+								this._selfUpdate = true;
 								this._$button.datepicker('setDates', dates);
+								this._selfUpdate = false;
 							});
 						}
 					});
@@ -326,7 +344,8 @@
 						this._$select = null;
 						this._$button = null;
 						this._previousDates = null;
-						this._selfUpdate = false
+						this._selfUpdate = false;
+						this._isDatepickerVisible = false;
 
 						this.afterRender = function () {
 							this._$select = this._$element.find('.profit-report__week-picker-input-group-select');
@@ -342,56 +361,61 @@
 
 							this._$button.data('datepicker').picker.addClass('profit-report__week-picker-input-group-datepicker');
 
+							this._$button.on('show', () => this._isDatepickerVisible = true);
+							this._$button.on('hide', () => this._isDatepickerVisible = false);
+
 							this._$button.on('changeDate', (event) => {
-								if (this._selfUpdate) {
-									this._previousDates = this._$button.datepicker('getDates');
-									return;
-								}
-
-								function getWeekDays(startOfWeek) {
-									return [
-										startOfWeek,
-										moment(startOfWeek).add(1, 'd').toDate(),
-										moment(startOfWeek).add(2, 'd').toDate(),
-										moment(startOfWeek).add(3, 'd').toDate(),
-										moment(startOfWeek).add(4, 'd').toDate(),
-										moment(startOfWeek).add(5, 'd').toDate(),
-										moment(startOfWeek).add(6, 'd').toDate(),
-									];
-								}
-
-								const addedDates = _.differenceBy(event.dates, this._previousDates, date => moment(date).format('DD.MM.YYYY'));
-								const removedDates = _.differenceBy(this._previousDates, event.dates, date => moment(date).format('DD.MM.YYYY'));
-
-								const dates = [...this._previousDates];
-
-								addedDates.forEach(date => getWeekDays(moment(date).startOf('isoWeek').toDate()).forEach(date => dates.push(date)));
-								removedDates.forEach(date => getWeekDays(moment(date).startOf('isoWeek').toDate()).forEach(date => {
-									_.remove(dates, d => date.getTime() === d.getTime());
-								}));
-
-								this._selfUpdate = true;
-								this._$button.datepicker('setDates', dates);
-								this._selfUpdate = false;
-
-								this._$select.empty().trigger('change');
-
-								_.chain(dates)
-								 .groupBy(date => moment(date).format('WW.YYYY'))
-								 .mapValues(dates => moment(dates[0]).startOf('isoWeek').toDate())
-								 .values()
-								 .sortBy(date => date.getTime())
-								 .value()
-								 .forEach(startOfWeek => {
-									const optionValue = moment(startOfWeek).format('DD.MM.YYYY')  + '–' + moment(startOfWeek).endOf('isoWeek').format('DD.MM.YYYY');
-
-									if (this._$select.find("option[value='" + optionValue + "']").length == 0) {
-										const newOption = new Option(optionValue, optionValue, true, true);
-										this._$select.append(newOption).trigger('change');
+								if (!this._selfUpdate) {
+									function getWeekDays(startOfWeek) {
+										return [
+											startOfWeek,
+											moment(startOfWeek).add(1, 'd').toDate(),
+											moment(startOfWeek).add(2, 'd').toDate(),
+											moment(startOfWeek).add(3, 'd').toDate(),
+											moment(startOfWeek).add(4, 'd').toDate(),
+											moment(startOfWeek).add(5, 'd').toDate(),
+											moment(startOfWeek).add(6, 'd').toDate(),
+										];
 									}
-								});
+
+									const addedDates = _.differenceBy(event.dates, this._previousDates, date => moment(date).format('DD.MM.YYYY'));
+									const removedDates = _.differenceBy(this._previousDates, event.dates, date => moment(date).format('DD.MM.YYYY'));
+
+									const dates = [...this._previousDates];
+
+									addedDates.forEach(date => getWeekDays(moment(date).startOf('isoWeek').toDate()).forEach(date => dates.push(date)));
+									removedDates.forEach(date => getWeekDays(moment(date).startOf('isoWeek').toDate()).forEach(date => {
+										_.remove(dates, d => date.getTime() === d.getTime());
+									}));
+
+									this._selfUpdate = true;
+									this._$button.datepicker('setDates', dates);
+									this._selfUpdate = false;
+
+									this._$select.empty().trigger('change');
+
+									_.chain(dates)
+									 .groupBy(date => moment(date).format('WW.YYYY'))
+									 .mapValues(dates => moment(dates[0]).startOf('isoWeek').toDate())
+									 .values()
+									 .sortBy(date => date.getTime())
+									 .value()
+									 .forEach(startOfWeek => {
+									 	const optionValue = moment(startOfWeek).format('DD.MM.YYYY') + '–' + moment(startOfWeek).endOf('isoWeek').format('DD.MM.YYYY');
+
+										if (this._$select.find("option[value='" + optionValue + "']").length == 0) {
+											const newOption = new Option(optionValue, optionValue, true, true);
+											this._$select.append(newOption).trigger('change');
+										}
+									});
+								}
 
 								this._previousDates = this._$button.datepicker('getDates');
+
+								if (this._isDatepickerVisible) {
+									this._$button.datepicker('hide');
+									this._$button.datepicker('show');
+								}
 							});
 
 							this._previousDates = this._$button.datepicker('getDates');
@@ -618,6 +642,15 @@
 					return true;
 				});
 
+				this.filtersClass = ko.pureComputed(() => {
+					switch (this.filters().period()) {
+						case '1': return 'profit-report__filters--period_years';
+						case '2': return 'profit-report__filters--period_months';
+						case '3': return 'profit-report__filters--period_weeks';
+						case '4': return 'profit-report__filters--period_days';
+					}
+				});
+
 				this.chartsState = ko.observable('hidden');
 				this.chartsData = ko.observable(null);
 
@@ -631,6 +664,8 @@
 					this.filters().weeks([]);
 					this.filters().days([]);
 					this.filters().branches([]);
+					this.chartsState('hidden');
+					this.chartsData(null);
 				};
 
 				this.submitFilters = function () {
