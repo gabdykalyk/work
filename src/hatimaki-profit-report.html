@@ -270,6 +270,35 @@
 	<script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
 
     <script type="text/javascript">
+		function getMonthName(month) {
+			switch (month) {
+				case 0: return 'Январь';
+				case 1: return 'Февраль';
+				case 2: return 'Март';
+				case 3: return 'Апрель';
+				case 4: return 'Май';
+				case 5: return 'Июнь';
+				case 6: return 'Июль';
+				case 7: return 'Август';
+				case 8: return 'Сентябрь';
+				case 9: return 'Октябрь';
+				case 10: return 'Ноябрь';
+				case 11: return 'Декабрь';
+			}
+		}
+
+		function getWeekdayName(weekday) {
+			switch (weekday) {
+				case 0: return 'пн';
+				case 1: return 'вт';
+				case 2: return 'ср';
+				case 3: return 'чт';
+				case 4: return 'пт';
+				case 5: return 'сб';
+				case 6: return 'вс';
+			}
+		}
+
 		ko.components.register('profit-report-day-picker-input-group', {
 			viewModel: {
 				createViewModel: function (params, componentInfo) {
@@ -446,6 +475,7 @@
 						this._$element = $(componentInfo.element);
 						this._title = params.title;
 						this._period = params.period;
+						this._groupBy = params.groupBy;
 						this._data = params.data;
 						this._id = _.uniqueId();
 						this._chart = null;
@@ -482,18 +512,12 @@
 											fontSize: '10px'
 										},
 										formatter: data => {
-											if (this._period === '1' || this._period === '2') {
+											if (this._period === '1' && this._groupBy === '2' || this._period === '2') {
 												return data.value + 1;
+											} else if (this._period === '1' && this._groupBy === '1') {
+												return getMonthName(data.value).toLowerCase().slice(0, 3);
 											} else if (this._period === '3') {
-												switch (data.value) {
-													case 0: return 'пн';
-													case 1: return 'вт';
-													case 2: return 'ср';
-													case 3: return 'чт';
-													case 4: return 'пт';
-													case 5: return 'сб';
-													case 6: return 'вс';
-												}
+												return getWeekdayName(data.value);
 											} else if (this._period === '4') {
 												return moment().startOf('d').add(data.value * 2, 'h').format('HH:mm');
 											}
@@ -674,6 +698,23 @@
 					if (this.isFiltersValid()) {
 						this.chartsState('loading');
 
+						// Ниже код, который генерирует данные для вёрстки.
+						// Данные необходимо передать в this.chartsData(data) в следующем формате:
+						// const data = {
+						// 	  period: '3',
+						// 	  groupBy: null,
+						// 	  charts: [{
+						// 		  title: 'Все филиалы',
+						// 		  data: [
+						// 		   	  {
+						// 			      name: '13.07.2020–19.07.2020',
+						// 				  values: [100, 123, 423, 1, 2134, 123, 54]
+						// 			  }
+						// 		  ]
+						// 	  }]
+						// };
+						// В values нужно передать значения в количестве, соответствующем выбранному периоду и группировке.
+
 						setTimeout(() => {
 							let periods = [];
 
@@ -695,7 +736,7 @@
 											if (this.filters().period() === '2') {
 												const parts = period.split('.');
 
-												return this.getMonthName(parts[0]).toLowerCase() + ' ' + parts[1];
+												return getMonthName(+parts[0] - 1).toLowerCase() + ' ' + parts[1];
 											} else {
 												return period;
 											}
@@ -742,7 +783,7 @@
 
 					const parts = state.id.split('.');
 
-					return this.getMonthName(parts[0]).toLowerCase().slice(0, 3);
+					return getMonthName(+parts[0] - 1).toLowerCase().slice(0, 3);
 				}.bind(this);
 
 				this.monthsFilterTemplateSelection = function(state) {
@@ -752,25 +793,8 @@
 
 					const parts = state.id.split('.');
 
-					return this.getMonthName(parts[0]) + ' ' + parts[1];
+					return getMonthName(+parts[0] - 1) + ' ' + parts[1];
 				}.bind(this);
-
-				this.getMonthName = function(month) {
-					switch (month) {
-						case '01': return 'Январь';
-						case '02': return 'Февраль';
-						case '03': return 'Март';
-						case '04': return 'Апрель';
-						case '05': return 'Май';
-						case '06': return 'Июнь';
-						case '07': return 'Июль';
-						case '08': return 'Август';
-						case '09': return 'Сентябрь';
-						case '10': return 'Октябрь';
-						case '11': return 'Ноябрь';
-						case '12': return 'Декабрь';
-					}
-				};
 			}
 
 			const viewModel = new ViewModel();
