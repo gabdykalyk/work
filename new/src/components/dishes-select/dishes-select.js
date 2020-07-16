@@ -235,14 +235,26 @@ ko.bindingHandlers.hrmLoadDishes = {
   init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
     const $element = $(element);
 
+    let value = allBindings.get('selectedOptions');
+
     ko.applyBindingsToDescendants(bindingContext, element);
 
     DishesSelect.load().then(() => {
       DishesSelect.render().then(() => {
         const selectClone = DishesSelect.html.cloneNode(true);
         $element.append($(selectClone).children());
+        let options = allBindings.get('selectedOptions');
+        $element.val(options());
       });
     });
+
+    $element.on('change.select2', () => {
+      let currentVal = value();
+      let newVal = $element.val();
+      if (currentVal.toString() !== newVal.toString()) {
+        value(newVal);
+      }
+    })
 
     return {
       controlsDescendantBindings: true
