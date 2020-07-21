@@ -1397,7 +1397,7 @@ ko.bindingHandlers.hrmLoadDishes = {
       if (errorStateMatcher === undefined) {
         errorStateMatcher = formControl => {
           return ko.pureComputed(() => {
-            return 'isValid' in formControl && !formControl.isValid();
+            return typeof formControl == 'function' && 'isValid' in formControl && !formControl.isValid();
           });
         };
       }
