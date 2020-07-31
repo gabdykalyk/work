@@ -437,12 +437,17 @@
 									</div>
 
 									<div class="col-md-4 col-sm-6 col-xs-12 profit-report__filter">
-										<div class="form-group" data-bind="css: { 'has-error': $root.isFiltersSubmitted() && !years.isValid() }">
+										<div class="form-group" data-bind="log, css: { 'has-error': $root.isFiltersSubmitted() && !years.isValid() }">
 											<label for="period">Годы <span class="profit-report__label-hint">(можно выбрать не более 5 значений)</span></label>
-											<select class="form-control" data-bind="selectedOptions: years, select2: {width: '100%', placeholder: 'Выберите значение'}" multiple id="years">
+											<select class="form-control" data-bind="
+
+											selectedOptions: years,
+											select2: {width: '100%', placeholder: 'Выберите значение'}" multiple id="years">
+
 												<!-- ko foreach: $root.yearsFilterOptions -->
 													<option data-bind="attr: {value: $data}, text: $data"></option>
 												<!-- /ko -->
+
 											</select>
 											<!-- ko if: $root.isFiltersSubmitted() && !years.isValid() -->
 												<span class="help-block" data-bind="text: years.error()"></span>
@@ -522,7 +527,7 @@
 								<div class="col-md-4 col-sm-6 col-xs-12 profit-report__filter">
 									<div class="form-group">
 										<label for="period">Филиалы</label>
-										<select class="form-control" data-bind="selectedOptions: branches, select2: {width: '100%', placeholder: 'Все филиалы'}" multiple id="branches">
+										<select class="form-control" data-bind="bindInner, selectedOptions: branches, select2: {width: '100%', placeholder: 'Все филиалы'}" multiple id="branches">
 											<!-- ko foreach: $root.branches -->
 												<option data-bind="attr: {value: id}, text: name"></option>
 											<!-- /ko -->
@@ -774,7 +779,14 @@
 	<script type="text/javascript" src="js/bootstrap-datepicker.ru.min.js"></script>
 	<script type="text/javascript" src="js/bootstrap-datetimepicker.min.js"></script>
 
-    <script type="text/javascript">
+		<script type="text/javascript">
+			ko.bindingHandlers.bindInner = {
+				init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+						ko.applyBindingsToDescendants(bindingContext, element);
+						return { controlsDescendantBindings: true };
+				}
+		};
+
 		function getMonthName(month) {
 			switch (month) {
 				case 0: return 'Январь';
@@ -810,11 +822,15 @@
 					return new (function () {
 						this.value = params !== undefined && 'value' in params ? params.value : null;
 
+
+
 						this._$element = $(componentInfo.element);
 						this._$select = null;
 						this._$button = null;
 						this._selfUpdate = false;
 						this._isDatepickerVisible = false;
+
+
 
 						this.afterRender = function () {
 							this._$select = this._$element.find('.profit-report__day-picker-input-group-select');
@@ -830,6 +846,15 @@
 
 							this._$button.on('show', () => this._isDatepickerVisible = true);
 							this._$button.on('hide', () => this._isDatepickerVisible = false);
+
+							this.value().forEach(v => {
+								const optionValue = v;
+
+								if (this._$select.find("option[value='" + optionValue + "']").length == 0) {
+									const newOption = new Option(optionValue, optionValue, true, true);
+									this._$select.append(newOption).trigger('change');
+								}
+							})
 
 							this._$button.on('changeDate', (event) => {
 								if (!this._selfUpdate) {
@@ -1082,7 +1107,7 @@
 						startDate.add(1, 'y');
 					}
 
-					return dates.map(date => date.getFullYear());
+					return dates.map(date => date.getFullYear()).reverse();
 				})();
 
 				this.monthsFilterOptions = (() => {
@@ -1101,6 +1126,7 @@
 							.mapValues(dates => dates.map(date => moment(date).format('MM')))
 							.entries()
 							.map(entry => ({year: entry[0], months: entry[1]}))
+							.reverse()
 							.value();
 				})();
 
@@ -1224,9 +1250,9 @@
 							let periods = [];
 
 							if (this.filters().period() === '1') {
-								periods = this.filters().years();
+								periods = this.filters().years().reverse();
 							} else if (this.filters().period() === '2') {
-								periods = this.filters().months();
+								periods = this.filters().months().reverse();
 							} else if (this.filters().period() === '3') {
 								periods = this.filters().weeks();
 							} else if (this.filters().period() === '4') {
