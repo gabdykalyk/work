@@ -437,7 +437,7 @@
 									</div>
 
 									<div class="col-md-4 col-sm-6 col-xs-12 profit-report__filter">
-										<div class="form-group" data-bind="log, css: { 'has-error': $root.isFiltersSubmitted() && !years.isValid() }">
+										<div class="form-group" data-bind="css: { 'has-error': $root.isFiltersSubmitted() && !years.isValid() }">
 											<label for="period">Годы <span class="profit-report__label-hint">(можно выбрать не более 5 значений)</span></label>
 											<select class="form-control" data-bind="
 
@@ -525,13 +525,22 @@
 								<!-- /ko -->
 
 								<div class="col-md-4 col-sm-6 col-xs-12 profit-report__filter">
-									<div class="form-group">
+									<div class="form-group" data-bind="css: {
+										'has-error': $root.isFiltersSubmitted() && !branches.isValid()
+									}">
 										<label for="period">Филиалы</label>
-										<select class="form-control" data-bind="bindInner, selectedOptions: branches, select2: {width: '100%', placeholder: 'Все филиалы'}" multiple id="branches">
-											<!-- ko foreach: $root.branches -->
-												<option data-bind="attr: {value: id}, text: name"></option>
+
+											<select class="form-control" data-bind="bindInner, selectedOptions: branches, select2: {width: '100%', placeholder: 'Все филиалы'}" multiple id="branches">
+												<!-- ko foreach: $root.branches -->
+													<option data-bind="attr: {value: id}, text: name"></option>
+												<!-- /ko -->
+											</select>
+
+											<!-- ko if: $root.isFiltersSubmitted() && !branches.isValid() -->
+											<span class="help-block" data-bind="text: branches.error()"></span>
 											<!-- /ko -->
-										</select>
+
+
 									</div>
 								</div>
 
@@ -1174,10 +1183,16 @@
 							message: 'Можно сравнить не более 5 периодов'
 						}
 					}),
-					branches: ko.observableArray([])
+					branches: ko.observableArray([]).extend({
+						required: {
+							message: 'Список филиалов пуст'
+						}
+					})
 				});
 
 				this.isFiltersValid = ko.pureComputed(() => {
+					if (!this.filters.branches.isValid()) return false;
+
 					if (this.filters().period() === '1' && !this.filters().years.isValid()) {
 						return false;
 					}
