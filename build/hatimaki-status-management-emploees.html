@@ -404,6 +404,8 @@
 							<div class="row">
 								<div class="col-md-7 col-sm-9 form-group">
 									<input class="form-control" id="status-emploees-search" type="text" placeholder="Поиск по названию" onkeyup="searchStr('status-emploees-search', 'status-management__table--emploees');">
+									<button type="button" class="btn btn-default isActive">Активные</button>
+									<button type="button" class="btn btn-default isActive">В архиве</button>
 								</div>
 								<div class="col-md-2 col-sm-3 form-group pull-right btn-add-status">
 									<button type="button" class="btn btn-primary btn-p25" data-toggle="modal" data-target="#addNewStatusEmploees">Создать статус</button>
@@ -427,6 +429,7 @@
 											<td>Нет</td>
 											<td class="cell-btns">
 												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -435,6 +438,7 @@
 											<td>Нет</td>
 											<td class="cell-btns">
 												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -443,6 +447,7 @@
 											<td>Нет</td>
 											<td class="cell-btns">
 												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -451,6 +456,7 @@
 											<td>Да</td>
 											<td class="cell-btns">
 												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -459,6 +465,7 @@
 											<td>Нет</td>
 											<td class="cell-btns">
 												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__dell" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -590,7 +597,48 @@
             }
         })
 		dragElements();
-    }
+	}
+	
+	//Архивация строки
+	function archive() {
+		let archive = document.querySelectorAll('.js-status-management__archive')
+		let notArchived = true;
+		for (let i = 0; i < archive.length; i ++) {
+			archive[i].addEventListener('click', (e)=> {
+				archive[i].classList.toggle('archived')
+				let td = archive[i].closest('tr')
+				for (let j = 0; j < td.children.length; j++) {
+					td.children[j].classList.toggle('archived')
+				}
+				let title = archive[i].getAttribute('title')
+				function isArchived() {
+					if (notArchived) {
+						archive[i].setAttribute('title', 'В архиве')
+						notArchived = !notArchived
+					} else if (!notArchived) {
+						archive[i].setAttribute('title', 'В архив')
+						notArchived = !notArchived
+					}
+				}
+				isArchived()
+				
+			})
+		}
+	}
+	archive()
+
+	//Переключение между активными и в архиве
+	function isActive() {
+		let active = document.querySelectorAll('.isActive')
+		for (let i = 0; i < active.length; i++) {
+			active[i].addEventListener('click', () => {
+				active[i].classList.toggle('active')
+				console.log('hello')
+			})
+		}
+	}
+	isActive()
+
 </script>
 </body>
 </html>
