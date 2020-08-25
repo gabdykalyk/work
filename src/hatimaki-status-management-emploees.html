@@ -34,11 +34,17 @@
 
 					<div class="tab-content">
 						<div role="tabpanel" class="tab-pane active" id="status-emploees">
-							<div class="row">
-								<div class="col-md-7 col-sm-9 form-group">
+							<div class="row search-status-bar">
+								<div class="col-md-7 col-sm-9 form-group search-status-bar__main">
 									<input class="form-control" id="status-emploees-search" type="text" placeholder="Поиск по названию" onkeyup="searchStr('status-emploees-search', 'status-management__table--emploees');">
-									<button type="button" class="btn btn-default isActive">Активные</button>
-									<button type="button" class="btn btn-default isActive">В архиве</button>
+									<div class="btn-group" data-toggle="buttons">
+										<label class="btn btn-default">
+											<input type="checkbox" autocomplete="off"> Активные
+										</label>
+										<label class="btn btn-default">
+											<input type="checkbox" autocomplete="off"> В архиве
+										</label>
+									</div>
 								</div>
 								<div class="col-md-2 col-sm-3 form-group pull-right btn-add-status">
 									<button type="button" class="btn btn-primary btn-p25" data-toggle="modal" data-target="#addNewStatusEmploees">Создать статус</button>
@@ -61,8 +67,8 @@
 											<td>Отпуск</td>
 											<td>Нет</td>
 											<td class="cell-btns">
-												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
-												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="far fa-pencil"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="far fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -70,8 +76,8 @@
 											<td>Отстранен от работы</td>
 											<td>Нет</td>
 											<td class="cell-btns">
-												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
-												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="far fa-pencil"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="far fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -79,8 +85,8 @@
 											<td>Работает</td>
 											<td>Нет</td>
 											<td class="cell-btns">
-												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
-												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="far fa-pencil"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="far fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -88,8 +94,8 @@
 											<td>Уволен</td>
 											<td>Да</td>
 											<td class="cell-btns">
-												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
-												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="far fa-pencil"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="far fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__del" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -97,8 +103,8 @@
 											<td>Стажировка</td>
 											<td>Нет</td>
 											<td class="cell-btns">
-												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="fas fa-pencil-alt"></i></i></button>
-												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="fas fa-archive"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30" title="Редактировать"><i class="far fa-pencil"></i></i></button>
+												<button type="button" class="btn btn-default btn-w-30 js-status-management__archive" title="В архив"><i class="far fa-archive"></i></i></button>
 												<button type="button" class="btn btn-default btn-w-30 js-status-management__dell" title="Удалить"><i class="fas fa-times"></i></button>
 											</td>
 										</tr>
@@ -201,10 +207,10 @@
 	//Архивация строки
 	function archive() {
 		let archive = document.querySelectorAll('.js-status-management__archive')
-		let notArchived = true;
 		for (let i = 0; i < archive.length; i ++) {
+			let notArchived = true;
 			archive[i].addEventListener('click', (e)=> {
-				archive[i].classList.toggle('archived')
+				archive[i].classList.toggle('archived-icon')
 				let td = archive[i].closest('tr')
 				for (let j = 0; j < td.children.length; j++) {
 					td.children[j].classList.toggle('archived')
@@ -225,19 +231,6 @@
 		}
 	}
 	archive()
-
-	//Переключение между активными и в архиве
-	function isActive() {
-		let active = document.querySelectorAll('.isActive')
-		for (let i = 0; i < active.length; i++) {
-			active[i].addEventListener('click', () => {
-				active[i].classList.toggle('active')
-				console.log('hello')
-			})
-		}
-	}
-	isActive()
-
 </script>
 </body>
 </html>
